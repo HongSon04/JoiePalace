@@ -1,5 +1,5 @@
 function page() {
-  return <h1>Hello next! We are Joie Palace</h1>;
+  return <h1>Ăng nhăng nhăng</h1>;
 }
 
 export default page;
