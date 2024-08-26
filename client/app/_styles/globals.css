@@ -126,6 +126,7 @@
 *:after {
   box-sizing: border-box;
   font-family: 'Gilroy', sans-serif;
+  transition: all 0.1s ease;
 }
 
 * {
@@ -181,6 +182,7 @@ body {
     backdrop-filter: blur(20px);
   }
 }
+<<<<<<< HEAD
 .bgYellow::before {
   content: "";
   position: absolute;
@@ -269,4 +271,19 @@ body {
 }
 .fp-watermark{
   display: none;
+=======
+
+@layer utilities {
+  .glass {
+    @apply bg-white bg-opacity-10 backdrop-blur-md;
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .admin-main {
+    min-height: calc(100vh);
+  }
+>>>>>>> 2a6523aaed153fe49521fadb3805fb63149c8b77
 }

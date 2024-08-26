@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from 'react';
 import fullpage from 'fullpage.js';
-import 'fullpage.js/dist/fullpage.css'; // Import fullpage.js CSS
+import 'fullpage.js/dist/fullpage.css'; 
 
 function Event() {
     useEffect(() => {
