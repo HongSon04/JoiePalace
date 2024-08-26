@@ -181,3 +181,7 @@ body {
     backdrop-filter: blur(20px);
   }
 }
+body::-webkit-scrollbar {
+  display: none;
+  /* Ẩn thanh cuộn trên Chrome, Safari */
+}
