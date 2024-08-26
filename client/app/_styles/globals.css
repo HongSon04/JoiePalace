@@ -181,3 +181,92 @@ body {
     backdrop-filter: blur(20px);
   }
 }
+.bgYellow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #B5905B;
+  z-index: 2;
+}
+
+.bgYellow::after {
+  content: "";  
+  position: absolute;
+  right: 70%;
+  top: 100px;
+  height: 50%;
+  width: 200px;
+  background-image: url(https://whitepalace.com.vn/wp-content/themes/whiteplace/images/icons/line-group.svg);
+  z-index: 1;
+}
+.mouse-btn {
+  margin: 10px auto;
+  width: 30px;
+  height: 60px;
+  border: 3px solid white;
+  border-radius: 20px;
+  display: flex;
+}
+
+.mouse-scroll {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(170deg, rgba(122, 122, 124, 0.918), rgb(123, 124, 124));
+  border-radius: 50%;
+  margin: auto;
+  animation: scrolling13 1s linear infinite;
+}
+
+@keyframes scrolling13 {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(20px);
+  }
+}
+.ball{
+  animation: float612 1.5s ease-in-out infinite;
+}
+@keyframes float612 {
+  0% {
+    transform: translatey(0px);
+  }
+
+  25% {
+    transform: translatey(-50px);
+  }
+
+  50% {
+    transform: translatey(25px);
+  }
+
+  75% {
+    transform: translatey(-25px);
+  }
+
+  100% {
+    transform: translatey(0px);
+  }
+}
+.content-event{
+  opacity: 0;
+  transform: translateY(50%);
+  animation: slideUp 1s ease-out forwards;
+}
+@keyframes slideUp {
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+.fp-watermark{
+  display: none;
+}
