@@ -3,7 +3,7 @@ export const metadata = {
 };
 
 function page() {
-  return <h1>Bảng điều khiển</h1>;
+  return <div className="">Bảng điều khiển</div>;
 }
 
 export default page;

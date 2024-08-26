@@ -16,6 +16,7 @@
     "@heroicons/react": "^2.1.5",
     "antd": "^5.20.2",
     "framer-motion": "^11.3.30",
+    "fullpage.js": "^4.0.28",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
@@ -23,6 +24,8 @@
     "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
+    "@types/node": "22.5.0",
+    "@types/react": "18.3.4",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",
