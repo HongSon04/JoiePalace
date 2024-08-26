@@ -126,6 +126,7 @@
 *:after {
   box-sizing: border-box;
   font-family: 'Gilroy', sans-serif;
+  transition: all 0.1s ease;
 }
 
 * {
@@ -179,5 +180,19 @@ body {
     gap: 30px;
     background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
     backdrop-filter: blur(20px);
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white bg-opacity-10 backdrop-blur-md;
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .admin-main {
+    min-height: calc(100vh);
   }
 }

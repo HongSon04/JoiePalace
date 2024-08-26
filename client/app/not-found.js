@@ -1,11 +1,16 @@
 "use client";
 
+import { Button } from "@chakra-ui/react";
 import React from "react";
+
+export const metadata = {
+  title: "404 Not Found",
+};
 
 function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-blue-500 to-purple-500">
-      <div className="bg-white bg-opacity-20 p-8 rounded-lg shadow-lg">
+      <div className="bg-white bg-opacity-20 p-8 rounded-lg shadow-lg flex flex-col items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-16 w-16 text-white mb-4"
@@ -18,10 +23,17 @@ function NotFound() {
             clipRule="evenodd"
           />
         </svg>
-        <h1 className="text-4xl font-bold text-white mb-4">404</h1>
         <p className="text-white text-lg">
           Oops! The page you&apos;re looking for doesn&apos;t exist.
         </p>
+        <h1 className="text-4xl font-bold text-white mb-4">404</h1>
+        <Button
+          colorScheme="white"
+          variant="outline"
+          className="!bg-white !text-dark font-semibold p-5 rounded-full"
+        >
+          Trang chủ
+        </Button>
       </div>
     </div>
   );
