@@ -1,8 +1,0 @@
-.menu {
-    top: -100vh;
-    transition: all 0.3s ease-in;
-    /* transition: 0.22s cubic-bezier(0.23, 1, 0.320, 1); */
-}
-.showMenu {
-    top: 0;
-}
