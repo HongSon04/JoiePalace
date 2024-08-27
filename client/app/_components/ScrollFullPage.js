@@ -10,7 +10,7 @@ const ScrollFullPage = ({ children }) => {
       autoScrolling: true,
       scrollHorizontally: true,
       scrollingSpeed: 1500,
-      easingcss3: "cubic-bezier(0.6, 0, 0.2, 1)",
+      easingcss3: "cubic-bezier(0.8, 0, 0.1, 1)",
     });
     return () => {
       if (window.fullpage_api) {
