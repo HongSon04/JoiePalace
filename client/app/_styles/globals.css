@@ -1,0 +1,281 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Heavy.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Heavy Italic.otf") format("opentype");
+  font-weight: 950;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Black.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Black Italic.otf") format("opentype");
+  font-weight: 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy XBold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy XBold Italic.otf") format("opentype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Bold Italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy SemiBold Italic.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Light Italic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Xlight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Xlight Italic.otf") format("opentype");
+  font-weight: 200;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Thin.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url("../../fonts/gilroy/SVN-Gilroy Thin Italic.otf") format("opentype");
+  font-weight: 100;
+  font-style: italic;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  font-family: 'Gilroy', sans-serif;
+  transition: all 0.1s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+/* :root {} */
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+select,
+textarea {
+  background-color: transparent;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+  outline: none;
+  border: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+}
+
+@layer components {
+  .bg-primary {
+    background-color: #022C25;
+  }
+
+  .admin-panel {
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 0;
+    gap: 30px;
+    background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(20px);
+  }
+}
+body::-webkit-scrollbar {
+  display: none;
+  /* Ẩn thanh cuộn trên Chrome, Safari */
+}
+.bgYellow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #B5905B;
+  z-index: 2;
+}
+
+.bgYellow::after {
+  content: "";  
+  position: absolute;
+  right: 70%;
+  top: 100px;
+  height: 50%;
+  width: 200px;
+  background-image: url(https://whitepalace.com.vn/wp-content/themes/whiteplace/images/icons/line-group.svg);
+  z-index: 1;
+}
+.mouse-btn {
+  margin: 10px auto;
+  width: 30px;
+  height: 60px;
+  border: 3px solid white;
+  border-radius: 20px;
+  display: flex;
+}
+
+.mouse-scroll {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(170deg, rgba(122, 122, 124, 0.918), rgb(123, 124, 124));
+  border-radius: 50%;
+  margin: auto;
+  animation: scrolling13 1s linear infinite;
+}
+
+@keyframes scrolling13 {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(20px);
+  }
+}
+.ball{
+  animation: float612 1.5s ease-in-out infinite;
+}
+@keyframes float612 {
+  0% {
+    transform: translatey(0px);
+  }
+
+  25% {
+    transform: translatey(-50px);
+  }
+
+  50% {
+    transform: translatey(25px);
+  }
+
+  75% {
+    transform: translatey(-25px);
+  }
+
+  100% {
+    transform: translatey(0px);
+  }
+}
+.content-event{
+  opacity: 0;
+  transform: translateY(50%);
+  animation: slideUp 1s ease-out forwards;
+}
+@keyframes slideUp {
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+.fp-watermark{
+  display: none;
+}
+
+.fp-overflow {
+  overflow: hidden !important;
+}
