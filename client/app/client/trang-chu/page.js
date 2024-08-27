@@ -6,8 +6,9 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "@/app/_styles/index.css";
-
+import ScrollFullPage from "@/app/_components/ScrollFullPage";
 const bannerImages = ["/banner-2.png", "/banner.png"];
+
 function Home() {
   const textContainerVariants = {
     hidden: { opacity: 0, y: 50 },
@@ -31,8 +32,8 @@ function Home() {
     cssEase: "ease-in-out",
   };
   return (
-    <main className="w-full min-h-screen flex flex-col">
-      <div className="banner w-full h-screen relative top-0 left-0">
+    <ScrollFullPage>
+      <section className="section banner w-full h-screen relative top-0 left-0">
         <div className="w-full h-full">
           <Slider {...bannerSliderSettings}>
             {bannerImages.map((image, index) => (
@@ -77,8 +78,9 @@ function Home() {
             <Image className="" src={mouseIcon} layout="" alt="My Image" />
           </motion.div>
         </div>
-      </div>
-    </main>
+      </section>
+      <section className="section w-screen h-screen bg-black"></section>
+    </ScrollFullPage>
   );
 }
 

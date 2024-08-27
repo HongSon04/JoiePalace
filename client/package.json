@@ -14,6 +14,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@heroicons/react": "^2.1.5",
+    "@react-spring/web": "^9.7.4",
     "antd": "^5.20.2",
     "framer-motion": "^11.3.30",
     "fullpage.js": "^4.0.28",

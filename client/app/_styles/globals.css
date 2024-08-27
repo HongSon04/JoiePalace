@@ -186,7 +186,6 @@ body::-webkit-scrollbar {
   display: none;
   /* Ẩn thanh cuộn trên Chrome, Safari */
 }
-<<<<<<< HEAD
 .bgYellow::before {
   content: "";
   position: absolute;
@@ -275,19 +274,8 @@ body::-webkit-scrollbar {
 }
 .fp-watermark{
   display: none;
-=======
+}
 
-@layer utilities {
-  .glass {
-    @apply bg-white bg-opacity-10 backdrop-blur-md;
-  }
-
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
-
-  .admin-main {
-    min-height: calc(100vh);
-  }
->>>>>>> 2a6523aaed153fe49521fadb3805fb63149c8b77
+.fp-overflow {
+  overflow: hidden !important;
 }
