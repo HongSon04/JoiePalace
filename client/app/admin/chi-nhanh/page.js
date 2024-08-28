@@ -1,4 +1,5 @@
 
+import AdminHeader from '@/app/_components/AdminHeader';
 import { Grid, Card, Image, Text, Stack, GridItem, Heading, Box } from '@chakra-ui/react';
 import { Col } from 'antd';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ export const metadata = {
 function PageChiNhanh() {
   return (
     <Box>
-      <Heading className='text-2xl font-bold leading-8'>Chi nhánh</Heading>
+    <AdminHeader showBackButton={false}  title={'Chi nhánh'} />
       <Stack alignItems="start" spacing="8" direction={'row'} className='mt-5' >
         <Heading as='h1' size='lg' className=''>Chi nhánh / </Heading>
       </Stack>

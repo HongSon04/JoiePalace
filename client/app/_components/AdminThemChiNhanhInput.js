@@ -31,18 +31,18 @@ const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title }) => {
                         />
                     )
                 ))}
-                <div className='w-full flex items-center justify-center mt-4'>
                     {inputs.length < 2 && (
-                        <Button
-                            onClick={handleAddInput}
-                            colorScheme="teal"
-                            size="lg"
-                            className='rounded-full size-5 p-5 bg-gray-600 flex items-center justify-center text-white font-medium text-xl'
-                        >
-                            +
-                        </Button>
+                        <div className='w-full flex items-center justify-center mt-4'>
+                                <Button
+                                    onClick={handleAddInput}
+                                    colorScheme="teal"
+                                    size="lg"
+                                    className='rounded-full size-5 p-5 bg-gray-600 flex items-center justify-center text-white font-medium text-xl'
+                                >
+                                    +
+                                </Button>
+                        </div>
                     )}
-                </div>
             </Stack>
         </div>
     );
