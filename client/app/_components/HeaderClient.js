@@ -1,6 +1,5 @@
-'use client'
-import { Col, Row } from "antd";
-import "@/app/_styles/header.css"
+"use client";
+import "@/app/_styles/header.css";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -29,8 +28,8 @@ const HeaderClient = () => {
         <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
+            width={24}
+            height={24}
             viewBox="0 0 16 16"
             fill="currentColor"
             className="hover:fill-[#C0995A]"
@@ -68,8 +67,6 @@ const HeaderClient = () => {
               fill="none"
             >
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
                 d="M2.40039 4.00001C2.40039 3.78784 2.48468 3.58436 2.63471 3.43433C2.78473 3.2843 2.98822 3.20001 3.20039 3.20001H12.8004C13.0126 3.20001 13.216 3.2843 13.3661 3.43433C13.5161 3.58436 13.6004 3.78784 13.6004 4.00001C13.6004 4.21219 13.5161 4.41567 13.3661 4.5657C13.216 4.71573 13.0126 4.80001 12.8004 4.80001H3.20039C2.98822 4.80001 2.78473 4.71573 2.63471 4.5657C2.48468 4.41567 2.40039 4.21219 2.40039 4.00001ZM2.40039 8.00001C2.40039 7.78784 2.48468 7.58436 2.63471 7.43433C2.78473 7.2843 2.98822 7.20001 3.20039 7.20001H12.8004C13.0126 7.20001 13.216 7.2843 13.3661 7.43433C13.5161 7.58436 13.6004 7.78784 13.6004 8.00001C13.6004 8.21219 13.5161 8.41567 13.3661 8.5657C13.216 8.71573 13.0126 8.80001 12.8004 8.80001H3.20039C2.98822 8.80001 2.78473 8.71573 2.63471 8.5657C2.48468 8.41567 2.40039 8.21219 2.40039 8.00001ZM7.20039 12C7.20039 11.7878 7.28468 11.5844 7.43471 11.4343C7.58473 11.2843 7.78822 11.2 8.00039 11.2H12.8004C13.0126 11.2 13.216 11.2843 13.3661 11.4343C13.5161 11.5844 13.6004 11.7878 13.6004 12C13.6004 12.2122 13.5161 12.4157 13.3661 12.5657C13.216 12.7157 13.0126 12.8 12.8004 12.8H8.00039C7.78822 12.8 7.58473 12.7157 7.43471 12.5657C7.28468 12.4157 7.20039 12.2122 7.20039 12Z"
                 fill="white"
               />
@@ -122,14 +119,14 @@ const HeaderClient = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 className="size-6"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
             </button>

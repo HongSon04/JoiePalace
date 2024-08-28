@@ -1,6 +1,8 @@
 import { Col, Row } from "antd";
+import 'fullpage.js/dist/fullpage.css';
 import HeaderClient from "../_components/HeaderClient";
 import Footer from "../_components/FooterClient";
+
 
 function layout({ children }) {
   return (
