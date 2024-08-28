@@ -1,5 +1,5 @@
 function page() {
-  return <h1>Ăng nhăng nhăng</h1>;
+  return <div>Home</div>;
 }
 
 export default page;
