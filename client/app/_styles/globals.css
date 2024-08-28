@@ -182,7 +182,6 @@ body {
     backdrop-filter: blur(20px);
   }
 }
-<<<<<<< HEAD
 .bgYellow::before {
   content: "";
   position: absolute;
@@ -222,6 +221,35 @@ body {
   margin: auto;
   animation: scrolling13 1s linear infinite;
 }
+
+.product-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card .group-hover\:translate-y-0 {
+  transform: translateY();
+}
+
+.product-card .group-hover\:translate-y-0,
+.product-card .group-hover\:-translate-y-6 {
+  transition: transform 0.3s ease, margin-bottom 0.3s ease;
+}
+
+.product-card .translate-y-full {
+  transform: translateY(100%);
+}
+
+.product-card .group-hover\:-translate-y-6,
+.product-card .group-hover\:translate-y-0 {
+  margin-bottom: 5px;
+}
+
+.product-card .translate-y-full {
+  margin-bottom: 0;
+}
+
+
 
 @keyframes scrolling13 {
   0% {
@@ -271,19 +299,4 @@ body {
 }
 .fp-watermark{
   display: none;
-=======
-
-@layer utilities {
-  .glass {
-    @apply bg-white bg-opacity-10 backdrop-blur-md;
-  }
-
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
-
-  .admin-main {
-    min-height: calc(100vh);
-  }
->>>>>>> 2a6523aaed153fe49521fadb3805fb63149c8b77
 }
