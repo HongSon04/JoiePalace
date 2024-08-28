@@ -181,11 +181,21 @@ body {
     background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
     backdrop-filter: blur(20px);
   }
+
+  .admin-main {
+    @apply min-h-[100vh]
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
 }
+
 body::-webkit-scrollbar {
   display: none;
   /* Ẩn thanh cuộn trên Chrome, Safari */
 }
+
 .bgYellow::before {
   content: "";
   position: absolute;
@@ -198,7 +208,7 @@ body::-webkit-scrollbar {
 }
 
 .bgYellow::after {
-  content: "";  
+  content: "";
   position: absolute;
   right: 70%;
   top: 100px;
@@ -213,10 +223,11 @@ body::-webkit-scrollbar {
   transform: translateY(50%);
   animation: slideUp 1s ease-out forwards;
 }
+
 @keyframes slideUp {
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 /* phần hiệu ứng khi out trang fullpage */

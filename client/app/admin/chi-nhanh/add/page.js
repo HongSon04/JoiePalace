@@ -21,13 +21,13 @@ const fields3 = [
   { type: 'textarea', placeholder: 'Mô tả' },
 ];
 
-function ChiNhanhChiTietPage() {
+function ChiNhanhAddPage() {
   return (
     <div>
       <AdminHeader showSearchForm={false} title={'Chi tiết chi nhánh'} />
       <Stack alignItems="start" spacing="8" direction={'row'} className='mt-5'>
         <Heading as='h1' size='lg'>Chi nhánh / </Heading>
-        <Text fontSize='5xl'>Chi tiết chi nhánh</Text>
+        <Text fontSize='5xl'>Thêm chi nhánh</Text>
       </Stack>
       <div className="flex gap-5 w-full mt-[30px]">
           <AdminThemChiNhanhInput fields={fields} title='Thông tin liên hệ'/>
@@ -45,4 +45,4 @@ function ChiNhanhChiTietPage() {
   );
 }
 
-export default ChiNhanhChiTietPage;
+export default ChiNhanhAddPage;

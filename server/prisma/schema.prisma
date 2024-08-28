@@ -24,6 +24,9 @@ model users {
   active         Boolean      @default(true)
   refresh_token  String?
   verify_at      DateTime?
+  deleted        Boolean      @default(false)
+  deleted_at     DateTime?
+  deleted_by     String?
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
   memberships_id Int?
@@ -38,6 +41,7 @@ model memberships {
   booking_totalAmount Int
   gifts               Json[]
   images              String[]
+  deleted             Boolean   @default(false)
   deleted_at          DateTime?
   deleted_by          String?
   created_at          DateTime  @default(now())
@@ -59,6 +63,7 @@ model locations {
   address    String
   phone      String
   rate       Int       @default(5)
+  deleted    Boolean   @default(false)
   deleted_at DateTime?
   deleted_by String?
   created_at DateTime  @default(now())
@@ -74,6 +79,9 @@ model staffs {
   phone        String
   payment_info String
   shift        String
+  deleted      Boolean   @default(false)
+  deleted_at   DateTime?
+  deleted_by   String?
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
 }
