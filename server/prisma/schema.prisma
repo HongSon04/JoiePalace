@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id             Int          @id @default(autoincrement())
+  username       String?
+  email          String       @unique
+  password       String
+  platform       String?
+  phone          String?
+  role           String       @default("user")
+  active         Boolean      @default(true)
+  refresh_token  String?
+  verify_at      DateTime?
+  deleted        Boolean      @default(false)
+  deleted_at     DateTime?
+  deleted_by     String?
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+  memberships_id Int?
+  memberships    memberships? @relation(fields: [memberships_id], references: [id])
+}
+
+model memberships {
+  id                  Int       @id @default(autoincrement())
+  name                String
+  decsription         String
+  booking_total       Int
+  booking_totalAmount Int
+  gifts               Json[]
+  images              String[]
+  deleted             Boolean   @default(false)
+  deleted_at          DateTime?
+  deleted_by          String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  users               users[]
+}
+
+model verify_tokens {
+  id         Int      @id @default(autoincrement())
+  email      String
+  token      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model locations {
+  id         Int       @id @default(autoincrement())
+  name       String
+  address    String
+  phone      String
+  rate       Int       @default(5)
+  deleted    Boolean   @default(false)
+  deleted_at DateTime?
+  deleted_by String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  staffs     staffs[]
+}
+
+model staffs {
+  id           Int       @id @default(autoincrement())
+  locations    locations @relation(fields: [locations_id], references: [id])
+  locations_id Int
+  name         String
+  phone        String
+  payment_info String
+  shift        String
+  deleted      Boolean   @default(false)
+  deleted_at   DateTime?
+  deleted_by   String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+}

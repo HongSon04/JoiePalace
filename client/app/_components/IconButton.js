@@ -1,6 +1,6 @@
 "use client";
 
-function IconButton({ onClick, className = "", children, size = "md" }) {
+function IconButton({ onClick, className = "", children, size = "md", type }) {
   const _size = {
     sm: "w-8 h-8",
     md: "w-10 h-10",
@@ -9,6 +9,7 @@ function IconButton({ onClick, className = "", children, size = "md" }) {
 
   return (
     <button
+      type={type}
       className={`flex-center rounded-full ${className} ${_size} glass hover:bg-whiteAlpha-300`}
       onClick={onClick}
     >
