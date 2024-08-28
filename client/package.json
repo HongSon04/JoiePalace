@@ -17,6 +17,7 @@
     "@react-spring/web": "^9.7.4",
     "antd": "^5.20.2",
     "framer-motion": "^11.3.30",
+    "fullpage.js": "^4.0.28",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
