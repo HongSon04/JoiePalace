@@ -1,4 +1,5 @@
-import { Heading, Stack, Button } from '@chakra-ui/react';
+'use client';
+import { Heading, Stack } from '@chakra-ui/react';
 import React, { useState } from 'react';
 
 const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title }) => {
@@ -11,6 +12,7 @@ const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title }) => {
         ]);
     };
 
+    
     return (
         <div className="p-4 w-[363px] bg-blackAlpha-100 rounded-lg h-fit">
             <Stack spacing={12}>
@@ -33,14 +35,12 @@ const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title }) => {
                 ))}
                     {inputs.length < 2 && (
                         <div className='w-full flex items-center justify-center mt-4'>
-                                <Button
+                                <button
                                     onClick={handleAddInput}
-                                    colorScheme="teal"
-                                    size="lg"
                                     className='rounded-full size-5 p-5 bg-gray-600 flex items-center justify-center text-white font-medium text-xl'
                                 >
                                     +
-                                </Button>
+                                </button>
                         </div>
                     )}
             </Stack>
