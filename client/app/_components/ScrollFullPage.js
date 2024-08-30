@@ -6,7 +6,6 @@ import "fullpage.js/dist/fullpage.css";
 const ScrollFullPage = ({ children }) => {
   useEffect(() => {
     new fullpage("#fullpage", {
-      licenseKey: "null",
       autoScrolling: true,
       scrollHorizontally: true,
       scrollingSpeed: 1500,
