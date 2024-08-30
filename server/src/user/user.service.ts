@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
+import { FilterDto } from 'helper/dto/Filter.dto';
 
 @Injectable()
 export class UserService {
@@ -182,6 +183,159 @@ export class UserService {
     });
     return {
       message: 'Cập nhật thông tin thành công',
+    };
+  }
+
+  // ! Get All User
+  async getAll(query: FilterDto) {
+    const page = Number(query.page) || 1;
+    const itemsPerPage = Number(query.itemsPerPage) || 10;
+    const search = query.search || '';
+    const skip = (page - 1) * itemsPerPage;
+
+    const [res, total] = await this.prismaService.$transaction([
+      this.prismaService.users.findMany({
+        where: {
+          deleted: false,
+          OR: [
+            {
+              username: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              phone: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+        skip,
+        take: itemsPerPage,
+      }),
+      this.prismaService.users.count({
+        where: {
+          OR: [
+            {
+              username: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              phone: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+      }),
+    ]);
+  }
+
+  // ! Get User By Id
+  async getById(id: number) {
+    const user = await this.prismaService.users.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+    }
+    const {
+      password,
+      refresh_token,
+      deleted,
+      deleted_at,
+      deleted_by,
+      ...userData
+    } = user;
+    return userData;
+  }
+
+  // ! Soft Delete User
+  async softDelete(reqUser: UserEntity, id: number) {
+    const user = await this.prismaService.users.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+    }
+    await this.prismaService.users.update({
+      where: {
+        id,
+      },
+      data: {
+        deleted: true,
+        deleted_at: new Date(),
+        deleted_by: reqUser.id as any,
+      },
+    });
+    return {
+      message: 'Xóa thành công',
+    };
+  }
+
+  // ! Restore User
+  async restore(id: number) {
+    const user = await this.prismaService.users.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+    }
+    await this.prismaService.users.update({
+      where: {
+        id,
+      },
+      data: {
+        deleted: false,
+        deleted_at: null,
+        deleted_by: null,
+      },
+    });
+    return {
+      message: 'Khôi phục thành công',
+    };
+  }
+
+  // ! Hard Delete User
+  async hardDelete(id: number) {
+    const user = await this.prismaService.users.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+    }
+    await this.prismaService.users.delete({
+      where: {
+        id,
+      },
+    });
+    return {
+      message: 'Xóa vĩnh viễn thành công',
     };
   }
 

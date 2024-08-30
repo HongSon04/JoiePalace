@@ -1,3 +1,5 @@
+"use client";
+
 // import custom components
 import IconButton from "./IconButton";
 
@@ -6,9 +8,9 @@ import Image from "next/image";
 
 // import icons
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import notificationIcon from "@/public/thong-bao.svg";
 import dashboardIcon from "@/public/bang-dieu-khien.svg";
 import SearchForm from "./SearchForm";
+import NotificationButton from "./NotificationButton";
 
 function AdminHeader({
   title,
@@ -37,16 +39,7 @@ function AdminHeader({
             />
           </IconButton>
         )}
-        {showNotificationButton && (
-          <IconButton>
-            <Image
-              src={notificationIcon}
-              width={20}
-              height={20}
-              alt="icon notification"
-            />
-          </IconButton>
-        )}
+        {showNotificationButton && <NotificationButton />}
       </div>
     </div>
   );

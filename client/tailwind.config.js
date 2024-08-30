@@ -10,10 +10,12 @@ module.exports = {
       fontFamily: {
         gilroy: ['Gilroy', 'sans-serif'],
       },
+
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        'custom-gradient': 'linear-gradient(180deg, rgba(255, 255, 255, 0.36) 0%, rgba(127, 127, 127, 0.24) 100%)',
       },
       content: [
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",
