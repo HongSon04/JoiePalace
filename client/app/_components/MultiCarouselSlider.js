@@ -1,5 +1,4 @@
 "use client";
-import "@/app/_styles/testSlider.css";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
