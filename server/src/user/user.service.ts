@@ -1,5 +1,10 @@
 import { User, User as UserEntity } from './entities/user.entity';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
@@ -9,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UserService {
@@ -16,11 +22,12 @@ export class UserService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
-  // ! Register
+  // ! Create User
   async create(createUserDto: CreateUserDto) {
-    const { username, email, password, phone, role } = createUserDto;
+    const { username, email, password, phone, role, avatar } = createUserDto;
 
     try {
       // ? Check email exist
@@ -30,7 +37,7 @@ export class UserService {
         },
       });
       if (findEmail) {
-        throw new HttpException('Email đã tồn tại', 400);
+        throw new HttpException('Email đã tồn tại', HttpStatus.BAD_REQUEST);
       }
       // ? hashed password
       const hashedPassword = this.hashedPassword(password);
@@ -42,54 +49,18 @@ export class UserService {
           password: hashedPassword,
           phone,
           role,
+          avatar,
         },
       });
-      // ? Generate token
-      const token = await this.generateToken(user);
+
       // ? Return token
-      return {
-        message: 'Đăng ký thành công',
-        token,
-      };
+      throw new HttpException('Tạo mới thành công', HttpStatus.CREATED);
     } catch (error) {
-      throw new HttpException(error.message, error.status);
-    }
-  }
-
-  // ! Login
-  async login(loginUserDto: LoginUserDto) {
-    const { email, password } = loginUserDto;
-    try {
-      // ? Check email exist
-      const user = await this.prismaService.users.findFirst({
-        where: {
-          email,
-        },
-      });
-
-      if (!user) {
-        throw new HttpException('Email không tồn tại', HttpStatus.BAD_REQUEST);
+      if (error instanceof HttpException) {
+        throw error;
       }
-      // ? Compare password
-      const comparePassword = await bcrypt.compare(password, user.password);
-      if (!comparePassword) {
-        throw new HttpException(
-          'Mật khẩu không chính xác',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      // ? Generate token
-      const token = await this.generateToken(user);
-      // ? Return token and user
-      const { password: userPassword, refresh_token, ...userData } = user;
-      return {
-        message: 'Đăng nhập thành công',
-        token,
-      };
-    } catch (error) {
-      throw new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      throw new InternalServerErrorException(
+        'Lỗi máy chủ, vui lòng thử lại sau !',
       );
     }
   }
@@ -98,11 +69,11 @@ export class UserService {
   async getProfile(reqUser: UserEntity) {
     const findUser = await this.prismaService.users.findUnique({
       where: {
-        id: reqUser.id,
+        id: Number(reqUser.id),
       },
     });
     const { password, refresh_token, ...user } = findUser;
-    return user;
+    throw new HttpException({ data: user }, HttpStatus.OK);
   }
 
   // ! Change Password
@@ -111,7 +82,7 @@ export class UserService {
     // ? Find user
     const findUser = await this.prismaService.users.findUnique({
       where: {
-        id: reqUser.id,
+        id: Number(reqUser.id),
       },
     });
     if (!findUser) {
@@ -147,15 +118,13 @@ export class UserService {
     const hashedPassword = this.hashedPassword(newPassword);
     await this.prismaService.users.update({
       where: {
-        id: reqUser.id,
+        id: Number(reqUser.id),
       },
       data: {
         password: hashedPassword,
       },
     });
-    return {
-      message: 'Đổi mật khẩu thành công',
-    };
+    throw new HttpException('Đổi mật khẩu thành công', HttpStatus.OK);
   }
 
   // ! Change Profile
@@ -164,7 +133,7 @@ export class UserService {
     // ? Find user
     const findUser = await this.prismaService.users.findUnique({
       where: {
-        id: reqUser.id,
+        id: Number(reqUser.id),
       },
     });
     if (!findUser) {
@@ -173,7 +142,7 @@ export class UserService {
     // ? Update user
     await this.prismaService.users.update({
       where: {
-        id: reqUser.id,
+        id: Number(reqUser.id),
       },
       data: {
         username,
@@ -181,9 +150,7 @@ export class UserService {
         role,
       },
     });
-    return {
-      message: 'Cập nhật thông tin thành công',
-    };
+    throw new HttpException('Cập nhật thông tin thành công', HttpStatus.OK);
   }
 
   // ! Get All User
@@ -191,7 +158,7 @@ export class UserService {
     const page = Number(query.page) || 1;
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
-    const skip = (page - 1) * itemsPerPage;
+    const skip = Number((page - 1) * itemsPerPage);
 
     const [res, total] = await this.prismaService.$transaction([
       this.prismaService.users.findMany({
@@ -246,13 +213,113 @@ export class UserService {
         },
       }),
     ]);
+
+    const lastPage = Math.ceil(total / itemsPerPage);
+    const nextPage = page >= lastPage ? null : page + 1;
+    const prevPage = page <= 1 ? null : page - 1;
+    throw new HttpException(
+      {
+        data: res,
+        pagination: {
+          total,
+          itemsPerPage,
+          lastPage,
+          nextPage,
+          prevPage,
+          currentPage: page,
+        },
+      },
+      HttpStatus.OK,
+    );
+  }
+
+  // ! Get All User Deleted
+  async getAllDeleted(query: FilterDto) {
+    const page = Number(query.page) || 1;
+    const itemsPerPage = Number(query.itemsPerPage) || 10;
+    const search = query.search || '';
+    const skip = Number((page - 1) * itemsPerPage);
+
+    const [res, total] = await this.prismaService.$transaction([
+      this.prismaService.users.findMany({
+        where: {
+          deleted: true,
+          OR: [
+            {
+              username: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              phone: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+        skip,
+        take: itemsPerPage,
+      }),
+      this.prismaService.users.count({
+        where: {
+          deleted: true,
+          OR: [
+            {
+              username: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              phone: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        },
+      }),
+    ]);
+
+    const lastPage = Math.ceil(total / itemsPerPage);
+    const nextPage = page >= lastPage ? null : page + 1;
+    const prevPage = page <= 1 ? null : page - 1;
+
+    throw new HttpException(
+      {
+        data: res,
+        pagination: {
+          total,
+          itemsPerPage,
+          lastPage,
+          nextPage,
+          prevPage,
+          currentPage: page,
+        },
+      },
+      HttpStatus.OK,
+    );
   }
 
   // ! Get User By Id
   async getById(id: number) {
     const user = await this.prismaService.users.findUnique({
       where: {
-        id,
+        id: Number(id),
       },
     });
     if (!user) {
@@ -266,14 +333,14 @@ export class UserService {
       deleted_by,
       ...userData
     } = user;
-    return userData;
+    throw new HttpException({ data: userData }, HttpStatus.OK);
   }
 
   // ! Soft Delete User
   async softDelete(reqUser: UserEntity, id: number) {
     const user = await this.prismaService.users.findUnique({
       where: {
-        id,
+        id: Number(id),
       },
     });
     if (!user) {
@@ -281,24 +348,22 @@ export class UserService {
     }
     await this.prismaService.users.update({
       where: {
-        id,
+        id: Number(id),
       },
       data: {
         deleted: true,
         deleted_at: new Date(),
-        deleted_by: reqUser.id as any,
+        deleted_by: Number(reqUser.id) as any,
       },
     });
-    return {
-      message: 'Xóa thành công',
-    };
+    throw new HttpException('Xóa thành công', HttpStatus.OK);
   }
 
   // ! Restore User
   async restore(id: number) {
     const user = await this.prismaService.users.findUnique({
       where: {
-        id,
+        id: Number(id),
       },
     });
     if (!user) {
@@ -306,7 +371,7 @@ export class UserService {
     }
     await this.prismaService.users.update({
       where: {
-        id,
+        id: Number(id),
       },
       data: {
         deleted: false,
@@ -314,29 +379,29 @@ export class UserService {
         deleted_by: null,
       },
     });
-    return {
-      message: 'Khôi phục thành công',
-    };
+    throw new HttpException('Khôi phục thành công', HttpStatus.OK);
   }
 
   // ! Hard Delete User
   async hardDelete(id: number) {
     const user = await this.prismaService.users.findUnique({
       where: {
-        id,
+        id: Number(id),
       },
     });
     if (!user) {
       throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
     }
+    // ? Delete Image
+    if (user.avatar) {
+      await this.cloudinaryService.deleteImageByUrl(user.avatar);
+    }
     await this.prismaService.users.delete({
       where: {
-        id,
+        id: Number(id),
       },
     });
-    return {
-      message: 'Xóa vĩnh viễn thành công',
-    };
+    throw new HttpException('Xóa vĩnh viễn thành công', HttpStatus.OK);
   }
 
   // ! Generate Token
