@@ -24,7 +24,7 @@ export class StagesController {
 
   // ! Create A New Stage
   @Post('create')
-  @ApiOperation({ summary: 'Tạo giai sảnh mới' })
+  @ApiOperation({ summary: 'Tạo sảnh mới' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {

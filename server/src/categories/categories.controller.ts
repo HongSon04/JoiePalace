@@ -48,40 +48,47 @@ export class CategoriesController {
   }
 
   // ! Get Category By Id
-  @Get('get/:id')
+  @Get('get/:category_id')
   @ApiOperation({ summary: 'Lấy thông tin danh mục theo ID' })
-  findOne(@Param('id') id: string) {
-    return this.categoriesService.findOne(+id);
+  findOne(@Param('category_id') id: number) {
+    return this.categoriesService.findOne(id);
+  }
+
+  // ! Get Category By Slug
+  @Get('get-slug/:slug')
+  @ApiOperation({ summary: 'Lấy thông tin danh mục theo slug' })
+  findOneBySlug(@Param('slug') slug: string) {
+    return this.categoriesService.findOneBySlug(slug);
   }
 
   // ! Update Category
-  @Patch('update/:id')
+  @Patch('update/:category_id')
   @ApiOperation({ summary: 'Cập nhật thông tin danh mục' })
   update(
-    @Param('id') id: number,
+    @Param('category_id') id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
   // ! Delete Category
-  @Delete('delete/:id')
+  @Delete('delete/:category_id')
   @ApiOperation({ summary: 'Xóa tạm thời danh mục' })
-  softDelete(@Request() req, @Param('id') id: number) {
+  softDelete(@Request() req, @Param('category_id') id: number) {
     return this.categoriesService.softDelete(req.user, id);
   }
 
   // ! Restore Category
-  @Post('restore/:id')
+  @Post('restore/:category_id')
   @ApiOperation({ summary: 'Khôi phục danh mục đã xóa' })
-  restore(@Param('id') id: number) {
+  restore(@Param('category_id') id: number) {
     return this.categoriesService.restore(id);
   }
 
   // ! Delete Category
-  @Delete('destroy/:id')
+  @Delete('destroy/:category_id')
   @ApiOperation({ summary: 'Xóa vĩnh viễn danh mục' })
-  remove(@Param('id') id: number) {
+  remove(@Param('category_id') id: number) {
     return this.categoriesService.destroy(id);
   }
 }

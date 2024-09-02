@@ -82,7 +82,7 @@ export class LocationsService {
       const { name, address, phone, email } = location;
 
       // Tạo slug cho địa điểm
-      const slug = await MakeSlugger(name);
+      const slug = MakeSlugger(name);
 
       // Tạo Location mới
       const createLocation = await this.prismaService.locations.create({
@@ -115,10 +115,13 @@ export class LocationsService {
       const bodySpace = {
         location_id: createLocation.id,
         name: location.spaces_name,
+        slug: MakeSlugger(location.spaces_name),
         description: location.spaces_description,
         images: locationImages.space_images,
       };
-      const createSpace = await this.spacesService.generateSpace(bodySpace);
+      const createSpace = await this.prismaService.spaces.create({
+        data: bodySpace,
+      });
 
       const { deleted, deleted_at, deleted_by, ...data } = createLocation;
       const result = {
@@ -361,6 +364,56 @@ export class LocationsService {
     };
 
     throw new HttpException({ data: result }, HttpStatus.OK);
+  }
+
+  // ! Get Location By Slug
+  async getLocationBySlug(slug: string) {
+    try {
+      const location = await this.prismaService.locations.findFirst({
+        where: {
+          slug,
+        },
+      });
+      if (!location) {
+        throw new HttpException(
+          'Địa điểm không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const location_detail =
+        await this.prismaService.location_details.findFirst({
+          where: {
+            location_id: location.id,
+          },
+        });
+
+      const spaces = await this.prismaService.spaces.findMany({
+        where: {
+          location_id: location.id,
+        },
+      });
+      const stages = await this.prismaService.stages.findMany({
+        where: {
+          location_id: location.id,
+        },
+      });
+      const { deleted, deleted_at, deleted_by, ...data } = location;
+      let result = {
+        ...data,
+        location_detail: location_detail,
+        space: spaces,
+        stages,
+      };
+
+      throw new HttpException({ data: result }, HttpStatus.OK);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+      );
+    }
   }
 
   // ! Update Location Info
@@ -667,68 +720,58 @@ export class LocationsService {
 
   // ! Delete Image By Url
   async deleteImageByUrl(url: any) {
-    // ! Tìm kiếm ảnh trong tất cả các bảng location, location_detail, spaces, stages
-    /* const location = await this.prismaService.locations.findMany({
-      where: {
-        images: {
-          has: url.image_url,
-        },
+    const models = [
+      { name: 'locations', imageField: 'images' },
+      {
+        name: 'location_details',
+        imageFields: ['slogan_images', 'diagram_images', 'equipment_images'],
       },
-    });
-    const locationDetail = await this.prismaService.location_details.findMany({
-      where: {
-        OR: [
-          {
-            slogan_images: {
-              has: url.image_url,
-            },
-          },
-          {
-            diagram_images: {
-              has: url.image_url,
-            },
-          },
-          {
-            equipment_images: {
-              has: url.image_url,
-            },
-          },
-        ],
-      },
-    });
-    const spaces = await this.prismaService.spaces.findMany({
-      where: {
-        images: {
-          has: url.image_url,
-        },
-      },
-    });
-    const stages = await this.prismaService.stages.findMany({
-      where: {
-        images: {
-          has: url.image_url,
-        },
-      },
-    });
+      { name: 'spaces', imageField: 'images' },
+      { name: 'stages', imageField: 'images' },
+    ];
 
-    // ! Tạo một hàm xử lý chung cho việc xóa ảnh
-    const deleteImages = async (entities: any[], extractImages: any) => {
-      const images = entities.flatMap(extractImages).filter(Boolean);
-      if (images.length > 0) {
-        await this.cloudinaryService.deleteMultipleImagesByUrl(images);
+    for (const model of models) {
+      const { name, imageField, imageFields } = model;
+
+      const records: any = imageField
+        ? await this.prismaService[name].findMany({
+            where: { [imageField]: { has: url } },
+          })
+        : await this.prismaService[name].findMany({
+            where: {
+              OR: imageFields.map((field) => ({
+                [field]: { has: url },
+              })),
+            },
+          });
+
+      if (records.length > 0) {
+        const updates = records.map(async (record: any) => {
+          const updatedData = imageField
+            ? {
+                [imageField]: {
+                  set: record[imageField].filter((img: string) => img !== url),
+                },
+              }
+            : imageFields.reduce((acc, field) => {
+                acc[field] = {
+                  set: record[field].filter((img: string) => img !== url),
+                };
+                return acc;
+              }, {});
+
+          return this.prismaService[name].update({
+            where: { id: record.id },
+            data: updatedData,
+          });
+        });
+
+        await Promise.all(updates);
+        await this.cloudinaryService.deleteImageByUrl(url);
+        throw new HttpException('Xóa ảnh thành công', HttpStatus.OK);
       }
-    };
+    }
 
-    // ! Xóa ảnh nếu có
-    await Promise.all([
-      deleteImages(location, (loc) => loc.images),
-      deleteImages(locationDetail, (loc) =>
-        [loc.slogan_images, loc.diagram_images, loc.equipment_images].flat(),
-      ),
-      deleteImages(spaces, (space) => space.images),
-      deleteImages(stages, (stage) => stage.images),
-    ]);
-
-    throw new HttpException('Xóa ảnh thành công', HttpStatus.OK); */
+    throw new HttpException('Ảnh không tồn tại', HttpStatus.BAD_REQUEST);
   }
 }

@@ -180,5 +180,4 @@ export class StaffsController {
   async hardDeleteStaff(@Param() staff_id: number) {
     return this.staffsService.hardDeleteStaff(staff_id);
   }
-
 }

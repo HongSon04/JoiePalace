@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
   Param,
@@ -57,9 +58,25 @@ export class SpacesController {
     return this.spacesService.createSpace(body, files);
   }
 
-  // ! generate Space From data location
-  async generateSpace(@Body() body: CreateSpaceDto): Promise<string> {
-    return this.spacesService.generateSpace(body);
+  // ! Find Spaces By Location ID
+  @Get('find-by-location/:location_id')
+  @ApiOperation({ summary: 'Tìm kiếm không gian theo ID địa điểm' })
+  async findSpacesByLocation(@Param('location_id') location_id: number) {
+    return this.spacesService.findSpacesByLocation(location_id);
+  }
+
+  // ! Find Space By ID
+  @Get('find/:space_id')
+  @ApiOperation({ summary: 'Tìm kiếm không gian theo ID' })
+  async findSpaceById(@Param('space_id') space_id: number) {
+    return this.spacesService.findSpaceById(space_id);
+  }
+
+  // ! Find Space By Slug
+  @Get('get-slug/:slug')
+  @ApiOperation({ summary: 'Tìm kiếm không gian theo slug' })
+  async findSpaceBySlug(@Param('slug') slug: string) {
+    return this.spacesService.findSpaceBySlug(slug);
   }
 
   // ? Update Space

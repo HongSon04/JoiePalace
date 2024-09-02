@@ -16,6 +16,7 @@ import { SpacesModule } from './spaces/spaces.module';
 import { StagesModule } from './stages/stages.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
+import { FoodsModule } from './foods/foods.module';
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -38,6 +39,7 @@ import { TagsModule } from './tags/tags.module';
     StagesModule,
     CategoriesModule,
     TagsModule,
+    FoodsModule,
   ],
   controllers: [AppController],
   providers: [

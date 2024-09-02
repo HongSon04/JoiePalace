@@ -61,7 +61,7 @@ model verify_tokens {
 model locations {
   id              Int                @id @default(autoincrement())
   name            String
-  slug            String
+  slug            String             @unique
   address         String
   phone           String
   email           String
@@ -109,6 +109,7 @@ model spaces {
   location    locations @relation(fields: [location_id], references: [id])
   location_id Int       @unique
   name        String
+  slug        String    @unique
   description String
   images      String[]
   created_at  DateTime  @default(now())
@@ -134,7 +135,7 @@ model staffs {
 model categories {
   id                Int       @id @default(autoincrement())
   name              String
-  slug              String
+  slug              String    @unique
   description       String
   short_description String?
   deleted           Boolean   @default(false)
@@ -145,31 +146,29 @@ model categories {
   foods             foods[]
 }
 
-model tags_name {
+model tags {
   id         Int      @id @default(autoincrement())
   name       String
-  slug       String
+  slug       String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  foodId     Int?
-  foods      foods?   @relation(fields: [foodsId], references: [id])
-  foodsId    Int?
+  foods      foods[]  @relation("FoodTags")
 }
 
 model foods {
-  id                Int         @id @default(autoincrement())
-  categories        categories  @relation(fields: [categories_id], references: [id])
-  categories_id     Int
+  id                Int        @id @default(autoincrement())
+  category_id       Int        @unique
+  categories        categories @relation(fields: [category_id], references: [id])
   name              String
-  slug              String
+  slug              String     @unique
   description       String
   short_description String?
   price             Int
   images            String[]
-  tags_name         tags_name[]
-  deleted           Boolean     @default(false)
+  tags              tags[]     @relation("FoodTags")
+  deleted           Boolean    @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
 }

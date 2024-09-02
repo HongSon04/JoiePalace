@@ -115,6 +115,15 @@ export class LocationsController {
     return this.locationsService.getLocationById(id);
   }
 
+  // ! Get Location By Slug
+  @Get('get-slug/:location_slug')
+  @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo Slug' })
+  async getLocationBySlug(
+    @Param('location_slug') slug: string,
+  ): Promise<LocationEntity | any> {
+    return this.locationsService.getLocationBySlug(slug);
+  }
+
   // ! Update Location Info
   @Patch('update/:location_id')
   @ApiOperation({ summary: 'Cập nhật thông tin chi nhánh' })
