@@ -21,6 +21,7 @@ module.exports = {
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
       ],
       colors: {
+        
         white: "#ffffff",
         black: "#000000",
         gold: "#B5905B",

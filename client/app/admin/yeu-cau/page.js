@@ -1,13 +1,13 @@
 // import custom components
 import AdminHeader from "@/app/_components/AdminHeader";
-
-// import`
+import { Suspense } from "react";
+import Loading from "../loading";
 
 function Page() {
   return (
-    <div>
+    <Suspense fallback={<Loading />}>
       <AdminHeader title={"Yêu cầu"} showSearchForm={false} />
-    </div>
+    </Suspense>
   );
 }
 
