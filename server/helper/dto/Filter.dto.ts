@@ -4,5 +4,4 @@ export class FilterDto {
   itemsPerPage: string;
 
   search: string;
-
 }

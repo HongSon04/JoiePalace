@@ -23,4 +23,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsEnum(Role, { message: 'Vai trò không hợp lệ' })
   role: string;
+
+  @ApiProperty()
+  avatar: string;
 }
