@@ -152,7 +152,6 @@ model tags {
   slug       String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  foods      foods[]  @relation("FoodTags")
 }
 
 model foods {
@@ -165,7 +164,7 @@ model foods {
   short_description String?
   price             Int
   images            String[]
-  tags              tags[]     @relation("FoodTags")
+  tags              Int[]
   deleted           Boolean    @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
