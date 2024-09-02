@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SpacesService } from './spaces.service';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
@@ -23,7 +23,8 @@ export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
 
   // ! Create A New Space
-  @Post('create/')
+  @Post('create')
+  @ApiOperation({ summary: 'Tạo không gian mới' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {
@@ -63,6 +64,7 @@ export class SpacesController {
 
   // ? Update Space
   @Patch('update/:space_id')
+  @ApiOperation({ summary: 'Cập nhật thông tin không gian' })
   async updateSpace(
     @Param('space_id') space_id: number,
     @Body() body: updateSpaceDto,
@@ -72,6 +74,7 @@ export class SpacesController {
 
   // ? Upload Space Images
   @Post('upload-images/:space_id')
+  @ApiOperation({ summary: 'Tải ảnh lên không gian' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {
@@ -106,6 +109,7 @@ export class SpacesController {
 
   // ! Delete Space Images
   @Delete('delete-images/:space_id')
+  @ApiOperation({ summary: 'Xóa ảnh không gian' })
   async deleteImages(
     @Param('space_id') space_id: number,
     @Body() body: DeleteImageDto,
@@ -114,7 +118,8 @@ export class SpacesController {
   }
 
   // ! Delete Space
-  @Delete('delete/:space_id')
+  @Delete('destroy/:space_id')
+  @ApiOperation({ summary: 'Xóa không gian vĩnh viễn' })
   async deleteSpace(@Param('space_id') space_id: number): Promise<string> {
     return this.spacesService.deleteSpace(space_id);
   }

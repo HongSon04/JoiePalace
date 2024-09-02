@@ -11,21 +11,13 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiCookieAuth,
-  ApiHeaders,
-  ApiOperation,
-  ApiProperty,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Request as RequestExpress } from 'express';
 import { isPublic } from 'decorator/auth.decorator';
 import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -37,6 +29,7 @@ export class AuthController {
 
   // ! Register
   @Post('register')
+  @ApiOperation({ summary: 'Người dùng tạo tài khoản' })
   @isPublic()
   create(@Body() createUserDto: CreateAuthUserDto) {
     return this.authService.register(createUserDto);
@@ -45,12 +38,14 @@ export class AuthController {
   // ! Login
   @Post('login')
   @isPublic()
+  @ApiOperation({ summary: 'Người dùng đăng nhập' })
   login(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
   }
 
   // ! Logout
   @Post('logout')
+  @ApiOperation({ summary: 'Người dùng đăng xuất' })
   logout(@Request() req) {
     return this.authService.logout(req.user);
   }
@@ -58,16 +53,17 @@ export class AuthController {
   // ! Refresh Token
   @Post('refresh-token')
   @isPublic()
-  @ApiOperation({ summary: 'Refresh access token from cookie' })
+  @ApiOperation({ summary: 'Làm mới token' })
   @ApiResponse({ status: 200, description: 'Access token refreshed' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  refreshToken(@Req() request: RequestExpress) {
-    const refreshToken = request.cookies['refresh_token'];
-    return this.authService.refreshToken(refreshToken);
+  refreshToken(@Body() body: RefreshTokenDto) {
+    const { refresh_token } = body;
+    return this.authService.refreshToken(refresh_token);
   }
 
   // ! Upload Avatar
   @Post('upload-avatar')
+  @ApiOperation({ summary: 'Người dùng tải ảnh đại diện' })
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {

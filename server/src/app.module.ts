@@ -14,6 +14,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { PrismaService } from './prisma.service';
 import { SpacesModule } from './spaces/spaces.module';
 import { StagesModule } from './stages/stages.module';
+import { CategoriesModule } from './categories/categories.module';
+import { TagsModule } from './tags/tags.module';
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -34,6 +36,8 @@ import { StagesModule } from './stages/stages.module';
     CloudinaryModule,
     SpacesModule,
     StagesModule,
+    CategoriesModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [

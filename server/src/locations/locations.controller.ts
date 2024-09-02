@@ -22,25 +22,19 @@ import {
   ImageUploadLocationDto,
 } from './dto/create-location.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
-import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import {
-  AnyFilesInterceptor,
-  FileFieldsInterceptor,
-} from '@nestjs/platform-express';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { DeleteImageDto } from './dto/delete-image.dto';
 
 @ApiTags('location')
 @UseGuards(AuthGuard)
 @Controller('location')
 export class LocationsController {
-  constructor(
-    private readonly locationsService: LocationsService,
-    private cloudinaryService: CloudinaryService,
-  ) {}
+  constructor(private readonly locationsService: LocationsService) {}
 
   // ! Create A New Location
+  @ApiOperation({ summary: 'Tạo chi nhánh mới' })
   @Post('create')
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -94,6 +88,7 @@ export class LocationsController {
 
   // ! Get All Locations
   @Get('get-all')
+  @ApiOperation({ summary: 'Lấy danh sách tất cả chi nhánh (trừ đã xóa tạm)' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -103,6 +98,7 @@ export class LocationsController {
 
   // ! Get All Locations (Deleted)
   @Get('get-all-deleted')
+  @ApiOperation({ summary: 'Lấy danh sách chi nhánh đã xóa tạm' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -112,6 +108,7 @@ export class LocationsController {
 
   // ! Get Location By Id
   @Get('get/:location_id')
+  @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo ID' })
   async getLocationById(
     @Param('location_id') id: number,
   ): Promise<LocationEntity | any> {
@@ -120,6 +117,7 @@ export class LocationsController {
 
   // ! Update Location Info
   @Patch('update/:location_id')
+  @ApiOperation({ summary: 'Cập nhật thông tin chi nhánh' })
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -173,7 +171,8 @@ export class LocationsController {
   }
 
   // ! Soft Delete Location
-  @Delete('soft-delete/:location_id')
+  @Delete('delete/:location_id')
+  @ApiOperation({ summary: 'Xóa tạm chi nhánh' })
   async softDeleteLocation(
     @Request() req,
     @Param('location_id') id: number,
@@ -183,18 +182,21 @@ export class LocationsController {
 
   // ! Restore Location
   @Post('restore/:location_id')
+  @ApiOperation({ summary: 'Khôi phục chi nhánh đã xóa tạm' })
   async restoreLocation(@Param('location_id') id: number): Promise<any> {
     return this.locationsService.restoreLocation(id);
   }
 
   // ! Hard Delete Location
-  @Delete('hard-delete/:location_id')
+  @Delete('destroy/:location_id')
+  @ApiOperation({ summary: 'Xóa vĩnh viễn chi nhánh' })
   async hardDeleteLocation(@Param('location_id') id: number): Promise<any> {
     return this.locationsService.hardDeleteLocation(id);
   }
 
   // ! Delete Image By Url
   @Delete('delete-image')
+  @ApiOperation({ summary: 'Xóa ảnh theo URL' })
   async deleteImageByUrl(@Body() image_url: DeleteImageDto): Promise<any> {
     return this.locationsService.deleteImageByUrl(image_url);
   }

@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
@@ -36,6 +36,7 @@ export class StaffsController {
 
   // ! Add Staff
   @Post('create')
+  @ApiOperation({ summary: 'Tạo nhân viên mới' })
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
@@ -76,6 +77,7 @@ export class StaffsController {
 
   // ! Get All Staff
   @Get('get-all')
+  @ApiOperation({ summary: 'Lấy danh sách nhân viên (trừ xóa tạm)' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -85,6 +87,7 @@ export class StaffsController {
 
   // ! Get All Staff Deleted
   @Get('get-all-deleted')
+  @ApiOperation({ summary: 'Lấy danh sách nhân viên đã xóa tạm' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -96,6 +99,7 @@ export class StaffsController {
 
   // ! Get Staff By Id
   @Get('get/:staff_id')
+  @ApiOperation({ summary: 'Lấy thông tin nhân viên theo id' })
   @ApiParam({ name: 'staff_id', required: true })
   async getStaffById(@Param() staff_id: number): Promise<StaffEntities | any> {
     return this.staffsService.getStaffById(staff_id);
@@ -103,6 +107,7 @@ export class StaffsController {
 
   // ! Update Staff
   @Post('update/:staff_id')
+  @ApiOperation({ summary: 'Cập nhật thông tin nhân viên' })
   async updateStaff(
     @Param('staff_id') staff_id: number,
     @Body() body: UpdateStaffDto,
@@ -112,6 +117,7 @@ export class StaffsController {
 
   // ! Update Avatar
   @Post('update-avatar/:staff_id')
+  @ApiOperation({ summary: 'Cập nhật ảnh đại diện nhân viên' })
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
@@ -153,6 +159,7 @@ export class StaffsController {
 
   // ! Delete Staff
   @Delete('delete/:staff_id')
+  @ApiOperation({ summary: 'Xóa tạm nhân viên' })
   @ApiParam({ name: 'staff_id', required: true })
   async deleteStaff(@Request() req: any, @Param() staff_id: number) {
     return this.staffsService.deleteStaff(req.user, staff_id);
@@ -160,25 +167,18 @@ export class StaffsController {
 
   // ! Restore Staff
   @Post('restore/:staff_id')
+  @ApiOperation({ summary: 'Khôi phục nhân viên đã xóa tạm' })
   @ApiParam({ name: 'staff_id', required: true })
   async restoreStaff(@Param() staff_id: number) {
     return this.staffsService.restoreStaff(staff_id);
   }
 
   // ! Hard Delete Staff
-  @Delete('hard-delete/:staff_id')
+  @Delete('destroy/:staff_id')
+  @ApiOperation({ summary: 'Xóa vĩnh viễn nhân viên' })
   @ApiParam({ name: 'staff_id', required: true })
   async hardDeleteStaff(@Param() staff_id: number) {
     return this.staffsService.hardDeleteStaff(staff_id);
   }
 
-  // ! Change Location Staff
-  @Post('change-location/:staff_id')
-  @ApiParam({ name: 'staff_id', required: true })
-  async changeLocationStaff(
-    @Param() staff_id: number,
-    @Body() body: ChangeLocationDto,
-  ) {
-    return this.staffsService.changeLocationStaff(staff_id, body);
-  }
 }
