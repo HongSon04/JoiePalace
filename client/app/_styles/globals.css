@@ -189,6 +189,15 @@ body {
   .flex-center {
     @apply flex items-center justify-center;
   }
+
+  .glass {
+    background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(20px);
+  }
+
+  .icon-button {
+    @apply flex-center rounded-full glass hover:bg-whiteAlpha-300
+  }
 }
 
 body::-webkit-scrollbar {

@@ -1,12 +1,12 @@
 "use client";
 
 // import react hooks
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 // import custom components
-import AdminSidebarNav from "./AdminSidebarNav";
-import AdminSidebarHeader from "./AdminSidebarHeader";
 import { Divider } from "@chakra-ui/react";
+import AdminSidebarHeader from "./AdminSidebarHeader";
+import AdminSidebarNav from "./AdminSidebarNav";
 
 function AdminSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
