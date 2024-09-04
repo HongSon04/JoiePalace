@@ -1,4 +1,4 @@
-import { User, User as UserEntity } from './entities/user.entity';
+import { User as UserEntity } from './entities/user.entity';
 import {
   HttpException,
   HttpStatus,
@@ -8,7 +8,6 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
-import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';

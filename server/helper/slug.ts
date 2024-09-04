@@ -10,3 +10,4 @@ export const MakeSlugger = (str: string): string => {
     trim: true, // ? Loại bỏ khoảng trắng ở đầu và cuối chuỗi
   });
 };
+

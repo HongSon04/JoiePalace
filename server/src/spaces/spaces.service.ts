@@ -18,6 +18,7 @@ export class SpacesService {
     private prismaService: PrismaService,
   ) {}
 
+  // ? Create space
   async createSpace(
     body: CreateSpaceDto,
     files: { images?: Express.Multer.File[] },
@@ -60,6 +61,7 @@ export class SpacesService {
     }
   }
 
+  // ? Find all spaces
   async findSpacesByLocation(location_id: number): Promise<string> {
     try {
       const spaces = await this.prismaService.spaces.findMany({
@@ -76,6 +78,7 @@ export class SpacesService {
     }
   }
 
+  // ? Update space
   async updateSpace(space_id: number, body: updateSpaceDto): Promise<string> {
     try {
       const { description, name } = body;
@@ -100,6 +103,7 @@ export class SpacesService {
     }
   }
 
+  // ? Find space by id
   async findSpaceById(space_id: number): Promise<string> {
     try {
       const space = await this.prismaService.spaces.findUnique({
@@ -116,6 +120,7 @@ export class SpacesService {
     }
   }
 
+  // ? Find space by slug
   async findSpaceBySlug(slug: string): Promise<string> {
     try {
       const space = await this.prismaService.spaces.findUnique({
@@ -132,6 +137,7 @@ export class SpacesService {
     }
   }
 
+  // ? Upload images
   async uploadImages(
     id: number,
     files: Express.Multer.File[],
@@ -173,6 +179,7 @@ export class SpacesService {
     }
   }
 
+  // ? Delete images
   async deleteImages(id: number, body: DeleteImageDto): Promise<string> {
     try {
       const { image_url } = body;
@@ -210,6 +217,7 @@ export class SpacesService {
     }
   }
 
+  // ? Delete space
   async deleteSpace(id: number): Promise<string> {
     try {
       const findSpace = await this.prismaService.spaces.findUnique({

@@ -12,6 +12,8 @@ export class FoodsService {
     private prismaService: PrismaService,
     private cloudinaryService: CloudinaryService,
   ) {}
+
+  // ! Create food
   async create(
     createFoodDto: CreateFoodDto,
     files: { images?: Express.Multer.File[] },
@@ -27,36 +29,48 @@ export class FoodsService {
       const { category_id, name, description, short_description, tags, price } =
         createFoodDto;
 
-      const findTags = await Promise.all(
-        tags.map(async (tagId) => {
-          const tag = await this.prismaService.tags.findUnique({
-            where: { id: tagId },
-          });
-          if (!tag) {
-            throw new HttpException(
-              'Tag không tồn tại',
-              HttpStatus.BAD_REQUEST,
-            );
-          }
-          return tag;
-        }),
-      );
-
-      if (findTags.length !== tags.length) {
-        throw new HttpException('Tag không tồn tại', HttpStatus.BAD_REQUEST);
+      // Validate inputs
+      if (!category_id || !name || !price) {
+        throw new HttpException(
+          'Thông tin không đầy đủ',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
-      // Kiểm tra danh mục
-      const findCategory = await this.prismaService.categories.findUnique({
-        where: { id: category_id },
+      // Check food existence
+      const existingFood = await this.prismaService.foods.findFirst({
+        where: { name },
       });
-      if (!findCategory) {
+      if (existingFood) {
+        throw new HttpException('Món ăn đã tồn tại', HttpStatus.BAD_REQUEST);
+      }
+
+      const tagsParse = JSON.parse(tags as any);
+
+      // Check tags existence
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tagsParse.map((tagId) => Number(tagId)) } },
+      });
+
+      if (existingTags.length !== tagsParse.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Check category existence
+      const existingCategory = await this.prismaService.categories.findUnique({
+        where: { id: Number(category_id) },
+      });
+      if (!existingCategory) {
         throw new HttpException(
           'Danh mục không tồn tại',
           HttpStatus.BAD_REQUEST,
         );
       }
 
+      // Upload images
       const uploadImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
@@ -66,17 +80,22 @@ export class FoodsService {
         throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
       }
 
+      // Create food
       const slug = MakeSlugger(name);
+      const tagsConnect = existingTags.map((tag) => ({ id: tag.id }));
+
       const createFood = await this.prismaService.foods.create({
         data: {
-          category_id,
+          category_id: Number(category_id),
           name,
           slug,
           description,
           short_description,
-          tags,
-          price,
+          price: Number(price),
           images: uploadImages as any,
+          tags: {
+            connect: tagsConnect,
+          },
         },
       });
 
@@ -88,10 +107,11 @@ export class FoodsService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException('Tạo món ăn thất bại', HttpStatus.BAD_REQUEST);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 
+  // ! Get all foods
   async findAll(query: FilterFoodDto) {
     const page = Number(query.page) || 1;
     const itemsPerPage = Number(query.itemsPerPage) || 10;
@@ -142,6 +162,7 @@ export class FoodsService {
         where: whereConditions,
         include: {
           categories: true, // Bao gồm thông tin danh mục
+          tags: true, // Bao gồm thông tin thẻ
         },
         skip,
         take: itemsPerPage,
@@ -154,30 +175,20 @@ export class FoodsService {
       }),
     ]);
 
-    const allTags = await this.prismaService.tags.findMany({
-      where: {
-        id: { in: foods.flatMap((food) => food.tags) },
-      },
-    });
-
-    const foodsWithTags = foods.map((food) => ({
-      ...food,
-      tags: allTags.filter((tag) => food.tags.includes(tag.id)),
-    }));
-
     const lastPage = Math.ceil(totalCount / itemsPerPage);
     const nextPage = page + 1 > lastPage ? null : page + 1;
     const prevPage = page - 1 <= 0 ? null : page - 1;
 
     throw new HttpException(
       {
-        data: foodsWithTags,
+        data: foods,
         pagination: { nextPage, prevPage, lastPage, currentPage: page },
       },
       HttpStatus.OK,
     );
   }
 
+  // ! Get all deleted foods
   async findAllDeleted(query: FilterFoodDto) {
     const page = Number(query.page) || 1;
     const itemsPerPage = Number(query.itemsPerPage) || 10;
@@ -228,6 +239,7 @@ export class FoodsService {
         where: whereConditions,
         include: {
           categories: true, // Bao gồm thông tin danh mục
+          tags: true, // Bao gồm thông tin thẻ
         },
         skip,
         take: itemsPerPage,
@@ -240,49 +252,33 @@ export class FoodsService {
       }),
     ]);
 
-    const allTags = await this.prismaService.tags.findMany({
-      where: {
-        id: { in: foods.flatMap((food) => food.tags) },
-      },
-    });
-
-    const foodsWithTags = foods.map((food) => ({
-      ...food,
-      tags: allTags.filter((tag) => food.tags.includes(tag.id)),
-    }));
-
     const lastPage = Math.ceil(totalCount / itemsPerPage);
     const nextPage = page + 1 > lastPage ? null : page + 1;
     const prevPage = page - 1 <= 0 ? null : page - 1;
 
     throw new HttpException(
       {
-        data: foodsWithTags,
+        data: foods,
         pagination: { nextPage, prevPage, lastPage, currentPage: page },
       },
       HttpStatus.OK,
     );
   }
 
+  // ! Get all foods by category
   async findOne(id: number) {
     try {
-      const food = await this.prismaService.foods.findUnique({
+      const food = await this.prismaService.foods.findFirst({
         where: { id },
         include: {
           categories: true,
+          tags: true,
         },
       });
-      const tags = await this.prismaService.tags.findMany({
-        where: {
-          id: { in: food.tags },
-        },
-      });
-
       throw new HttpException(
         {
           data: {
             ...food,
-            tags,
           },
         },
         HttpStatus.OK,
@@ -292,26 +288,20 @@ export class FoodsService {
     }
   }
 
+  // ! Get all foods by slug
   async findBySlug(slug: string) {
     try {
       const food = await this.prismaService.foods.findFirst({
         where: { slug },
         include: {
           categories: true,
-        },
-      });
-      const tags = await this.prismaService.tags.findMany({
-        where: {
-          id: { in: food.tags },
+          tags: true,
         },
       });
 
       throw new HttpException(
         {
-          data: {
-            ...food,
-            tags,
-          },
+          data: food,
         },
         HttpStatus.OK,
       );
@@ -320,6 +310,7 @@ export class FoodsService {
     }
   }
 
+  // ! Update food
   async update(
     id: number,
     updateFoodDto: UpdateFoodDto,
@@ -328,6 +319,8 @@ export class FoodsService {
     try {
       const { category_id, name, description, short_description, tags, price } =
         updateFoodDto;
+
+      // Check if food exists
       const findFood = await this.prismaService.foods.findUnique({
         where: { id },
       });
@@ -335,26 +328,31 @@ export class FoodsService {
         throw new HttpException('Món ăn không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      const findTags = await Promise.all(
-        tags.map(async (tagId) => {
-          const tag = await this.prismaService.tags.findUnique({
-            where: { id: tagId },
-          });
-          if (!tag) {
-            throw new HttpException(
-              'Tag không tồn tại',
-              HttpStatus.BAD_REQUEST,
-            );
-          }
-          return tag;
-        }),
-      );
-
-      if (findTags.length !== tags.length) {
-        throw new HttpException('Tag không tồn tại', HttpStatus.BAD_REQUEST);
+      // Check if name already exists, except for the current food
+      const findFoodByName = await this.prismaService.foods.findFirst({
+        where: { name, id: { not: id } },
+      });
+      if (findFoodByName) {
+        throw new HttpException(
+          'Tên món ăn đã tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
-      // Kiểm tra danh mục
+      // Parse tags and validate existence
+      const tagsParse = JSON.parse(tags as any);
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tagsParse.map((tagId) => Number(tagId)) } },
+      });
+
+      if (existingTags.length !== tagsParse.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Check category existence
       const findCategory = await this.prismaService.categories.findUnique({
         where: { id: category_id },
       });
@@ -364,8 +362,25 @@ export class FoodsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const slug = MakeSlugger(name);
 
+      const slug = MakeSlugger(name);
+      const tagsConnect = existingTags.map((tag) => ({ id: tag.id }));
+
+      // Prepare data for update
+      let updateData = {
+        category_id,
+        name,
+        slug,
+        description,
+        short_description,
+        price,
+        images: [],
+        tags: {
+          connect: tagsConnect,
+        },
+      };
+
+      // Upload images if present
       if (files.images) {
         const uploadImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
@@ -378,49 +393,31 @@ export class FoodsService {
             HttpStatus.BAD_REQUEST,
           );
         }
-        const updateFood = await this.prismaService.foods.update({
-          where: { id },
-          data: {
-            category_id,
-            name,
-            slug,
-            description,
-            short_description,
-            tags,
-            price,
-            images: uploadImages as any,
-          },
-        });
-        throw new HttpException(
-          { message: 'Tạo món ăn thành công', data: updateFood },
-          HttpStatus.CREATED,
-        );
-      } else {
-        const updateFood = await this.prismaService.foods.update({
-          where: { id },
-          data: {
-            category_id,
-            name,
-            slug,
-            description,
-            short_description,
-            tags,
-            price,
-          },
-        });
-        throw new HttpException(
-          { message: 'Tạo món ăn thành công', data: updateFood },
-          HttpStatus.CREATED,
-        );
+        updateData.images = uploadImages;
       }
+
+      // Perform update
+      const updatedFood = await this.prismaService.foods.update({
+        where: { id },
+        data: updateData,
+      });
+
+      throw new HttpException(
+        { message: 'Cập nhật món ăn thành công', data: updatedFood },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException('Tạo món ăn thất bại', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Cập nhật món ăn thất bại',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
+  // ! Remove food
   async removeFood(reqUser, id: number) {
     try {
       const findFood = await this.prismaService.foods.findUnique({
@@ -455,6 +452,7 @@ export class FoodsService {
     }
   }
 
+  // ! Restore food
   async restoreFood(id: number) {
     try {
       const findFood = await this.prismaService.foods.findUnique({
@@ -492,6 +490,7 @@ export class FoodsService {
     }
   }
 
+  // ! Destroy food
   async destroy(id: number) {
     try {
       const findFood = await this.prismaService.foods.findUnique({

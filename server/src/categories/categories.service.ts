@@ -8,10 +8,32 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 @Injectable()
 export class CategoriesService {
   constructor(private prismaService: PrismaService) {}
+
+  // ! Create Categories
   async create(createCategoryDto: CreateCategoryDto) {
     try {
       const { name, description, short_description } = createCategoryDto;
       const slug = MakeSlugger(name);
+      // ? Check Name and Slug
+      const findCategories = await this.prismaService.categories.findFirst({
+        where: {
+          OR: [
+            {
+              name,
+            },
+            {
+              slug,
+            },
+          ],
+        },
+      });
+      if (findCategories) {
+        throw new HttpException(
+          { message: 'Tên danh mục đã tồn tại' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      // ? Create Categories
       const categories = await this.prismaService.categories.create({
         data: {
           name,
@@ -35,6 +57,7 @@ export class CategoriesService {
     }
   }
 
+  // ! Get All Categories
   async findAll(query: FilterDto) {
     try {
       const page = Number(query.page) || 1;
@@ -126,6 +149,7 @@ export class CategoriesService {
     }
   }
 
+  // ! Get All Deleted Categories
   async findAllDeleted(query: FilterDto) {
     try {
       const page = Number(query.page) || 1;
@@ -217,9 +241,10 @@ export class CategoriesService {
     }
   }
 
-  findOne(id: number) {
+  // ! Get One Category
+  async findOne(id: number) {
     try {
-      const category = this.prismaService.categories.findUnique({
+      const category = await this.prismaService.categories.findUnique({
         where: {
           id,
         },
@@ -242,9 +267,10 @@ export class CategoriesService {
     }
   }
 
-  findOneBySlug(slug: string) {
+  // ! Get One Category By Slug
+  async findOneBySlug(slug: string) {
     try {
-      const category = this.prismaService.categories.findUnique({
+      const category = await this.prismaService.categories.findUnique({
         where: {
           slug,
         },
@@ -267,9 +293,11 @@ export class CategoriesService {
     }
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
+  // ! Update Categories
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
     try {
-      const findCategories = this.prismaService.categories.findUnique({
+      // ? Check Categories
+      const findCategories = await this.prismaService.categories.findUnique({
         where: {
           id,
         },
@@ -280,9 +308,31 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
+
       const { name, description, short_description } = updateCategoryDto;
       const slug = MakeSlugger(name);
-      const categories = this.prismaService.categories.update({
+      // ? Check Name and Slug
+      const findCategoriesByName =
+        await this.prismaService.categories.findFirst({
+          where: {
+            OR: [
+              {
+                name,
+              },
+              {
+                slug,
+              },
+            ],
+          },
+        });
+      if (findCategoriesByName) {
+        throw new HttpException(
+          { message: 'Tên danh mục đã tồn tại' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      // ? Update Categories
+      const categories = await this.prismaService.categories.update({
         where: {
           id,
         },
@@ -293,6 +343,7 @@ export class CategoriesService {
           short_description,
         },
       });
+
       throw new HttpException(
         { message: 'Cập nhật danh mục thành công', data: categories },
         HttpStatus.OK,
@@ -308,9 +359,11 @@ export class CategoriesService {
     }
   }
 
-  softDelete(reqUser, id: number) {
+  // ! Soft Delete Categories
+  async softDelete(reqUser, id: number) {
     try {
-      const findCategories = this.prismaService.categories.findUnique({
+      // ? Check Categories
+      const findCategories = await this.prismaService.categories.findUnique({
         where: {
           id,
         },
@@ -321,7 +374,8 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
-      const categories = this.prismaService.categories.update({
+      // ? Soft Delete Categories
+      const categories = await this.prismaService.categories.update({
         where: {
           id,
         },
@@ -346,9 +400,11 @@ export class CategoriesService {
     }
   }
 
+  // ! Restore Categories
   async restore(id: number) {
     try {
-      const findCategories = this.prismaService.categories.findUnique({
+      // ? Check Categories
+      const findCategories = await this.prismaService.categories.findUnique({
         where: {
           id,
         },
@@ -359,7 +415,8 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
-      const categories = this.prismaService.categories.update({
+      // ? Restore Categories
+      const categories = await this.prismaService.categories.update({
         where: {
           id,
         },
@@ -384,9 +441,11 @@ export class CategoriesService {
     }
   }
 
+  // ! Destroy Categories
   async destroy(id: number) {
     try {
-      const findCategories = this.prismaService.categories.findUnique({
+      // ? Check Categories
+      const findCategories = await this.prismaService.categories.findUnique({
         where: {
           id,
         },
@@ -397,7 +456,8 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
-      const categories = this.prismaService.categories.delete({
+      // ? Destroy Categories
+      const categories = await this.prismaService.categories.delete({
         where: {
           id,
         },

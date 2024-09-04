@@ -9,6 +9,7 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 export class TagsService {
   constructor(private prismaService: PrismaService) {}
 
+  // ! Create tag
   async create(createTagDto: CreateTagDto) {
     try {
       const { name } = createTagDto;
@@ -49,6 +50,7 @@ export class TagsService {
     }
   }
 
+  // ? Get all tags
   async findAll(query: FilterDto): Promise<any> {
     try {
       const page = Number(query.page) || 1;
@@ -106,6 +108,7 @@ export class TagsService {
     }
   }
 
+  // ? Get tag by id
   async findOne(id: number) {
     const tag = await this.prismaService.tags.findUnique({
       where: {
@@ -121,6 +124,7 @@ export class TagsService {
     throw new HttpException({ data: tag }, HttpStatus.OK);
   }
 
+  // ? Get tag by slug
   async findBySlug(slug: string) {
     const tag = await this.prismaService.tags.findFirst({
       where: {
@@ -136,6 +140,7 @@ export class TagsService {
     throw new HttpException({ data: tag }, HttpStatus.OK);
   }
 
+  // ? Update tag
   async update(id: number, updateTagDto: UpdateTagDto) {
     try {
       const { name } = updateTagDto;
@@ -175,6 +180,7 @@ export class TagsService {
     }
   }
 
+  // ? Remove tag
   async remove(id: number) {
     try {
       const findTag = await this.prismaService.tags.findUnique({
