@@ -1,5 +1,6 @@
 // import global css styles
 import "@/app/_styles/globals.css";
+import { Providers } from "./providers";
 
 // metadata for the layout
 export const metadata = {
@@ -14,7 +15,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="vn">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

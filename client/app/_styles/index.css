@@ -1,18 +1,43 @@
-.banner .slick-list {
+/* .slick-list {
     width: 100%;
     height: 100vh;
     position: relative;
 }
-.banner .slick-slider {
+.slick-slider {
     width: 100%;
     height: 100vh;
 }
-.banner .slick-slide {
+.slick-slide {
     width: 100vw !important;
     height: 100vh !important;
     user-select: none !important;
 }
-.banner .slick-slide img {
+.slick-slide img {
     width: 100vw !important;
     height: 100vh !important;
+} */
+#section-location .fp-overflow {
+    display: flex;
+}
+.location-section-item .location-image-bg {
+    background-position: center;
+}
+.location-name {
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+.location-detail {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+.location-section-item:hover .location-detail {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.location-section-item:hover .location-name {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+.react-multi-carousel-item {
+    width: 100vw !important;
 }

@@ -4,63 +4,94 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Patch,
   Post,
   Put,
   Query,
   Request,
-  UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { LoginUserDto } from './dto/login-user.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Roles } from 'decorator/roles.decorator';
+import { Role } from 'helper/role.enum';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
-  // ! Register
-  @UseGuards(AuthGuard)
-  @Post('register')
-  create(@Body() createUserDto: CreateUserDto) {
+  // ! Create User
+  @Post('create')
+  @ApiOperation({ summary: 'Quản trị viên tạo tài khoản' })
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new HttpException(
+              `Chỉ chấp nhận ảnh jpg, jpeg, png`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        } else {
+          const fileSize = parseInt(req.headers['content-length']);
+          if (fileSize > 1024 * 1024 * 5) {
+            return cb(
+              new HttpException(
+                'Kích thước ảnh tối đa 5MB',
+                HttpStatus.BAD_REQUEST,
+              ),
+              false,
+            );
+          } else {
+            cb(null, true);
+          }
+        }
+      },
+    }),
+  )
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (file) {
+      const avatar = await this.cloudinaryService.uploadFileToFolder(
+        file,
+        'joieplace/avatar',
+      );
+      createUserDto.avatar = avatar;
+    } else {
+      createUserDto.avatar = '';
+    }
     return this.userService.create(createUserDto);
   }
-  // ! Login
-  @Post('login')
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.userService.login(loginUserDto);
-  }
+
   // ! Get Profile
-  @UseGuards(AuthGuard)
   @Get('profile')
+  @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
   getProfile(@Request() req) {
     return this.userService.getProfile(req.user);
   }
-  // ! Change Password
-  @UseGuards(AuthGuard)
-  @Put('change-password')
-  changePassword(
-    @Request() req,
-    @Body()
-    body: ChangePasswordUserDto,
-  ) {
-    return this.userService.changePassword(req.user, body);
-  }
-  // ! Change Profile
-  @UseGuards(AuthGuard)
-  @Patch('change-profile')
-  changeProfile(@Request() req, @Body() body: ChangeProfileUserDto) {
-    return this.userService.changeProfile(req.user, body);
-  }
 
   // ! Get All User
-  @UseGuards(AuthGuard)
   @Get('get-all')
+  @ApiOperation({
+    summary: 'Lấy danh sách tài khoản (trừ tài khoản bị xóa tạm)',
+  })
+  @Roles(Role.ADMIN)
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -68,31 +99,59 @@ export class UserController {
     return this.userService.getAll(query);
   }
 
+  // ! Get All User Deleted
+  @Get('get-all-deleted')
+  @ApiOperation({ summary: 'Lấy danh sách tài khoản đã bị xóa tạm' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  getAllDeleted(@Query() query: FilterDto): Promise<any> {
+    return this.userService.getAllDeleted(query);
+  }
+
   // ! Get User By Id
-  @UseGuards(AuthGuard)
-  @Get('get/:id')
-  getById(@Query('id') id: number): Promise<any> {
+  @Get('get/:user_id')
+  @ApiOperation({ summary: 'Lấy thông tin tài khoản theo id' })
+  getById(@Query('user_id') id: number): Promise<any> {
     return this.userService.getById(id);
   }
 
+  // ! Change Password
+  @Put('change-password')
+  @ApiOperation({ summary: 'Thay đổi mật khẩu' })
+  changePassword(
+    @Request() req,
+    @Body()
+    body: ChangePasswordUserDto,
+  ) {
+    return this.userService.changePassword(req.user, body);
+  }
+
+  // ! Change Profile
+  @Patch('change-profile')
+  @ApiOperation({ summary: 'Thay đổi thông tin cá nhân' })
+  changeProfile(@Request() req, @Body() body: ChangeProfileUserDto) {
+    return this.userService.changeProfile(req.user, body);
+  }
+
   // ! Soft Delete User
-  @UseGuards(AuthGuard)
-  @Delete('soft-delete/:id')
-  softDelete(@Request() req, @Query('id') id: number): Promise<any> {
+  @Delete('delete/:user_id')
+  @ApiOperation({ summary: 'Xóa tài khoản tạm thời' })
+  softDelete(@Request() req, @Query('user_id') id: number): Promise<any> {
     return this.userService.softDelete(req.user, id);
   }
 
   // ! Restore User
-  @UseGuards(AuthGuard)
-  @Post('restore/:id')
-  restore(@Query('id') id: number): Promise<any> {
+  @Post('restore/:user_id')
+  @ApiOperation({ summary: 'Khôi phục tài khoản đã xóa tạm' })
+  restore(@Query('user_id') id: number): Promise<any> {
     return this.userService.restore(id);
   }
 
   // ! Hard Delete User
-  @UseGuards(AuthGuard)
-  @Delete('hard-delete/:id')
-  hardDelete(@Query('id') id: number): Promise<any> {
+  @Delete('destroy/:user_id')
+  @ApiOperation({ summary: 'Xóa vĩnh viễn tài khoản' })
+  hardDelete(@Query('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);
   }
 }

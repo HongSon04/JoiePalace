@@ -8,7 +8,6 @@ const ScrollFullPage = ({ children }) => {
     const textElements = document.querySelectorAll('.text-fade-in');
     const textElementsLefttoRight = document.querySelectorAll('.text-left-to-right');
     new fullpage("#fullpage", {
-      licenseKey: "null",
       autoScrolling: true,
       scrollHorizontally: true,
       scrollingSpeed: 1500,
