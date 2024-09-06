@@ -77,7 +77,7 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
                         <div className="flex items-center justify-center bg-blackAlpha-100 h-full rounded-lg">
                             <label
                                 htmlFor={inputId}
-                                className="flex items-center justify-center bg-whiteAlpha-100 mt-5 rounded-full p-5 size-5 text-xl font-semibold bg-gray-600 cursor-pointer transition-all"
+                                className="flex items-center justify-center mt-5 rounded-full p-5 size-5 text-xl font-semibold bg-gray-600 cursor-pointer transition-all"
                             >
                                 +
                             </label>

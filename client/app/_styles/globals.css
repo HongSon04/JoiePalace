@@ -168,7 +168,7 @@ body {
 
 @layer components {
   .bg-primary {
-    background-color: #022C25;
+    background-color: #022C25 !important;
   }
 
   .admin-panel {
@@ -198,6 +198,15 @@ body {
   .icon-button {
     @apply flex-center rounded-full glass hover:bg-whiteAlpha-300
   }
+
+  .silver-gradient {
+    background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+  }
+
+  .no-border,
+  .no-border * {
+    border: none !important;
+  }
 }
 
 body::-webkit-scrollbar {
@@ -226,8 +235,9 @@ body::-webkit-scrollbar {
   background-image: url(/line-group.svg);
   z-index: 1;
 }
+
 /* phần hiệu ứng khi in trang fullpage */
-.text-fade-in{
+.text-fade-in {
   opacity: 0;
   transform: translateY(50%);
   animation: slideUp 1s ease-out forwards;
@@ -239,27 +249,36 @@ body::-webkit-scrollbar {
     transform: translateY(0);
   }
 }
+
 /* phần hiệu ứng khi out trang fullpage */
 .text-fade-out {
   animation: fadeOut 1s forwards;
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(50px); }
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(50px);
+  }
 }
 
-.fp-watermark{
+.fp-watermark {
   display: none;
 }
 
 .fp-overflow {
   overflow: hidden !important;
 }
-.affterSS2::after{
-  content: "";  
+
+.affterSS2::after {
+  content: "";
   position: absolute;
-  left:0;
+  left: 0;
   top: 100px;
   height: 50%;
   width: 150px;
@@ -267,35 +286,47 @@ body::-webkit-scrollbar {
   background-size: cover;
   z-index: 1;
 }
+
 /* custom scrollbar  */
 .sectionEvent::-webkit-scrollbar {
   width: 7px;
 }
+
 .sectionEvent::-webkit-scrollbar-thumb {
   background: #011612;
   border-radius: 5px;
 }
 
 /* Hiệu ứng từ trái sang phải */
-.text-left-to-right{
+.text-left-to-right {
   opacity: 0;
   transform: translateX(-20%);
   animation: slideleft 1s ease-out forwards;
 }
+
 @keyframes slideleft {
   to {
-      opacity: 1;
-      transform: translateX(0);
+    opacity: 1;
+    transform: translateX(0);
   }
 }
+
 .text-left-to-right-out {
   animation: slideleftOut 1s forwards;
 }
 
 @keyframes slideleftOut {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateX(-20%); }
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-20%);
+  }
 }
+
 /* hiệu ứng từ phải sang trái */
 .text-right-to-left {
   opacity: 0;
@@ -310,3 +341,55 @@ body::-webkit-scrollbar {
   }
 }
 
+
+
+/* custom scrollbar  */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 100rem;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  border-right: 1px solid #5B5B5B;
+  border-left: 1px solid #5B5B5B;
+  border-bottom: 1px solid #5B5B5B;
+  overflow: hidden;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.table th,
+.table td {
+  /* display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 0 0;
+  align-self: stretch; */
+
+  border-top: 1px solid #5B5B5B;
+  border-left: 1px solid #5B5B5B;
+}
+
+.table th {
+  font-weight: 600;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table td {
+  padding: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  background: rgba(0, 0, 0, 0.2);
+}

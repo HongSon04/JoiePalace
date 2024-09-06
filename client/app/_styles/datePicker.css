@@ -1,0 +1,14 @@
+div[data-slot="input-wrapper"].bg-default-100 {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+div[data-slot="inner-wrapper"].text-default-400,
+div[data-slot="inner-wrapper"].text-default-400 * {
+  color: white !important;
+}
+
+span[data-slot="label"] {
+  color: white !important;
+  font-weight: bold !important;
+}
