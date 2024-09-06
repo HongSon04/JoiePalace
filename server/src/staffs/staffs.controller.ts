@@ -7,6 +7,7 @@ import {
   HttpException,
   Param,
   Post,
+  Put,
   Query,
   Request,
   UploadedFile,
@@ -166,7 +167,7 @@ export class StaffsController {
   }
 
   // ! Restore Staff
-  @Post('restore/:staff_id')
+  @Put('restore/:staff_id')
   @ApiOperation({ summary: 'Khôi phục nhân viên đã xóa tạm' })
   @ApiParam({ name: 'staff_id', required: true })
   async restoreStaff(@Param() staff_id: number) {

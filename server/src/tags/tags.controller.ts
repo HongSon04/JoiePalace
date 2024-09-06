@@ -42,7 +42,7 @@ export class TagsController {
     return this.tagsService.findOne(id);
   }
 
-  @Get('/get-slug/:slug')
+  @Get('/get-by-slug/:slug')
   @ApiOperation({ summary: 'Lấy tag theo slug' })
   findBySlug(@Param('slug') slug: string) {
     return this.tagsService.findBySlug(slug);

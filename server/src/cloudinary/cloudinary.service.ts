@@ -69,7 +69,9 @@ export class CloudinaryService {
     });
   }
 
-  deleteMultipleImagesByUrl(urls: string[] | any): Promise<CloudinaryResponse[]> {
+  deleteMultipleImagesByUrl(
+    urls: string[] | any,
+  ): Promise<CloudinaryResponse[]> {
     console.log('Deleting images with URLs:', urls);
     return Promise.all(urls.map((url) => this.deleteImageByUrl(url)));
   }

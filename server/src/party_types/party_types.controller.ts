@@ -1,0 +1,150 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  HttpException,
+  HttpStatus,
+  UploadedFiles,
+  Query,
+  Request,
+  Put,
+} from '@nestjs/common';
+import { PartyTypesService } from './party_types.service';
+import {
+  CreatePartyTypeDto,
+  ImagePartyTypesDto,
+} from './dto/create-party_type.dto';
+import { UpdatePartyTypeDto } from './dto/update-party_type.dto';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FilterDto } from 'helper/dto/Filter.dto';
+
+@ApiTags('party-types')
+@Controller('party-types')
+export class PartyTypesController {
+  constructor(private readonly partyTypesService: PartyTypesService) {}
+
+  // ! Create party type
+  @Post('create')
+  @ApiOperation({ summary: 'Tạo loại tiệc' })
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new HttpException(
+              'Chỉ chấp nhận ảnh jpg, jpeg, png',
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        } else if (file.size > 1024 * 1024 * 5) {
+          return cb(
+            new HttpException(
+              'Kích thước ảnh tối đa 5MB',
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        } else {
+          cb(null, true);
+        }
+      },
+    }),
+  )
+  create(
+    @Body() createPartyTypeDto: CreatePartyTypeDto,
+    @UploadedFiles() files: ImagePartyTypesDto,
+  ) {
+    return this.partyTypesService.create(createPartyTypeDto, files);
+  }
+
+  // ! Get all party types
+  @Get('get-all')
+  @ApiOperation({ summary: 'Lấy tất cả loại tiệc' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAll(@Query() query: FilterDto) {
+    return this.partyTypesService.findAll(query);
+  }
+
+  // ! Get all party types deleted
+  @Get('get-all-deleted')
+  @ApiOperation({ summary: 'Lấy tất cả loại tiệc đã xóa tạm' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllDeleted(@Query() query: FilterDto) {
+    return this.partyTypesService.findAllDeleted(query);
+  }
+
+  // ! Get party type by id
+  @Get('get/:party_types_id')
+  findOne(@Param('party_types_id') id: number) {
+    return this.partyTypesService.findOne(id);
+  }
+
+  // ! Get party type by slug
+  @Get('get-by-slug/:slug')
+  findBySlug(@Param('slug') slug: string) {
+    return this.partyTypesService.findBySlug(slug);
+  }
+  // ! Update party type
+  @Patch('update/:party_types_id')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new HttpException(
+              'Chỉ chấp nhận ảnh jpg, jpeg, png',
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        } else if (file.size > 1024 * 1024 * 5) {
+          return cb(
+            new HttpException(
+              'Kích thước ảnh tối đa 5MB',
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        } else {
+          cb(null, true);
+        }
+      },
+    }),
+  )
+  update(
+    @Param('party_types_id') id: number,
+    @Body() updatePartyTypeDto: UpdatePartyTypeDto,
+    files: ImagePartyTypesDto,
+  ) {
+    return this.partyTypesService.update(id, updatePartyTypeDto, files);
+  }
+
+  // ! Soft delete party type
+  @Delete('delete/:party_types_id')
+  remove(@Request() req, @Param('party_types_id') id: number) {
+    return this.partyTypesService.remove(req.user, id);
+  }
+
+  // ! Restore party type
+  @Put('restore/:party_types_id')
+  restore(@Param('party_types_id') id: number) {
+    return this.partyTypesService.restore(id);
+  }
+
+  // ! Hard delete party type
+  @Delete('hard-delete/:party_types_id')
+  destroy(@Param('party_types_id') id: number) {
+    return this.partyTypesService.destroy(id);
+  }
+}

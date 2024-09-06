@@ -17,6 +17,9 @@ import { StagesModule } from './stages/stages.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
 import { FoodsModule } from './foods/foods.module';
+import { MenusModule } from './menus/menus.module';
+import { DecorsModule } from './decors/decors.module';
+import { PartyTypesModule } from './party_types/party_types.module';
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -40,6 +43,9 @@ import { FoodsModule } from './foods/foods.module';
     CategoriesModule,
     TagsModule,
     FoodsModule,
+    MenusModule,
+    DecorsModule,
+    PartyTypesModule,
   ],
   controllers: [AppController],
   providers: [

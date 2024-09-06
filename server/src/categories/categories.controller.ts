@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Request,
+  Put,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -21,7 +22,7 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   // ! Add Category
-  @Post()
+  @Post('create')
   @ApiOperation({ summary: 'Tạo danh mục mới' })
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
@@ -55,7 +56,7 @@ export class CategoriesController {
   }
 
   // ! Get Category By Slug
-  @Get('get-slug/:slug')
+  @Get('get-by-slug/:slug')
   @ApiOperation({ summary: 'Lấy thông tin danh mục theo slug' })
   findOneBySlug(@Param('slug') slug: string) {
     return this.categoriesService.findOneBySlug(slug);
@@ -79,7 +80,7 @@ export class CategoriesController {
   }
 
   // ! Restore Category
-  @Post('restore/:category_id')
+  @Put('restore/:category_id')
   @ApiOperation({ summary: 'Khôi phục danh mục đã xóa' })
   restore(@Param('category_id') id: number) {
     return this.categoriesService.restore(id);

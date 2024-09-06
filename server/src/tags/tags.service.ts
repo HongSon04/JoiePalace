@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -43,9 +48,9 @@ export class TagsService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException(
-        { message: 'Tạo tag thất bại', error },
-        HttpStatus.BAD_REQUEST,
+      console.log('Lỗi từ tag.service.ts -> create: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
     }
   }
@@ -101,43 +106,63 @@ export class TagsService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException(
-        { message: 'Lấy danh sách tag thất bại', error },
-        HttpStatus.BAD_REQUEST,
+      console.log('Lỗi từ tag.service.ts -> findAll: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
     }
   }
 
   // ? Get tag by id
   async findOne(id: number) {
-    const tag = await this.prismaService.tags.findUnique({
-      where: {
-        id,
-      },
-    });
-    if (!tag) {
-      throw new HttpException(
-        { message: 'Tag không tồn tại' },
-        HttpStatus.BAD_REQUEST,
+    try {
+      const tag = await this.prismaService.tags.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (!tag) {
+        throw new HttpException(
+          { message: 'Tag không tồn tại' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      throw new HttpException({ data: tag }, HttpStatus.OK);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ tag.service.ts -> findOne: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
     }
-    throw new HttpException({ data: tag }, HttpStatus.OK);
   }
 
   // ? Get tag by slug
   async findBySlug(slug: string) {
-    const tag = await this.prismaService.tags.findFirst({
-      where: {
-        slug,
-      },
-    });
-    if (!tag) {
-      throw new HttpException(
-        { message: 'Tag không tồn tại' },
-        HttpStatus.BAD_REQUEST,
+    try {
+      const tag = await this.prismaService.tags.findFirst({
+        where: {
+          slug,
+        },
+      });
+      if (!tag) {
+        throw new HttpException(
+          { message: 'Tag không tồn tại' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      throw new HttpException({ data: tag }, HttpStatus.OK);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ tag.service.ts -> findBySlug: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
     }
-    throw new HttpException({ data: tag }, HttpStatus.OK);
   }
 
   // ? Update tag
@@ -146,9 +171,7 @@ export class TagsService {
       const { name } = updateTagDto;
       const slug = MakeSlugger(name);
       const findTag = await this.prismaService.tags.findUnique({
-        where: {
-          id,
-        },
+        where: { id: Number(id) },
       });
       if (!findTag) {
         throw new HttpException(
@@ -156,10 +179,17 @@ export class TagsService {
           HttpStatus.BAD_REQUEST,
         );
       }
+      const findTagByName = await this.prismaService.tags.findFirst({
+        where: { name, id: { not: Number(id) } },
+      });
+      if (findTagByName) {
+        throw new HttpException(
+          { message: 'Tag đã tồn tại' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const tag = await this.prismaService.tags.update({
-        where: {
-          id,
-        },
+        where: { id: Number(id) },
         data: {
           name,
           slug,
@@ -173,9 +203,9 @@ export class TagsService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException(
-        { message: 'Cập nhật tag thất bại', error },
-        HttpStatus.BAD_REQUEST,
+      console.log('Lỗi từ tag.service.ts -> update: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
     }
   }
@@ -184,9 +214,7 @@ export class TagsService {
   async remove(id: number) {
     try {
       const findTag = await this.prismaService.tags.findUnique({
-        where: {
-          id,
-        },
+        where: { id: Number(id) },
       });
       if (!findTag) {
         throw new HttpException(
@@ -195,9 +223,7 @@ export class TagsService {
         );
       }
       const tag = await this.prismaService.tags.delete({
-        where: {
-          id,
-        },
+        where: { id: Number(id) },
       });
       throw new HttpException(
         { message: 'Xóa tag thành công', data: tag },
@@ -207,9 +233,9 @@ export class TagsService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException(
-        { message: 'Xóa tag thất bại', error },
-        HttpStatus.BAD_REQUEST,
+      console.log('Lỗi từ tag.service.ts -> remove: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
     }
   }

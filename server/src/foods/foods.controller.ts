@@ -18,7 +18,7 @@ import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodDto } from './dto/update-food.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { FilterFoodDto } from './dto/filter-food.dto';
+import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 
 @ApiTags('foods')
 @Controller('foods')
@@ -68,7 +68,7 @@ export class FoodsController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
-  findAll(@Query() query: FilterFoodDto) {
+  findAll(@Query() query: FilterPriceDto) {
     return this.foodsService.findAll(query);
   }
 
@@ -80,7 +80,7 @@ export class FoodsController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
-  findAllDeleted(@Query() query: FilterFoodDto) {
+  findAllDeleted(@Query() query: FilterPriceDto) {
     return this.foodsService.findAllDeleted(query);
   }
 
@@ -92,10 +92,24 @@ export class FoodsController {
   }
 
   // ! Get food by slug
-  @Get('get-slug/:slug')
+  @Get('get-by-slug/:slug')
   @ApiOperation({ summary: 'Lấy món ăn theo slug' })
   findBySlug(@Param('slug') slug: string) {
     return this.foodsService.findBySlug(slug);
+  }
+
+  // ! Get Food By Category Id
+  @Get('get-by-category/:category_id')
+  @ApiOperation({ summary: 'Lấy món ăn theo id danh mục' })
+  findByCategoryId(@Param('category_id') category_id: number) {
+    return this.foodsService.findByCategoryId(category_id);
+  }
+
+  // ! Get Food By Tag Id
+  @Get('get-by-tag/:tag_id')
+  @ApiOperation({ summary: 'Lấy món ăn theo id tag' })
+  findByTagId(@Param('tag_id') tag_id: number) {
+    return this.foodsService.findByTagId(tag_id);
   }
 
   // ! Update food
