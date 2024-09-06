@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma.service';
@@ -15,36 +16,48 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private configService: ConfigService,
     private prismaService: PrismaService,
+    private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const isPublic = this.reflector.get<boolean>(
+      'isPublic',
+      context.getHandler(),
+    );
+
+    if (isPublic) {
+      return true;
+    }
+    const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException({
-        message: 'Bạn cần phải đăng nhập để thực hiện thao tác này',
-      });
+      throw new UnauthorizedException(
+        'Bạn cần phải đăng nhập để thực hiện thao tác này',
+      );
     }
+
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get('ACCESS_SECRET_JWT'),
-      });
-      const checkUser = await this.prismaService.users.findUnique({
-        where: {
-          id: payload.id,
-        },
+        secret: this.configService.get<string>('ACCESS_SECRET_JWT'),
       });
 
-      if (!checkUser) {
-        throw new UnauthorizedException({ message: 'Token không hợp lệ' });
+      const user = await this.prismaService.users.findUnique({
+        where: { id: payload.id },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException(
+          'Token không hợp lệ hoặc người dùng không tồn tại',
+        );
       }
 
-      request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException({
-        message: 'Token Truy Cập không hợp lệ hoặc hết thời gian sử dụng',
-      });
+      request['user'] = user;
+    } catch (error) {
+      throw new UnauthorizedException(
+        'Token Truy Cập không hợp lệ hoặc hết thời gian sử dụng',
+      );
     }
+
     return true;
   }
 

@@ -20,16 +20,17 @@ model users {
   password       String
   platform       String?
   phone          String?
+  avatar         String?
   role           String       @default("user")
   active         Boolean      @default(true)
   refresh_token  String?
   verify_at      DateTime?
   deleted        Boolean      @default(false)
   deleted_at     DateTime?
-  deleted_by     String?
+  deleted_by     Int?
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
-  memberships_id Int?
+  memberships_id Int?         @unique
   memberships    memberships? @relation(fields: [memberships_id], references: [id])
 }
 
@@ -43,7 +44,7 @@ model memberships {
   images              String[]
   deleted             Boolean   @default(false)
   deleted_at          DateTime?
-  deleted_by          String?
+  deleted_by          Int?
   created_at          DateTime  @default(now())
   updated_at          DateTime  @updatedAt
   users               users[]
@@ -58,30 +59,116 @@ model verify_tokens {
 }
 
 model locations {
-  id         Int       @id @default(autoincrement())
-  name       String
-  address    String
-  phone      String
-  rate       Int       @default(5)
-  deleted    Boolean   @default(false)
-  deleted_at DateTime?
-  deleted_by String?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  staffs     staffs[]
+  id              Int                @id @default(autoincrement())
+  name            String
+  slug            String             @unique
+  address         String
+  phone           String
+  email           String
+  rate            Int                @default(5)
+  images          String[]
+  deleted         Boolean            @default(false)
+  deleted_at      DateTime?
+  deleted_by      Int?
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+  staffs          staffs[]
+  location_detail location_details[]
+  stages          stages[]
+  spaces          spaces[]
+}
+
+model location_details {
+  id                    Int       @id @default(autoincrement())
+  location              locations @relation(fields: [location_id], references: [id])
+  location_id           Int       @unique
+  slogan                String
+  slogan_description    String
+  slogan_images         String[]
+  diagram_description   String
+  diagram_images        String[]
+  equipment_description String
+  equipment_images      String[]
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+}
+
+model stages {
+  id          Int       @id @default(autoincrement())
+  location    locations @relation(fields: [location_id], references: [id])
+  location_id Int       @unique
+  name        String
+  description String
+  images      String[]
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+}
+
+model spaces {
+  id          Int       @id @default(autoincrement())
+  location    locations @relation(fields: [location_id], references: [id])
+  location_id Int       @unique
+  name        String
+  slug        String    @unique
+  description String
+  images      String[]
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
 }
 
 model staffs {
   id           Int       @id @default(autoincrement())
   locations    locations @relation(fields: [locations_id], references: [id])
-  locations_id Int
+  locations_id Int       @unique
   name         String
   phone        String
+  avatar       String?
   payment_info String
   shift        String
   deleted      Boolean   @default(false)
   deleted_at   DateTime?
-  deleted_by   String?
+  deleted_by   Int?
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
+}
+
+model categories {
+  id                Int       @id @default(autoincrement())
+  name              String
+  slug              String    @unique
+  description       String
+  short_description String?
+  deleted           Boolean   @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  foods             foods[]
+}
+
+model tags {
+  id         Int      @id @default(autoincrement())
+  name       String
+  slug       String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  foods      foods[]  @relation("FoodTags")
+}
+
+model foods {
+  id                Int        @id @default(autoincrement())
+  category_id       Int
+  categories        categories @relation(fields: [category_id], references: [id])
+  name              String
+  slug              String     @unique
+  description       String
+  short_description String?
+  price             Int
+  images            String[]
+  tags              tags[]     @relation("FoodTags")
+  deleted           Boolean    @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
 }

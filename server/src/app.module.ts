@@ -6,9 +6,19 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocationsModule } from './locations/locations.module';
 import { AuthModule } from './auth/auth.module';
+import { StaffsModule } from './staffs/staffs.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './guards/role.guard';
+import { AuthGuard } from './guards/auth.guard';
+import { PrismaService } from './prisma.service';
+import { SpacesModule } from './spaces/spaces.module';
+import { StagesModule } from './stages/stages.module';
+import { CategoriesModule } from './categories/categories.module';
+import { TagsModule } from './tags/tags.module';
+import { FoodsModule } from './foods/foods.module';
 @Module({
   imports: [
-    UserModule,
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],
@@ -20,10 +30,30 @@ import { AuthModule } from './auth/auth.module';
       }),
       inject: [ConfigService],
     }),
-    LocationsModule,
     AuthModule,
+    UserModule,
+    LocationsModule,
+    StaffsModule,
+    CloudinaryModule,
+    SpacesModule,
+    StagesModule,
+    CategoriesModule,
+    TagsModule,
+    FoodsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    ConfigService,
+    PrismaService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}
