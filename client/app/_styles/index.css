@@ -1,21 +1,3 @@
-/* .slick-list {
-    width: 100%;
-    height: 100vh;
-    position: relative;
-}
-.slick-slider {
-    width: 100%;
-    height: 100vh;
-}
-.slick-slide {
-    width: 100vw !important;
-    height: 100vh !important;
-    user-select: none !important;
-}
-.slick-slide img {
-    width: 100vw !important;
-    height: 100vh !important;
-} */
 #section-location .fp-overflow {
     display: flex;
 }
@@ -38,6 +20,20 @@
     opacity: 0 !important;
     visibility: hidden !important;
 }
-.react-multi-carousel-item {
+.banner .react-multi-carousel-item {
     width: 100vw !important;
+}
+#section-event .fp-overflow {
+    display: flex !important;
+    gap: 60px;
+}
+.section-event-listCard {
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+        /* Làm cuộn mượt mà */
+        --scroll-speed: 1000ms;
+        /* Điều chỉnh tốc độ cuộn */
+}
+.section-event-listCard::-webkit-scrollbar {
+    display: none;
 }

@@ -33,6 +33,7 @@ const MultiCarousel = (props) => {
       transitionDuration={props.transitionDuration}
       customTransition={props.customTransition}
       containerClass={props.containerClass}
+      initialSlide={props.initialSlide}
     >
       {props.children}
     </Carousel>

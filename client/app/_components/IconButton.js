@@ -10,7 +10,7 @@ function IconButton({ onClick, className = "", children, size = "md", type }) {
   return (
     <button
       type={type}
-      className={`flex-center rounded-full ${className} ${_size} glass hover:bg-whiteAlpha-300`}
+      className={`flex-center rounded-full ${className} ${_size} hover:bg-whiteAlpha-300`}
       onClick={onClick}
     >
       {children}

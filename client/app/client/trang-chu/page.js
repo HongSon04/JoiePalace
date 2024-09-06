@@ -5,8 +5,9 @@ import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import Footer from "@/app/_components/FooterClient";
 import TextFade from "@/app/_components/TextFade";
 import MultiCarousel from "@/app/_components/MultiCarouselSlider";
-import "@/app/_styles/index.css";
 import { useEffect, useState } from "react";
+import ButtonDiscover from "@/app/_components/ButtonDiscover";
+import "@/app/_styles/index.css";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -24,6 +25,29 @@ const locations = [
     id: 3,
     name: "võ văn kiệt",
     descriptoin: "không gian duy mỹ nâng tầm sự kiện",
+  },
+];
+const services = [
+  {
+    id: 1,
+    name: "sự kiện",
+    title: "hơn cả sự mong đợi",
+    description:
+      "Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất lượng dịch vụ, White Palace là không gian hoàn hảo để triển khai bất kì kế hoạch sự kiện nào mà bạn đang ấp ủ, từ các buổi yến tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật giải trí sáng tạo, các sự kiện trọng thể của doanh nghiệp như sự kiện ra mắt sản phẩm, tiệc tri ân khách hàng, tiệc tất niên, triển lãm thương mại.",
+  },
+  {
+    id: 2,
+    name: "tiệc cưới",
+    title: "Chạm đến trái tim",
+    description:
+      "Tiệc cưới – bức tranh tình yêu vượt mọi ngôn từ cảm xúc, bước khởi đầu hoàn hảo cho cuộc hôn nhân viên mãn. Vì vậy, hãy để chúng tôi giúp bạn san sẻ niềm hạnh phúc đến những người yêu thương bằng một chuyến du hành mỹ vị khó quên, với đa dạng lựa chọn, từ những set menu đã được nghiên cứu kỹ lưỡng hay bạn có thể tự chọn thực đơn theo đặc điểm khách mời.",
+  },
+  {
+    id: 3,
+    name: "hội nghị",
+    title: "dấu ấn thành công",
+    description:
+      "White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.",
   },
 ];
 const textContainerVariants = {
@@ -46,13 +70,13 @@ function Home() {
   };
   useEffect(() => {
     delay();
-  },[])
+  }, []);
   return (
     <ScrollFullPage>
       <section className="section banner w-full h-screen relative top-0 left-0">
         <MultiCarousel
           removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
-          autoplaySpeed={14000}
+          autoplaySpeed={5000}
           transitionDuration={7000}
           customTransition={"transform 7000ms ease-in-out"}
           containerClass="w-screen"
@@ -133,13 +157,11 @@ function Home() {
                       opacity: 1,
                       x: 0,
                       transition: {
-                        duration: 1.5,
+                        duration: 1,
                         ease: "easeIn",
-                        delay: 0.5,
                       },
                     },
                   }}
-                  replayEffect={false}
                 >
                   <span className="location-name uppercase text-gold text-6xl font-normal leading-[80px] pointer-events-none">
                     {location.name}
@@ -159,26 +181,94 @@ function Home() {
                       {location.descriptoin}
                     </span>
                   </div>
-                  <button className="bg-gold flex justify-center items-center gap-1 px-6 h-12 w-[11%] rounded-3xl cursor-pointer">
-                    <span className="text-lg">Khám phá</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M7.52867 11.5286L8.47133 12.4712L12.9427 7.9999L8.47133 3.52856L7.52867 4.47123L10.3907 7.33323H4V8.66656H10.3907L7.52867 11.5286Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
+                  <ButtonDiscover className={"w-[10%]"} />
                 </div>
               </div>
             </section>
           ))}
         </div>
+      </section>
+      <section className="section relative w-screen" id="section-services">
+        <TextFade
+          settings={{
+            hidden: { opacity: 0, y: 400 },
+            visible: {
+              opacity: 1,
+              y: 135,
+              transition: {
+                duration: 1,
+                ease: "easeIn",
+              },
+            },
+          }}
+          replayEffect={false}
+          styles="absolute z-10 w-screen top-[0%] left-[10%]"
+        >
+          <span className="uppercase text-gold absolute text-6xl font-bold leading-[100%]">
+            dịch vụ
+          </span>
+        </TextFade>
+        <MultiCarousel
+          removeArrowOnDeviceType={["tablet", "mobile", ""]}
+          autoplaySpeed={2000}
+          transitionDuration={3000}
+          customTransition={"3000ms ease-in-out"}
+          containerClass="w-screen"
+          autoPlay={timeAutoPlay}
+        >
+          {services.map((service, index) => (
+            <div key={service.id} className="w-screen h-screen flex relative">
+              <div className="w-[73%] h-full overflow-hidden relative">
+                <Image
+                  src={`/images-client/service-section/service-img-${service.id}.png`}
+                  w={"100%"}
+                  h={"100%"}
+                  className="object-cover"
+                  alt=""
+                />
+                <div className="absolute inset-0 bg-blackAlpha-400"></div>
+              </div>
+              <div className="w-[27%] h-full relative">
+                <Image
+                  className="absolute left-0 translate-x-[50%] top-0 translate-y-[30%]"
+                  src="/decor-cover.png"
+                  alt=""
+                />
+                <span className="absolute w-9 h-[40vh] bg-gold right-0 bottom-0 translate-y-[-75%]"></span>
+              </div>
+              <div className="w-1/4 absolute bg-black left-3/4 translate-x-[-50%] bottom-[8%] backdrop-blur-[15px] bg-blackAlpha-500 overflow-hidden">
+                <TextFade
+                  settings={{
+                    hidden: { opacity: 0, x: 30 },
+                    visible: {
+                      opacity: 1,
+                      x: 0,
+                      transition: {
+                        duration: 0.5,
+                        delay: 0,
+                      },
+                    },
+                  }}
+                  replayEffect={false}
+                  styles="p-[30px] flex flex-col gap-[4em]"
+                >
+                  <span className="uppercase text-gold leading-[60px] text-[4em] font-normal">
+                    {service.name}
+                  </span>
+                  <div className="flex flex-col gap-7">
+                    <span className="uppercase font-bold text-[1.2em] leading-[120%]">
+                      {service.title}
+                    </span>
+                    <span className="leading-[150%] font-normal text-base">
+                      {service.description}
+                    </span>
+                  </div>
+                  <ButtonDiscover className={"w-[45%]"} />
+                </TextFade>
+              </div>
+            </div>
+          ))}
+        </MultiCarousel>
       </section>
       <section className="section">
         <Footer />
