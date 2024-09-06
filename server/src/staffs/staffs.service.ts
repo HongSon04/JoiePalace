@@ -285,31 +285,4 @@ export class StaffsService {
       data: hardDeleteStaff,
     };
   }
-
-  // ! Change Location
-  async changeLocationStaff(
-    staff_id: number,
-    body: ChangeLocationDto,
-  ): Promise<StaffEntities | any> {
-    const { location_id } = body;
-    const checkStaff = await this.prismaService.staffs.findUnique({
-      where: { id: Number(staff_id) },
-    });
-    if (!checkStaff) {
-      throw new HttpException('Nhân viên không tồn tại', HttpStatus.NOT_FOUND);
-    }
-    const checkLocation = await this.prismaService.locations.findUnique({
-      where: { id: location_id },
-    });
-    if (!checkLocation) {
-      throw new HttpException('Địa điểm không tồn tại', HttpStatus.NOT_FOUND);
-    }
-    const changeLocation = await this.prismaService.staffs.update({
-      where: { id: Number(staff_id) },
-      data: {
-        locations_id: location_id,
-      },
-    });
-    throw new HttpException('Thay đổi địa điểm thành công', HttpStatus.OK);
-  }
 }

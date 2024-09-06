@@ -192,6 +192,7 @@ export class AuthService {
 
     throw new HttpException(
       {
+        message: 'Làm mới token thành công',
         access_token,
       },
       HttpStatus.OK,

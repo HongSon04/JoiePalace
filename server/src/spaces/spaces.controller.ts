@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
   Param,
@@ -11,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SpacesService } from './spaces.service';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
@@ -23,7 +24,8 @@ export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
 
   // ! Create A New Space
-  @Post('create/')
+  @Post('create')
+  @ApiOperation({ summary: 'Tạo không gian mới' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {
@@ -56,13 +58,30 @@ export class SpacesController {
     return this.spacesService.createSpace(body, files);
   }
 
-  // ! generate Space From data location
-  async generateSpace(@Body() body: CreateSpaceDto): Promise<string> {
-    return this.spacesService.generateSpace(body);
+  // ! Find Spaces By Location ID
+  @Get('find-by-location/:location_id')
+  @ApiOperation({ summary: 'Tìm kiếm không gian theo ID địa điểm' })
+  async findSpacesByLocation(@Param('location_id') location_id: number) {
+    return this.spacesService.findSpacesByLocation(location_id);
+  }
+
+  // ! Find Space By ID
+  @Get('find/:space_id')
+  @ApiOperation({ summary: 'Tìm kiếm không gian theo ID' })
+  async findSpaceById(@Param('space_id') space_id: number) {
+    return this.spacesService.findSpaceById(space_id);
+  }
+
+  // ! Find Space By Slug
+  @Get('get-slug/:slug')
+  @ApiOperation({ summary: 'Tìm kiếm không gian theo slug' })
+  async findSpaceBySlug(@Param('slug') slug: string) {
+    return this.spacesService.findSpaceBySlug(slug);
   }
 
   // ? Update Space
   @Patch('update/:space_id')
+  @ApiOperation({ summary: 'Cập nhật thông tin không gian' })
   async updateSpace(
     @Param('space_id') space_id: number,
     @Body() body: updateSpaceDto,
@@ -72,6 +91,7 @@ export class SpacesController {
 
   // ? Upload Space Images
   @Post('upload-images/:space_id')
+  @ApiOperation({ summary: 'Tải ảnh lên không gian' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {
@@ -106,6 +126,7 @@ export class SpacesController {
 
   // ! Delete Space Images
   @Delete('delete-images/:space_id')
+  @ApiOperation({ summary: 'Xóa ảnh không gian' })
   async deleteImages(
     @Param('space_id') space_id: number,
     @Body() body: DeleteImageDto,
@@ -114,7 +135,8 @@ export class SpacesController {
   }
 
   // ! Delete Space
-  @Delete('delete/:space_id')
+  @Delete('destroy/:space_id')
+  @ApiOperation({ summary: 'Xóa không gian vĩnh viễn' })
   async deleteSpace(@Param('space_id') space_id: number): Promise<string> {
     return this.spacesService.deleteSpace(space_id);
   }

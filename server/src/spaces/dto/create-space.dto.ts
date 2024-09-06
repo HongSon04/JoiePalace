@@ -14,4 +14,6 @@ export class CreateSpaceDto {
   description: string;
   @ApiProperty()
   images: string[];
+
+  slug: any;
 }

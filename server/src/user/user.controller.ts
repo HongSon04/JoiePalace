@@ -15,7 +15,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
@@ -34,6 +34,7 @@ export class UserController {
 
   // ! Create User
   @Post('create')
+  @ApiOperation({ summary: 'Quản trị viên tạo tài khoản' })
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
@@ -80,29 +81,16 @@ export class UserController {
 
   // ! Get Profile
   @Get('profile')
+  @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
   getProfile(@Request() req) {
     return this.userService.getProfile(req.user);
   }
 
-  // ! Change Password
-  @Put('change-password')
-  changePassword(
-    @Request() req,
-    @Body()
-    body: ChangePasswordUserDto,
-  ) {
-    return this.userService.changePassword(req.user, body);
-  }
-
-  // ! Change Profile
-  @Patch('change-profile')
-  changeProfile(@Request() req, @Body() body: ChangeProfileUserDto) {
-    return this.userService.changeProfile(req.user, body);
-  }
-
   // ! Get All User
-
   @Get('get-all')
+  @ApiOperation({
+    summary: 'Lấy danh sách tài khoản (trừ tài khoản bị xóa tạm)',
+  })
   @Roles(Role.ADMIN)
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
@@ -113,6 +101,7 @@ export class UserController {
 
   // ! Get All User Deleted
   @Get('get-all-deleted')
+  @ApiOperation({ summary: 'Lấy danh sách tài khoản đã bị xóa tạm' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -122,24 +111,46 @@ export class UserController {
 
   // ! Get User By Id
   @Get('get/:user_id')
+  @ApiOperation({ summary: 'Lấy thông tin tài khoản theo id' })
   getById(@Query('user_id') id: number): Promise<any> {
     return this.userService.getById(id);
   }
 
+  // ! Change Password
+  @Put('change-password')
+  @ApiOperation({ summary: 'Thay đổi mật khẩu' })
+  changePassword(
+    @Request() req,
+    @Body()
+    body: ChangePasswordUserDto,
+  ) {
+    return this.userService.changePassword(req.user, body);
+  }
+
+  // ! Change Profile
+  @Patch('change-profile')
+  @ApiOperation({ summary: 'Thay đổi thông tin cá nhân' })
+  changeProfile(@Request() req, @Body() body: ChangeProfileUserDto) {
+    return this.userService.changeProfile(req.user, body);
+  }
+
   // ! Soft Delete User
-  @Delete('soft-delete/:user_id')
+  @Delete('delete/:user_id')
+  @ApiOperation({ summary: 'Xóa tài khoản tạm thời' })
   softDelete(@Request() req, @Query('user_id') id: number): Promise<any> {
     return this.userService.softDelete(req.user, id);
   }
 
   // ! Restore User
   @Post('restore/:user_id')
+  @ApiOperation({ summary: 'Khôi phục tài khoản đã xóa tạm' })
   restore(@Query('user_id') id: number): Promise<any> {
     return this.userService.restore(id);
   }
 
   // ! Hard Delete User
-  @Delete('hard-delete/:user_id')
+  @Delete('destroy/:user_id')
+  @ApiOperation({ summary: 'Xóa vĩnh viễn tài khoản' })
   hardDelete(@Query('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);
   }

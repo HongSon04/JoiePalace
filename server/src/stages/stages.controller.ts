@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StagesService } from './stages.service';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { StageDto } from './dto/stage.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { StageUpdateDto } from './dto/stage-update.dto';
@@ -24,6 +24,7 @@ export class StagesController {
 
   // ! Create A New Stage
   @Post('create')
+  @ApiOperation({ summary: 'Tạo sảnh mới' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {
@@ -58,18 +59,22 @@ export class StagesController {
 
   // ! Get All Stages
   @Get('get-all')
+  @ApiOperation({ summary: 'Lấy tất cả sảnh theo chi nhánh' })
   async getAll(@Query('location_id') location_id: number) {
     return await this.stagesService.getAll(location_id);
   }
 
   // ! Get Stage By ID
   @ApiParam({ name: 'stage_id', required: true })
+  @ApiOperation({ summary: 'Lấy thông tin sảnh theo ID' })
   @Get('get/:stage_id')
   async getStageById(@Param('stage_id') stage_id: number) {
     return await this.stagesService.getStageById(stage_id);
   }
 
   // ! Update Stage
+  @Post('update/:stage_id')
+  @ApiOperation({ summary: 'Cập nhật thông tin sảnh' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {
@@ -95,7 +100,6 @@ export class StagesController {
       },
     }),
   )
-  @Post('update/:stage_id')
   async update(
     @Param('stage_id') stage_id: number,
     @Body() body: StageUpdateDto,
@@ -105,8 +109,9 @@ export class StagesController {
   }
 
   // ! Delete Stage
+  @Delete('destroy/:stage_id')
+  @ApiOperation({ summary: 'Xóa sảnh vĩnh viễn' })
   @ApiParam({ name: 'stage_id', required: true })
-  @Delete('delete/:stage_id')
   async delete(@Param('stage_id') stage_id: number) {
     return await this.stagesService.delete(stage_id);
   }

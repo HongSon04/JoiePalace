@@ -11,6 +11,7 @@ export class StagesService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
+  // ! Create stage
   async create(body: StageDto, files: { images?: Express.Multer.File[] }) {
     try {
       const findLocation = await this.prismaService.locations.findUnique({
@@ -61,6 +62,7 @@ export class StagesService {
     }
   }
 
+  // ! Get all stages
   async getAll(location_id: number) {
     try {
       if (location_id) {
@@ -95,6 +97,7 @@ export class StagesService {
     }
   }
 
+  // ! Get stage by id
   async getStageById(stage_id: number) {
     try {
       const findStage = await this.prismaService.stages.findUnique({
@@ -115,6 +118,7 @@ export class StagesService {
     }
   }
 
+  // ! Update stage
   async update(
     stage_id: number,
     body: StageUpdateDto,
@@ -167,6 +171,7 @@ export class StagesService {
     }
   }
 
+  // ! Delete stage
   async delete(stage_id: number) {
     try {
       const findStage = await this.prismaService.stages.findUnique({
