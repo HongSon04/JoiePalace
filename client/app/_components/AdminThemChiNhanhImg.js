@@ -60,8 +60,10 @@ const AdminThemChiNhanhImg = ({ title, inputId }) => {
                         className="bg-blackAlpha-100 rounded-lg"
                         h='170px'
                     >
-                        <div className="size-5 p-5 rounded-full bg-gray-600 flex items-center justify-center align-middle mx-auto">
-                            <label htmlFor={inputId} className="text-xl font-medium text-center">+</label>
+                        <div className="p-3 rounded-full bg-gray-600 flex items-center justify-center align-middle mx-auto">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M15.8333 10.8333H10.8333V15.8333H9.16663V10.8333H4.16663V9.16667H9.16663V4.16667H10.8333V9.16667H15.8333V10.8333Z" fill="#F7F5F2"/>
+                </svg>
                         </div>
                         <input
                             id={inputId}
