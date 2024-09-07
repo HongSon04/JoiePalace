@@ -73,7 +73,7 @@ export class SpacesController {
   }
 
   // ! Find Space By Slug
-  @Get('get-slug/:slug')
+  @Get('get-by-slug/:slug')
   @ApiOperation({ summary: 'Tìm kiếm không gian theo slug' })
   async findSpaceBySlug(@Param('slug') slug: string) {
     return this.spacesService.findSpaceBySlug(slug);
@@ -82,15 +82,41 @@ export class SpacesController {
   // ? Update Space
   @Patch('update/:space_id')
   @ApiOperation({ summary: 'Cập nhật thông tin không gian' })
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new HttpException(
+              'Chỉ chấp nhận ảnh jpg, jpeg, png',
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        } else if (file.size > 1024 * 1024 * 5) {
+          return cb(
+            new HttpException(
+              'Kích thước ảnh tối đa 5MB',
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        } else {
+          cb(null, true);
+        }
+      },
+    }),
+  )
   async updateSpace(
     @Param('space_id') space_id: number,
     @Body() body: updateSpaceDto,
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
   ): Promise<string> {
-    return this.spacesService.updateSpace(space_id, body);
+    return this.spacesService.updateSpace(space_id, body, files);
   }
 
   // ? Upload Space Images
-  @Post('upload-images/:space_id')
+  /*  @Post('upload-images/:space_id')
   @ApiOperation({ summary: 'Tải ảnh lên không gian' })
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
@@ -122,17 +148,17 @@ export class SpacesController {
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ): Promise<string> {
     return this.spacesService.uploadImages(space_id, files as any);
-  }
+  } */
 
   // ! Delete Space Images
-  @Delete('delete-images/:space_id')
+  /*  @Delete('delete-images/:space_id')
   @ApiOperation({ summary: 'Xóa ảnh không gian' })
   async deleteImages(
     @Param('space_id') space_id: number,
     @Body() body: DeleteImageDto,
   ): Promise<string> {
     return this.spacesService.deleteImages(space_id, body);
-  }
+  } */
 
   // ! Delete Space
   @Delete('destroy/:space_id')

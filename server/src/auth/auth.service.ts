@@ -58,6 +58,7 @@ export class AuthService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ auth.service.ts -> register', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -99,6 +100,7 @@ export class AuthService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ auth.service.ts -> login', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -132,6 +134,7 @@ export class AuthService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ auth.service.ts -> logout', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -140,23 +143,36 @@ export class AuthService {
 
   // ! Change Avatar
   async changeAvatar(reqUser: UserEntity, avatar: string) {
-    const findImageUser = await this.prismaService.users.findFirst({
-      where: {
-        id: Number(reqUser.id),
-      },
-    });
-    if (findImageUser.avatar) {
-      await this.cloudinaryService.deleteImageByUrl(findImageUser.avatar);
+    try {
+      const findImageUser = await this.prismaService.users.findFirst({
+        where: {
+          id: Number(reqUser.id),
+        },
+      });
+      if (findImageUser.avatar) {
+        await this.cloudinaryService.deleteImageByUrl(findImageUser.avatar);
+      }
+      await this.prismaService.users.update({
+        where: {
+          id: Number(reqUser.id),
+        },
+        data: {
+          avatar,
+        },
+      });
+      throw new HttpException(
+        'Thay đổi ảnh đại diện thành công',
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ auth.service.ts -> changeAvatar', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
     }
-    await this.prismaService.users.update({
-      where: {
-        id: Number(reqUser.id),
-      },
-      data: {
-        avatar,
-      },
-    });
-    throw new HttpException('Thay đổi ảnh đại diện thành công', HttpStatus.OK);
   }
 
   // ! Refresh Token

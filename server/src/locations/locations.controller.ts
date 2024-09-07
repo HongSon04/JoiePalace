@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Request,
   UploadedFiles,
@@ -116,7 +117,7 @@ export class LocationsController {
   }
 
   // ! Get Location By Slug
-  @Get('get-slug/:location_slug')
+  @Get('get-by-slug/:location_slug')
   @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo Slug' })
   async getLocationBySlug(
     @Param('location_slug') slug: string,
@@ -190,7 +191,7 @@ export class LocationsController {
   }
 
   // ! Restore Location
-  @Post('restore/:location_id')
+  @Put('restore/:location_id')
   @ApiOperation({ summary: 'Khôi phục chi nhánh đã xóa tạm' })
   async restoreLocation(@Param('location_id') id: number): Promise<any> {
     return this.locationsService.restoreLocation(id);
@@ -204,9 +205,9 @@ export class LocationsController {
   }
 
   // ! Delete Image By Url
-  @Delete('delete-image')
+  /* @Delete('delete-image')
   @ApiOperation({ summary: 'Xóa ảnh theo URL' })
   async deleteImageByUrl(@Body() image_url: DeleteImageDto): Promise<any> {
     return this.locationsService.deleteImageByUrl(image_url);
-  }
+  } */
 }

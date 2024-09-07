@@ -51,11 +51,12 @@ model memberships {
 }
 
 model verify_tokens {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   email      String
   token      String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  expired_at DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 }
 
 model locations {
@@ -166,9 +167,69 @@ model foods {
   price             Int
   images            String[]
   tags              tags[]     @relation("FoodTags")
+  menus             menus[]    @relation("FoodMenus") // Many-to-Many relationship
   deleted           Boolean    @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
   created_at        DateTime   @default(now())
   updated_at        DateTime   @updatedAt
+}
+
+model menus {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String
+  price       Int
+  foods       foods[]   @relation("FoodMenus") // Many-to-Many relationship
+  deleted     Boolean   @default(false)
+  deleted_at  DateTime?
+  deleted_by  Int?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+}
+
+model decors {
+  id                Int       @id @default(autoincrement())
+  name              String
+  slug              String    @unique
+  description       String
+  short_description String?
+  images            String[]
+  price             Int
+  deleted           Boolean   @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+}
+
+model party_types {
+  id                Int       @id @default(autoincrement())
+  name              String
+  slug              String    @unique
+  description       String
+  short_description String?
+  images            String[]
+  deleted           Boolean   @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+}
+
+model funitures {
+  id                Int       @id @default(autoincrement())
+  name              String
+  slug              String    @unique
+  description       String
+  short_description String?
+  images            String[]
+  price             Int
+  type              String
+  deleted           Boolean   @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
 }

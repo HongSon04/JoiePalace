@@ -23,6 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'decorator/roles.decorator';
 import { Role } from 'helper/role.enum';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('user')
 @Controller('user')
@@ -142,7 +143,7 @@ export class UserController {
   }
 
   // ! Restore User
-  @Post('restore/:user_id')
+  @Put('restore/:user_id')
   @ApiOperation({ summary: 'Khôi phục tài khoản đã xóa tạm' })
   restore(@Query('user_id') id: number): Promise<any> {
     return this.userService.restore(id);
