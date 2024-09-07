@@ -4,74 +4,90 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import {
+  CreatePartyTypeDto,
+  ImagePartyTypesDto,
+} from './dto/create-party_type.dto';
+import { UpdatePartyTypeDto } from './dto/update-party_type.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterDto } from 'helper/dto/Filter.dto';
 
 @Injectable()
-export class CategoriesService {
-  constructor(private prismaService: PrismaService) {}
+export class PartyTypesService {
+  constructor(
+    private prismaService: PrismaService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
-  // ! Create Categories
-  async create(createCategoryDto: CreateCategoryDto) {
+  // ! Create party type
+  async create(
+    createPartyTypeDto: CreatePartyTypeDto,
+    files: ImagePartyTypesDto,
+  ) {
+    const { name, description, short_description } = createPartyTypeDto;
     try {
-      const { name, description, short_description } = createCategoryDto;
-      const slug = MakeSlugger(name);
-      // ? Check Name and Slug
-      const findCategories = await this.prismaService.categories.findFirst({
-        where: {
-          OR: [
-            {
-              name,
-            },
-            {
-              slug,
-            },
-          ],
-        },
-      });
-      if (findCategories) {
+      if (!files.images) {
         throw new HttpException(
-          { message: 'Tên danh mục đã tồn tại' },
+          'Hình ảnh không được để trống',
           HttpStatus.BAD_REQUEST,
         );
       }
-      // ? Create Categories
-      const categories = await this.prismaService.categories.create({
+
+      const findPartyByName = await this.prismaService.party_types.findFirst({
+        where: {
+          name,
+        },
+      });
+
+      if (findPartyByName) {
+        throw new HttpException(
+          'Tên loại tiệc đã tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
+        files.images as any,
+        'joieplace/party',
+      );
+      const slug = MakeSlugger(name);
+      const partyType = await this.prismaService.party_types.create({
         data: {
           name,
           slug,
           description,
           short_description,
+          images: images as any,
         },
       });
+
       throw new HttpException(
-        { message: 'Tạo danh mục thành công', data: categories },
+        { message: 'Tạo loại tiệc thành công', data: partyType },
         HttpStatus.CREATED,
       );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> create', error);
+      console.log('Lỗi từ partyTypesService -> create: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Get All Categories
+  // ! Get all party types
   async findAll(query: FilterDto) {
-    try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
-      const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
+    const page = Number(query.page) || 1;
+    const itemsPerPage = Number(query.itemsPerPage) || 10;
+    const search = query.search || '';
+    const skip = (page - 1) * itemsPerPage;
 
+    try {
       const [res, total] = await this.prismaService.$transaction([
-        this.prismaService.categories.findMany({
+        this.prismaService.party_types.findMany({
           where: {
             deleted: false,
             OR: [
@@ -97,8 +113,11 @@ export class CategoriesService {
           },
           skip,
           take: itemsPerPage,
+          orderBy: {
+            created_at: 'desc',
+          },
         }),
-        this.prismaService.categories.count({
+        this.prismaService.party_types.count({
           where: {
             deleted: false,
             OR: [
@@ -126,15 +145,14 @@ export class CategoriesService {
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
+      const nextPage = page + 1 > lastPage ? null : page + 1;
+      const prevPage = page - 1 <= 0 ? null : page - 1;
 
       throw new HttpException(
         {
           data: res,
           pagination: {
             total,
-            itemsPerPage,
             lastPage,
             nextPage,
             prevPage,
@@ -147,23 +165,23 @@ export class CategoriesService {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> ', error);
+      console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Get All Deleted Categories
+  // ! Get all party types deleted
   async findAllDeleted(query: FilterDto) {
-    try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
-      const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
+    const page = Number(query.page) || 1;
+    const itemsPerPage = Number(query.itemsPerPage) || 10;
+    const search = query.search || '';
+    const skip = (page - 1) * itemsPerPage;
 
+    try {
       const [res, total] = await this.prismaService.$transaction([
-        this.prismaService.categories.findMany({
+        this.prismaService.party_types.findMany({
           where: {
             deleted: true,
             OR: [
@@ -189,8 +207,11 @@ export class CategoriesService {
           },
           skip,
           take: itemsPerPage,
+          orderBy: {
+            created_at: 'desc',
+          },
         }),
-        this.prismaService.categories.count({
+        this.prismaService.party_types.count({
           where: {
             deleted: true,
             OR: [
@@ -218,15 +239,14 @@ export class CategoriesService {
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
+      const nextPage = page + 1 > lastPage ? null : page + 1;
+      const prevPage = page - 1 <= 0 ? null : page - 1;
 
       throw new HttpException(
         {
           data: res,
           pagination: {
             total,
-            itemsPerPage,
             lastPage,
             nextPage,
             prevPage,
@@ -239,136 +259,149 @@ export class CategoriesService {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> findAllDeleted', error);
+      console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Get One Category
+  // ! Get party type by id
   async findOne(id: number) {
     try {
-      const category = await this.prismaService.categories.findUnique({
+      const partyType = await this.prismaService.party_types.findUnique({
         where: { id: Number(id) },
       });
-      if (!category) {
+
+      if (!partyType) {
         throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
+          'Không tìm thấy loại tiệc',
           HttpStatus.NOT_FOUND,
         );
       }
-      throw new HttpException({ data: category }, HttpStatus.OK);
+
+      throw new HttpException(partyType, HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> findOne', error);
+      console.log('Lỗi từ partyTypesService -> findOne: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Get One Category By Slug
-  async findOneBySlug(slug: string) {
+  // ! Get party type by slug
+  async findBySlug(slug: string) {
     try {
-      const category = await this.prismaService.categories.findUnique({
+      const partyType = await this.prismaService.party_types.findFirst({
+        where: { slug },
+      });
+
+      if (!partyType) {
+        throw new HttpException(
+          'Không tìm thấy loại tiệc',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      throw new HttpException(partyType, HttpStatus.OK);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ partyTypesService -> findBySlug: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
+    }
+  }
+
+  // ! Update party type
+  async update(
+    id: number,
+    updatePartyTypeDto: UpdatePartyTypeDto,
+    files: ImagePartyTypesDto,
+  ) {
+    const { name, description, short_description } = updatePartyTypeDto;
+    try {
+      const partyType = await this.prismaService.party_types.findUnique({
+        where: { id: Number(id) },
+      });
+
+      if (!partyType) {
+        throw new HttpException(
+          'Không tìm thấy loại tiệc',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const findPartyByName = await this.prismaService.party_types.findFirst({
         where: {
-          slug,
+          name,
+          NOT: {
+            id,
+          },
         },
       });
-      if (!category) {
-        throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      throw new HttpException({ data: category }, HttpStatus.OK);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ categories.service.ts -> findOneBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      );
-    }
-  }
 
-  // ! Update Categories
-  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    try {
-      // ? Check Categories
-      const findCategories = await this.prismaService.categories.findUnique({
-        where: { id: Number(id) },
-      });
-      if (!findCategories) {
+      if (findPartyByName) {
         throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      const { name, description, short_description } = updateCategoryDto;
-      const slug = MakeSlugger(name);
-      // ? Check Name and Slug
-      const findCategoriesByName =
-        await this.prismaService.categories.findFirst({
-          where: {
-            name,
-            NOT: {
-              id: Number(id),
-            },
-          },
-        });
-      if (findCategoriesByName) {
-        throw new HttpException(
-          { message: 'Tên danh mục đã tồn tại' },
+          'Tên loại tiệc đã tồn tại',
           HttpStatus.BAD_REQUEST,
         );
       }
-      // ? Update Categories
-      const categories = await this.prismaService.categories.update({
+
+      const dataUpdate: any = {
+        name,
+        description,
+        short_description,
+      };
+
+      if (files.images) {
+        const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
+          files.images as any,
+          'joieplace/party',
+        );
+        dataUpdate.images = images as any;
+      }
+
+      const updatedPartyType = await this.prismaService.party_types.update({
         where: { id: Number(id) },
-        data: {
-          name,
-          slug,
-          description,
-          short_description,
-        },
+        data: dataUpdate,
       });
 
       throw new HttpException(
-        { message: 'Cập nhật danh mục thành công', data: categories },
+        { message: 'Cập nhật loại tiệc thành công', data: updatedPartyType },
         HttpStatus.OK,
       );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> update', error);
+      console.log('Lỗi từ partyTypesService -> update: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Soft Delete Categories
-  async softDelete(reqUser, id: number) {
+  // ! Remove party type
+  async remove(reqUser, id: number) {
     try {
-      // ? Check Categories
-      const findCategories = await this.prismaService.categories.findUnique({
+      const partyType = await this.prismaService.party_types.findUnique({
         where: { id: Number(id) },
       });
-      if (!findCategories) {
+
+      if (!partyType) {
         throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
+          'Không tìm thấy loại tiệc',
           HttpStatus.NOT_FOUND,
         );
       }
-      // ? Soft Delete Categories
-      const categories = await this.prismaService.categories.update({
+
+      const updatedPartyType = await this.prismaService.party_types.update({
         where: { id: Number(id) },
         data: {
           deleted: true,
@@ -376,36 +409,37 @@ export class CategoriesService {
           deleted_at: new Date(),
         },
       });
+
       throw new HttpException(
-        { message: 'Xóa danh mục thành công', data: categories },
+        { message: 'Xóa loại tiệc thành công', data: updatedPartyType },
         HttpStatus.OK,
       );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> softDelete', error);
+      console.log('Lỗi từ partyTypesService -> remove: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Restore Categories
+  // ! Restore party type
   async restore(id: number) {
     try {
-      // ? Check Categories
-      const findCategories = await this.prismaService.categories.findUnique({
+      const partyType = await this.prismaService.party_types.findUnique({
         where: { id: Number(id) },
       });
-      if (!findCategories) {
+
+      if (!partyType) {
         throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
+          'Không tìm thấy loại tiệc',
           HttpStatus.NOT_FOUND,
         );
       }
-      // ? Restore Categories
-      const categories = await this.prismaService.categories.update({
+
+      const updatedPartyType = await this.prismaService.party_types.update({
         where: { id: Number(id) },
         data: {
           deleted: false,
@@ -413,47 +447,49 @@ export class CategoriesService {
           deleted_at: null,
         },
       });
+
       throw new HttpException(
-        { message: 'Khôi phục danh mục thành công', data: categories },
+        { message: 'Khôi phục loại tiệc thành công', data: updatedPartyType },
         HttpStatus.OK,
       );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> restore', error);
+      console.log('Lỗi từ partyTypesService -> restore: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Destroy Categories
+  // ! Hard delete party type
   async destroy(id: number) {
     try {
-      // ? Check Categories
-      const findCategories = await this.prismaService.categories.findUnique({
+      const partyType = await this.prismaService.party_types.findUnique({
         where: { id: Number(id) },
       });
-      if (!findCategories) {
+
+      if (!partyType) {
         throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
+          'Không tìm thấy loại tiệc',
           HttpStatus.NOT_FOUND,
         );
       }
-      // ? Destroy Categories
-      const categories = await this.prismaService.categories.delete({
+
+      await this.prismaService.party_types.delete({
         where: { id: Number(id) },
       });
+
       throw new HttpException(
-        { message: 'Xóa danh mục vĩnh viễn thành công', data: categories },
+        'Xóa vĩnh viễn loại tiệc thành công',
         HttpStatus.OK,
       );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ categories.service.ts -> destroy', error);
+      console.log('Lỗi từ partyTypesService -> hardDelete: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
