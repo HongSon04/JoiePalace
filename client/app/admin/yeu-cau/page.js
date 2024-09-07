@@ -9,7 +9,7 @@ function Page() {
     <div>
       <AdminHeader title={"Yêu cầu"} showSearchForm={false} />
       <Suspense fallback={<BranchesSkeleton />}>
-        <Branches />
+        <Branches nameLink={'yeu-cau'} />
       </Suspense>
     </div>
   );

@@ -6,7 +6,8 @@ import AdminThemChiNhanhInput from "@/app/_components/AdminThemChiNhanhInput";
 import AdminThemChiNhanhInputAndImg from "@/app/_components/AdminThemChiNhanhInputAndImg";
 import IconButton from "@/app/_components/IconButton";
 import IconButtonSave from "@/app/_components/IconButtonSave";
-import { Heading, Stack, Text } from "@chakra-ui/react";
+import RequestBreadcrumbs from "@/app/_components/RequestBreadcrumbs";
+import { BreadcrumbLink, BreadcrumbItem, Breadcrumb , Heading, Stack, Text } from "@chakra-ui/react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 const fields = [
@@ -25,14 +26,18 @@ const fields3 = [
   { type: 'textarea', placeholder: 'Mô tả' },
 ];
 
-function ChiNhanhChiTietPage() {
+const branch = {
+  id: 1,
+  name: "Hoàng Văn Thụ",
+  slug: "hoang-van-thu",
+};
+
+function ChiNhanhChiTietPage({params}) {
+  const {chiNhanhSlug} = params
   return (
     <div>
     <AdminHeader showSearchForm={false} title={'Chi tiết chi nhánh'} />
-    <Stack alignItems="start" spacing="8" direction={'row'} className='mt-5'>
-      <Heading as='h1' size='lg'>Chi nhánh / </Heading>
-      <Text fontSize='5xl'>Thêm chi nhánh</Text>
-    </Stack>
+    <RequestBreadcrumbs requestId={chiNhanhSlug} nameLink={'chi-nhanh'}></RequestBreadcrumbs>
     <div className="flex flex-col gap-[30px] w-full mt-[30px]">
       <div className="flex gap-5 ">
         <AdminThemChiNhanhInput fields={fields} title='Thông tin liên hệ' />

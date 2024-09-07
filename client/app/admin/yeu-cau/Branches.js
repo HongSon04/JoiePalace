@@ -37,12 +37,12 @@ const initialBranches = [
   },
 ];
 
-function Branches() {
+function Branches({nameLink}) {
   return (
     <Row gutter={[16, 16]} className="mt-8">
       {initialBranches.map((branch) => (
         <Col span={8} key={branch.id}>
-          <Branch branch={branch} />
+          <Branch branch={branch} nameLink={nameLink}  />
         </Col>
       ))}
     </Row>
