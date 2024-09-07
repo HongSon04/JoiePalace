@@ -493,6 +493,8 @@ export class FoodsService {
             HttpStatus.BAD_REQUEST,
           );
         }
+        // Delete old images
+        await this.cloudinaryService.deleteMultipleImagesByUrl(findFood.images);
         updateData.images = uploadImages;
       }
 
@@ -603,14 +605,13 @@ export class FoodsService {
         throw new HttpException('Món ăn không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      const deleteFood = await this.prismaService.foods.delete({
+      // Delete images
+      await this.cloudinaryService.deleteMultipleImagesByUrl(findFood.images);
+      await this.prismaService.foods.delete({
         where: { id: Number(id) },
       });
 
-      throw new HttpException(
-        { message: 'Xóa món ăn thành công', data: deleteFood },
-        HttpStatus.OK,
-      );
+      throw new HttpException('Xóa món ăn thành công', HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

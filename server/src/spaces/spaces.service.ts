@@ -89,6 +89,17 @@ export class SpacesService {
     try {
       const { description, name } = body;
 
+      const findSpace = await this.prismaService.spaces.findUnique({
+        where: { id: Number(space_id) },
+      });
+
+      if (!findSpace) {
+        throw new HttpException(
+          'Không tìm thấy không gian',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       const findSpaceByName = await this.prismaService.spaces.findFirst({
         where: { name, id: { not: Number(space_id) } },
       });
@@ -99,7 +110,7 @@ export class SpacesService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      
+
       const updateData: any = {
         description,
         name,
@@ -118,7 +129,10 @@ export class SpacesService {
             HttpStatus.BAD_REQUEST,
           );
         }
-
+        // ? Delete old images from cloudinary
+        await this.cloudinaryService.deleteMultipleImagesByUrl(
+          findSpace.images,
+        );
         updateData.images = spacesImages as any;
       }
 

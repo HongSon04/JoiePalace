@@ -326,7 +326,7 @@ export class StaffsService {
         return { status: 404, message: 'Nhân viên không tồn tại' };
       }
 
-      const deleteStaff = await this.prismaService.staffs.update({
+      await this.prismaService.staffs.update({
         where: { id: Number(id) },
         data: {
           deleted: true,
@@ -334,7 +334,7 @@ export class StaffsService {
           deleted_at: new Date(),
         },
       });
-      return { message: 'Xóa nhân viên thành công', data: deleteStaff };
+      throw new HttpException('Xóa nhân viên thành công', HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -399,13 +399,14 @@ export class StaffsService {
       if (checkStaff.avatar) {
         await this.cloudinaryService.deleteImageByUrl(checkStaff.avatar);
       }
-      const hardDeleteStaff = await this.prismaService.staffs.delete({
+
+      await this.prismaService.staffs.delete({
         where: { id: Number(id) },
       });
-      return {
-        message: 'Xóa vĩnh viễn nhân viên thành công',
-        data: hardDeleteStaff,
-      };
+      throw new HttpException(
+        'Xóa nhân viên vĩnh viễn thành công',
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

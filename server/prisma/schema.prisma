@@ -217,3 +217,19 @@ model party_types {
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
 }
+
+model funitures {
+  id                Int       @id @default(autoincrement())
+  name              String
+  slug              String    @unique
+  description       String
+  short_description String?
+  images            String[]
+  price             Int
+  type              String
+  deleted           Boolean   @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+}

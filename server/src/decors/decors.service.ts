@@ -369,6 +369,8 @@ export class DecorsService {
             HttpStatus.BAD_REQUEST,
           );
         }
+        // Delete old images
+        await this.cloudinaryService.deleteMultipleImagesByUrl(decor.images);
         dataToUpdate.images = imagesDecor;
       }
 
@@ -492,7 +494,10 @@ export class DecorsService {
         );
       }
 
-      const deletedDecor = await this.prismaService.decors.delete({
+      // Delete images
+      await this.cloudinaryService.deleteMultipleImagesByUrl(decor.images);
+
+      await this.prismaService.decors.delete({
         where: { id: Number(id) },
       });
 

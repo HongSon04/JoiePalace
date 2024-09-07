@@ -178,6 +178,11 @@ export class StagesService {
           );
         }
 
+        // Delete old images
+        await this.cloudinaryService.deleteMultipleImagesByUrl(
+          findStage.images,
+        );
+
         updateData.images = stagesImages as any;
       }
 

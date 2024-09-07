@@ -20,6 +20,7 @@ import { FoodsModule } from './foods/foods.module';
 import { MenusModule } from './menus/menus.module';
 import { DecorsModule } from './decors/decors.module';
 import { PartyTypesModule } from './party_types/party_types.module';
+import { FunituresModule } from './funitures/funitures.module';
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -46,6 +47,7 @@ import { PartyTypesModule } from './party_types/party_types.module';
     MenusModule,
     DecorsModule,
     PartyTypesModule,
+    FunituresModule,
   ],
   controllers: [AppController],
   providers: [

@@ -364,6 +364,16 @@ export class PartyTypesService {
           files.images as any,
           'joieplace/party',
         );
+        if (!images) {
+          throw new HttpException(
+            'Upload hình ảnh thất bại',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        // Remove old images
+        await this.cloudinaryService.deleteMultipleImagesByUrl(
+          partyType.images,
+        );
         dataUpdate.images = images as any;
       }
 
@@ -477,6 +487,9 @@ export class PartyTypesService {
         );
       }
 
+      // Remove images
+      await this.cloudinaryService.deleteMultipleImagesByUrl(partyType.images);
+      // Remove party type
       await this.prismaService.party_types.delete({
         where: { id: Number(id) },
       });
