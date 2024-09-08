@@ -73,6 +73,9 @@ export class UserService {
           id: Number(reqUser.id),
         },
       });
+      if (!findUser) {
+        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+      }
       const { password, refresh_token, ...user } = findUser;
       throw new HttpException({ data: user }, HttpStatus.OK);
     } catch (error) {

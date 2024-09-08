@@ -15,7 +15,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
@@ -23,7 +23,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'decorator/roles.decorator';
 import { Role } from 'helper/role.enum';
-import { isPublic } from 'decorator/auth.decorator';
+import { platform } from 'os';
+import { verify } from 'crypto';
 
 @ApiTags('user')
 @Controller('user')
@@ -36,6 +37,24 @@ export class UserController {
   // ! Create User
   @Post('create')
   @ApiOperation({ summary: 'Quản trị viên tạo tài khoản' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    example: {
+      message: 'Tạo tài khoản thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Email đã tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
@@ -83,6 +102,39 @@ export class UserController {
   // ! Get Profile
   @Get('profile')
   @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: {
+        id: 'number',
+        email: 'string',
+        username: 'string',
+        platform: 'string',
+        avatar: 'string',
+        role: 'string',
+        active: 'boolean',
+        verify_at: 'date',
+        deleted: 'boolean',
+        deleted_at: 'date',
+        deleted_by: 'number',
+        created_at: 'string',
+        updated_at: 'string',
+        membership_id: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'User không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   getProfile(@Request() req) {
     return this.userService.getProfile(req.user);
   }
@@ -91,6 +143,43 @@ export class UserController {
   @Get('get-all')
   @ApiOperation({
     summary: 'Lấy danh sách tài khoản (trừ tài khoản bị xóa tạm)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          email: 'string',
+          username: 'string',
+          platform: 'string',
+          avatar: 'string',
+          role: 'string',
+          active: 'boolean',
+          verify_at: 'date',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'string',
+          updated_at: 'string',
+          membership_id: 'number',
+        },
+      ],
+      pagination: {
+        total: 'number',
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        lastPage: 'number | null',
+        nextPage: 'number | null',
+        prevPage: 'number | null',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
   })
   @Roles(Role.ADMIN)
   @ApiQuery({ name: 'page', required: false })
@@ -102,6 +191,43 @@ export class UserController {
 
   // ! Get All User Deleted
   @Get('get-all-deleted')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          email: 'string',
+          username: 'string',
+          platform: 'string',
+          avatar: 'string',
+          role: 'string',
+          active: 'boolean',
+          verify_at: 'date',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'string',
+          updated_at: 'string',
+          membership_id: 'number',
+        },
+      ],
+      pagination: {
+        total: 'number',
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        lastPage: 'number | null',
+        nextPage: 'number | null',
+        prevPage: 'number | null',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Lấy danh sách tài khoản đã bị xóa tạm' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
@@ -112,6 +238,39 @@ export class UserController {
 
   // ! Get User By Id
   @Get('get/:user_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: {
+        id: 'number',
+        email: 'string',
+        username: 'string',
+        platform: 'string',
+        avatar: 'string',
+        role: 'string',
+        active: 'boolean',
+        verify_at: 'date',
+        deleted: 'boolean',
+        deleted_at: 'date',
+        deleted_by: 'number',
+        created_at: 'string',
+        updated_at: 'string',
+        membership_id: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'User không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo id' })
   getById(@Query('user_id') id: number): Promise<any> {
     return this.userService.getById(id);
@@ -119,6 +278,24 @@ export class UserController {
 
   // ! Change Password
   @Put('change-password')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Đổi mật khẩu thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Mật khẩu cũ không chính xác',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Thay đổi mật khẩu' })
   changePassword(
     @Request() req,
@@ -130,6 +307,24 @@ export class UserController {
 
   // ! Change Profile
   @Patch('change-profile')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Thay đổi thông tin cá nhân thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Email đã tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Thay đổi thông tin cá nhân' })
   changeProfile(@Request() req, @Body() body: ChangeProfileUserDto) {
     return this.userService.changeProfile(req.user, body);
@@ -137,6 +332,24 @@ export class UserController {
 
   // ! Soft Delete User
   @Delete('delete/:user_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xóa tài khoản thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Tài khoản không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Xóa tài khoản tạm thời' })
   softDelete(@Request() req, @Query('user_id') id: number): Promise<any> {
     return this.userService.softDelete(req.user, id);
@@ -144,6 +357,24 @@ export class UserController {
 
   // ! Restore User
   @Put('restore/:user_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Khôi phục tài khoản thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Tài khoản không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Khôi phục tài khoản đã xóa tạm' })
   restore(@Query('user_id') id: number): Promise<any> {
     return this.userService.restore(id);
@@ -151,6 +382,24 @@ export class UserController {
 
   // ! Hard Delete User
   @Delete('destroy/:user_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xóa tài khoản vĩnh viễn thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Tài khoản không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Xóa vĩnh viễn tài khoản' })
   hardDelete(@Query('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);

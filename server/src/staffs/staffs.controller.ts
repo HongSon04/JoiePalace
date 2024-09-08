@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   HttpException,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -15,7 +16,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
@@ -38,6 +45,36 @@ export class StaffsController {
   // ! Add Staff
   @Post('create')
   @ApiOperation({ summary: 'Tạo nhân viên mới' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    example: {
+      message: 'Tạo nhân viên thành công',
+      data: {
+        id: 'number',
+        name: 'string',
+        email: 'string',
+        location_id: 'number',
+        phone: 'string',
+        payment_info: 'string',
+        shift: 'string',
+        avatar: 'string',
+        created_at: 'string',
+        updated_at: 'string',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Chỉ chấp nhận ảnh jpg, jpeg, png',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
@@ -78,6 +115,46 @@ export class StaffsController {
 
   // ! Get All Staff
   @Get('get-all')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Lấy danh sách nhân viên thành công',
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          email: 'string',
+          location_id: 'number',
+          phone: 'string',
+          payment_info: 'string',
+          shift: 'string',
+          avatar: 'string',
+          created_at: 'string',
+          updated_at: 'string',
+        },
+      ],
+      pagination: {
+        total: 'number',
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        lastPage: 'number',
+        prevPage: 'number',
+        nextPage: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy nhân viên nào',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Lấy danh sách nhân viên (trừ xóa tạm)' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
@@ -88,6 +165,46 @@ export class StaffsController {
 
   // ! Get All Staff Deleted
   @Get('get-all-deleted')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Lấy danh sách nhân viên thành công',
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          email: 'string',
+          location_id: 'number',
+          phone: 'string',
+          payment_info: 'string',
+          shift: 'string',
+          avatar: 'string',
+          created_at: 'string',
+          updated_at: 'string',
+        },
+      ],
+      pagination: {
+        total: 'number',
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        lastPage: 'number',
+        prevPage: 'number',
+        nextPage: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy nhân viên nào',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Lấy danh sách nhân viên đã xóa tạm' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
@@ -100,6 +217,36 @@ export class StaffsController {
 
   // ! Get Staff By Id
   @Get('get/:staff_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Lấy thông tin nhân viên thành công',
+      data: {
+        id: 'number',
+        name: 'string',
+        email: 'string',
+        location_id: 'number',
+        phone: 'string',
+        payment_info: 'string',
+        shift: 'string',
+        avatar: 'string',
+        created_at: 'string',
+        updated_at: 'string',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy nhân viên nào',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Lấy thông tin nhân viên theo id' })
   @ApiParam({ name: 'staff_id', required: true })
   async getStaffById(@Param() staff_id: number): Promise<StaffEntities | any> {
@@ -108,6 +255,36 @@ export class StaffsController {
 
   // ! Update Staff
   @Post('update/:staff_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Cập nhật thông tin nhân viên thành công',
+      data: {
+        id: 'number',
+        name: 'string',
+        email: 'string',
+        location_id: 'number',
+        phone: 'string',
+        payment_info: 'string',
+        shift: 'string',
+        avatar: 'string',
+        created_at: 'string',
+        updated_at: 'string',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy nhân viên nào',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Cập nhật thông tin nhân viên' })
   async updateStaff(
     @Param('staff_id') staff_id: number,
@@ -118,6 +295,36 @@ export class StaffsController {
 
   // ! Update Avatar
   @Post('update-avatar/:staff_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Cập nhật ảnh đại diện nhân viên thành công',
+      data: {
+        id: 'number',
+        name: 'string',
+        email: 'string',
+        location_id: 'number',
+        phone: 'string',
+        payment_info: 'string',
+        shift: 'string',
+        avatar: 'string',
+        created_at: 'string',
+        updated_at: 'string',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Chỉ chấp nhận ảnh jpg, jpeg, png',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Cập nhật ảnh đại diện nhân viên' })
   @UseInterceptors(
     FileInterceptor('avatar', {
@@ -160,6 +367,24 @@ export class StaffsController {
 
   // ! Delete Staff
   @Delete('delete/:staff_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xóa tạm nhân viên thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy nhân viên nào',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Xóa tạm nhân viên' })
   @ApiParam({ name: 'staff_id', required: true })
   async deleteStaff(@Request() req: any, @Param() staff_id: number) {
@@ -168,6 +393,24 @@ export class StaffsController {
 
   // ! Restore Staff
   @Put('restore/:staff_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Khôi phục nhân viên thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy nhân viên nào',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Khôi phục nhân viên đã xóa tạm' })
   @ApiParam({ name: 'staff_id', required: true })
   async restoreStaff(@Param() staff_id: number) {
@@ -176,6 +419,24 @@ export class StaffsController {
 
   // ! Hard Delete Staff
   @Delete('destroy/:staff_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xóa vĩnh viễn nhân viên thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy nhân viên nào',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Xóa vĩnh viễn nhân viên' })
   @ApiParam({ name: 'staff_id', required: true })
   async hardDeleteStaff(@Param() staff_id: number) {

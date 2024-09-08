@@ -568,10 +568,15 @@ export class LocationsService {
         },
       });
 
+      const stages = await this.prismaService.stages.findMany({
+        where: { location_id: Number(id) },
+      });
+
       const result = {
         ...updatedLocation,
         location_detail: updatedLocationDetail,
         space: updatedSpace,
+        stages,
       };
 
       throw new HttpException(

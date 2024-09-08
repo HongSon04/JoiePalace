@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -32,6 +26,7 @@ model users {
   updated_at     DateTime     @updatedAt
   memberships_id Int?         @unique
   memberships    memberships? @relation(fields: [memberships_id], references: [id])
+  bookings       bookings[]
 }
 
 model memberships {
@@ -77,6 +72,7 @@ model locations {
   location_detail location_details[]
   stages          stages[]
   spaces          spaces[]
+  bookings        bookings[]
 }
 
 model location_details {
@@ -95,26 +91,28 @@ model location_details {
 }
 
 model stages {
-  id          Int       @id @default(autoincrement())
-  location    locations @relation(fields: [location_id], references: [id])
-  location_id Int       @unique
+  id          Int        @id @default(autoincrement())
+  location    locations  @relation(fields: [location_id], references: [id])
+  location_id Int        @unique
   name        String
   description String
   images      String[]
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  bookings    bookings[]
 }
 
 model spaces {
-  id          Int       @id @default(autoincrement())
-  location    locations @relation(fields: [location_id], references: [id])
-  location_id Int       @unique
+  id          Int        @id @default(autoincrement())
+  location    locations  @relation(fields: [location_id], references: [id])
+  location_id Int        @unique
   name        String
-  slug        String    @unique
+  slug        String     @unique
   description String
   images      String[]
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  bookings    bookings[]
 }
 
 model staffs {
@@ -181,7 +179,8 @@ model menus {
   slug        String    @unique
   description String
   price       Int
-  foods       foods[]   @relation("FoodMenus") // Many-to-Many relationship
+  foods       foods[]   @relation("FoodMenus")
+  is_show     Boolean   @default(true)
   deleted     Boolean   @default(false)
   deleted_at  DateTime?
   deleted_by  Int?
@@ -227,6 +226,51 @@ model funitures {
   images            String[]
   price             Int
   type              String
+  deleted           Boolean   @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+}
+
+model deposits {
+  id             Int        @id @default(autoincrement())
+  transactionID  Int
+  name           String
+  phone          String?
+  email          String
+  amount         Int
+  payment_method String
+  status         String     @default("pending")
+  deleted        Boolean    @default(false)
+  deleted_at     DateTime?
+  deleted_by     Int?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  bookings       bookings[]
+}
+
+model bookings {
+  id                Int       @id @default(autoincrement())
+  user_id           Int
+  users             users     @relation(fields: [user_id], references: [id])
+  location_id       Int
+  locations         locations @relation(fields: [location_id], references: [id])
+  space_id          Int
+  spaces            spaces    @relation(fields: [space_id], references: [id])
+  stage_id          Int
+  stages            stages    @relation(fields: [stage_id], references: [id])
+  deposit_id        Int
+  deposits          deposits  @relation(fields: [deposit_id], references: [id])
+  name              String
+  images            String[]
+  accessories       Json[]
+  shift             String
+  organization_date DateTime
+  amount            Int
+  fee               Int
+  total_amount      Int
+  status            String    @default("pending")
   deleted           Boolean   @default(false)
   deleted_at        DateTime?
   deleted_by        Int?

@@ -17,7 +17,7 @@ export class MenusService {
   // ! Create Menu
   async create(createMenuDto: CreateMenuDto) {
     try {
-      const { name, description, foods, price } = createMenuDto;
+      const { name, description, foods, price, is_show } = createMenuDto;
       const slug = MakeSlugger(name);
 
       const findName = await this.prismaService.menus.findFirst({
@@ -55,6 +55,7 @@ export class MenusService {
           description,
           price: Number(price),
           slug,
+          is_show,
           foods: {
             connect: connectFoods,
           },

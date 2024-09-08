@@ -31,4 +31,7 @@ export class CreateMenuDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'Giá không được để trống' })
   price: number;
+
+  @ApiProperty({ example: ['true', 'false'] })
+  is_show: boolean;
 }
