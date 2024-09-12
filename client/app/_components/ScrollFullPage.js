@@ -14,7 +14,7 @@ const ScrollFullPage = ({ children }) => {
       scrollHorizontally: true,
       scrollingSpeed: 1500,
       easingcss3: "cubic-bezier(0.8, 0, 0.1, 1)",
-      normalScrollElements: ".section-event-listCard",
+      normalScrollElements: ".section-event-listCard, #form-information",
       onLeave: function (origin, destination, direction) {
         if (textElements) {
           // Hiệu ứng từ dưới hiện lên

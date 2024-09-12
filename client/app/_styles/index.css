@@ -39,3 +39,7 @@
 #section-offers .react-multiple-carousel__arrow {
     display: none;
 }
+#section-information .fp-overflow {
+    display: flex;
+    gap: 40px;
+}
