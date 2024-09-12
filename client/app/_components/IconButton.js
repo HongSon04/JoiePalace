@@ -1,5 +1,7 @@
 "use client";
 
+import { ClassNames } from "@emotion/react";
+
 function IconButton({
   onClick,
   className = "",
@@ -24,7 +26,7 @@ function IconButton({
   return (
     <button
       type={type}
-      className={`flex-center rounded-full ${className} ${_size} ${_background} hover:bg-whiteAlpha-300`}
+      className={`flex-center rounded-full hover:bg-whiteAlpha-300 ${_size} ${_background} ${className}`}
       onClick={onClick}
     >
       {children}
