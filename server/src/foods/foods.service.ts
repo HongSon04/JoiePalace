@@ -10,6 +10,10 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class FoodsService {
@@ -123,77 +127,85 @@ export class FoodsService {
   // ! Get all foods
   async findAll(query: FilterPriceDto) {
     try {
+      // Parse và gán giá trị mặc định cho các tham số
       const page = Number(query.page) || 1;
       const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
       const skip = (page - 1) * itemsPerPage;
+      const priceSort = query.priceSort.toLowerCase();
 
-      const minPrice = Number(query.minPrice) || 0;
-      const maxPrice = Number(query.maxPrice) || 999999999999;
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
 
-      // Tạo mảng điều kiện để tìm kiếm
+      const minPrice = Math.max(0, Number(query.minPrice) || 0);
+      const maxPrice = Math.max(
+        minPrice,
+        Number(query.maxPrice) || 999999999999,
+      );
+
+      // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: false,
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
+          { categories: { name: { contains: search, mode: 'insensitive' } } },
           {
-            categories: {
-              name: { contains: search, mode: 'insensitive' }, // Tìm kiếm theo tên danh mục
-            },
-          },
-          {
-            tags: {
-              some: {
-                name: { contains: search, mode: 'insensitive' }, // Tìm kiếm theo tên thẻ
-              },
-            },
+            tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
         ],
       };
 
       // Điều kiện giá
       if (minPrice >= 0) {
-        whereConditions.AND = [
-          ...(whereConditions.AND || []),
-          {
-            price: {
-              gte: minPrice,
-              lte: maxPrice,
-            },
-          },
-        ];
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
       }
 
-      // Lấy danh sách món ăn theo trang và tìm kiếm
+      // Điều kiện ngày tạo
+      if (startDate && endDate) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({
+          created_at: { gte: startDate, lte: endDate },
+        });
+      }
+
+      // Sắp xếp theo giá
+      let orderByConditions: any = {};
+      if (priceSort === 'asc' || priceSort === 'desc') {
+        orderByConditions.price = priceSort;
+      }
+
+      // Lấy danh sách món ăn và tổng số
       const [foods, totalCount] = await Promise.all([
         this.prismaService.foods.findMany({
           where: whereConditions,
-          include: {
-            categories: true, // Bao gồm thông tin danh mục
-            tags: true, // Bao gồm thông tin thẻ
-          },
+          include: { categories: true, tags: true },
           skip,
           take: itemsPerPage,
-          orderBy: {
-            created_at: 'desc',
-          },
+          orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
-        this.prismaService.foods.count({
-          where: whereConditions,
-        }),
+        this.prismaService.foods.count({ where: whereConditions }),
       ]);
 
+      // Tính toán các trang
       const lastPage = Math.ceil(totalCount / itemsPerPage);
-      const nextPage = page + 1 > lastPage ? null : page + 1;
-      const prevPage = page - 1 <= 0 ? null : page - 1;
+      const paginationInfo = {
+        nextPage: page + 1 > lastPage ? null : page + 1,
+        prevPage: page - 1 <= 0 ? null : page - 1,
+        lastPage: lastPage,
+        itemsPerPage,
+        currentPage: page,
+      };
 
+      // Trả về kết quả
       throw new HttpException(
-        {
-          data: foods,
-          pagination: { nextPage, prevPage, lastPage, currentPage: page },
-        },
+        { data: foods, pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -210,77 +222,85 @@ export class FoodsService {
   // ! Get all deleted foods
   async findAllDeleted(query: FilterPriceDto) {
     try {
+      // Parse và gán giá trị mặc định cho các tham số
       const page = Number(query.page) || 1;
       const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
       const skip = (page - 1) * itemsPerPage;
+      const priceSort = query.priceSort.toLowerCase();
 
-      const minPrice = Number(query.minPrice) || 0;
-      const maxPrice = Number(query.maxPrice) || 999999999999;
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
 
-      // Tạo mảng điều kiện để tìm kiếm
+      const minPrice = Math.max(0, Number(query.minPrice) || 0);
+      const maxPrice = Math.max(
+        minPrice,
+        Number(query.maxPrice) || 999999999999,
+      );
+
+      // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: true,
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
+          { categories: { name: { contains: search, mode: 'insensitive' } } },
           {
-            categories: {
-              name: { contains: search, mode: 'insensitive' }, // Tìm kiếm theo tên danh mục
-            },
-          },
-          {
-            tags: {
-              some: {
-                name: { contains: search, mode: 'insensitive' }, // Tìm kiếm theo tên thẻ
-              },
-            },
+            tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
         ],
       };
 
       // Điều kiện giá
       if (minPrice >= 0) {
-        whereConditions.AND = [
-          ...(whereConditions.AND || []),
-          {
-            price: {
-              gte: minPrice,
-              lte: maxPrice,
-            },
-          },
-        ];
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
       }
 
-      // Lấy danh sách món ăn theo trang và tìm kiếm
+      // Điều kiện ngày tạo
+      if (startDate && endDate) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({
+          created_at: { gte: startDate, lte: endDate },
+        });
+      }
+
+      // Sắp xếp theo giá
+      let orderByConditions: any = {};
+      if (priceSort === 'asc' || priceSort === 'desc') {
+        orderByConditions.price = priceSort;
+      }
+
+      // Lấy danh sách món ăn và tổng số
       const [foods, totalCount] = await Promise.all([
         this.prismaService.foods.findMany({
           where: whereConditions,
-          include: {
-            categories: true, // Bao gồm thông tin danh mục
-            tags: true, // Bao gồm thông tin thẻ
-          },
+          include: { categories: true, tags: true },
           skip,
           take: itemsPerPage,
-          orderBy: {
-            created_at: 'desc',
-          },
+          orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
-        this.prismaService.foods.count({
-          where: whereConditions,
-        }),
+        this.prismaService.foods.count({ where: whereConditions }),
       ]);
 
+      // Tính toán các trang
       const lastPage = Math.ceil(totalCount / itemsPerPage);
-      const nextPage = page + 1 > lastPage ? null : page + 1;
-      const prevPage = page - 1 <= 0 ? null : page - 1;
+      const paginationInfo = {
+        nextPage: page + 1 > lastPage ? null : page + 1,
+        prevPage: page - 1 <= 0 ? null : page - 1,
+        lastPage: lastPage,
+        itemsPerPage,
+        currentPage: page,
+      };
 
+      // Trả về kết quả
       throw new HttpException(
-        {
-          data: foods,
-          pagination: { nextPage, prevPage, lastPage, currentPage: page },
-        },
+        { data: foods, pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -352,20 +372,88 @@ export class FoodsService {
   }
 
   // ! Get all foods by category id
-  async findByCategoryId(category_id: number) {
+  async findByCategoryId(query: FilterPriceDto, category_id: number) {
     try {
-      const foods = await this.prismaService.foods.findMany({
-        where: { category_id },
-        include: {
-          categories: true,
-          tags: true,
-        },
-      });
+      // Parse và gán giá trị mặc định cho các tham số
+      const page = Number(query.page) || 1;
+      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      const search = query.search || '';
+      const skip = (page - 1) * itemsPerPage;
+      const priceSort = query.priceSort.toLowerCase();
 
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const minPrice = Math.max(0, Number(query.minPrice) || 0);
+      const maxPrice = Math.max(
+        minPrice,
+        Number(query.maxPrice) || 999999999999,
+      );
+
+      // Tạo điều kiện tìm kiếm
+      const whereConditions: any = {
+        deleted: false,
+        category_id,
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { short_description: { contains: search, mode: 'insensitive' } },
+          { categories: { name: { contains: search, mode: 'insensitive' } } },
+          {
+            tags: { some: { name: { contains: search, mode: 'insensitive' } } },
+          },
+        ],
+      };
+
+      // Điều kiện giá
+      if (minPrice >= 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+      }
+
+      // Điều kiện ngày tạo
+      if (startDate && endDate) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({
+          created_at: { gte: startDate, lte: endDate },
+        });
+      }
+
+      // Sắp xếp theo giá
+      let orderByConditions: any = {};
+      if (priceSort === 'asc' || priceSort === 'desc') {
+        orderByConditions.price = priceSort;
+      }
+
+      // Lấy danh sách món ăn và tổng số
+      const [foods, totalCount] = await Promise.all([
+        this.prismaService.foods.findMany({
+          where: whereConditions,
+          include: { categories: true, tags: true },
+          skip,
+          take: itemsPerPage,
+          orderBy: { ...orderByConditions, created_at: 'desc' },
+        }),
+        this.prismaService.foods.count({ where: whereConditions }),
+      ]);
+
+      // Tính toán các trang
+      const lastPage = Math.ceil(totalCount / itemsPerPage);
+      const paginationInfo = {
+        nextPage: page + 1 > lastPage ? null : page + 1,
+        prevPage: page - 1 <= 0 ? null : page - 1,
+        lastPage: lastPage,
+        itemsPerPage,
+        currentPage: page,
+      };
+
+      // Trả về kết quả
       throw new HttpException(
-        {
-          data: foods,
-        },
+        { data: foods, pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -380,26 +468,92 @@ export class FoodsService {
   }
 
   // ! Get all foods by tag id
-  async findByTagId(tag_id: number) {
+  async findByTagId(query: FilterPriceDto, tag_id: number) {
     try {
-      const foods = await this.prismaService.foods.findMany({
-        where: {
-          tags: {
-            some: {
-              id: tag_id,
-            },
+      // Parse và gán giá trị mặc định cho các tham số
+      const page = Number(query.page) || 1;
+      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      const search = query.search || '';
+      const skip = (page - 1) * itemsPerPage;
+      const priceSort = query.priceSort.toLowerCase();
+
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const minPrice = Math.max(0, Number(query.minPrice) || 0);
+      const maxPrice = Math.max(
+        minPrice,
+        Number(query.maxPrice) || 999999999999,
+      );
+
+      // Tạo điều kiện tìm kiếm
+      const whereConditions: any = {
+        deleted: false,
+        tags: {
+          some: {
+            id: tag_id,
           },
         },
-        include: {
-          categories: true,
-          tags: true,
-        },
-      });
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { short_description: { contains: search, mode: 'insensitive' } },
+          { categories: { name: { contains: search, mode: 'insensitive' } } },
+          {
+            tags: { some: { name: { contains: search, mode: 'insensitive' } } },
+          },
+        ],
+      };
 
+      // Điều kiện giá
+      if (minPrice >= 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+      }
+
+      // Điều kiện ngày tạo
+      if (startDate && endDate) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({
+          created_at: { gte: startDate, lte: endDate },
+        });
+      }
+
+      // Sắp xếp theo giá
+      let orderByConditions: any = {};
+      if (priceSort === 'asc' || priceSort === 'desc') {
+        orderByConditions.price = priceSort;
+      }
+
+      // Lấy danh sách món ăn và tổng số
+      const [foods, totalCount] = await Promise.all([
+        this.prismaService.foods.findMany({
+          where: whereConditions,
+          include: { categories: true, tags: true },
+          skip,
+          take: itemsPerPage,
+          orderBy: { ...orderByConditions, created_at: 'desc' },
+        }),
+        this.prismaService.foods.count({ where: whereConditions }),
+      ]);
+
+      // Tính toán các trang
+      const lastPage = Math.ceil(totalCount / itemsPerPage);
+      const paginationInfo = {
+        nextPage: page + 1 > lastPage ? null : page + 1,
+        prevPage: page - 1 <= 0 ? null : page - 1,
+        lastPage: lastPage,
+        itemsPerPage,
+        currentPage: page,
+      };
+
+      // Trả về kết quả
       throw new HttpException(
-        {
-          data: foods,
-        },
+        { data: foods, pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {

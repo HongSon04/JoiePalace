@@ -34,8 +34,8 @@ export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
 
   // ! Create A New Location
-  @ApiOperation({ summary: 'Tạo chi nhánh mới' })
   @Post('create')
+  @ApiOperation({ summary: 'Tạo chi nhánh mới' })
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -215,6 +215,8 @@ export class LocationsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   async getAllLocations(@Query() query: FilterDto): Promise<any> {
     return this.locationsService.getAllLocations(query);
   }
@@ -287,6 +289,8 @@ export class LocationsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   async getAllDeletedLocations(@Query() query: FilterDto): Promise<any> {
     return this.locationsService.getAllDeletedLocations(query);
   }

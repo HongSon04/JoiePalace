@@ -93,6 +93,9 @@ export class MenusController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
   findAll(@Query() query: FilterPriceDto) {
     return this.menusService.findAll(query);
   }
@@ -134,6 +137,9 @@ export class MenusController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
   findAllDeleted(@Query() query: FilterPriceDto) {
     return this.menusService.findAllDeleted(query);
   }

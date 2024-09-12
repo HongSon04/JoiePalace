@@ -10,6 +10,10 @@ import { PrismaService } from 'src/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class DecorsService {
@@ -89,6 +93,13 @@ export class DecorsService {
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
 
+    const priceSort = query.priceSort.toLowerCase();
+
+    const startDate = query.startDate
+      ? FormatDateToStartOfDay(query.startDate)
+      : null;
+    const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
+
     const whereConditions: any = {
       deleted: false,
       OR: [
@@ -117,7 +128,7 @@ export class DecorsService {
       ],
     };
 
-    if (minPrice > 0) {
+    if (minPrice >= 0) {
       whereConditions.AND = [
         ...(whereConditions.AND || []),
         {
@@ -129,6 +140,20 @@ export class DecorsService {
       ];
     }
 
+    // Điều kiện ngày tạo
+    if (startDate && endDate) {
+      if (!whereConditions.AND) whereConditions.AND = [];
+      whereConditions.AND.push({
+        created_at: { gte: startDate, lte: endDate },
+      });
+    }
+
+    // Sắp xếp theo giá
+    let orderByConditions: any = {};
+    if (priceSort === 'asc' || priceSort === 'desc') {
+      orderByConditions.price = priceSort;
+    }
+
     try {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.decors.findMany({
@@ -136,28 +161,27 @@ export class DecorsService {
 
           skip,
           take: itemsPerPage,
+          orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
         this.prismaService.decors.count({
           where: whereConditions,
         }),
       ]);
 
+      // Tính toán các trang
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page + 1 > lastPage ? null : page + 1;
-      const prevPage = page - 1 <= 0 ? null : page - 1;
+      const paginationInfo = {
+        nextPage: page + 1 > lastPage ? null : page + 1,
+        prevPage: page - 1 <= 0 ? null : page - 1,
+        lastPage: lastPage,
+        itemsPerPage,
+        currentPage: page,
+      };
 
       throw new HttpException(
         {
-          message: 'Lấy danh sách trang trí thành công',
           data: res,
-          pagination: {
-            total,
-            itemsPerPage,
-            currentPage: page,
-            lastPage,
-            nextPage,
-            prevPage,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -181,6 +205,13 @@ export class DecorsService {
 
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
+
+    const priceSort = query.priceSort.toLowerCase();
+
+    const startDate = query.startDate
+      ? FormatDateToStartOfDay(query.startDate)
+      : null;
+    const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
     const whereConditions: any = {
       deleted: true,
@@ -210,7 +241,7 @@ export class DecorsService {
       ],
     };
 
-    if (minPrice > 0) {
+    if (minPrice >= 0) {
       whereConditions.AND = [
         ...(whereConditions.AND || []),
         {
@@ -222,6 +253,20 @@ export class DecorsService {
       ];
     }
 
+    // Điều kiện ngày tạo
+    if (startDate && endDate) {
+      if (!whereConditions.AND) whereConditions.AND = [];
+      whereConditions.AND.push({
+        created_at: { gte: startDate, lte: endDate },
+      });
+    }
+
+    // Sắp xếp theo giá
+    let orderByConditions: any = {};
+    if (priceSort === 'asc' || priceSort === 'desc') {
+      orderByConditions.price = priceSort;
+    }
+
     try {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.decors.findMany({
@@ -229,28 +274,27 @@ export class DecorsService {
 
           skip,
           take: itemsPerPage,
+          orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
         this.prismaService.decors.count({
           where: whereConditions,
         }),
       ]);
 
+      // Tính toán các trang
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page + 1 > lastPage ? null : page + 1;
-      const prevPage = page - 1 <= 0 ? null : page - 1;
+      const paginationInfo = {
+        nextPage: page + 1 > lastPage ? null : page + 1,
+        prevPage: page - 1 <= 0 ? null : page - 1,
+        lastPage: lastPage,
+        itemsPerPage,
+        currentPage: page,
+      };
 
       throw new HttpException(
         {
-          message: 'Lấy danh sách trang trí thành công',
           data: res,
-          pagination: {
-            total,
-            itemsPerPage,
-            currentPage: page,
-            lastPage,
-            nextPage,
-            prevPage,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );

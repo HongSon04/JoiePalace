@@ -8,4 +8,10 @@ export class FilterPriceDto {
   maxPrice: string;
 
   minPrice: string;
+
+  priceSort: string;
+
+  startDate: string;
+
+  endDate: string;
 }

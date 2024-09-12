@@ -14,6 +14,10 @@ import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class UserService {
@@ -192,76 +196,53 @@ export class UserService {
       const page = Number(query.page) || 1;
       const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
-      const skip = Number((page - 1) * itemsPerPage);
+      const skip = (page - 1) * itemsPerPage;
+
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? { created_at: { gte: new Date(startDate), lte: new Date(endDate) } }
+          : {};
+
+      const whereConditions: any = {
+        deleted: false,
+        OR: [
+          { username: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+        ],
+        ...sortRangeDate,
+      };
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                username: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                email: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           skip,
           take: itemsPerPage,
+          orderBy: { created_at: 'desc' },
         }),
-        this.prismaService.users.count({
-          where: {
-            OR: [
-              {
-                username: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                email: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
-        }),
+        this.prismaService.users.count({ where: whereConditions }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
       throw new HttpException(
         {
           data: res,
-          pagination: {
-            total,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -282,78 +263,54 @@ export class UserService {
       const page = Number(query.page) || 1;
       const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
-      const skip = Number((page - 1) * itemsPerPage);
+      const skip = (page - 1) * itemsPerPage;
+
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? { created_at: { gte: new Date(startDate), lte: new Date(endDate) } }
+          : {};
+      console.log(sortRangeDate);
+
+      const whereConditions: any = {
+        deleted: true,
+        OR: [
+          { username: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+        ],
+        ...sortRangeDate,
+      };
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                username: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                email: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           skip,
           take: itemsPerPage,
+          orderBy: { created_at: 'desc' },
         }),
-        this.prismaService.users.count({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                username: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                email: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
-        }),
+        this.prismaService.users.count({ where: whereConditions }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
-
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
       throw new HttpException(
         {
           data: res,
-          pagination: {
-            total,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -537,4 +494,6 @@ export class UserService {
     const hashedPassword = bcrypt.hashSync(password, 10);
     return hashedPassword;
   }
+
+  // ! Test Api
 }

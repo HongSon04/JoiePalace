@@ -9,6 +9,10 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 import { PrismaService } from 'src/prisma.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class MenusService {
@@ -83,6 +87,12 @@ export class MenusService {
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
     const skip = (page - 1) * itemsPerPage;
+    const priceSort = query.priceSort.toLowerCase();
+
+    const startDate = query.startDate
+      ? FormatDateToStartOfDay(query.startDate)
+      : null;
+    const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
@@ -113,9 +123,13 @@ export class MenusService {
           },
         },
       ],
+      created_at: {
+        gte: startDate,
+        lte: endDate,
+      },
     };
 
-    if (minPrice > 0) {
+    if (minPrice >= 0) {
       whereConditions.AND = [
         ...(whereConditions.AND || []),
         {
@@ -125,6 +139,12 @@ export class MenusService {
           },
         },
       ];
+    }
+
+    // Sắp xếp theo giá
+    let orderByConditions: any = {};
+    if (priceSort === 'asc' || priceSort === 'desc') {
+      orderByConditions.price = priceSort;
     }
 
     try {
@@ -141,37 +161,12 @@ export class MenusService {
           skip,
           take: itemsPerPage,
           orderBy: {
+            ...orderByConditions,
             created_at: 'desc',
           },
         }),
         this.prismaService.menus.count({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                foods: {
-                  some: {
-                    name: {
-                      contains: search,
-                      mode: 'insensitive',
-                    },
-                  },
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 
@@ -210,6 +205,12 @@ export class MenusService {
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
     const skip = (page - 1) * itemsPerPage;
+    const priceSort = query.priceSort.toLowerCase();
+
+    const startDate = query.startDate
+      ? FormatDateToStartOfDay(query.startDate)
+      : null;
+    const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
@@ -240,6 +241,10 @@ export class MenusService {
           },
         },
       ],
+      created_at: {
+        gte: startDate,
+        lte: endDate,
+      },
     };
 
     if (minPrice >= 0) {
@@ -252,6 +257,12 @@ export class MenusService {
           },
         },
       ];
+    }
+
+    // Sắp xếp theo giá
+    let orderByConditions: any = {};
+    if (priceSort === 'asc' || priceSort === 'desc') {
+      orderByConditions.price = priceSort;
     }
 
     try {
@@ -268,37 +279,12 @@ export class MenusService {
           skip,
           take: itemsPerPage,
           orderBy: {
+            ...orderByConditions,
             created_at: 'desc',
           },
         }),
         this.prismaService.menus.count({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                foods: {
-                  some: {
-                    name: {
-                      contains: search,
-                      mode: 'insensitive',
-                    },
-                  },
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 

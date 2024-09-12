@@ -13,6 +13,10 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MakeSlugger } from 'helper/slug';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class LocationsService {
@@ -153,86 +157,79 @@ export class LocationsService {
       const search = query.search || '';
       const itemsPerPage = Number(query.itemsPerPage) || 1;
       const skip = (page - 1) * itemsPerPage;
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
+
+      const whereConditions = {
+        deleted: false,
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            address: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+        created_at: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+        ...sortRangeDate,
+      };
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.locations.findMany({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                address: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           skip: skip,
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
           },
-          select: {
-            id: true,
-            name: true,
-            address: true,
-            phone: true,
-          },
         }),
         this.prismaService.locations.count({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                address: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
-
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
       throw new HttpException(
         {
           data: res,
-          pagination: {
-            total,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -254,86 +251,79 @@ export class LocationsService {
       const search = query.search || '';
       const itemsPerPage = Number(query.itemsPerPage) || 1;
       const skip = (page - 1) * itemsPerPage;
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
+
+      const whereConditions = {
+        deleted: true,
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            address: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+        created_at: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+        ...sortRangeDate,
+      };
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.locations.findMany({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                address: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           skip: skip,
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
           },
-          select: {
-            id: true,
-            name: true,
-            address: true,
-            phone: true,
-          },
         }),
         this.prismaService.locations.count({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                address: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                phone: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
-
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
       throw new HttpException(
         {
           data: res,
-          pagination: {
-            total: res.length,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );

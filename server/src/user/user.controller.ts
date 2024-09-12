@@ -23,8 +23,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'decorator/roles.decorator';
 import { Role } from 'helper/role.enum';
-import { platform } from 'os';
-import { verify } from 'crypto';
+import { get } from 'http';
 
 @ApiTags('user')
 @Controller('user')
@@ -140,7 +139,6 @@ export class UserController {
   }
 
   // ! Get All User
-  @Get('get-all')
   @ApiOperation({
     summary: 'Lấy danh sách tài khoản (trừ tài khoản bị xóa tạm)',
   })
@@ -181,10 +179,13 @@ export class UserController {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
     },
   })
+  @Get('get-all')
   @Roles(Role.ADMIN)
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
   getAll(@Query() query: FilterDto): Promise<any> {
     return this.userService.getAll(query);
   }
@@ -232,6 +233,8 @@ export class UserController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
   getAllDeleted(@Query() query: FilterDto): Promise<any> {
     return this.userService.getAllDeleted(query);
   }
@@ -404,4 +407,5 @@ export class UserController {
   hardDelete(@Query('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);
   }
+
 }

@@ -9,6 +9,10 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from 'src/prisma.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class CategoriesService {
@@ -70,76 +74,76 @@ export class CategoriesService {
       const search = query.search || '';
       const skip = (page - 1) * itemsPerPage;
 
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
+
+      const whereConditions: any = {
+        deleted: false,
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+        ...sortRangeDate,
+      };
+
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.categories.findMany({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           skip,
           take: itemsPerPage,
+          orderBy: {
+            created_at: 'desc',
+          },
         }),
         this.prismaService.categories.count({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
 
       throw new HttpException(
         {
           data: res,
-          pagination: {
-            total,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -162,76 +166,76 @@ export class CategoriesService {
       const search = query.search || '';
       const skip = (page - 1) * itemsPerPage;
 
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
+
+      const whereConditions: any = {
+        deleted: true,
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+        ...sortRangeDate,
+      };
+
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.categories.findMany({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           skip,
           take: itemsPerPage,
+          orderBy: {
+            created_at: 'desc',
+          },
         }),
         this.prismaService.categories.count({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
 
       throw new HttpException(
         {
           data: res,
-          pagination: {
-            total,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
