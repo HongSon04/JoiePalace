@@ -393,3 +393,10 @@ body::-webkit-scrollbar {
   font-weight: 400;
   background: rgba(0, 0, 0, 0.2);
 }
+.bg-image-tintuc{
+  background-image: url('/banner-news-detail.png');
+  background-size: cover;
+}
+.div-children-banner:hover  {
+  opacity: 0.9;
+}

@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
 import { User as UserEntity } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcrypt';
@@ -58,6 +58,7 @@ export class AuthService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ auth.service.ts -> register', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -75,13 +76,16 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new HttpException('Email không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Tài khoản hoặc mật khẩu không chính xác',
+          HttpStatus.BAD_REQUEST,
+        );
       }
       // ? Compare password
       const comparePassword = await bcrypt.compare(password, user.password);
       if (!comparePassword) {
         throw new HttpException(
-          'Mật khẩu không chính xác',
+          'Tài khoản hoặc mật khẩu không chính xác',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -99,6 +103,7 @@ export class AuthService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ auth.service.ts -> login', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -132,6 +137,7 @@ export class AuthService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ auth.service.ts -> logout', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -140,63 +146,92 @@ export class AuthService {
 
   // ! Change Avatar
   async changeAvatar(reqUser: UserEntity, avatar: string) {
-    const findImageUser = await this.prismaService.users.findFirst({
-      where: {
-        id: Number(reqUser.id),
-      },
-    });
-    if (findImageUser.avatar) {
-      await this.cloudinaryService.deleteImageByUrl(findImageUser.avatar);
+    try {
+      const findImageUser = await this.prismaService.users.findFirst({
+        where: {
+          id: Number(reqUser.id),
+        },
+      });
+      if (findImageUser.avatar) {
+        await this.cloudinaryService.deleteImageByUrl(findImageUser.avatar);
+      }
+      await this.prismaService.users.update({
+        where: {
+          id: Number(reqUser.id),
+        },
+        data: {
+          avatar,
+        },
+      });
+      throw new HttpException(
+        'Thay đổi ảnh đại diện thành công',
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ auth.service.ts -> changeAvatar', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
     }
-    await this.prismaService.users.update({
-      where: {
-        id: Number(reqUser.id),
-      },
-      data: {
-        avatar,
-      },
-    });
-    throw new HttpException('Thay đổi ảnh đại diện thành công', HttpStatus.OK);
   }
 
   // ! Refresh Token
   async refreshToken(refreshToken: string): Promise<any> {
-    if (!refreshToken) {
-      throw new UnauthorizedException('Không tìm thấy refresh token');
-    }
-    const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: this.configService.get('REFRESH_SECRET_JWT'),
-    });
-    if (!payload) {
-      throw new UnauthorizedException('Refresh token không hợp lệ');
-    }
-    const user = await this.prismaService.users.findFirst({
-      where: {
-        refresh_token: refreshToken,
-        id: payload.id,
-      },
-    });
+    try {
+      if (!refreshToken) {
+        throw new UnauthorizedException('Không tìm thấy refresh token');
+      }
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get('REFRESH_SECRET_JWT'),
+      });
+      if (!payload) {
+        throw new UnauthorizedException('Refresh token không hợp lệ');
+      }
+      const user = await this.prismaService.users.findFirst({
+        where: {
+          refresh_token: refreshToken,
+          id: payload.id,
+        },
+      });
 
-    if (!user) {
-      throw new UnauthorizedException(
-        'Refresh token không hợp lệ hoặc đã hết hạn',
+      if (!user) {
+        throw new UnauthorizedException(
+          'Refresh token không hợp lệ hoặc đã hết hạn',
+        );
+      }
+
+      const { id, username, email, role, phone } = user;
+      const newPayload = { id, username, email, role, phone };
+      const access_token = this.jwtService.sign(newPayload, {
+        secret: this.configService.get('ACCESS_SECRET_JWT'),
+        expiresIn: this.configService.get('EXP_IN_ACCESS_TOKEN'),
+      });
+
+      throw new HttpException(
+        {
+          message: 'Làm mới token thành công',
+          access_token,
+        },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      if (error instanceof JsonWebTokenError) {
+        throw new UnauthorizedException('Invalid token signature');
+      }
+
+      // Handle other types of errors...
+
+      throw new InternalServerErrorException(
+        'Unexpected error during token refresh',
       );
     }
-
-    const { id, username, email, role, phone } = user;
-    const newPayload = { id, username, email, role, phone };
-    const access_token = this.jwtService.sign(newPayload, {
-      secret: this.configService.get('ACCESS_SECRET_JWT'),
-      expiresIn: this.configService.get('EXP_IN_ACCESS_TOKEN'),
-    });
-
-    throw new HttpException(
-      {
-        message: 'Làm mới token thành công',
-        access_token,
-      },
-      HttpStatus.OK,
-    );
   }
 
   // ! Generate Token
