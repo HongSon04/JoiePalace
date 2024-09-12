@@ -5,9 +5,12 @@ import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import Footer from "@/app/_components/FooterClient";
 import TextFade from "@/app/_components/TextFade";
 import MultiCarousel from "@/app/_components/MultiCarouselSlider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
 import "@/app/_styles/index.css";
+import IconButton from "@/app/_components/IconButton";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -50,6 +53,71 @@ const services = [
       "White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.",
   },
 ];
+const events = [
+  [
+    {
+      id: 1,
+      content: "MÀN CHÀO SÂN ĐẦY MẠNH MẼ VÀ ẤN TƯỢNG CỦA SUZUKI XL7 HYBRID",
+      urlImage: "/images-client/events/fev.jpg",
+    },
+    {
+      id: 2,
+      content:
+        "KHI SẮC TRẮNG THANH KHIẾT TÔ ĐIỂM CHO KHÔNG GIAN CƯỚI NGHỆ THUẬT CỦA WHITE PALACE PHẠM VĂN ĐỒNG",
+      urlImage: "/images-client/events/46-1.jpg",
+    },
+    {
+      id: 3,
+      content:
+        "ĐẠI HỘI ĐẠI BIỂU LẦN IX CỦA HAWA: WHITE PALACE PHẠM VĂN ĐỒNG ĐÓN TIẾP CỘNG ĐỒNG DOANH NGHIỆP NGÀNH GỖ VÀ MỸ NGHỆ",
+      urlImage: "/images-client/events/HAWA-62.jpg",
+    },
+  ],
+  [
+    {
+      id: 1,
+      content:
+        "SOCIAL & AFFILIATE GLOBAL SUMMIT 2024: SỰ KIỆN LỚN NHẤT NĂM CHO CỘNG ĐỒNG DOANH NGHIỆP VÀ PUBLISHER/KOC",
+      urlImage: "/images-client/events/SAGS-64-1.jpg",
+    },
+    {
+      id: 2,
+      content:
+        "NGÀY HỘI NAILS DAY 2024: SỰ KIỆN ĐẲNG CẤP QUY TỤ HÀNG NGHÌN NGƯỜI YÊU NAIL TRÊN KHẮP VIỆT NAM",
+      urlImage: "/images-client/events/NDKP-138.jpg",
+    },
+    {
+      id: 3,
+      content:
+        "TIỆC THÔI NÔI TẠI SẢNH SERENE – LỜI CHÚC BÌNH AN CHO BÉ TRONG CỘT MỐC ĐẦU ĐỜI",
+      urlImage: "/images-client/events/evr.jpg",
+    },
+  ],
+];
+const offers = [
+  {
+    id: 1,
+    title: "tặng sân khấu màn hình led cho doanh nghiệp",
+    content:
+      "White Palace áp dụng chương trình ưu đãi tặng sân khấu màn hình LED cho sự kiện doanh nghiệp có thời gian tổ chức từ nay đến hết 30/9/2024.",
+    image: "/images-client/offers/offer1.png",
+  },
+  {
+    id: 2,
+    title:
+      "tặng kì nghỉ trăng mật 2 ngày 1 đêm trên du thuyển 5 sao elite of the seas tại vịnh hạ long khi đặt tiệc cưới",
+    content:
+      "White Palace trân trọng dành tặng kì trăng mật lãng mạn trên du thuyền 5 sao tại Vịnh Hạ Long (kèm vé máy bay khứ hồi) cho khách hàng tổ chức sự kiện cưới tại chi nhánh bất kỳ",
+    image: "/images-client/offers/offer2.png",
+  },
+  {
+    id: 3,
+    title: "tặng trang sức ngọc trai cho khách hàng tiệc cưới",
+    content:
+      "White Palace tặng bạn trang sức ngọc trai Long Beach Pearl trị giá 20.000.000 VND khi đặt tiệc cưới tại chi nhánh bất kỳ.",
+    image: "/images-client/offers/offer3.png",
+  },
+];
 const textContainerVariants = {
   hidden: { opacity: 0, y: 50 },
   visible: {
@@ -63,6 +131,8 @@ const textContainerVariants = {
 };
 function Home() {
   const [timeAutoPlay, setTimeAutoPlay] = useState(false);
+  const carouselRef = useRef();
+  const [currentSlide, setCurrentSlide] = useState(0);
   const delay = () => {
     setTimeout(() => {
       setTimeAutoPlay(true);
@@ -71,8 +141,12 @@ function Home() {
   useEffect(() => {
     delay();
   }, []);
+  const handleSlideChange = (nextSlide) => {
+    setCurrentSlide(nextSlide)
+  };
   return (
     <ScrollFullPage>
+      {/* banner */}
       <section className="section banner w-full h-screen relative top-0 left-0">
         <MultiCarousel
           removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
@@ -81,6 +155,7 @@ function Home() {
           customTransition={"transform 7000ms ease-in-out"}
           containerClass="w-screen"
           autoPlay={timeAutoPlay}
+          customButtons={false}
         >
           {bannerImages.map((image, index) => (
             <div key={index}>
@@ -98,7 +173,7 @@ function Home() {
             NƠI CỦA SỰ THANH LỊCH, <br />
             LÒNG HIẾU KHÁCH <br /> VÀ TINH THẦN DUY MỸ
           </h1>
-          <span className="text-base font-normal leading-6 text-center w-[45%]">
+          <span className="text-base font-normal leading-6 text-center w-[50%]">
             Được xây dựng và phát triển bởi IN Hospitality vào năm 2007, White
             Palace là thương hiệu đầu tiên tại Việt Nam mở ra mô hình trung tâm
             hội nghị và sự kiện. Với sự đầu tư bài bản và chuyên biệt cho các
@@ -124,6 +199,7 @@ function Home() {
           </motion.div>
         </div>
       </section>
+      {/* location */}
       <section className="section w-full h-full flex" id="section-location">
         <div className="w-[9%] h-screen flex justify-center items-center bg-gold shrink-0">
           <span className="h-auto uppercase -rotate-90 whitespace-nowrap font-bold text-5xl w-auto">
@@ -188,10 +264,11 @@ function Home() {
           ))}
         </div>
       </section>
+      {/* events */}
       <section className="section relative w-screen" id="section-services">
         <TextFade
           settings={{
-            hidden: { opacity: 0, y: 400 },
+            hidden: { opacity: 0, y: 200 },
             visible: {
               opacity: 1,
               y: 135,
@@ -215,6 +292,7 @@ function Home() {
           customTransition={"3000ms ease-in-out"}
           containerClass="w-screen"
           autoPlay={timeAutoPlay}
+          customButtons={false}
         >
           {services.map((service, index) => (
             <div key={service.id} className="w-screen h-screen flex relative">
@@ -269,6 +347,246 @@ function Home() {
             </div>
           ))}
         </MultiCarousel>
+      </section>
+      {/* services */}
+      <section
+        className="section w-screen h-screen relative flex flex-row gap-28"
+        id="section-event"
+      >
+        <div className="w-[50%] h-screen relative flex justify-center items-center pl-20">
+          <Image
+            src="/decor-cover.png"
+            className="absolute top-1/2 -translate-y-1/2 -left-[50%] translate-x-[50%] object-cover"
+            h={"60vh"}
+            w={"auto"}
+            alt=""
+          />
+          <div className="flex flex-col gap-14 z-10">
+            <TextFade
+              settings={{
+                hidden: { opacity: 0, y: 100 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 1,
+                    ease: "easeIn",
+                  },
+                },
+              }}
+              replayEffect={false}
+              styles="w-[79%]"
+            >
+              <span className="uppercase text-gold font-bold text-[4em] leading-[64px]">
+                TIN TỨC & SỰ KIỆN MỚI NHẤT
+              </span>
+            </TextFade>
+            <TextFade
+              settings={{
+                hidden: { opacity: 0, y: 100 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 1,
+                    delay: 0.15,
+                    ease: "easeIn",
+                  },
+                },
+              }}
+              replayEffect={false}
+            >
+              <span className="leading-[150%] font-normal text-[18px] w-[85%]">
+                Cảm ơn quý khách đã ghé thăm chuyên mục tin tức của chúng
+                tôi.Tại đây, quý khách có thể cập nhật những tin tức mới
+                nhất,điểm lại những sự kiện nổi bật nhất tại White Palace vàkhám
+                phá những ưu đãi đặc biệt dành cho sự kiện của bạn.
+              </span>
+            </TextFade>
+            <TextFade
+              settings={{
+                hidden: { opacity: 0, y: 100 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 1,
+                    delay: 0.25,
+                    ease: "easeIn",
+                  },
+                },
+              }}
+              replayEffect={false}
+            >
+              <ButtonDiscover className={"w-[20%]"} />
+            </TextFade>
+          </div>
+        </div>
+        <div className="w-[50%] h-screen pr-20 pt-[100px] pb-[40px] flex gap-6">
+          {events.map((event, indexEvent) => (
+            <div
+              key={indexEvent}
+              className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${
+                indexEvent === 0 ? "flex-col-reverse" : "flex-col"
+              } gap-6 overflow-y-scroll cursor-pointer`}
+            >
+              {event.map((item, indexItem) => (
+                <div
+                  key={indexItem}
+                  className="w-full h-[65%] flex-shrink-0 relative"
+                >
+                  <div className="w-full h-full overflow-hidden relative">
+                    <Image
+                      src={`${item.urlImage}`}
+                      className="object-cover"
+                      w={"100%"}
+                      h={"100%"}
+                      alt=""
+                    />
+                    <div className="absolute inset-0 bg-blackAlpha-600"></div>
+                  </div>
+                  <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-between py-10 px-5">
+                    <span className="font-semibold text-lg leading-7">
+                      {item.content}
+                    </span>
+                    <IconButton background="none" type={"button"}>
+                      <Image
+                        src="/arrow_circle_right.svg"
+                        w={"100%"}
+                        h={"100%"}
+                        alt=""
+                      />
+                    </IconButton>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+      {/* offers */}
+      <section className="section w-screen h-screen" id="section-offers">
+        <Carousel
+          afterChange={handleSlideChange}
+          ref={carouselRef}
+          responsive={{
+            superLargeDesktop: {
+              breakpoint: { max: 4000, min: 1024 },
+              items: 1,
+            },
+            desktop: {
+              breakpoint: { max: 1024, min: 768 },
+              items: 1,
+            },
+            tablet: {
+              breakpoint: { max: 768, min: 464 },
+              items: 1,
+            },
+            mobile: {
+              breakpoint: { max: 464, min: 0 },
+              items: 1,
+            },
+          }}
+          showDots={false}
+          infinite={true}
+          keyBoardControl={true}
+          autoPlay={true}
+          autoPlaySpeed={8000}
+          removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
+          transitionDuration={2000}
+          customTransition={"2000ms ease-in-out"}
+          containerClass="w-full h-full"
+        >
+          {offers.map((offer, index) => (
+            <div key={offer.id} className="w-screen h-screen relative">
+              <div className="w-full h-full absolute top-0 left-0 flex justify-center items-center overflow-hidden">
+                <Image
+                  src={offer.image}
+                  w={"100%"}
+                  h={"100vh"}
+                  className="object-cover"
+                  alt=""
+                />
+              </div>
+              <div className="h-full flex gap-3 relative p-20">
+                <div className="h-full flex justify-center items-center">
+                  <TextFade
+                    settings={{
+                      hidden: { opacity: 0, x: -40 },
+                      visible: {
+                        opacity: 1,
+                        x: 0,
+                        y: 0,
+                        transition: {
+                          duration: 1,
+                          delay: 0.5,
+                        },
+                      },
+                    }}
+                    replayEffect={true}
+                  >
+                    <div className=" flex justify-center items-center shrink-0">
+                      <span className="h-auto uppercase -rotate-90 whitespace-nowrap font-bold text-5xl w-auto text-gold">
+                        ưu đãi
+                      </span>
+                    </div>
+                  </TextFade>
+                </div>
+                <div className="w-[30%] h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
+                  <TextFade
+                    settings={{
+                      hidden: { opacity: 0, x: 50 },
+                      visible: {
+                        opacity: 1,
+                        x: 0,
+                        transition: {
+                          duration: 1,
+                          delay: 0.5,
+                        },
+                      },
+                    }}
+                    replayEffect={true}
+                    styles="h-full flex flex-col justify-between"
+                  >
+                    <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-4">
+                      {offer.title}
+                    </span>
+                    <span className="font-normal text-lg">{offer.content}</span>
+                    <div className="w-full flex justify-between items-center">
+                      <ButtonDiscover className="w-[40%]"></ButtonDiscover>
+                      <div className="flex items-center gap-4">
+                        <IconButton
+                          background="none"
+                          type={"button"}
+                          onClick={() => carouselRef.current.previous()}
+                        >
+                          <Image
+                            src="/arrow_circle_left.svg"
+                            w={"100%"}
+                            h={"100%"}
+                            alt=""
+                          />
+                        </IconButton>
+                        <IconButton
+                          background="none"
+                          type={"button"}
+                          onClick={() => carouselRef.current.next()}
+                        >
+                          <Image
+                            src="/arrow_circle_right.svg"
+                            w={"100%"}
+                            h={"100%"}
+                            alt=""
+                          />
+                        </IconButton>
+                      </div>
+                    </div>
+                  </TextFade>
+                </div>
+              </div>
+            </div>
+          ))}
+        </Carousel>
       </section>
       <section className="section">
         <Footer />

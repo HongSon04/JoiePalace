@@ -28,12 +28,14 @@
     gap: 60px;
 }
 .section-event-listCard {
+    overflow-y: scroll;
     scrollbar-width: none;
     scroll-behavior: smooth;
-        /* Làm cuộn mượt mà */
-        --scroll-speed: 1000ms;
-        /* Điều chỉnh tốc độ cuộn */
+    --scroll-speed: 1000ms;
 }
 .section-event-listCard::-webkit-scrollbar {
+    display: none;
+}
+#section-offers .react-multiple-carousel__arrow {
     display: none;
 }
