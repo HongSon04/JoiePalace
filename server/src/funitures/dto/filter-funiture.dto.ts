@@ -1,4 +1,4 @@
-export class FilterFoodDto {
+export class FilterFunitureDto {
   page: string;
 
   itemsPerPage: string;
@@ -6,5 +6,8 @@ export class FilterFoodDto {
   search: string;
 
   maxPrice: string;
+
   minPrice: string;
+
+  type: string;
 }

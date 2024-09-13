@@ -4,6 +4,7 @@ import AdminHeader from "@/app/_components/AdminHeader";
 import RequestBreadcrumbs from "./RequestBreadcrumbs";
 import StatusSelect from "./StatusSelect";
 import RequestDetail from "./RequestDetail";
+import { useParams } from "next/navigation";
 
 function page({ params: { yeuCauId } }) {
   return (

@@ -13,14 +13,16 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MakeSlugger } from 'helper/slug';
-import { SpacesService } from 'src/spaces/spaces.service';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class LocationsService {
   constructor(
     private prismaService: PrismaService,
     private cloudinaryService: CloudinaryService,
-    private spacesService: SpacesService,
   ) {}
 
   // ! Create A New Location
@@ -141,229 +143,252 @@ export class LocationsService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ locations.service.ts -> createLocation', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
   // ! Get All Locations
   async getAllLocations(query: FilterDto) {
-    const page = Number(query.page) || 1;
-    const search = query.search || '';
-    const itemsPerPage = Number(query.itemsPerPage) || 1;
-    const skip = (page - 1) * itemsPerPage;
+    try {
+      const page = Number(query.page) || 1;
+      const search = query.search || '';
+      const itemsPerPage = Number(query.itemsPerPage) || 1;
+      const skip = (page - 1) * itemsPerPage;
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
 
-    const [res, total] = await this.prismaService.$transaction([
-      this.prismaService.locations.findMany({
-        where: {
-          deleted: false,
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: 'insensitive',
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
               },
-            },
-            {
-              address: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              phone: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-        skip: skip,
-        take: itemsPerPage,
-        orderBy: {
-          created_at: 'desc',
-        },
-        select: {
-          id: true,
-          name: true,
-          address: true,
-          phone: true,
-        },
-      }),
-      this.prismaService.locations.count({
-        where: {
-          deleted: false,
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              address: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              phone: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-      }),
-    ]);
+            }
+          : {};
 
-    const lastPage = Math.ceil(total / itemsPerPage);
-    const nextPage = page >= lastPage ? null : page + 1;
-    const prevPage = page <= 1 ? null : page - 1;
-
-    throw new HttpException(
-      {
-        data: res,
-        pagination: {
-          total,
-          itemsPerPage,
-          lastPage,
-          nextPage,
-          prevPage,
-          currentPage: page,
+      const whereConditions = {
+        deleted: false,
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            address: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+        created_at: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
         },
-      },
-      HttpStatus.OK,
-    );
+        ...sortRangeDate,
+      };
+
+      const [res, total] = await this.prismaService.$transaction([
+        this.prismaService.locations.findMany({
+          where: whereConditions,
+          skip: skip,
+          take: itemsPerPage,
+          orderBy: {
+            created_at: 'desc',
+          },
+        }),
+        this.prismaService.locations.count({
+          where: whereConditions,
+        }),
+      ]);
+
+      const lastPage = Math.ceil(total / itemsPerPage);
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
+      throw new HttpException(
+        {
+          data: res,
+          pagination: paginationInfo,
+        },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ locations.service.ts -> getAllLocations', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
+    }
   }
 
   // ! Get All Deleted Locations
   async getAllDeletedLocations(query: FilterDto) {
-    const page = Number(query.page) || 1;
-    const search = query.search || '';
-    const itemsPerPage = Number(query.itemsPerPage) || 1;
-    const skip = (page - 1) * itemsPerPage;
+    try {
+      const page = Number(query.page) || 1;
+      const search = query.search || '';
+      const itemsPerPage = Number(query.itemsPerPage) || 1;
+      const skip = (page - 1) * itemsPerPage;
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
 
-    const [res, total] = await this.prismaService.$transaction([
-      this.prismaService.locations.findMany({
-        where: {
-          deleted: true,
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: 'insensitive',
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
               },
-            },
-            {
-              address: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              phone: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-        skip: skip,
-        take: itemsPerPage,
-        orderBy: {
-          created_at: 'desc',
-        },
-        select: {
-          id: true,
-          name: true,
-          address: true,
-          phone: true,
-        },
-      }),
-      this.prismaService.locations.count({
-        where: {
-          deleted: true,
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              address: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              phone: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-      }),
-    ]);
+            }
+          : {};
 
-    const lastPage = Math.ceil(total / itemsPerPage);
-    const nextPage = page >= lastPage ? null : page + 1;
-    const prevPage = page <= 1 ? null : page - 1;
-
-    throw new HttpException(
-      {
-        data: res,
-        pagination: {
-          total: res.length,
-          itemsPerPage,
-          lastPage,
-          nextPage,
-          prevPage,
-          currentPage: page,
+      const whereConditions = {
+        deleted: true,
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            address: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+        created_at: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
         },
-      },
-      HttpStatus.OK,
-    );
+        ...sortRangeDate,
+      };
+
+      const [res, total] = await this.prismaService.$transaction([
+        this.prismaService.locations.findMany({
+          where: whereConditions,
+          skip: skip,
+          take: itemsPerPage,
+          orderBy: {
+            created_at: 'desc',
+          },
+        }),
+        this.prismaService.locations.count({
+          where: whereConditions,
+        }),
+      ]);
+
+      const lastPage = Math.ceil(total / itemsPerPage);
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
+      throw new HttpException(
+        {
+          data: res,
+          pagination: paginationInfo,
+        },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log(
+        'Lỗi từ locations.service.ts -> getAllDeletedLocations',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
+    }
   }
 
   // ! Get Location By Id
   async getLocationById(id: number) {
-    const location = await this.prismaService.locations.findUnique({
-      where: {
-        id: Number(id),
-      },
-    });
-    if (!location) {
-      throw new HttpException('Địa điểm không tồn tại', HttpStatus.BAD_REQUEST);
-    }
-    const location_detail =
-      await this.prismaService.location_details.findUnique({
+    try {
+      const location = await this.prismaService.locations.findUnique({
         where: {
           id: Number(id),
         },
       });
+      if (!location) {
+        throw new HttpException(
+          'Địa điểm không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const location_detail =
+        await this.prismaService.location_details.findUnique({
+          where: {
+            id: Number(id),
+          },
+        });
 
-    const spaces = await this.prismaService.spaces.findMany({
-      where: {
-        location_id: Number(id),
-      },
-    });
-    const stages = await this.prismaService.stages.findMany({
-      where: {
-        location_id: Number(id),
-      },
-    });
-    const { deleted, deleted_at, deleted_by, ...data } = location;
-    let result = {
-      ...data,
-      location_detail: location_detail,
-      space: spaces,
-    };
+      const spaces = await this.prismaService.spaces.findMany({
+        where: {
+          location_id: Number(id),
+        },
+      });
+      const stages = await this.prismaService.stages.findMany({
+        where: {
+          location_id: Number(id),
+        },
+      });
+      const { deleted, deleted_at, deleted_by, ...data } = location;
+      let result = {
+        ...data,
+        location_detail: location_detail,
+        space: spaces,
+      };
 
-    throw new HttpException({ data: result }, HttpStatus.OK);
+      throw new HttpException({ data: result }, HttpStatus.OK);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ locations.service.ts -> getLocationById', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+      );
+    }
   }
 
   // ! Get Location By Slug
@@ -410,6 +435,7 @@ export class LocationsService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ locations.service.ts -> getLocationBySlug', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -422,58 +448,58 @@ export class LocationsService {
     location: UpdateLocationDto,
     files?: ImageUploadLocationDto,
   ) {
-    const locationImages: Partial<ImageUploadLocationDto> = {};
-    const errors: string[] = [];
+    try {
+      const locationImages: Partial<ImageUploadLocationDto> = {};
+      const errors: string[] = [];
 
-    // Kiểm tra các file nếu có yêu cầu upload ảnh mới
-    if (files) {
-      const requiredFiles = {
-        images: 'Hình ảnh không được để trống',
-        diagram_images: 'Hình ảnh sơ đồ không được để trống',
-        slogan_images: 'Hình ảnh slogan không được để trống',
-        equipment_images: 'Hình ảnh thiết bị không được để trống',
-        space_images: 'Hình ảnh không gian không được để trống',
-      };
+      // Kiểm tra các file nếu có yêu cầu upload ảnh mới
+      if (files) {
+        const requiredFiles = {
+          images: 'Hình ảnh không được để trống',
+          diagram_images: 'Hình ảnh sơ đồ không được để trống',
+          slogan_images: 'Hình ảnh slogan không được để trống',
+          equipment_images: 'Hình ảnh thiết bị không được để trống',
+          space_images: 'Hình ảnh không gian không được để trống',
+        };
 
-      Object.keys(requiredFiles).forEach((key) => {
-        if (!files[key]) {
-          errors.push(requiredFiles[key]);
+        Object.entries(requiredFiles).forEach(([key, message]) => {
+          if (!files[key]) {
+            errors.push(message);
+          }
+        });
+
+        if (errors.length > 0) {
+          throw new HttpException(
+            { message: errors.join(', '), data: null },
+            HttpStatus.BAD_REQUEST,
+          );
         }
-      });
 
-      if (errors.length > 0) {
-        throw new HttpException(
-          { message: errors.join(', '), data: null },
-          HttpStatus.BAD_REQUEST,
+        // Tạo hàm upload ảnh mới nếu cần
+        const uploadImages = async (
+          fileKey: keyof ImageUploadLocationDto,
+          folder: string,
+        ) => {
+          if (files[fileKey]) {
+            locationImages[fileKey] =
+              await this.cloudinaryService.uploadMultipleFilesToFolder(
+                files[fileKey],
+                folder,
+              );
+          }
+        };
+
+        // Upload các hình ảnh nếu có
+        await Promise.all(
+          Object.entries(files).map(([key]) =>
+            uploadImages(
+              key as keyof ImageUploadLocationDto,
+              `joieplace/${key}`,
+            ),
+          ),
         );
       }
 
-      // Tạo hàm upload ảnh mới nếu cần
-      const uploadImages = async (
-        fileKey: keyof ImageUploadLocationDto,
-        folder: string,
-      ) => {
-        if (files[fileKey]) {
-          const images =
-            await this.cloudinaryService.uploadMultipleFilesToFolder(
-              files[fileKey],
-              folder,
-            );
-          locationImages[fileKey] = images;
-        }
-      };
-
-      // Upload các hình ảnh nếu có
-      await Promise.all([
-        uploadImages('images', 'joieplace/location'),
-        uploadImages('diagram_images', 'joieplace/diagram'),
-        uploadImages('slogan_images', 'joieplace/slogan'),
-        uploadImages('equipment_images', 'joieplace/equipment'),
-        uploadImages('space_images', 'joieplace/space'),
-      ]);
-    }
-
-    try {
       const {
         name,
         address,
@@ -487,27 +513,28 @@ export class LocationsService {
       } = location;
 
       // Tạo slug mới nếu cần
-      let slug: string | undefined;
-      if (name) {
-        slug = MakeSlugger(name);
+      const slug = name ? MakeSlugger(name) : undefined;
+
+      // Kiểm tra tên địa điểm đã tồn tại
+      const checkNameLocation = await this.prismaService.locations.findFirst({
+        where: { name, NOT: { id: Number(id) } },
+      });
+
+      if (checkNameLocation) {
+        throw new HttpException(
+          'Tên địa điểm đã tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // Cập nhật Location
-      const updateLocation = await this.prismaService.locations.update({
-        where: {
-          id: Number(id),
-        },
-        data: {
-          name,
-          slug,
-          address,
-          phone,
-          images: locationImages.images, // Cập nhật hình ảnh nếu có
-        },
+      const updatedLocation = await this.prismaService.locations.update({
+        where: { id: Number(id) },
+        data: { name, slug, address, phone, images: locationImages.images },
       });
 
       // Cập nhật Location Detail
-      const updateLocationDetail =
+      const updatedLocationDetail =
         await this.prismaService.location_details.update({
           where: { location_id: Number(id) },
           data: {
@@ -522,7 +549,7 @@ export class LocationsService {
         });
 
       // Cập nhật Space nếu có
-      const updateSpace = await this.prismaService.spaces.update({
+      const updatedSpace = await this.prismaService.spaces.update({
         where: { location_id: Number(id) },
         data: {
           name: spaces_name,
@@ -531,11 +558,15 @@ export class LocationsService {
         },
       });
 
-      const { deleted, deleted_at, deleted_by, ...data } = updateLocation;
+      const stages = await this.prismaService.stages.findMany({
+        where: { location_id: Number(id) },
+      });
+
       const result = {
-        ...data,
-        location_detail: updateLocationDetail,
-        space: updateSpace,
+        ...updatedLocation,
+        location_detail: updatedLocationDetail,
+        space: updatedSpace,
+        stages,
       };
 
       throw new HttpException(
@@ -546,6 +577,7 @@ export class LocationsService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ locations.service.ts -> updateLocation', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -582,6 +614,7 @@ export class LocationsService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ locations.service.ts -> softDeleteLocation', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -617,6 +650,7 @@ export class LocationsService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ locations.service.ts -> restoreLocation', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
@@ -712,6 +746,7 @@ export class LocationsService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ locations.service.ts -> hardDeleteLocation', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -720,58 +755,70 @@ export class LocationsService {
 
   // ! Delete Image By Url
   async deleteImageByUrl(url: any) {
-    const models = [
-      { name: 'locations', imageField: 'images' },
-      {
-        name: 'location_details',
-        imageFields: ['slogan_images', 'diagram_images', 'equipment_images'],
-      },
-      { name: 'spaces', imageField: 'images' },
-      { name: 'stages', imageField: 'images' },
-    ];
+    try {
+      const models = [
+        { name: 'locations', imageField: 'images' },
+        {
+          name: 'location_details',
+          imageFields: ['slogan_images', 'diagram_images', 'equipment_images'],
+        },
+        { name: 'spaces', imageField: 'images' },
+        { name: 'stages', imageField: 'images' },
+      ];
 
-    for (const model of models) {
-      const { name, imageField, imageFields } = model;
+      for (const model of models) {
+        const { name, imageField, imageFields } = model;
 
-      const records: any = imageField
-        ? await this.prismaService[name].findMany({
-            where: { [imageField]: { has: url } },
-          })
-        : await this.prismaService[name].findMany({
-            where: {
-              OR: imageFields.map((field) => ({
-                [field]: { has: url },
-              })),
-            },
+        const records: any = imageField
+          ? await this.prismaService[name].findMany({
+              where: { [imageField]: { has: url } },
+            })
+          : await this.prismaService[name].findMany({
+              where: {
+                OR: imageFields.map((field) => ({
+                  [field]: { has: url },
+                })),
+              },
+            });
+
+        if (records.length > 0) {
+          const updates = records.map(async (record: any) => {
+            const updatedData = imageField
+              ? {
+                  [imageField]: {
+                    set: record[imageField].filter(
+                      (img: string) => img !== url,
+                    ),
+                  },
+                }
+              : imageFields.reduce((acc, field) => {
+                  acc[field] = {
+                    set: record[field].filter((img: string) => img !== url),
+                  };
+                  return acc;
+                }, {});
+
+            return this.prismaService[name].update({
+              where: { id: record.id },
+              data: updatedData,
+            });
           });
 
-      if (records.length > 0) {
-        const updates = records.map(async (record: any) => {
-          const updatedData = imageField
-            ? {
-                [imageField]: {
-                  set: record[imageField].filter((img: string) => img !== url),
-                },
-              }
-            : imageFields.reduce((acc, field) => {
-                acc[field] = {
-                  set: record[field].filter((img: string) => img !== url),
-                };
-                return acc;
-              }, {});
-
-          return this.prismaService[name].update({
-            where: { id: record.id },
-            data: updatedData,
-          });
-        });
-
-        await Promise.all(updates);
-        await this.cloudinaryService.deleteImageByUrl(url);
-        throw new HttpException('Xóa ảnh thành công', HttpStatus.OK);
+          await Promise.all(updates);
+          await this.cloudinaryService.deleteImageByUrl(url);
+          throw new HttpException('Xóa ảnh thành công', HttpStatus.OK);
+        }
       }
-    }
 
-    throw new HttpException('Ảnh không tồn tại', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Ảnh không tồn tại', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ locations.service.ts -> deleteImageByUrl', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+      );
+    }
   }
 }

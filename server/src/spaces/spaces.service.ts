@@ -55,6 +55,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> createSpace: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -72,6 +73,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> findSpacesByLocation: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -79,16 +81,66 @@ export class SpacesService {
   }
 
   // ? Update space
-  async updateSpace(space_id: number, body: updateSpaceDto): Promise<string> {
+  async updateSpace(
+    space_id: number,
+    body: updateSpaceDto,
+    files: { images?: Express.Multer.File[] },
+  ): Promise<string> {
     try {
       const { description, name } = body;
+
+      const findSpace = await this.prismaService.spaces.findUnique({
+        where: { id: Number(space_id) },
+      });
+
+      if (!findSpace) {
+        throw new HttpException(
+          'Không tìm thấy không gian',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const findSpaceByName = await this.prismaService.spaces.findFirst({
+        where: { name, id: { not: Number(space_id) } },
+      });
+
+      if (findSpaceByName) {
+        throw new HttpException(
+          'Tên không gian đã tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const updateData: any = {
+        description,
+        name,
+      };
+
+      if (files.images && files.images.length > 0) {
+        const spacesImages =
+          await this.cloudinaryService.uploadMultipleFilesToFolder(
+            files.images,
+            'joieplace/spaces',
+          );
+
+        if (!spacesImages || spacesImages.length === 0) {
+          throw new HttpException(
+            'Lỗi khi upload ảnh, vui lòng thử lại',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        // ? Delete old images from cloudinary
+        await this.cloudinaryService.deleteMultipleImagesByUrl(
+          findSpace.images,
+        );
+        updateData.images = spacesImages as any;
+      }
+
       const spaces = await this.prismaService.spaces.update({
         where: { id: Number(space_id) },
-        data: {
-          description,
-          name,
-        },
+        data: updateData,
       });
+
       throw new HttpException(
         { message: 'Cập nhật không gian thành công', data: spaces },
         HttpStatus.OK,
@@ -97,6 +149,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> updateSpace: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -114,6 +167,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> findSpaceById: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -131,6 +185,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> findSpaceBySlug: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -148,7 +203,7 @@ export class SpacesService {
         'joieplace/space',
       );
       const findSpace = await this.prismaService.spaces.findUnique({
-        where: { id },
+        where: { id: Number(id) },
       });
       if (!findSpace) {
         throw new HttpException(
@@ -160,7 +215,7 @@ export class SpacesService {
       const newImages = [...findSpace.images, ...images];
       // ? Update space images
       const space = await this.prismaService.spaces.update({
-        where: { id },
+        where: { id: Number(id) },
         data: {
           images: newImages as any,
         },
@@ -173,6 +228,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> uploadImages: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -184,7 +240,7 @@ export class SpacesService {
     try {
       const { image_url } = body;
       const findSpace = await this.prismaService.spaces.findUnique({
-        where: { id },
+        where: { id: Number(id) },
       });
       if (!findSpace) {
         throw new HttpException(
@@ -196,7 +252,7 @@ export class SpacesService {
       const newImages = findSpace.images.filter((image) => image !== image_url);
       // ? Update space images
       const space = await this.prismaService.spaces.update({
-        where: { id },
+        where: { id: Number(id) },
         data: {
           images: newImages as any,
         },
@@ -211,6 +267,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> deleteImages: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );
@@ -221,7 +278,7 @@ export class SpacesService {
   async deleteSpace(id: number): Promise<string> {
     try {
       const findSpace = await this.prismaService.spaces.findUnique({
-        where: { id },
+        where: { id: Number(id) },
       });
       if (!findSpace) {
         throw new HttpException(
@@ -238,6 +295,7 @@ export class SpacesService {
       if (error instanceof HttpException) {
         throw error;
       }
+      console.log('Lỗi từ space.service.ts -> deleteSpace: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );

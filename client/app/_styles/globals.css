@@ -167,6 +167,10 @@ body {
 }
 
 @layer components {
+  .example {
+    @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
+  }
+  
   .bg-primary {
     background-color: #022C25 !important;
   }
@@ -397,4 +401,15 @@ body::-webkit-scrollbar {
   font-size: 14px;
   font-weight: 400;
   background: rgba(0, 0, 0, 0.2);
+}
+.bg-image-tintuc{
+  background-image: url('/banner-news-detail.png');
+  background-size: cover;
+}
+.div-children-banner:hover  {
+  opacity: 0.9;
+}
+.thongbao:hover div{
+  background-color: red;
+  color:white;
 }

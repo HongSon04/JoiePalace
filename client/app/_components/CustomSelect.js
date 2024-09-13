@@ -1,6 +1,5 @@
 "use client";
 import { Select, SelectSection, SelectItem } from "@nextui-org/react";
-
 function CustomSelect({
   options = [],
   value = "",

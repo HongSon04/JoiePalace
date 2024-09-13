@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   HttpException,
+  HttpStatus,
   Post,
   Req,
   Request,
@@ -29,6 +30,25 @@ export class AuthController {
 
   // ! Register
   @Post('register')
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    example: {
+      message: 'Đăng ký thành công',
+      data: { access_token: 'string', refresh_token: 'string' },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Email đã tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Người dùng tạo tài khoản' })
   @isPublic()
   create(@Body() createUserDto: CreateAuthUserDto) {
@@ -38,6 +58,25 @@ export class AuthController {
   // ! Login
   @Post('login')
   @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Đăng nhập thành công',
+      data: { access_token: 'string', refresh_token: 'string' },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Tài khoản hoặc mật khẩu không chính xác',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Người dùng đăng nhập' })
   login(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
@@ -46,6 +85,24 @@ export class AuthController {
   // ! Logout
   @Post('logout')
   @ApiOperation({ summary: 'Người dùng đăng xuất' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Đăng xuất thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Người dùng không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   logout(@Request() req) {
     return this.authService.logout(req.user);
   }
@@ -53,6 +110,25 @@ export class AuthController {
   // ! Refresh Token
   @Post('refresh-token')
   @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Làm mới token thành công',
+      data: { access_token: 'string' },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    example: {
+      message: 'Không thể làm mới token',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Làm mới token' })
   @ApiResponse({ status: 200, description: 'Access token refreshed' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -86,6 +162,24 @@ export class AuthController {
       },
     }),
   )
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Đổi ảnh đại diện thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Chỉ chấp nhận ảnh jpg, jpeg, png',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   async uploadAvatar(
     @Request() req,
     @Body() body: UploadAvatarAuthDto,
