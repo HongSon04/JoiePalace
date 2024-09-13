@@ -9,6 +9,8 @@ import { useFormContext } from "react-hook-form";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 
 function CustomInput({
+  onChange,
+  autoFocus = false,
   validation,
   inputType = "text",
   multiLine = false,
@@ -17,20 +19,22 @@ function CustomInput({
   value = "",
   className,
   classNames = {
-    label: "!text-white font-bold",
-    inputWrapper: "!bg-whiteAlpha-200",
-    input: "!text-white",
+    label: "!text-gray-600 font-bold",
+    inputWrapper: "!bg-blackAlpha-100",
+    input: "!text-gray-600",
+    placeholder: "!text-gray-400",
   },
   placeholder = "",
   children: startContent,
   name = "",
+  errorMessage,
 }) {
   const {
     register,
     formState: { errors },
   } = useFormContext();
 
-  const inputError = findInputError(errors, label);
+  const inputError = findInputError(errors, name);
   const isInvalid = isFormInvalid(inputError);
 
   if (inputType === "date")
@@ -51,6 +55,8 @@ function CustomInput({
   if (multiLine)
     return (
       <Textarea
+        onChange={onChange}
+        autoFocus={autoFocus}
         name={name}
         value={value}
         label={label}
@@ -66,6 +72,7 @@ function CustomInput({
 
   return (
     <Input
+      autoFocus={autoFocus}
       name={name}
       value={value}
       label={label}
@@ -76,7 +83,18 @@ function CustomInput({
       startContent={startContent}
       isInvalid={isInvalid}
       {...register(name, validation)}
-    />
+      onChange={onChange}
+      errorMessage={errorMessage}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        {isInvalid && (
+          <InputError
+            message={inputError.error.message}
+            key={inputError.error.message}
+          />
+        )}
+      </AnimatePresence>
+    </Input>
   );
 }
 

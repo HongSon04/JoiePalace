@@ -77,7 +77,7 @@ function NotificationButton() {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button className="icon-button w-10 h-10">
+        <Button className="icon-button w-10 h-10 bg-white hover:bg-white hover:brightness-95">
           <Image
             src={notificationIcon}
             width={20}
