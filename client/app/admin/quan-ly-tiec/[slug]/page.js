@@ -1,12 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import { Suspense, useRef, useState } from 'react';
-import HeaderSelect from './HeaderSelect';
 import RequestBreadcrumbs from '@/app/_components/RequestBreadcrumbs';
-import StatusSelectDay from './StatusSelectDay';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
 import TableGrab from '@/app/_components/TableGrab';
+import { Suspense } from 'react';
+import HeaderSelect from './HeaderSelect';
+import StatusSelectDay from './StatusSelectDay';
 
 const ChiTietTiecPage = ({ params }) => {
     const {slug} = params;
@@ -24,7 +23,6 @@ const ChiTietTiecPage = ({ params }) => {
             <Suspense fallback={<TableSkeleton/>}>
                 <TableGrab></TableGrab>
             </Suspense>
-            
         </div>
     );
 };
