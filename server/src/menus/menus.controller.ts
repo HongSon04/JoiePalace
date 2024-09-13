@@ -61,7 +61,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách menu thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -105,7 +104,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách menu đã xóa tạm thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -149,7 +147,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy menu thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -183,7 +180,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy menu thành công',
       data: {
         id: 'number',
         name: 'string',

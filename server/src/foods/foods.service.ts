@@ -201,6 +201,7 @@ export class FoodsService {
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
+        total: totalCount,
       };
 
       // Trả về kết quả
@@ -296,6 +297,7 @@ export class FoodsService {
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
+        total: totalCount,
       };
 
       // Trả về kết quả
@@ -449,6 +451,7 @@ export class FoodsService {
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
+        total: totalCount,
       };
 
       // Trả về kết quả
@@ -549,6 +552,7 @@ export class FoodsService {
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
+        total: totalCount,
       };
 
       // Trả về kết quả

@@ -102,7 +102,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách món ăn thành công',
       data: [
         {
           id: 'number',
@@ -158,7 +157,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách món ăn đã xóa thành công',
       data: [
         {
           id: 'number',
@@ -214,7 +212,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -252,7 +249,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -290,7 +286,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: [
         {
           id: 'number',
@@ -329,7 +324,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: [
         {
           id: 'number',

@@ -206,8 +206,10 @@ export class LocationsController {
       pagination: {
         currentPage: 'number',
         itemsPerPage: 'number',
-        totalItems: 'number',
-        totalPages: 'number',
+        total: 'number',
+        prevPage: 'number',
+        nextPage: 'number',
+        lastPage: 'number',
       },
     },
   })
@@ -280,8 +282,10 @@ export class LocationsController {
       pagination: {
         currentPage: 'number',
         itemsPerPage: 'number',
-        totalItems: 'number',
-        totalPages: 'number',
+        total: 'number',
+        prevPage: 'number',
+        nextPage: 'number',
+        lastPage: 'number',
       },
     },
   })

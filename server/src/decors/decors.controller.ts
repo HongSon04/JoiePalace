@@ -92,7 +92,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách trang trí thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -136,7 +135,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách trang trí đã xóa tạm thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -180,7 +178,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy thông tin trang trí thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -214,7 +211,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy thông tin trang trí thành công',
       data: {
         id: 'number',
         name: 'string',

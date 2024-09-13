@@ -176,6 +176,7 @@ export class DecorsService {
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
+total,
       };
 
       throw new HttpException(
@@ -289,6 +290,7 @@ export class DecorsService {
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
+total,
       };
 
       throw new HttpException(

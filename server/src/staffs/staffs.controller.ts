@@ -116,7 +116,6 @@ export class StaffsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách nhân viên thành công',
       data: [
         {
           id: 'number',
@@ -168,7 +167,6 @@ export class StaffsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách nhân viên thành công',
       data: [
         {
           id: 'number',
@@ -222,7 +220,6 @@ export class StaffsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy thông tin nhân viên thành công',
       data: {
         id: 'number',
         name: 'string',
