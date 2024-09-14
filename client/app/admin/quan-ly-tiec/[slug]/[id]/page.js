@@ -118,6 +118,61 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         },
     ];
 
+    const inputsCost = [
+        {
+            svg: null,
+            title: 'Menu',
+            type: 'select',
+            name: 'menu',
+            options: [
+                { value: 'wedding', label: 'Tiệc cưới' },
+                { value: 'birthday', label: 'Tiệc sinh nhật' },
+                { value: 'conference', label: 'Hội thảo' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Sảnh',
+            type: 'select',
+            name: 'hall',
+            options: [
+                { value: 'wedding', label: 'Tiệc cưới' },
+                { value: 'birthday', label: 'Tiệc sinh nhật' },
+                { value: 'conference', label: 'Hội thảo' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Decor',
+            type: 'select',
+            name: 'decor',
+            options: [
+                { value: 'wedding', label: 'Tiệc cưới' },
+                { value: 'birthday', label: 'Tiệc sinh nhật' },
+                { value: 'conference', label: 'Hội thảo' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Bánh kem',
+            type: 'select',
+            name: 'cake',
+            options: [
+                { value: 1, label: 'có' },
+                { value: 0, label: 'không' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Champagne',
+            type: 'select',
+            name: 'champagne',
+            options: [
+                { value: 1, label: 'có' },
+                { value: 0, label: 'không' },
+            ]
+        },
+    ]
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
@@ -142,6 +197,22 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 <h3 className='font-semibold text-xl leading-7 mb-[22px]'>Thông tin tổ chức</h3>
                 <div className='grid grid-cols-3 gap-[30px]'>
                     {inputOrganization.map((detail, index) => (
+                        <InputDetailCustomer
+                            key={index}
+                            svg={detail.svg}
+                            title={detail.title}
+                            type={detail.type}
+                            name={detail.name}
+                            placeholder={detail.placeholder}
+                            options={detail.options}
+                        />
+                    ))}
+                </div>
+            </div>
+            <div className='p-4 mt-5 w-full bg-blackAlpha-300 rounded-lg'>
+                <h3 className='font-semibold text-xl leading-7 mb-[22px]'>Chi phí</h3>
+                <div className='grid grid-cols-3 gap-[30px]'>
+                    {inputsCost.map((detail, index) => (
                         <InputDetailCustomer
                             key={index}
                             svg={detail.svg}
