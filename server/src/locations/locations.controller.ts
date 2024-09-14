@@ -23,10 +23,9 @@ import {
   ImageUploadLocationDto,
 } from './dto/create-location.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { DeleteImageDto } from './dto/delete-image.dto';
 
 @ApiTags('location')
 @UseGuards(AuthGuard)
@@ -35,8 +34,69 @@ export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
 
   // ! Create A New Location
-  @ApiOperation({ summary: 'Tạo chi nhánh mới' })
   @Post('create')
+  @ApiOperation({ summary: 'Tạo chi nhánh mới' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    example: {
+      message: 'Thêm địa điểm thành công',
+      data: {
+        id: 'number',
+        name: 'string',
+        slug: 'string',
+        address: 'string',
+        phone: 'string',
+        email: 'string',
+        rate: 'number',
+        images: ['string', 'string'],
+        created_at: 'date',
+        updated_at: 'date',
+        location_detail: {
+          id: 'number',
+          location_id: 'number',
+          slogan: 'string',
+          slogan_description: 'string',
+          slogan_images: ['string', 'string'],
+          diagram_description: 'string',
+          diagram_images: ['string', 'string'],
+          equipment_description: 'string',
+          equipment_images: ['string', 'string'],
+          created_at: 'date',
+          updated_at: 'date',
+        },
+        space: [
+          {
+            id: 'number',
+            location_id: 'number',
+            name: 'string',
+            slug: 'string',
+            description: 'string',
+            images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Tên chi nhánh đã tồn tại !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy ảnh nào được tải lên !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -89,26 +149,224 @@ export class LocationsController {
 
   // ! Get All Locations
   @Get('get-all')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          slug: 'string',
+          address: 'string',
+          phone: 'string',
+          email: 'string',
+          rate: 'number',
+          images: ['string', 'string'],
+          created_at: 'date',
+          updated_at: 'date',
+          location_detail: {
+            id: 'number',
+            location_id: 'number',
+            slogan: 'string',
+            slogan_description: 'string',
+            slogan_images: ['string', 'string'],
+            diagram_description: 'string',
+            diagram_images: ['string', 'string'],
+            equipment_description: 'string',
+            equipment_images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+          space: [
+            {
+              id: 'number',
+              location_id: 'number',
+              name: 'string',
+              slug: 'string',
+              description: 'string',
+              images: ['string', 'string'],
+              created_at: 'date',
+              updated_at: 'date',
+            },
+          ],
+          stages: [
+            {
+              id: 'number',
+              location_id: 'number',
+              name: 'string',
+              slug: 'string',
+              description: 'string',
+              images: ['string', 'string'],
+              created_at: 'date',
+              updated_at: 'date',
+            },
+          ],
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        total: 'number',
+        prevPage: 'number',
+        nextPage: 'number',
+        lastPage: 'number',
+      },
+    },
+  })
   @ApiOperation({ summary: 'Lấy danh sách tất cả chi nhánh (trừ đã xóa tạm)' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   async getAllLocations(@Query() query: FilterDto): Promise<any> {
     return this.locationsService.getAllLocations(query);
   }
 
   // ! Get All Locations (Deleted)
   @Get('get-all-deleted')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          slug: 'string',
+          address: 'string',
+          phone: 'string',
+          email: 'string',
+          rate: 'number',
+          images: ['string', 'string'],
+          created_at: 'date',
+          updated_at: 'date',
+          location_detail: {
+            id: 'number',
+            location_id: 'number',
+            slogan: 'string',
+            slogan_description: 'string',
+            slogan_images: ['string', 'string'],
+            diagram_description: 'string',
+            diagram_images: ['string', 'string'],
+            equipment_description: 'string',
+            equipment_images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+          space: [
+            {
+              id: 'number',
+              location_id: 'number',
+              name: 'string',
+              slug: 'string',
+              description: 'string',
+              images: ['string', 'string'],
+              created_at: 'date',
+              updated_at: 'date',
+            },
+          ],
+          stages: [
+            {
+              id: 'number',
+              location_id: 'number',
+              name: 'string',
+              slug: 'string',
+              description: 'string',
+              images: ['string', 'string'],
+              created_at: 'date',
+              updated_at: 'date',
+            },
+          ],
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        total: 'number',
+        prevPage: 'number',
+        nextPage: 'number',
+        lastPage: 'number',
+      },
+    },
+  })
   @ApiOperation({ summary: 'Lấy danh sách chi nhánh đã xóa tạm' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   async getAllDeletedLocations(@Query() query: FilterDto): Promise<any> {
     return this.locationsService.getAllDeletedLocations(query);
   }
 
   // ! Get Location By Id
   @Get('get/:location_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: {
+        id: 'number',
+        name: 'string',
+        slug: 'string',
+        address: 'string',
+        phone: 'string',
+        email: 'string',
+        rate: 'number',
+        images: ['string', 'string'],
+        created_at: 'date',
+        updated_at: 'date',
+        location_detail: {
+          id: 'number',
+          location_id: 'number',
+          slogan: 'string',
+          slogan_description: 'string',
+          slogan_images: ['string', 'string'],
+          diagram_description: 'string',
+          diagram_images: ['string', 'string'],
+          equipment_description: 'string',
+          equipment_images: ['string', 'string'],
+          created_at: 'date',
+          updated_at: 'date',
+        },
+        space: [
+          {
+            id: 'number',
+            location_id: 'number',
+            name: 'string',
+            slug: 'string',
+            description: 'string',
+            images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+        stages: [
+          {
+            id: 'number',
+            location_id: 'number',
+            name: 'string',
+            slug: 'string',
+            description: 'string',
+            images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy chi nhánh !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo ID' })
   async getLocationById(
     @Param('location_id') id: number,
@@ -118,6 +376,72 @@ export class LocationsController {
 
   // ! Get Location By Slug
   @Get('get-by-slug/:location_slug')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: {
+        id: 'number',
+        name: 'string',
+        slug: 'string',
+        address: 'string',
+        phone: 'string',
+        email: 'string',
+        rate: 'number',
+        images: ['string', 'string'],
+        created_at: 'date',
+        updated_at: 'date',
+        location_detail: {
+          id: 'number',
+          location_id: 'number',
+          slogan: 'string',
+          slogan_description: 'string',
+          slogan_images: ['string', 'string'],
+          diagram_description: 'string',
+          diagram_images: ['string', 'string'],
+          equipment_description: 'string',
+          equipment_images: ['string', 'string'],
+          created_at: 'date',
+          updated_at: 'date',
+        },
+        space: [
+          {
+            id: 'number',
+            location_id: 'number',
+            name: 'string',
+            slug: 'string',
+            description: 'string',
+            images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+        stages: [
+          {
+            id: 'number',
+            location_id: 'number',
+            name: 'string',
+            slug: 'string',
+            description: 'string',
+            images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy chi nhánh !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo Slug' })
   async getLocationBySlug(
     @Param('location_slug') slug: string,
@@ -127,6 +451,73 @@ export class LocationsController {
 
   // ! Update Location Info
   @Patch('update/:location_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Cập nhật thông tin chi nhánh thành công !',
+      data: {
+        id: 'number',
+        name: 'string',
+        slug: 'string',
+        address: 'string',
+        phone: 'string',
+        email: 'string',
+        rate: 'number',
+        images: ['string', 'string'],
+        created_at: 'date',
+        updated_at: 'date',
+        location_detail: {
+          id: 'number',
+          location_id: 'number',
+          slogan: 'string',
+          slogan_description: 'string',
+          slogan_images: ['string', 'string'],
+          diagram_description: 'string',
+          diagram_images: ['string', 'string'],
+          equipment_description: 'string',
+          equipment_images: ['string', 'string'],
+          created_at: 'date',
+          updated_at: 'date',
+        },
+        space: [
+          {
+            id: 'number',
+            location_id: 'number',
+            name: 'string',
+            slug: 'string',
+            description: 'string',
+            images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+        stages: [
+          {
+            id: 'number',
+            location_id: 'number',
+            name: 'string',
+            slug: 'string',
+            description: 'string',
+            images: ['string', 'string'],
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Tên chi nhánh đã tồn tại !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy ảnh nào được tải lên !',
+    },
+  })
   @ApiOperation({ summary: 'Cập nhật thông tin chi nhánh' })
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -182,6 +573,24 @@ export class LocationsController {
 
   // ! Soft Delete Location
   @Delete('delete/:location_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xóa chi nhánh thành công !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy chi nhánh !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Xóa tạm chi nhánh' })
   async softDeleteLocation(
     @Request() req,
@@ -192,6 +601,24 @@ export class LocationsController {
 
   // ! Restore Location
   @Put('restore/:location_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Khôi phục chi nhánh thành công !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy chi nhánh !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Khôi phục chi nhánh đã xóa tạm' })
   async restoreLocation(@Param('location_id') id: number): Promise<any> {
     return this.locationsService.restoreLocation(id);
@@ -199,6 +626,24 @@ export class LocationsController {
 
   // ! Hard Delete Location
   @Delete('destroy/:location_id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xóa vĩnh viễn chi nhánh thành công !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy chi nhánh !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
   @ApiOperation({ summary: 'Xóa vĩnh viễn chi nhánh' })
   async hardDeleteLocation(@Param('location_id') id: number): Promise<any> {
     return this.locationsService.hardDeleteLocation(id);

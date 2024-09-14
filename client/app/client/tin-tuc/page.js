@@ -107,7 +107,7 @@ function News() {
                                 WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
-                    </div>
+                    </div> 
                     <div className="flex flex-col justify-between items-center border-l border-r pt-20">
                         <div className=" w-[296px] max-lg:w-[200px] max-md:w-[150px] max-sm:w-[100px] leading-10 max-sm:leading-5 mb-20">
                             <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70 ">

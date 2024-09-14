@@ -1,8 +1,10 @@
 "use client";
+import { useRef } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
 const MultiCarousel = (props) => {
+  const carouselRef = useRef();
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
@@ -25,16 +27,13 @@ const MultiCarousel = (props) => {
     <Carousel
       responsive={responsive}
       infinite={true}
-      autoPlay={props.autoPlay}
       keyBoardControl={true}
+      autoPlay={props.autoPlay}
       showDots={false}
-      removeArrowOnDeviceType={props.removeArrowOnDeviceType}
-      autoPlaySpeed={props.autoPlaySpeed}
-      transitionDuration={props.transitionDuration}
-      customTransition={props.customTransition}
-      containerClass={props.containerClass}
+      ref={carouselRef}
+      {...props}
     >
-      {props.children}
+      {props.customButtons ? props.children(carouselRef) : props.children}
     </Carousel>
   );
 };

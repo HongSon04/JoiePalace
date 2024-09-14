@@ -1,5 +1,7 @@
 "use client";
 
+import { ClassNames } from "@emotion/react";
+
 function IconButton({
   onClick,
   className = "",
@@ -18,13 +20,13 @@ function IconButton({
 
   const _background = {
     none: "",
-    default: "glass",
+    default: "bg-white",
   }[background];
 
   return (
     <button
       type={type}
-      className={`flex-center rounded-full ${className} ${_size} ${_background} hover:bg-whiteAlpha-300`}
+      className={`flex-center rounded-full ${className} ${_size} ${_background} hover:brightness-95`}
       onClick={onClick}
     >
       {children}

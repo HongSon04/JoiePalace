@@ -53,7 +53,7 @@ function RequestDetail() {
                 name={"name"}
                 label="Chủ tiệc"
                 value={request.name}
-                validation={{ ...require }}
+                validation={{ ..._require }}
               >
                 <UserIcon className="w-6 h-6 text-whiteAlpha-300" />
               </CustomInput>

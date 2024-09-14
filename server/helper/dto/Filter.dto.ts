@@ -4,4 +4,8 @@ export class FilterDto {
   itemsPerPage: string;
 
   search: string;
+
+  startDate: string;
+
+  endDate: string;
 }

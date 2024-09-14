@@ -10,7 +10,10 @@ import { StaffEntities } from './entities/staff.entities';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { ChangeLocationDto } from './dto/change-location.dto';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+} from 'helper/formatDate';
 
 @Injectable()
 export class StaffsService {
@@ -70,17 +73,36 @@ export class StaffsService {
       const itemsPerPage = Number(query.itemsPerPage) || 10;
       const skip = Number((page - 1) * itemsPerPage);
       const search = query.search || '';
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
+
+      const whereConditions: any = {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+          { locations: { name: { contains: search }, mode: 'insensitive' } },
+        ],
+        deleted: false,
+        ...sortRangeDate,
+      };
 
       const [staffs, total] = await this.prismaService.$transaction([
         this.prismaService.staffs.findMany({
-          where: {
-            OR: [
-              { name: { contains: search } },
-              { phone: { contains: search } },
-              { locations: { name: { contains: search } } },
-            ],
-            deleted: false,
-          },
+          where: whereConditions,
           include: {
             locations: true,
           },
@@ -91,32 +113,24 @@ export class StaffsService {
           take: itemsPerPage,
         }),
         this.prismaService.staffs.count({
-          where: {
-            OR: [
-              { name: { contains: search } },
-              { phone: { contains: search } },
-              { locations: { name: { contains: search } } },
-            ],
-            deleted: false,
-          },
+          where: whereConditions,
         }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
 
       throw new HttpException(
         {
           data: staffs,
-          pagination: {
-            total,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -138,17 +152,36 @@ export class StaffsService {
       const itemsPerPage = Number(query.itemsPerPage) || 10;
       const skip = Number((page - 1) * itemsPerPage);
       const search = query.search || '';
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : null;
+      const endDate = query.endDate
+        ? FormatDateToEndOfDay(query.endDate)
+        : null;
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
+
+      const whereConditions: any = {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+          { locations: { name: { contains: search }, mode: 'insensitive' } },
+        ],
+        deleted: true,
+        ...sortRangeDate,
+      };
 
       const [staffs, total] = await this.prismaService.$transaction([
         this.prismaService.staffs.findMany({
-          where: {
-            OR: [
-              { name: { contains: search } },
-              { phone: { contains: search } },
-              { locations: { name: { contains: search } } },
-            ],
-            deleted: true,
-          },
+          where: whereConditions,
           include: {
             locations: true,
           },
@@ -159,32 +192,24 @@ export class StaffsService {
           take: itemsPerPage,
         }),
         this.prismaService.staffs.count({
-          where: {
-            OR: [
-              { name: { contains: search } },
-              { phone: { contains: search } },
-              { locations: { name: { contains: search } } },
-            ],
-            deleted: true,
-          },
+          where: whereConditions,
         }),
       ]);
 
       const lastPage = Math.ceil(total / itemsPerPage);
-      const nextPage = page >= lastPage ? null : page + 1;
-      const prevPage = page <= 1 ? null : page - 1;
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
 
       throw new HttpException(
         {
           data: staffs,
-          pagination: {
-            total,
-            itemsPerPage,
-            lastPage,
-            nextPage,
-            prevPage,
-            currentPage: page,
-          },
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );

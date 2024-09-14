@@ -18,11 +18,11 @@ function CustomSelect({
         onChange={onChange}
         className={selectClassName}
         classNames={{
-          base: "!overflow-hidden !text-white",
-          trigger: "text-sm text-gray-100 !bg-white/20",
-          value: "text-sm !text-white",
+          base: "!overflow-hidden !text-gray-600",
+          trigger: "text-sm text-gray-600 !bg-blackAlpha-100",
+          value: "text-sm !text-gray-600",
           innerWrapper: "!overflow-hidden",
-          popoverContent: "bg-white/20 backdrop-blur-lg gap-1",
+          popoverContent: "bg-white border border-gray-50 !text-gray-600 gap-1",
         }}
         variant={variant}
         label={label}
