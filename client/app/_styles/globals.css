@@ -170,7 +170,7 @@ body {
   .example {
     @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
   }
-  
+
   .bg-primary {
     background-color: #022C25 !important;
   }
@@ -369,30 +369,40 @@ body::-webkit-scrollbar {
 .table {
   border-collapse: collapse;
   width: 100%;
-  border-right: 1px solid #5B5B5B;
-  border-left: 1px solid #5B5B5B;
-  border-bottom: 1px solid #5B5B5B;
   overflow: hidden;
   border-radius: 10px !important;
-  background: rgba(255, 255, 255, 0.1);
+  background: white;
+}
+
+.table td:is(:not(:last-child)) {
+  border-right: 1px solid #e0e0e0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.table th:is(:not(:last-child)) {
+  border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.table td:last-child,
+.table th:last-child {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.table tr:last-child td:last-child {
+  border-bottom: none;
 }
 
 .table th,
 .table td {
-  /* display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex: 1 0 0;
-  align-self: stretch; */
-
-  border-top: 1px solid #5B5B5B;
-  border-left: 1px solid #5B5B5B;
+  overflow: hidden;
+  color: gray;
 }
 
 .table th {
   font-weight: 600;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: white;
 }
 
 .table td {
@@ -400,16 +410,18 @@ body::-webkit-scrollbar {
   padding: 10px 12px;
   font-size: 14px;
   font-weight: 400;
-  background: rgba(0, 0, 0, 0.2);
 }
-.bg-image-tintuc{
+
+.bg-image-tintuc {
   background-image: url('/banner-news-detail.png');
   background-size: cover;
 }
-.div-children-banner:hover  {
+
+.div-children-banner:hover {
   opacity: 0.9;
 }
-.thongbao:hover div{
+
+.thongbao:hover div {
   background-color: red;
-  color:white;
+  color: white;
 }

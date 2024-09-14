@@ -25,7 +25,9 @@ function RequestTableWrapper() {
     <div>
       {/* Header */}
       <div className="mt-8 flex items-center justify-between w-full">
-        <h2 className="text-base font-bold">Danh sách yêu cầu</h2>
+        <h2 className="text-base font-bold text-gray-600 min-w-max">
+          Danh sách yêu cầu
+        </h2>
         <RequestFilter onChange={handleChange} filter={filter} />
       </div>
       {/* Table */}

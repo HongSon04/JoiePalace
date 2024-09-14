@@ -33,14 +33,14 @@ function AdminHeader({
     router.replace("/admin/bang-dieu-khien");
   };
 
-  const {size} = useSelector((state) => state.sidebar);
+  const { size } = useSelector((state) => state.sidebar);
   const dispatch = useDispatch();
   const onSidebar = () => {
     dispatch(toggleSidebar());
   };
 
   return (
-    <div className="admin-header flex w-full justify-between items-center gap-5">
+    <div className="admin-header flex w-full justify-between items-center gap-5 relative z-40">
       <AdminSidebarButton
         onSidebar={onSidebar}
         size={size}

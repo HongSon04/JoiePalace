@@ -8,6 +8,10 @@ function CustomSelect({
   placeholder = "",
   selectClassName = "",
   itemClassName = "",
+  triggerClassName = "",
+  labelPlacement,
+  labelClassName,
+  ariaLabel,
   onChange = () => {},
 }) {
   const defaultValue = options.find((item) => item.value === value)?.value;
@@ -15,18 +19,20 @@ function CustomSelect({
   return (
     <div className="flex justify-end w-full">
       <Select
+        labelPlacement={labelPlacement}
         onChange={onChange}
         className={selectClassName}
         classNames={{
           base: "!overflow-hidden !text-gray-600",
-          trigger: "text-sm text-gray-600 !bg-blackAlpha-100",
+          trigger: `text-sm text-gray-600 !bg-blackAlpha-100 ${triggerClassName}`,
           value: "text-sm !text-gray-600",
           innerWrapper: "!overflow-hidden",
           popoverContent: "bg-white border border-gray-50 !text-gray-600 gap-1",
+          label: labelClassName,
         }}
         variant={variant}
         label={label}
-        aria-label="Select"
+        aria-label={ariaLabel}
         placeholder={placeholder}
         defaultSelectedKeys={defaultValue ? [defaultValue.toString()] : []}
       >
