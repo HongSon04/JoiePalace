@@ -40,6 +40,8 @@ function AdminSidebar({ handleSidebar, size }) {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
+        await animate();
+
         await animate(
           scope.current,
           {
@@ -73,7 +75,7 @@ function AdminSidebar({ handleSidebar, size }) {
     >
       <AdminSidebarHeader onSidebar={handleSidebar} size={size} />
       <Divider
-        background={"rgba(0, 0, 0, 0.2)"}
+        background={"rgba(0, 0, 0, 0.05)"}
         height={0.5}
         className={`${isSidebarOpen ? "w-5/6" : ""} shrink-0`}
       />
@@ -174,9 +176,9 @@ function AdminSidebarNav() {
         })}
       </ul>
       <Divider
-        background={"rgba(0, 0 , 0, 0.2)"}
+        background={"rgba(0, 0, 0, 0.05)"}
         height={0.5}
-        className={`${isSidebarOpen ? "w-5/6" : ""}`}
+        className={`${isSidebarOpen ? "w-5/6" : ""} shrink-0`}
       />
       <ul className={`flex-center flex-col px-3 w-full`}>
         {subOptions.map((item, index) => {
@@ -200,22 +202,22 @@ function AdminSidebarItem({ item }) {
       item={item}
       className={`flex w-full items-center justify-between rounded-md !text-gray-600 mb-2 transition-all relative  hover:bg-blackAlpha-50 ${
         isActive ? "bg-blackAlpha-100" : ""
-      } ${item.qty ? "bg-red-200 animate-pulse" : ""}`}
+      } ${item.qty ? "bg-red-100 animate-pulse" : ""}`}
     >
-      <div
+      <Link
+        href={item.path}
         layout
         className={`flex items-center gap-2 p-2 flex-1 text-gray-600 !stroke-gray-600 rounded-md flex-center relative`}
       >
         <Image src={item.icon} alt={item.title} className={`w-6 h-6`} />
         {isSidebarOpen && (
-          <Link
-            href={item.path}
+          <span
             className={`text-gray-600 hover:text-gray-500 flex-1 min-w-max block text-base`}
           >
             {item.title}
-          </Link>
+          </span>
         )}
-      </div>
+      </Link>
       {item.qty && (
         <span
           className={`shrink-0 w-5 h-5 bg-red-400 text-sm text-white rounded-full flex-center absolute -top-1 -right-1`}
