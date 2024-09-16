@@ -16,7 +16,7 @@ const ChiTietTiecPage = ({ params }) => {
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={`${slug}`} />
             <RequestBreadcrumbs requestId={slug} nameLink={'quan-ly-tiec'} />
             <div className='flex justify-between items-center w-full mt-8'>
-                <h1 className='text-lg font-bold leading-8 flex-1 text-left'>Danh sách tiệc</h1>
+                <h1 className='text-lg font-bold leading-8 flex-1 text-left text-black'>Danh sách tiệc</h1>
                 <div>
                     <StatusSelectDay />
                 </div>

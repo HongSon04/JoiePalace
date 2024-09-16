@@ -8,7 +8,6 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
     const [defaultValue, setDefaultValue] = useState('');
 
     useEffect(() => {
-        // This will run every time options or value changes
         const initialValue = options.find((item) => item.value === defaultValue)?.value;
         if (initialValue) {
             setDefaultValue(initialValue);
@@ -29,24 +28,24 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
         <div className='flex flex-col gap-2'>
             <div className='flex gap-2 items-center'>
                 {svg}
-                <span className='font-bold leading-6 text-base'>{title}</span>
+                <span className='font-bold leading-6 text-base text-gray-600'>{title}</span>
             </div>
             {type === 'select' ? (
                 <Select
                     aria-label={title}
                     className='rounded-lg'
                     classNames={{
-                        base: "!overflow-hidden !text-white",
-                        trigger: "text-sm text-gray-100 !bg-white/20 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                        value: "text-sm !text-white",
+                        base: "!overflow-hidden !text-black",
+                        trigger: "text-sm text-black !bg-blackAlpha-100 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                        value: "text-sm !text-black",
                         innerWrapper: "!overflow-hidden",
-                        popoverContent: "bg-white/20 backdrop-blur-lg gap-1 rounded-lg",
+                        popoverContent: "bg-blackAlpha-100 backdrop-blur-lg gap-1 rounded-lg",
                     }}
                     defaultSelectedKeys={defaultValue ? [defaultValue] : []}
                 >
                     {options.map((option) => (
                         <SelectItem
-                            className='p-3 text-white text-base font-medium'
+                            className='p-3 text-black text-base font-medium'
                             key={option.value}
                             value={option.value}
                         >
@@ -59,7 +58,7 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
                     id={name}
                     name={name}
                     type={type}
-                    className='p-3 bg-whiteAlpha-200 rounded-lg appearance-none'
+                    className='p-3 bg-blackAlpha-100 rounded-lg appearance-none text-gray-300'
                     placeholder={placeholder}
                     min={type === 'number' ? 1 : undefined}
                     onChange={handleInputChange}

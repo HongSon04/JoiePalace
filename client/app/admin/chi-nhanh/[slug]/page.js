@@ -7,24 +7,25 @@ import AdminThemChiNhanhInputAndImg from "@/app/_components/AdminThemChiNhanhInp
 import IconButton from "@/app/_components/IconButton";
 import IconButtonSave from "@/app/_components/IconButtonSave";
 import RequestBreadcrumbs from "@/app/_components/RequestBreadcrumbs";
-import { BreadcrumbLink, BreadcrumbItem, Breadcrumb , Heading, Stack, Text } from "@chakra-ui/react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
-const fields = [
-  { type: 'text', placeholder: 'Tên chi nhánh' },
-  { type: 'text', placeholder: 'Địa chỉ' },
-  { type: 'text', placeholder: 'Email' },
-  { type: 'text', placeholder: 'Số điện thoại' },
-];
-
-const fields2 = [
-  { type: 'textarea', placeholder: 'Slogan' },
-  { type: 'textarea', placeholder: 'Mô tả' },
-];
-
-const fields3 = [
-  { type: 'textarea', placeholder: 'Mô tả' },
-];
+const fieldsConfig = {
+  contact: [
+    { type: 'text', placeholder: 'Tên chi nhánh', name: 'branchName' },
+    { type: 'text', placeholder: 'Địa chỉ', name: 'address' },
+    { type: 'text', placeholder: 'Email', name: 'email' },
+    { type: 'text', placeholder: 'Số điện thoại', name: 'phone' },
+  ],
+  slogan: [
+    { type: 'textarea', placeholder: 'Slogan', name: 'slogan' },
+    { type: 'textarea', placeholder: 'Mô tả', name: 'description' },
+  ],
+  equipment: [{ type: 'textarea', placeholder: 'Mô tả', name: 'equipmentDescription' }],
+  space: [
+    { type: 'text', placeholder: 'Tên không gian', name: 'spaceName' },
+    { type: 'textarea', placeholder: 'Mô tả', name: 'spaceDescription' },
+  ],
+};
 
 const branch = {
   id: 1,
@@ -32,41 +33,41 @@ const branch = {
   slug: "hoang-van-thu",
 };
 
-function ChiNhanhChiTietPage({params}) {
-  const {chiNhanhSlug} = params
+function ChiNhanhChiTietPage({ params }) {
+  const { chiNhanhSlug } = params;
+
   return (
     <div>
-    <AdminHeader showSearchForm={false} title={'Chi tiết chi nhánh'} />
-    <RequestBreadcrumbs requestId={chiNhanhSlug} nameLink={'chi-nhanh'}></RequestBreadcrumbs>
-    <div className="flex flex-col gap-[30px] w-full mt-[30px]">
-      <div className="flex gap-5 ">
-        <AdminThemChiNhanhInput fields={fields} title='Thông tin liên hệ' />
-        <AdminThemChiNhanhImg title='Hình ảnh carousel' inputId="image-upload-carousel" />
+      <AdminHeader showSearchForm={false} title="Chi tiết chi nhánh" />
+      <RequestBreadcrumbs requestId={chiNhanhSlug} nameLink="chi-nhanh" />
+      <div className="flex flex-col gap-6 w-full mt-6">
+        {renderSection('Thông tin liên hệ', fieldsConfig.contact, 'Hình ảnh carousel', "image-upload-carousel")}
+        {renderSection('Slogan & Mô tả', fieldsConfig.slogan, 'Hình ảnh mô tả', "image-upload-description", 'h-[80px]')}
+        {renderSection('Trang thiết bị', fieldsConfig.equipment, 'Hình ảnh sơ đồ', "image-upload-map", 'h-[160px]')}
+        {renderSection('Không gian hội nghị', fieldsConfig.space, 'Hình ảnh mô tả', "image-upload-space", 'h-[100px]')}
+        
+        <AdminThemChiNhanhInputAndImg title="Sảnh" height="290px" inputId="input-image-upload-map" input={false} />
+        <AdminThemChiNhanhInputAndImg title="Không gian" height="321px" inputId="input-image-upload-map-space" input={true} />
       </div>
-      <div className="flex gap-5 ">
-        <AdminThemChiNhanhInput fields={fields2} type={'textarea'} title='Slogan & Mô tả' />
-        <AdminThemChiNhanhImg title='Hình ảnh mô tả' inputId="image-upload-description" />
-      </div>
-      <div className="flex gap-5 ">
-        <AdminThemChiNhanhInput fields={fields3} typeADD={'textarea'} placeholderADD='Mô tả' title='Trang thiết bị' />
-        <AdminThemChiNhanhImg title='Hình ảnh sơ đồ' inputId="image-upload-map" />
-      </div>
-      <AdminThemChiNhanhInputAndImg title='Sảnh' height={'290px'} inputId="input-image-upload-map" input={false}/>
-      <AdminThemChiNhanhInputAndImg title='Không gian' height={'321px'} inputId="input-image-upload-map-space" 
-      input={true}/>
-    </div>
-    <div className="flex w-full  mt-[30px]">
-       <IconButton  className="bg-whiteAlpha-400 ">
-        <ArrowLeftIcon width={20} height={20} />
-      </IconButton>
-      <div className="ml-auto flex flex-shrink-0 gap-4">
-        <IconButtonSave title={'Hủy'} color={'bg-red-400'}></IconButtonSave>
-        <IconButtonSave title={'Lưu'} color={'bg-teal-400'}></IconButtonSave>
-      </div>
-    </div>
 
-  </div>
+      <div className="flex w-full mt-6">
+        <IconButton className="bg-blackAlpha-400">
+          <ArrowLeftIcon width={20} height={20} color="black" />
+        </IconButton>
+        <div className="ml-auto flex space-x-4">
+          <IconButtonSave title="Hủy" color="bg-red-400" />
+          <IconButtonSave title="Lưu" color="bg-teal-400" />
+        </div>
+      </div>
+    </div>
   );
 }
+
+const renderSection = (title, fields, imgTitle, inputId, heightTextarea) => (
+  <div className="flex gap-5">
+    <AdminThemChiNhanhInput fields={fields} title={title} heightTextarea={heightTextarea} />
+    <AdminThemChiNhanhImg title={imgTitle} inputId={inputId} />
+  </div>
+);
 
 export default ChiNhanhChiTietPage;
