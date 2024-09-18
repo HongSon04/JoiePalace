@@ -57,7 +57,6 @@ export class TagsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách tag thành công',
       data: [
         {
           id: 'number',
@@ -101,7 +100,6 @@ export class TagsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy tag thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -132,7 +130,6 @@ export class TagsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy tag thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -163,7 +160,7 @@ export class TagsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Cập nhật tag',
+      message: 'Cập nhật tag thành công',
       data: {
         id: 'number',
         name: 'string',

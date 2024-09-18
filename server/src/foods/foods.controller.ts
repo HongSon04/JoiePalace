@@ -102,7 +102,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách món ăn thành công',
       data: [
         {
           id: 'number',
@@ -146,6 +145,9 @@ export class FoodsController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
   findAll(@Query() query: FilterPriceDto) {
     return this.foodsService.findAll(query);
   }
@@ -155,7 +157,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách món ăn đã xóa thành công',
       data: [
         {
           id: 'number',
@@ -199,6 +200,9 @@ export class FoodsController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
   findAllDeleted(@Query() query: FilterPriceDto) {
     return this.foodsService.findAllDeleted(query);
   }
@@ -208,7 +212,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -246,7 +249,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -284,7 +286,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: [
         {
           id: 'number',
@@ -303,8 +304,19 @@ export class FoodsController {
     },
   })
   @ApiOperation({ summary: 'Lấy món ăn theo id danh mục' })
-  findByCategoryId(@Param('category_id') category_id: number) {
-    return this.foodsService.findByCategoryId(category_id);
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'minPrice', required: false })
+  @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
+  findByCategoryId(
+    @Query() query: FilterPriceDto,
+    @Param('category_id') category_id: number,
+  ) {
+    return this.foodsService.findByCategoryId(query, category_id);
   }
 
   // ! Get Food By Tag Id
@@ -312,7 +324,6 @@ export class FoodsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy món ăn thành công',
       data: [
         {
           id: 'number',
@@ -342,9 +353,17 @@ export class FoodsController {
       message: 'Lỗi server vui lòng thử lại sau',
     },
   })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'minPrice', required: false })
+  @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
   @ApiOperation({ summary: 'Lấy món ăn theo id tag' })
-  findByTagId(@Param('tag_id') tag_id: number) {
-    return this.foodsService.findByTagId(tag_id);
+  findByTagId(@Query() query: FilterPriceDto, @Param('tag_id') tag_id: number) {
+    return this.foodsService.findByTagId(query, tag_id);
   }
 
   // ! Update food

@@ -61,7 +61,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách menu thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -93,6 +92,9 @@ export class MenusController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
   findAll(@Query() query: FilterPriceDto) {
     return this.menusService.findAll(query);
   }
@@ -102,7 +104,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách menu đã xóa tạm thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -134,6 +135,9 @@ export class MenusController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
   findAllDeleted(@Query() query: FilterPriceDto) {
     return this.menusService.findAllDeleted(query);
   }
@@ -143,7 +147,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy menu thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -177,7 +180,6 @@ export class MenusController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy menu thành công',
       data: {
         id: 'number',
         name: 'string',

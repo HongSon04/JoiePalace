@@ -30,8 +30,6 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
-import { query } from 'express';
-import { ChangeLocationDto } from './dto/change-location.dto';
 
 @ApiTags('staffs')
 @UseGuards(AuthGuard)
@@ -118,7 +116,6 @@ export class StaffsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách nhân viên thành công',
       data: [
         {
           id: 'number',
@@ -159,6 +156,8 @@ export class StaffsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   async getAllStaff(@Query() query: FilterDto): Promise<StaffEntities[] | any> {
     return this.staffsService.getAllStaff(query);
   }
@@ -168,7 +167,6 @@ export class StaffsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách nhân viên thành công',
       data: [
         {
           id: 'number',
@@ -209,6 +207,8 @@ export class StaffsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   async getAllStaffDeleted(
     @Query() query: FilterDto,
   ): Promise<StaffEntities[] | any> {
@@ -220,7 +220,6 @@ export class StaffsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy thông tin nhân viên thành công',
       data: {
         id: 'number',
         name: 'string',

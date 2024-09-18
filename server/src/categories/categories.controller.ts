@@ -98,6 +98,8 @@ export class CategoriesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   findAll(@Query() query: FilterDto) {
     return this.categoriesService.findAll(query);
   }
@@ -141,6 +143,8 @@ export class CategoriesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
   findAllDeleted(@Query() query: FilterDto) {
     return this.categoriesService.findAllDeleted(query);
   }

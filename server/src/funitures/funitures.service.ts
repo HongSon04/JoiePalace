@@ -146,6 +146,7 @@ export class FunituresService {
           pagination: {
             total,
             currentPage: page,
+            itemsPerPage,
             lastPage,
             nextPage,
             prevPage,
@@ -229,6 +230,7 @@ export class FunituresService {
           data: res,
           pagination: {
             total,
+            itemsPerPage,
             currentPage: page,
             lastPage,
             nextPage,

@@ -20,13 +20,13 @@ function IconButton({
 
   const _background = {
     none: "",
-    default: "glass",
+    default: "bg-white",
   }[background];
 
   return (
     <button
       type={type}
-      className={`flex-center rounded-full hover:bg-whiteAlpha-300 ${_size} ${_background} ${className}`}
+      className={`flex-center rounded-full ${className} ${_size} ${_background} hover:brightness-95`}
       onClick={onClick}
     >
       {children}

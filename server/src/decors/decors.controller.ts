@@ -92,7 +92,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách trang trí thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -124,6 +123,9 @@ export class DecorsController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
   findAll(@Query() query: FilterPriceDto) {
     return this.decorsService.findAll(query);
   }
@@ -133,7 +135,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách trang trí đã xóa tạm thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -165,6 +166,9 @@ export class DecorsController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
   findAllDeleted(@Query() query: FilterPriceDto) {
     return this.decorsService.findAllDeleted(query);
   }
@@ -174,7 +178,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy thông tin trang trí thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -208,7 +211,6 @@ export class DecorsController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy thông tin trang trí thành công',
       data: {
         id: 'number',
         name: 'string',

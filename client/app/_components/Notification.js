@@ -28,7 +28,7 @@ function Notification({ notification }) {
 
   return (
     <div
-      className={`notification border-solid border-l-4 ${_type} flex justify-between items-center gap-5 p-3 bg-whiteAlpha-100 mb-3`}
+      className={`notification border-solid border-l-4 ${_type} flex justify-between items-center gap-5 p-3 bg-white mb-3 hover:brightness-95`}
     >
       <div className="flex-1">
         <h1 className="text-base font-bold">{notification.title}</h1>

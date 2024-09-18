@@ -1,32 +1,16 @@
 "use client";
+import { requestStatus } from "../_utils/config";
 import CustomSelect from "./CustomSelect";
 
 function RequestFilter({ onChange = () => {}, filter = 1 }) {
-  const options = [
-    {
-      id: 1,
-      name: "Chờ xử lý",
-      value: 1,
-    },
-    {
-      id: 2,
-      name: "Đã xử lý",
-      value: 2,
-    },
-    {
-      id: 3,
-      name: "Đã hủy",
-      value: 3,
-    },
-  ];
-
   return (
     <CustomSelect
       onChange={onChange}
-      options={options}
+      options={requestStatus}
       value={filter}
       variant="bordered"
       selectClassName="w-[200px]"
+      triggerClassName="!bg-white"
     />
   );
 }

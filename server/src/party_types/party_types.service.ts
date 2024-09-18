@@ -153,6 +153,7 @@ export class PartyTypesService {
           data: res,
           pagination: {
             total,
+            itemsPerPage,
             lastPage,
             nextPage,
             prevPage,
@@ -247,6 +248,7 @@ export class PartyTypesService {
           data: res,
           pagination: {
             total,
+            itemsPerPage,
             lastPage,
             nextPage,
             prevPage,

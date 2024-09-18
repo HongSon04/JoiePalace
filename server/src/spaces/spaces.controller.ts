@@ -12,11 +12,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SpacesService } from './spaces.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
-import { DeleteImageDto } from './dto/upload-image.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')

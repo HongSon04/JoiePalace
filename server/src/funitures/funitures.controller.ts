@@ -93,7 +93,6 @@ export class FunituresController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách nội thất thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -136,7 +135,6 @@ export class FunituresController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách nội thất đã xóa thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -178,7 +176,6 @@ export class FunituresController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy nội thất thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -213,7 +210,6 @@ export class FunituresController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy nội thất thành công',
       data: {
         id: 'number',
         name: 'string',

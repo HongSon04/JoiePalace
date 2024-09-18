@@ -95,7 +95,6 @@ export class PartyTypesController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách loại tiệc thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -133,7 +132,6 @@ export class PartyTypesController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy danh sách loại tiệc đã xóa tạm thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -163,7 +161,6 @@ export class PartyTypesController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy loại tiệc thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -196,7 +193,6 @@ export class PartyTypesController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Lấy loại tiệc thành công',
       data: {
         id: 'number',
         name: 'string',
@@ -228,7 +224,6 @@ export class PartyTypesController {
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
-      message: 'Cập nhật loại tiệc thành công',
       data: {
         id: 'number',
         name: 'string',
