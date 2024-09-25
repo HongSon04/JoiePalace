@@ -9,7 +9,7 @@ const QuanLyTiecPage = () => {
     <Box>
       <AdminHeader showBackButton={false} title={'Quản lý tiệc'} />
       <Stack alignItems="start" spacing="8" direction={'row'} className='mt-5' >
-        <Heading as='h1' size='lg' className=''>Quản lý tiệc / </Heading>
+        <Heading as='h1' size='lg' className='leading-6 font-normal text-base text-gray-400'>Quản lý tiệc / </Heading>
       </Stack>
       <Suspense fallback={<BranchesSkeleton />}>
         <Branches nameLink='quan-ly-tiec' />

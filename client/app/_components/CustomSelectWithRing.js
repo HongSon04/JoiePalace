@@ -21,7 +21,7 @@ function CustomSelect({
                 classNames={{
                     base: "!overflow-hidden !text-black ",
                     trigger: "text-sm text-black !bg-white",
-                    value: "text-sm !text-black",
+                    value: "text-sm !text-black font-medium",
                     innerWrapper: "!overflow-hidden",
                     popoverContent: "bg-blackAlpha-100 backdrop-blur-lg gap-1",
                 }}

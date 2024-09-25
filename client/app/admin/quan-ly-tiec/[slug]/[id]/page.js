@@ -6,6 +6,11 @@ import InputDetailCustomer from './InputDetailCustomer';
 import IconButton from '@/app/_components/IconButton';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import IconButtonSave from '@/app/_components/IconButtonSave';
+import TableDetail from '@/app/_components/TableDetailCost';
+
+const TitleSpanInfo = ({ title }) => (
+    <span className="font-semibold text-xl leading-7 text-gray-600">{title}</span>
+);
 
 const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const { id } = params;
@@ -18,7 +23,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     <path d="M9.78 12H14.22C15.43 12 16.36 10.94 16.2 9.74L15.88 7.29C15.57 5.39 13.92 4 12 4C10.08 4 8.43 5.39 8.12 7.29L7.8 9.74C7.64 10.94 8.57 12 9.78 12Z" fill="#4B5563" />
                 </svg>
             ),
-            name: 'name',
+            name: 'nameHost',
             title: 'Chủ tiệc',
             type: 'text',
             placeholder: 'Họ và Tên'
@@ -92,6 +97,15 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         },
         {
             svg: (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11ZM8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11ZM8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13ZM16 13C15.71 13 15.38 13.02 15.03 13.05C16.19 13.89 17 15.02 17 16.5V19H23V16.5C23 14.17 18.33 13 16 13Z" fill="#4B5563" />
+            </svg>),
+            name: 'customerAndChair',
+            title: 'Số lượng khách / bàn',
+            type: 'number',
+            placeholder: 'Nhập số lượng khách / bàn',
+        },
+        {
+            svg: (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4 19 4ZM19 20H5V10H19V20ZM9 14H7V12H9V14ZM13 14H11V12H13V14ZM17 14H15V12H17V14ZM9 18H7V16H9V18ZM13 18H11V16H13V18ZM17 18H15V16H17V18Z" fill="#4B5563" />
             </svg>),
             name: 'partyDate',
@@ -103,7 +117,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             svg: (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4 19 4ZM19 20H5V10H19V20ZM9 14H7V12H9V14ZM13 14H11V12H13V14ZM17 14H15V12H17V14ZM9 18H7V16H9V18ZM13 18H11V16H13V18ZM17 18H15V16H17V18Z" fill="#4B5563" />
             </svg>),
-            name: 'DateOrganization',
+            name: 'dateOrganization',
             title: 'Ngày tổ chức',
             type: 'date',
             placeholder: 'dd-mm-yyyy',
@@ -115,32 +129,48 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             </svg>),
             name: 'time',
             title: 'Giờ tổ chức',
-            type: 'time',
+            type: 'timeEvent',
             placeholder: '00:00:00',
         },
-    ];
-
-    const inputsCost = [
         {
             svg: null,
             title: 'Menu',
             type: 'select',
             name: 'menu',
             options: [
-                { value: 'wedding', label: 'Tiệc cưới' },
+                { value: 'wedding', label: 'A La Carte' },
                 { value: 'birthday', label: 'Tiệc sinh nhật' },
                 { value: 'conference', label: 'Hội thảo' },
             ]
         },
         {
             svg: null,
-            title: 'Sảnh',
+            title: 'Bữa ăn nhẹ',
             type: 'select',
-            name: 'hall',
+            name: 'snack',
             options: [
-                { value: 'wedding', label: 'Tiệc cưới' },
-                { value: 'birthday', label: 'Tiệc sinh nhật' },
-                { value: 'conference', label: 'Hội thảo' },
+                { value: '1', label: 'Có' },
+                { value: '0', label: 'Không' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Loại bàn',
+            type: 'select',
+            name: 'table',
+            options: [
+                { value: '1', label: 'Bàn tròn tiêu chuẩn' },
+                { value: '0', label: 'Không' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Loại ghế',
+            type: 'select',
+            name: 'chair',
+            options: [
+                { value: '1', label: 'Ghế tựa tiêu chuẩn' },
+                { value: '0', label: 'Không' },
             ]
         },
         {
@@ -156,39 +186,164 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         },
         {
             svg: null,
+            title: 'Màu chủ đạo',
+            type: 'input',
+            name: 'color',
+            placeholder: 'Vàng',
+        },
+        {
+            svg: null,
+            title: 'Sảnh',
+            type: 'select',
+            name: 'hall',
+            options: [
+                { value: 'wedding', label: 'Tiệc cưới' },
+                { value: 'birthday', label: 'Tiệc sinh nhật' },
+                { value: 'conference', label: 'Hội thảo' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Vũ đoàn',
+            type: 'select',
+            name: 'danceTroupe',
+            options: [
+                { value: '1', label: 'Có' },
+                { value: '0', label: 'Không' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Sân khấu & màn hình led',
+            type: 'select',
+            name: 'StageAndLed',
+            options: [
+                { value: '1', label: 'Có' },
+                { value: '0', label: 'Không' },
+            ]
+        },
+        {
+            svg: null,
             title: 'Bánh kem',
             type: 'select',
             name: 'cake',
             options: [
-                { value: 1, label: 'có' },
-                { value: 0, label: 'không' },
+                { value: '1', label: 'có' },
+                { value: '0', label: 'không' },
             ]
         },
         {
             svg: null,
             title: 'Champagne',
-            type: 'select',
+            type: 'input',
             name: 'champagne',
+            placeholder: '2'
+        },
+
+    ];
+
+    const inputsCost = [
+        {
+            svg: null,
+            title: 'Họ tên người thanh toán',
+            type: 'input',
+            name: 'namePayer',
+            placeholder: 'Nguyễn văn A'
+        },
+        {
+            svg: null,
+            title: 'Hình thức thanh toán',
+            type: 'select',
+            name: 'payment',
             options: [
-                { value: 1, label: 'có' },
-                { value: 0, label: 'không' },
+                { value: '0', label: 'Momo' },
+                { value: '1', label: 'ZaloPay' },
             ]
+        },
+        {
+            svg: null,
+            title: 'Số tiền phải thanh toán',
+            type: 'input',
+            name: 'amountPayable',
+            placeholder: '1000000'
+        },
+        {
+            svg: null,
+            title: 'Số tiền cọc (30%)',
+            type: 'input',
+            name: 'depositAmount',
+            placeholder: '1000000'
+        },
+        {
+            svg: null,
+            title: 'Trạng thái đã cọc',
+            type: 'select',
+            name: 'depositStatus',
+            options: [
+                { value: '1', label: 'Đã đặt cọc' },
+                { value: '0', label: 'Chưa đặt cọc' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Ngày đặt cọc',
+            type: 'date',
+            name: 'depositDate',
+            placeholder : '29/12/2024'
+        },
+        {
+            svg: null,
+            title: 'Số tiền còn lại phải thanh toán',
+            type: 'input',
+            name: 'remainingAmountPaid',
+            placeholder : '10000000000'
+        },
+        {
+            svg: null,
+            title: 'Trạng thái thanh toán',
+            type: 'select',
+            name: 'statusPayment',
+            options: [
+                { value: '1', label: 'Đã thanh toán' },
+                { value: '0', label: 'Chưa thanh toán' },
+            ]
+        },
+        {
+            svg: null,
+            title: 'Ngày thanh toán',
+            type: 'date',
+            name: 'dataPay',
+            placeholder : '29/12/2024'
         },
     ]
 
-    const drinks = [
-        { name: 'Nước suối Aquafina', quantity: 10, unit: 'Thùng' },
-        { name: 'Nước ngọt Pepsi', quantity: 12, unit: 'Thùng' },
-        { name: 'Bia lon Sài Gòn Bạc', quantity: 20, unit: 'Thùng' },
+    const headers = ['Dịch vụ', 'Mô tả', 'Thành tiền (VND)'];
+    const data = [
+    { service: 'Menu', description: '4.000.000 VND / 1 bàn * 10 bàn', cost: '40.000.000' },
+    {
+        service: 'Đồ uống',
+        description: ['Bia: 10 thùng tiger', 'Pepsi: 5 thùng', 'Nước suối: 5 thùng'],
+        cost: '10.000.000',
+    },
+    { service: 'Bánh kem', description: '', cost: '1.000.000' },
+    { service: 'Trang trí', description: 'Màu vàng', cost: '3.000.000' },
+    { service: 'Âm thanh, ánh sáng, sân khấu, màn hình', description: '', cost: '5.000.000' },
+    { service: 'Phí thuê bàn ghế', description: '', cost: '1.000.000' },
+    { service: 'Phí thuê sảnh tiệc', description: '3 giờ', cost: '20.000.000' },
+    { service: 'Bữa ăn nhẹ cho cô dâu - chú rể', description: '', cost: '100.000' },
+    { service: 'MC', description: '', cost: '500.000' },
+    { service: 'Chi phí phát sinh', description: 'Thêm 1 bàn tiệc', cost: '4.000.000' },
+    { service: 'Tổng chi phí', description: '', cost: '999.000.000' },
+    { service: 'VAT', description: '10%', cost: '99.000.000' },
+    { service: 'Tổng chi phí bao gồm VAT', description: '', cost: '1.000.000.000' },
     ];
 
-    
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
             <RequestBreadcrumbsForQuanLyTiec requestId={id} nameLink={'quan-ly-tiec'} />
-            <div className='p-4 mt-[30px] w-full bg-white rounded-lg'>
-                <h3 className='font-semibold text-xl leading-7 mb-[22px] text-gray-600'>Thông tin liên hệ</h3>
+            <div className='p-4 mt-[30px] w-full bg-white rounded-lg flex flex-col gap-[22px]'>
+                <TitleSpanInfo title={'Thông tin liên hệ'}></TitleSpanInfo>
                 <div className='grid grid-cols-3 gap-[30px]'>
                     {inputInfoUser.map((detail, index) => (
                         <InputDetailCustomer
@@ -198,13 +353,13 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                             type={detail.type}
                             name={detail.name}
                             placeholder={detail.placeholder}
-
+                            
                         />
                     ))}
                 </div>
             </div>
-            <div className='p-4 mt-5 w-full bg-white rounded-lg'>
-                <h3 className='font-semibold text-xl leading-7 mb-[22px] text-gray-600'>Thông tin tổ chức</h3>
+            <div className='p-4 mt-5 w-full bg-white rounded-lg flex flex-col gap-[22px]'>
+            <TitleSpanInfo title={'Thông tin tổ chức'}></TitleSpanInfo>
                 <div className='grid grid-cols-3 gap-[30px]'>
                     {inputOrganization.map((detail, index) => (
                         <InputDetailCustomer
@@ -217,10 +372,33 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                             options={detail.options}
                         />
                     ))}
+                    <div className='flex flex-col gap-2'>
+                        <span className='font-bold leading-6 text-base text-gray-600'>Đồ uống</span>
+                        <div className='flex flex-wrap gap-[10px] w-fit'>
+                            <div className='bg-white border-1 rounded-lg p-2 flex gap-[6px] text-gray-600 items-center'>
+                                <span className='text-[12px] font-medium leading-4'>Nước uống Aquafina</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                    <path opacity="0.5" d="M5 3.88906L8.88906 0L10 1.11094L6.11094 5L10 8.88906L8.88906 10L5 6.11094L1.11094 10L0 8.88906L3.88906 5L0 1.11094L1.11094 0L5 3.88906Z" fill="#1A202C" />
+                                </svg>
+                            </div>
+                            <div className='bg-white border-1 rounded-lg p-2 flex gap-[6px] text-gray-600 items-center'>
+                                <span className='text-[12px] font-medium leading-4'>Pepsi</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                    <path opacity="0.5" d="M5 3.88906L8.88906 0L10 1.11094L6.11094 5L10 8.88906L8.88906 10L5 6.11094L1.11094 10L0 8.88906L3.88906 5L0 1.11094L1.11094 0L5 3.88906Z" fill="#1A202C" />
+                                </svg>
+                            </div>
+                            <div className='bg-white border-1 rounded-lg p-2 flex gap-[6px] text-gray-600 items-center'>
+                                <span className='text-[12px] font-medium leading-4'>Bia sài gòn bạc</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                    <path opacity="0.5" d="M5 3.88906L8.88906 0L10 1.11094L6.11094 5L10 8.88906L8.88906 10L5 6.11094L1.11094 10L0 8.88906L3.88906 5L0 1.11094L1.11094 0L5 3.88906Z" fill="#1A202C" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div className='p-4 mt-5 w-full bg-white rounded-lg'>
-                <h3 className='font-semibold text-xl leading-7 mb-[22px] text-gray-600'>Chi phí</h3>
+            <div className='p-4 mt-5 w-full bg-white rounded-lg flex flex-col gap-[22px]'>
+            <TitleSpanInfo title={'Thông tin thanh toán'}></TitleSpanInfo>
                 <div className='grid grid-cols-3 gap-[30px]'>
                     {inputsCost.map((detail, index) => (
                         <InputDetailCustomer
@@ -233,44 +411,11 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                             options={detail.options}
                         />
                     ))}
-                    <div className='flex flex-col gap-[9px]'>
-                        <span className='font-bold leading-6 text-base text-gray-600'>Đồ uống</span>
-                        <div className='flex flex-col gap-[19px]'>
-                            {drinks.map((drink, index) => (
-                                <DrinkItem 
-                                    key={index} 
-                                    name={drink.name} 
-                                    quantity={drink.quantity} 
-                                    unit={drink.unit}
-                                    index={index}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                    <div className='flex flex-col gap-3'>
-                        <div className='flex gap-3 '>
-                            <span className='text-gray-600 text-base font-semibold leading-6'>Bánh kem: </span>
-                            <span className='text-base font-normal leading-6 text-gray-600'>000000 VND</span>
-                        </div>
-                        <div className='flex gap-3 '>
-                            <span className='text-gray-600 text-base font-semibold leading-6'>Champagne: </span>
-                            <span className='text-base font-normal leading-6 text-gray-600'>000000 VND</span>
-                        </div>
-                        <div className='flex gap-3 '>
-                            <span className='text-gray-600 text-base font-semibold leading-6'>Đồ uống: </span>
-                            <span className='text-base font-normal leading-6 text-gray-600'>000000 VND</span>
-                        </div>
-                        <div className='flex gap-3 '>
-                            <span className='text-gray-600 text-base font-semibold leading-6'>Bàn tiệc: </span>
-                            <span className='text-base font-normal leading-6 text-gray-600'>000000 VND</span>
-                        </div>
-                        <div className='flex gap-3 '>
-                            <span className='text-gray-600 text-base font-semibold leading-6'>Tổng chi: </span>
-                            <span className='text-base font-normal leading-6 text-gray-600'>000000 VND</span>
-                        </div>
-                    </div>
                 </div>
-
+            </div>
+            <div className='p-4 mt-5 w-full bg-white rounded-lg flex flex-col gap-[22px]'>
+                <TitleSpanInfo title={'Bảng chi phí chi tiết'}></TitleSpanInfo>
+                <TableDetail headers={headers} data={data}></TableDetail>
             </div>
             <div className="flex mt-[30px] mr-[30px]">
                 <IconButton className="bg-whiteAlpha-400 ">
@@ -285,17 +430,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     );
 };
 
-const DrinkItem = ({ name, quantity, unit, index }) => {
-    return (
-        <div className='flex items-center gap-3 text-gray-600'>
-            <span>{`${index + 1}. ${name}`}</span>
-            <div>
-                <input type="number" className='w-[60px] text-center h-6 bg-blackAlpha-100 rounded' value={quantity} />
-            </div>
-            <span>{unit}</span>
-        </div>
-    );
-};
 
 
 export default ChiTietTiecCuaChiNhanhPage;
