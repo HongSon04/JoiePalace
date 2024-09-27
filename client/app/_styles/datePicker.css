@@ -1,14 +1,14 @@
 div[data-slot="input-wrapper"].bg-default-100 {
-  background: rgba(0, 0, 0, 0.06) !important;
-  color: gray !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: white !important;
 }
 
 div[data-slot="inner-wrapper"].text-default-400,
 div[data-slot="inner-wrapper"].text-default-400 * {
-  color: gray !important;
+  color: white !important;
 }
 
 span[data-slot="label"] {
-  color: gray !important;
+  color: white !important;
   font-weight: bold !important;
 }

@@ -2,6 +2,7 @@ import { Col, Row } from "antd";
 import Menu from "./Menu";
 
 function MenuList({ menuList, isSelectAll, onCheckboxChange }) {
+  // console.log(menuList);
   return (
     <Row gutter={[16, 16]} className="mt-8 w-full">
       {menuList.map((menu, index) => {

@@ -1,33 +1,43 @@
 "use client";
 
 import AdminHeader from "@/app/_components/AdminHeader";
-import { ChevronDownIcon, PlusIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
-import MenuList from "./MenuList";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-import {
-  Button,
-  ButtonGroup,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Checkbox,
-} from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
-import SearchForm from "@/app/_components/SearchForm";
-import { useDispatch, useSelector } from "react-redux";
 import {
   fetchMenuItems,
+  setSelectedMenuId,
   toggleCheckbox,
   toggleSelectAll,
 } from "@/app/_lib/features/menu/menuSlice";
+import {
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+} from "@chakra-ui/react";
+import { ChevronDownIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@nextui-org/react";
 import { FormProvider } from "antd/es/form/context";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import MenuList from "./MenuList";
+import { useToast } from "@chakra-ui/react";
 
 function Page() {
+  const toast = useToast();
+
   const dispatch = useDispatch();
-  const { selectAll, menuItems, status } = useSelector((store) => store.menu);
+  const { menuList, status, selectAll, selectedMenuId } = useSelector(
+    (store) => store.menu
+  );
 
   const methods = useForm();
 
@@ -37,29 +47,63 @@ function Page() {
 
   const handleSelectAll = (event) => {
     dispatch(toggleSelectAll(event.target.checked));
+    dispatch(setSelectedMenuId(menuList.map((item) => item.id)));
+    toast({
+      position: "top-right",
+      render: () => (
+        <Box color="gray.600" p={3} bg="white" rounded={"8px"}>
+          {event.target.checked ? "Chọn tất cả" : "Bỏ chọn tất cả"}
+        </Box>
+      ),
+      isClosable: true,
+      duration: 1000,
+    });
   };
 
   const handleCheckboxChange = (id) => {
     dispatch(toggleCheckbox(id));
+    dispatch(setSelectedMenuId(id));
   };
 
   const [selectedOption, setSelectedOption] = useState(new Set(["edit"]));
 
-  // const descriptionsMap = {
-  //   edit: "All commits from the source branch are added to the destination branch via a merge commit.",
-  //   delete:
-  //     "All commits from the source branch are added to the destination branch as a single commit.",
-  //   active:
-  //     "All commits from the source branch are added to the destination branch individually.",
-  //   unactive:
-  //     "All commits from the source branch are added to the destination branch individually.",
-  // };
+  const handleEdit = () => {
+    console.log("Edit menu");
+    console.log(selectedMenuId);
+  };
+
+  const handleDelete = () => {
+    console.log("Delete menu");
+    console.log(selectedMenuId);
+  };
+
+  const handleActivate = () => {
+    console.log("Activate menu");
+    console.log(selectedMenuId);
+  };
+
+  const handleDeactivate = () => {
+    console.log("Deactivate menu");
+    console.log(selectedMenuId);
+  };
 
   const labelsMap = {
-    edit: "Chỉnh sửa thực đơn",
-    delete: "Xóa thực đơn",
-    active: "Active thực đơn",
-    unactive: "Unactive thực đơn",
+    edit: {
+      label: "Chỉnh sửa thực đơn",
+      action: handleEdit,
+    },
+    delete: {
+      label: "Xóa thực đơn",
+      action: handleDelete,
+    },
+    active: {
+      label: "Active thực đơn",
+      action: handleActivate,
+    },
+    unactive: {
+      label: "Unactive thực đơn",
+      action: handleDeactivate,
+    },
   };
 
   // Convert the Set to an Array and get the first value.
@@ -79,9 +123,9 @@ function Page() {
         />
         <Link
           href="/admin/thuc-don/tao-thuc-don"
-          className="px-3 py-2 h-full bg-white flex flex-center gap-3 rounded-full text-gray-600 shrink-0 hover:brightness-95"
+          className="px-3 py-2 h-full bg-whiteAlpha-100 flex flex-center gap-3 rounded-full text-white shrink-0 hover:whiteAlpha-200"
         >
-          <PlusIcon className="h-6 w-6 cursor-pointer text-gray-600" />
+          <PlusIcon className="h-6 w-6 cursor-pointer text-white" />
           Tạo thực đơn
         </Link>
       </div>
@@ -103,30 +147,40 @@ function Page() {
           <div className="flex items-center gap-5 mt-8 w-full">
             {/* SORT BY */}
             <div className="flex items-center gap-3">
-              <p className="text-gray-600">Sắp xếp:</p>
-              <select>
-                <option value="asc">Giá tăng dần</option>
-                <option value="desc">Giá giảm dần</option>
+              <h4 className="text-white">Sắp xếp:</h4>
+              <select className="select">
+                <option className="option" value="asc">
+                  Giá tăng dần
+                </option>
+                <option className="option" value="desc">
+                  Giá giảm dần
+                </option>
               </select>
             </div>
 
             {/* ACTIONS */}
             <div className="flex gap-5 flex-1 justify-end items-center">
               <Checkbox
-                className="bg-white rounded-lg h-full py-2 text-sm font-normal"
+                className="bg-whiteAlpha-100 rounded-lg h-full py-2 px-3 text-sm font-normal"
                 defaultChecked={false}
                 onChange={handleSelectAll}
+                classNames={{
+                  label: "text-white",
+                }}
               >
                 Chọn tất cả
               </Checkbox>
               <ButtonGroup variant="flat">
-                <Button className="bg-white text-gray-600">
-                  {labelsMap[selectedOptionValue]}
+                <Button
+                  className="bg-whiteAlpha-100 text-white"
+                  onClick={labelsMap[selectedOptionValue].action}
+                >
+                  {labelsMap[selectedOptionValue].label}
                 </Button>
                 <Dropdown placement="bottom-end">
                   <DropdownTrigger>
-                    <Button isIconOnly className="bg-white">
-                      <ChevronDownIcon className="w-6 h-6 text-gray-600" />
+                    <Button isIconOnly className="bg-whiteAlpha-100">
+                      <ChevronDownIcon className="w-6 h-6 text-white" />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
@@ -156,7 +210,8 @@ function Page() {
           {status === "failed" && <div>Error: {error}</div>}
           {status === "succeeded" && (
             <MenuList
-              menuList={menuItems}
+              menuList={menuList}
+              isSelectAll={selectAll}
               onCheckboxChange={handleCheckboxChange}
             />
           )}

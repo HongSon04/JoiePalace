@@ -28,7 +28,7 @@ function page() {
         <BreadcrumbItem>
           <BreadcrumbLink
             className="text-gray-400 hover:text-gray-200"
-            href="/admin/do-uong"
+            href="/admin/mon-an"
           >
             Đồ uống /
           </BreadcrumbLink>

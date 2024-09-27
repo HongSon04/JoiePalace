@@ -205,7 +205,7 @@ function AdminSidebarItem({ item }) {
     <li
       item={item}
       className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative  hover:bg-whiteAlpha-50 ${
-        isActive ? "bg-blackAlpha-100" : ""
+        isActive ? "bg-whiteAlpha-100" : ""
       } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""}`}
     >
       <Link
@@ -215,7 +215,7 @@ function AdminSidebarItem({ item }) {
         <Image src={item.icon} alt={item.title} className={`w-6 h-6`} />
         {isSidebarOpen && (
           <span
-            className={`text-white hover:text-gray-500 flex-1 min-w-max block text-base`}
+            className={`text-white transition flex-1 min-w-max block text-base`}
           >
             {item.title}
           </span>

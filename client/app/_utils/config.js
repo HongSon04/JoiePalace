@@ -36,4 +36,57 @@ export const roles = [
   },
 ];
 
-export const dishCategories = ["Khai vị", "Món chính", "Tráng miệng"];
+export const partyTypes = [
+  {
+    key: "wedding",
+    label: "Wedding",
+  },
+  {
+    key: "birthday",
+    label: "Birthday",
+  },
+  {
+    key: "corporate",
+    label: "Corporate",
+  },
+  {
+    key: "other",
+    label: "Other",
+  },
+];
+
+export const dishCategories = [
+  {
+    id: 1,
+    key: "khai-vi",
+    label: "Khai vị",
+  },
+  {
+    id: 2,
+    key: "mon-chinh",
+    label: "Món chính",
+  },
+  {
+    id: 3,
+    key: "mon-trang-mieng",
+    label: "Món tráng miệng",
+  },
+];
+
+export const beverageCategories = [
+  {
+    id: 1,
+    key: "nuoc-ngot",
+    label: "Nước ngọt",
+  },
+  {
+    id: 2,
+    key: "do-uong-co-con",
+    label: "Đồ uống có cồn",
+  },
+  {
+    id: 4,
+    key: "nuoc-tinh-khiet",
+    label: "Nước tinh khiết",
+  },
+];

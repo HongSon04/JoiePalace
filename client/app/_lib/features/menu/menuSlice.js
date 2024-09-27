@@ -2,6 +2,73 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import menuBg from "@/public/Alacarte-Menu-Thumbnail.png";
 
+const initialState = {
+  selectAll: false,
+  menuList: [],
+  status: "idle",
+  error: null,
+  selectedMenuId: [],
+};
+
+const checkboxSlice = createSlice({
+  name: "menu",
+  initialState,
+  reducers: {
+    toggleSelectAll: (state, action) => {
+      state.selectAll = action.payload;
+      state.menuList = state.menuList.map((item) => ({
+        ...item,
+        checked: action.payload,
+      }));
+    },
+    toggleCheckbox: (state, action) => {
+      const item = state.menuList.find((item) => item.id === action.payload);
+      if (item) {
+        item.checked = !item.checked;
+      }
+      state.selectAll = state.menuList.every((item) => item.checked);
+    },
+    setSelectedMenuId: (state, action) => {
+      if (state.selectedMenuId.includes(action.payload)) {
+        state.selectedMenuId = state.selectedMenuId.filter(
+          (id) => id !== action.payload
+        );
+      } else {
+        if (Array.isArray(state.selectedMenuId))
+          if (Array.isArray(action.payload)) {
+            state.selectedMenuId = [...state.selectedMenuId, ...action.payload];
+          } else {
+            state.selectedMenuId = action.payload;
+          }
+        else {
+          if (Array.isArray(action.payload)) {
+            state.selectedMenuId = [state.selectedMenuId, ...action.payload];
+          } else {
+            state.selectedMenuId = [state.selectedMenuId, action.payload];
+          }
+        }
+      }
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchMenuItems.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchMenuItems.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.menuList = action.payload.map((item) => ({
+          ...item,
+          checked: false,
+        }));
+      })
+      .addCase(fetchMenuItems.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      });
+  },
+});
+
 export const fetchMenuItems = createAsyncThunk(
   "menu/fetchMenuItems",
   async () => {
@@ -72,6 +139,8 @@ export const fetchMenuItems = createAsyncThunk(
         name: "Thực đơn 1",
         price: 100000000,
         checked: false,
+        label: "Thực đơn 1",
+        active: false,
       },
       {
         id: 2,
@@ -137,6 +206,8 @@ export const fetchMenuItems = createAsyncThunk(
         name: "Thực đơn 2",
         price: 100000000,
         checked: false,
+        label: "Thực đơn 2",
+        active: true,
       },
       {
         id: 3,
@@ -202,6 +273,8 @@ export const fetchMenuItems = createAsyncThunk(
         name: "Thực đơn 3",
         price: 100000000,
         checked: false,
+        label: "Thực đơn 3",
+        active: true,
       },
     ];
 
@@ -209,50 +282,6 @@ export const fetchMenuItems = createAsyncThunk(
   }
 );
 
-const initialState = {
-  selectAll: false,
-  menuItems: [],
-  status: "idle",
-  error: null,
-};
-
-const checkboxSlice = createSlice({
-  name: "checkbox",
-  initialState,
-  reducers: {
-    toggleSelectAll: (state, action) => {
-      state.selectAll = action.payload;
-      state.menuItems = state.menuItems.map((item) => ({
-        ...item,
-        checked: action.payload,
-      }));
-    },
-    toggleCheckbox: (state, action) => {
-      const item = state.menuItems.find((item) => item.id === action.payload);
-      if (item) {
-        item.checked = !item.checked;
-      }
-      state.selectAll = state.menuItems.every((item) => item.checked);
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchMenuItems.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchMenuItems.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.menuItems = action.payload.map((item) => ({
-          ...item,
-          checked: false,
-        }));
-      })
-      .addCase(fetchMenuItems.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      });
-  },
-});
-
-export const { toggleSelectAll, toggleCheckbox } = checkboxSlice.actions;
+export const { toggleSelectAll, toggleCheckbox, setSelectedMenuId } =
+  checkboxSlice.actions;
 export default checkboxSlice;

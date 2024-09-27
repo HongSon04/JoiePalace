@@ -47,12 +47,17 @@ function AddDishCategory() {
           >
             <CustomInput
               name={"categoryName"}
+              ariaLabel={"Tên danh mục"}
               validation={{ ..._require }}
               label="Tên danh mục"
               placeholder="Nhập tên danh mục"
               autoFocus={true}
               value={categoryName}
               errorMessage="Vui lòng điền tên danh mục"
+              classNames={{
+                input: "w-full",
+                label: "text-gray-600 font-semibold",
+              }}
               onChange={(e) => setCategoryName(e.target.value)}
             />
             <div className="flex w-full justify-end items-center gap-5">
