@@ -4,11 +4,9 @@ import Image from "next/image";
 
 import Notification from "./Notification";
 
-import notificationIcon from "@/public/thong-bao.svg";
+import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
 
-import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/popover";
-import IconButton from "./IconButton";
-import TextButton from "./TextButton";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Button } from "@nextui-org/react";
 
 function NotificationButton() {
@@ -120,7 +118,7 @@ function NotificationButton() {
         <Button
           radius="full"
           isIconOnly
-          className="w-10 h-10 bg-white hover:bg-white hover:brightness-95"
+          className="w-10 h-10 bg-whiteAlpha-100 hover:bg-whiteAlpha-200"
         >
           <Image
             src={notificationIcon}

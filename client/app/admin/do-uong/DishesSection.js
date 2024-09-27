@@ -18,7 +18,7 @@ import { FormProvider, useForm } from "react-hook-form";
 
 function DishesSection({ dishesType }) {
   const dishes = {
-    "Khai Vị": [
+    "Nước suối": [
       {
         id: 1,
         name: "Gỏi cuốn",
@@ -49,7 +49,7 @@ function DishesSection({ dishesType }) {
           "https://plus.unsplash.com/premium_photo-1661771822467-e516ca075314?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZGlzaHxlbnwwfHwwfHx8MA%3D%3D",
       },
     ],
-    "Món chính": [
+    "Đồ uống có ga": [
       {
         id: 3,
         name: "Cá kho tộ",
@@ -65,7 +65,7 @@ function DishesSection({ dishesType }) {
           "https://plus.unsplash.com/premium_photo-1661771822467-e516ca075314?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZGlzaHxlbnwwfHwwfHx8MA%3D%3D",
       },
     ],
-    "Món tráng miệng": [
+    "Đồ uống có cồn": [
       {
         id: 5,
         name: "Chè",
@@ -87,17 +87,17 @@ function DishesSection({ dishesType }) {
     {
       id: 1,
       value: 1,
-      name: "Khai vị",
+      name: "Nước suối",
     },
     {
       id: 2,
       value: 2,
-      name: "Món chính",
+      name: "Đồ uống có ga",
     },
     {
       id: 3,
       value: 3,
-      name: "Món tráng miệng",
+      name: "Đồ uống có cồn",
     },
   ];
 
@@ -108,7 +108,7 @@ function DishesSection({ dishesType }) {
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-600">{dishesType}</h2>
+        <h2 className="text-xl font-semibold text-white">{dishesType}</h2>
         <Button
           radius="full"
           className="glass text-white font-semibold !shrink-0"
@@ -128,14 +128,14 @@ function DishesSection({ dishesType }) {
             span: 6,
           }}
         >
-          <div className="bg-white p-3 group rounded-lg shadow-md flex items-center hover:brightness-95 flex-center h-full">
+          <div className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-full">
             <Button
               onPress={onOpen}
               isIconOnly
-              className="bg-blackAlpha-100"
+              className="!bg-transparent"
               radius="full"
             >
-              <PlusIcon className="w-5 h-5 text-gray-600 font-semibold" />
+              <PlusIcon className="w-5 h-5 text-white font-semibold" />
             </Button>
           </div>
         </Col>
@@ -176,7 +176,7 @@ function DishesSection({ dishesType }) {
                           className={"mt-5"}
                         />
                         <CustomSelect
-                          labelClassName={"text-gray-600"}
+                          labelClassName={"text-white"}
                           labelPlacement="outside"
                           label="Danh mục món ăn"
                           areaLabel="Danh mục món ăn"

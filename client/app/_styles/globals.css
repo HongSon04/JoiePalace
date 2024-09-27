@@ -171,18 +171,18 @@ body {
     @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
   }
 
-  .bg-primary {
+  /* .bg-primary {
     background-color: #022C25 !important;
-  }
+  } */
 
   .admin-panel {
-    border-radius: 24px;
+    /* border-radius: 24px; */
     /* padding: 20px; */
     display: flex;
     flex-direction: column;
     flex: 1 0 0;
     gap: 30px;
-    background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
+    /* background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08)); */
     /* backdrop-filter: blur(20px); */
   }
 
@@ -424,4 +424,12 @@ body::-webkit-scrollbar {
 .thongbao:hover div {
   background-color: red;
   color: white;
+}
+
+select {
+  padding: 12px 16px;
+  border: none;
+  background: white;
+  border-radius: 10px;
+  color: gray
 }

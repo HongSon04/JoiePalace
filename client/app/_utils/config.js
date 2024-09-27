@@ -1,17 +1,39 @@
 export const requestStatus = [
   {
-    id: 1,
-    name: "Chờ xử lý",
-    value: 1,
+    key: "pending",
+    label: "Chờ xử lý",
   },
   {
-    id: 2,
-    name: "Đã xử lý",
-    value: 2,
+    key: "approved",
+    label: "Đã duyệt",
   },
   {
-    id: 3,
-    name: "Đã hủy",
-    value: 3,
+    key: "rejected",
+    label: "Đã hủy",
+  },
+  {
+    key: "completed",
+    label: "Đã hoàn thành",
   },
 ];
+
+export const roles = [
+  {
+    key: "admin",
+    label: "Admin",
+  },
+  {
+    key: "manager",
+    label: "Manager",
+  },
+  {
+    key: "chef",
+    label: "Chef",
+  },
+  {
+    key: "accountant",
+    label: "Accountant",
+  },
+];
+
+export const dishCategories = ["Khai vị", "Món chính", "Tráng miệng"];

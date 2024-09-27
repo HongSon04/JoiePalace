@@ -108,7 +108,7 @@ function DishesSection({ dishesType }) {
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-600">{dishesType}</h2>
+        <h2 className="text-xl font-semibold text-white">{dishesType}</h2>
         <Button
           radius="full"
           className="glass text-white font-semibold !shrink-0"
@@ -128,14 +128,14 @@ function DishesSection({ dishesType }) {
             span: 6,
           }}
         >
-          <div className="bg-white p-3 group rounded-lg shadow-md flex items-center hover:brightness-95 flex-center h-full">
+          <div className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-full">
             <Button
               onPress={onOpen}
               isIconOnly
-              className="bg-blackAlpha-100"
+              className="!bg-transparent"
               radius="full"
             >
-              <PlusIcon className="w-5 h-5 text-gray-600 font-semibold" />
+              <PlusIcon className="w-5 h-5 text-white font-semibold" />
             </Button>
           </div>
         </Col>
@@ -175,15 +175,19 @@ function DishesSection({ dishesType }) {
                           validation={_require}
                           className={"mt-5"}
                         />
-                        <CustomSelect
-                          labelClassName={"text-gray-600"}
-                          labelPlacement="outside"
+                        <select
+                          className="w-full bg-gray-100"
                           label="Danh mục món ăn"
                           areaLabel="Danh mục món ăn"
                           name="category"
-                          value="1"
                           options={categories}
-                        ></CustomSelect>
+                        >
+                          {categories.map((category) => (
+                            <option key={category.id} value={category.value}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
                       </ModalBody>
                       <ModalFooter>
                         <Button

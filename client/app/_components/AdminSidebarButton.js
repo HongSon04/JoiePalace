@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 
-import sidebarIcon from "@/public/toggle-sidebar.svg";
+import sidebarIcon from "@/public/admin-sidebar/toggle-sidebar.svg";
 
 function AdminSidebarButton({ onSidebar, size, className }) {
   return (
     <button
-      className={`w-fit h-fit p-3 rounded-full hover:bg-blackAlpha-100 ${className}`}
+      className={`w-fit h-fit p-3 rounded-full bg-whiteAlpha-100 hover:bg-whiteAlpha-200 ${className}`}
     >
       <Image
         className="rotate-180"

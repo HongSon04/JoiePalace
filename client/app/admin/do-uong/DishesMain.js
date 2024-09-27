@@ -3,7 +3,7 @@
 import DishesSection from "./DishesSection";
 
 function DishesMain() {
-  const dishesType = ["Khai Vị", "Món chính", "Món tráng miệng"];
+  const dishesType = ["Nước suối", "Đồ uống có ga", "Đồ uống có cồn"];
 
   return (
     <div className="w-full mt-8">

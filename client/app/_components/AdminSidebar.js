@@ -15,22 +15,23 @@ import { useEffect } from "react";
 import { Divider } from "@chakra-ui/react";
 
 // import images
-import logo from "@/public/admin_logo_dark.svg";
-import dashboardIcon from "@/public/bang-dieu-khien.svg";
-import settingIcon from "@/public/cai-dat.svg";
-import branchIcon from "@/public/chi-nhanh.svg";
-import drinkIcon from "@/public/do-uong.svg";
-import customerIcon from "@/public/khach-hang.svg";
-import contactIcon from "@/public/lien-he-ho-tro.svg";
-import menuIcon from "@/public/menu.svg";
-import foodIcon from "@/public/mon-an.svg";
-import notificationIcon from "@/public/thong-bao.svg";
-import statisticIcon from "@/public/thong-ke.svg";
-import eventIcon from "@/public/tiec-icon.svg";
-import requestIcon from "@/public/yeu-cau.svg";
+import logo from "@/public/logo-dark.png";
+import dashboardIcon from "@/public/admin-sidebar/bang-dieu-khien.svg";
+import settingIcon from "@/public/admin-sidebar/cai-dat.svg";
+import branchIcon from "@/public/admin-sidebar/chi-nhanh.svg";
+import drinkIcon from "@/public/admin-sidebar/do-uong.svg";
+import customerIcon from "@/public/admin-sidebar/khach-hang.svg";
+import contactIcon from "@/public/admin-sidebar/lien-he-ho-tro.svg";
+import menuIcon from "@/public/admin-sidebar/menu.svg";
+import foodIcon from "@/public/admin-sidebar/mon-an.svg";
+import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
+import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
+import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
+import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import { useSelector } from "react-redux";
+import AdminUser from "./AdminUser";
 
-function AdminSidebar({ handleSidebar, size }) {
+function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   const [scope, animate] = useAnimate();
@@ -71,15 +72,20 @@ function AdminSidebar({ handleSidebar, size }) {
     <motion.div
       ref={scope}
       layout
-      className={`admin-sidebar items-center bg-white flex flex-col max-h-screen h-screen overflow-y-scroll relative rounded-xl`}
+      className={`admin-sidebar items-center bg-whiteAlpha-100 *:!text-white flex flex-col max-h-screen h-screen overflow-y-scroll relative rounded-xl`}
     >
-      <AdminSidebarHeader onSidebar={handleSidebar} size={size} />
-      <Divider
-        background={"rgba(0, 0, 0, 0.05)"}
-        height={0.5}
-        className={`${isSidebarOpen ? "w-5/6" : ""} shrink-0`}
-      />
-      <AdminSidebarNav></AdminSidebarNav>
+      <div className="flex-1 w-full">
+        <AdminSidebarHeader />
+        <Divider
+          background={"rgba(0, 0, 0, 0.05)"}
+          height={0.5}
+          className={`${isSidebarOpen ? "w-5/6" : ""} shrink-0`}
+        />
+        <AdminSidebarNav></AdminSidebarNav>
+      </div>
+      <div className="flex-center pb-8 w-full">
+        <AdminUser />
+      </div>
     </motion.div>
   );
 }
@@ -89,7 +95,6 @@ function AdminSidebarHeader() {
 
   return (
     <div
-      layout
       className={`${
         isSidebarOpen ? "flex-center flex-col" : ""
       } flex items-center justify-between w-full p-3`}
@@ -198,21 +203,19 @@ function AdminSidebarItem({ item }) {
 
   return (
     <li
-      layout
       item={item}
-      className={`flex w-full items-center justify-between rounded-md !text-gray-600 mb-2 transition-all relative  hover:bg-blackAlpha-50 ${
+      className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative  hover:bg-whiteAlpha-50 ${
         isActive ? "bg-blackAlpha-100" : ""
-      } ${item.qty ? "bg-red-100 animate-pulse" : ""}`}
+      } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""}`}
     >
       <Link
         href={item.path}
-        layout
-        className={`flex items-center gap-2 p-2 flex-1 text-gray-600 !stroke-gray-600 rounded-md flex-center relative`}
+        className={`flex items-center gap-2 p-2 flex-1 text-white !stroke-gray-600 rounded-md flex-center relative`}
       >
         <Image src={item.icon} alt={item.title} className={`w-6 h-6`} />
         {isSidebarOpen && (
           <span
-            className={`text-gray-600 hover:text-gray-500 flex-1 min-w-max block text-base`}
+            className={`text-white hover:text-gray-500 flex-1 min-w-max block text-base`}
           >
             {item.title}
           </span>

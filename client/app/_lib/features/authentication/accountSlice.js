@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  account: {},
+  username: "",
+  password: "",
+  email: "",
+  role: "",
   accessToken: "",
   refreshToken: "",
 };
@@ -11,23 +14,37 @@ const accountSlice = createSlice({
   initialState,
   reducers: {
     login(state, action) {
-      state.account = action.payload.account;
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+      // LATER: Handle login
     },
     register(state, action) {
-      state.account = action.payload.account;
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+      // LATER: Handle register
     },
     logout(state) {
-      state.account = {};
-      state.accessToken = "";
-      state.refreshToken = "";
+      // LATER: Handle logout
+    },
+    setUsername(state, action) {
+      state.username = action.payload;
+    },
+    setPassword(state, action) {
+      state.password = action.payload;
+    },
+    setEmail(state, action) {
+      state.email = action.payload;
+    },
+    setRole(state, action) {
+      state.role = action.payload;
     },
   },
 });
 
-export const { login, register, logout } = accountSlice.actions;
+export const {
+  login,
+  register,
+  logout,
+  setUsername,
+  setPassword,
+  setEmail,
+  setRole,
+} = accountSlice.actions;
 
 export default accountSlice;
