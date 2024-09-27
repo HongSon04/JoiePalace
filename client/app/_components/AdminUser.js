@@ -17,13 +17,13 @@ function AdminUser() {
     <Popover placement="right-start">
       <PopoverTrigger>
         <div
-          className={`flex items-center w-full p-3 bg-whiteAlpha-100 hover:brightness-95 cursor-pointer ${
+          className={`flex items-center w-full p-3 hover:brightness-95 cursor-pointer ${
             isSidebarOpen ? "justify-between" : "justify-center"
           }`}
         >
           <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
           <motion.h2
-            className={`font-semibold text-sm text-gray-600 flex-1 text-left ml-2 ${
+            className={`font-semibold text-sm text-white flex-1 text-left ml-2 ${
               isSidebarOpen ? "block" : "hidden"
             }`}
           >
@@ -34,7 +34,7 @@ function AdminUser() {
             radius="full"
             className={`bg-transparent ${isSidebarOpen ? "" : "hidden"}`}
           >
-            <EllipsisHorizontalIcon className="text-gray-600 w-6 h-6" />
+            <EllipsisHorizontalIcon className="text-white w-6 h-6" />
           </Button>
         </div>
       </PopoverTrigger>

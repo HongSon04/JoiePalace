@@ -216,6 +216,14 @@ body {
   .glass-button {
     @apply glass rounded-full px-4 py-2 text-white font-semibold hover:bg-whiteAlpha-300 hover:text-gray-100
   }
+
+  .select {
+    @apply bg-whiteAlpha-200 rounded-xl px-4 py-2 text-white text-base hover:bg-whiteAlpha-300 hover:text-gray-100
+  }
+
+  .option {
+    @apply bg-whiteAlpha-200 rounded-md px-4 py-2 text-gray-600 font-normal hover:bg-whiteAlpha-300 hover:text-gray-100
+  }
 }
 
 .bgYellow::before {
@@ -366,22 +374,21 @@ body {
   width: 100%;
   overflow: hidden;
   border-radius: 10px !important;
-  background: white;
 }
 
 .table td:is(:not(:last-child)) {
-  border-right: 1px solid #e0e0e0;
-  border-top: 1px solid #e0e0e0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table th:is(:not(:last-child)) {
-  border-right: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table td:last-child,
 .table th:last-child {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table tr:last-child td:last-child {
@@ -391,13 +398,13 @@ body {
 .table th,
 .table td {
   overflow: hidden;
-  color: gray;
+  color: white;
 }
 
 .table th {
   font-weight: 600;
   padding: 10px 12px;
-  background: white;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .table td {
@@ -405,6 +412,7 @@ body {
   padding: 10px 12px;
   font-size: 14px;
   font-weight: 400;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .bg-image-tintuc {

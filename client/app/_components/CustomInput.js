@@ -19,9 +19,9 @@ function CustomInput({
   value = "",
   className,
   classNames = {
-    label: "!text-gray-600 font-bold",
-    inputWrapper: "!bg-blackAlpha-100",
-    input: "!text-gray-600",
+    label: "!text-white font-bold",
+    inputWrapper: "!bg-whiteAlpha-100",
+    input: "!text-white",
     placeholder: "!text-gray-400",
   },
   placeholder = "",

@@ -1,18 +1,19 @@
 "use client";
 
+import { setSelectedMenuId } from "@/app/_lib/features/menu/menuSlice";
 import { dishCategories } from "@/app/_utils/config";
 import { ListBulletIcon } from "@heroicons/react/24/outline";
 import { Checkbox } from "@nextui-org/checkbox";
-import { Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 function Menu({ menu, onCheckboxChange }) {
   return (
     <div
       className={`h-[440px] relative group rounded-lg overflow-hidden ${
-        menu.checked ? "border-4 border-blue-500" : ""
-      }`}
+        menu.checked ? "border-4 border-teal-500" : ""
+      } ${menu.active ? "" : "brightness-50"}`}
     >
       <Image
         src={menu.background}
@@ -20,6 +21,12 @@ function Menu({ menu, onCheckboxChange }) {
         fill
         className={`object-cover ${menu.checked ? "brightness-50" : ""}`}
       />
+      {/* Tag */}
+      <div className="absolute top-5 left-5">
+        <Button variant="flat" color={menu.active ? "success" : "warning"}>
+          {menu.active ? "Active" : "Inactive"}
+        </Button>
+      </div>
       <div
         onClick={() => onCheckboxChange(menu.id)}
         className="overlay cursor-pointer overflow-y-auto absolute inset-0 p-5 bg-blackAlpha-700 backdrop-blur-md !text-white rounded-lg translate-y-full group-hover:translate-y-0 ease-in duration-200"
@@ -45,12 +52,12 @@ function Menu({ menu, onCheckboxChange }) {
               <div key={index} className="mb-4">
                 <h3 className="p-2 bg-whiteAlpha-200 text-base font-semibold rounded-md">
                   <ListBulletIcon className="w-6 h-6 inline-block mr-2" />
-                  {category}
+                  {category.label}
                 </h3>
                 <div className="flex flex-col gap-3 mt-3">
                   {menu.dishes.map((dish, index) => {
                     return (
-                      dish.category === category && (
+                      dish.category === category.label && (
                         <div
                           key={index}
                           className="flex items-center justify-between p-3 rounded-md hover:bg-whiteAlpha-100"

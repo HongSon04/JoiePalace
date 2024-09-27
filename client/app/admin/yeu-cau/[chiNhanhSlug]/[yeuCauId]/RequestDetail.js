@@ -13,6 +13,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import SelectPartyType from "./SelectPartyType";
 
 import { _require } from "@/app/_utils/validations";
+import { partyTypes } from "@/app/_utils/config";
 
 function RequestDetail() {
   const request = {
@@ -43,8 +44,8 @@ function RequestDetail() {
   return (
     <FormProvider {...methods}>
       <form className="mt-8" onSubmit={(e) => e.preventDefault()} noValidate>
-        <section className="bg-white rounded-xl p-4 flex flex-col gap-5">
-          <h2 className="text-xl leading-7 font-semibold text-gray-600">
+        <section className="bg-whiteAlpha-100 rounded-xl p-4 flex flex-col gap-5">
+          <h2 className="text-xl leading-7 font-semibold text-white">
             Thông tin liên hệ
           </h2>
           <Row gutter={[20, 20]} className="w-full">
@@ -55,7 +56,7 @@ function RequestDetail() {
                 value={request.name}
                 validation={{ ..._require }}
               >
-                <UserIcon className="w-6 h-6 text-gray-600" />
+                <UserIcon className="w-6 h-6 text-white" />
               </CustomInput>
             </Col>
             <Col span={8}>
@@ -64,30 +65,44 @@ function RequestDetail() {
                 label="Số điện thoại"
                 value={request.phone}
               >
-                <PhoneIcon className="w-6 h-6 text-gray-600" />
+                <PhoneIcon className="w-6 h-6 text-white" />
               </CustomInput>
             </Col>
             <Col span={8}>
               <CustomInput name={"email"} label="Email" value={request.email}>
-                <EnvelopeIcon className="w-6 h-6 text-gray-600" />
+                <EnvelopeIcon className="w-6 h-6 text-white" />
               </CustomInput>
             </Col>
           </Row>
         </section>
-        <section className="bg-white rounded-xl p-4 flex flex-col gap-5 mt-5">
-          <h2 className="text-xl leading-7 font-semibold text-gray-600">
+        <section className="bg-whiteAlpha-100 rounded-xl p-4 flex flex-col gap-5 mt-5">
+          <h2 className="text-xl leading-7 font-semibold text-white">
             Thông tin tổ chức
           </h2>
           <Row gutter={[20, 20]} className="w-full">
             <Col span={8}>
-              <SelectPartyType name={"type"} partyType={request.event.type} />
+              <div className="flex flex-col">
+                <h2 className="!text-white font-bold mb-3">Loại tiệc</h2>
+                <select
+                  name="partyType"
+                  id="partyType"
+                  value={partyTypes[0].label}
+                  className="select w-full h-[40px] overflow-hidden"
+                >
+                  {partyTypes.map((type) => (
+                    <option value={type.key} key={type.key} className="option">
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </Col>
             <Col span={8}>
               <CustomInput
                 name={"mainTable"}
                 label="Số lượng bàn chính thức"
                 value={request.event.mainTable}
-                className={"text-gray-600"}
+                className={"text-white"}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +113,7 @@ function RequestDetail() {
                 >
                   <path
                     d="M21.9601 9.73L20.5301 4.73C20.4101 4.3 20.0201 4 19.5701 4H4.43009C3.98009 4 3.59009 4.3 3.47009 4.73L2.04009 9.73C1.86009 10.36 2.34009 11 3.00009 11H5.20009L4.00009 20H6.00009L6.67009 15H17.3401L18.0001 20H20.0001L18.8001 11H21.0001C21.6601 11 22.1401 10.36 21.9601 9.73ZM6.93009 13L7.20009 11H16.8001L17.0701 13H6.93009Z"
-                    fill="rgb(75 85 99)"
+                    fill="#fff"
                     fillOpacity="0.3"
                   />
                 </svg>
@@ -119,7 +134,7 @@ function RequestDetail() {
                 >
                   <path
                     d="M21.9601 9.73L20.5301 4.73C20.4101 4.3 20.0201 4 19.5701 4H4.43009C3.98009 4 3.59009 4.3 3.47009 4.73L2.04009 9.73C1.86009 10.36 2.34009 11 3.00009 11H5.20009L4.00009 20H6.00009L6.67009 15H17.3401L18.0001 20H20.0001L18.8001 11H21.0001C21.6601 11 22.1401 10.36 21.9601 9.73ZM6.93009 13L7.20009 11H16.8001L17.0701 13H6.93009ZM4.33009 9L5.19009 6H18.8201L19.6801 9H4.33009Z"
-                    fill="rgb(75 85 99)"
+                    fill="#fff"
                     fillOpacity="0.36"
                   />
                 </svg>
@@ -131,7 +146,7 @@ function RequestDetail() {
                 label="Số lượng khách dự kiến"
                 value={request.event.guests}
               >
-                <UserGroupIcon className="w-6 h-6 text-gray-600" />
+                <UserGroupIcon className="w-6 h-6 text-white" />
               </CustomInput>
             </Col>
             <Col span={8} className="flex flex-col">
@@ -142,7 +157,7 @@ function RequestDetail() {
                 value={request.event.createdAt}
                 classNames={{
                   input: "!bg-blackAlpha-100",
-                  inputWrapper: "!bg-blackAlpha-100 text-gray-600",
+                  inputWrapper: "!bg-blackAlpha-100 text-white",
                 }}
               />
             </Col>
@@ -154,7 +169,7 @@ function RequestDetail() {
                 value={request.event.orgDate}
                 classNames={{
                   input: "!bg-blackAlpha-100",
-                  inputWrapper: "!bg-blackAlpha-100 text-gray-600",
+                  inputWrapper: "!bg-blackAlpha-100 text-white",
                 }}
               />
             </Col>

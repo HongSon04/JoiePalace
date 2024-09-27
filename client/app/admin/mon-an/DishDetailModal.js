@@ -1,6 +1,7 @@
 import CustomInput from "@/app/_components/CustomInput";
 import CustomSelect from "@/app/_components/CustomSelect";
 import FileUploader from "@/app/_components/FileUploader";
+import { dishCategories } from "@/app/_utils/config";
 import { _required } from "@/app/_utils/validations";
 import {
   Button,
@@ -77,6 +78,10 @@ async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
                     value={dish.name}
                     validation={_required}
                     className={"w-full"}
+                    classNames={{
+                      input: "bg-blackAlpha-100",
+                      label: "text-gray-600 font-semibold",
+                    }}
                     placeholder="Nhập tên món ăn"
                   />
                   <CustomInput
@@ -85,14 +90,33 @@ async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
                     value={dish.price}
                     validation={_required}
                     className={"w-full mt-14"}
+                    classNames={{
+                      input: "bg-blackAlpha-100",
+                      label: "text-gray-600 font-semibold",
+                    }}
                     placeholder="Nhập giá món ăn"
                   />
-                  <CustomSelect
-                    value={"1"}
-                    label="Loại món ăn"
-                    labelPlacement="outside"
-                    options={options}
-                  />
+                  <div className="flex flex-col">
+                    <h2 className="text-gray-600 font-semibold mb-3">
+                      Danh mục món ăn
+                    </h2>
+                    <select
+                      name="dishCategory"
+                      id="dishCategory"
+                      value={dishCategories}
+                      className="select !bg-blackAlpha-100 text-gray-600 hover:text-gray-400"
+                    >
+                      {dishCategories.map((category) => (
+                        <option
+                          value={category.id}
+                          key={category.key}
+                          className="option text-gray-600"
+                        >
+                          {category.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </form>
               </FormProvider>
             </ModalBody>
