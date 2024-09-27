@@ -19,11 +19,11 @@ function CustomSelect({
                 onChange={onChange}
                 className={selectClassName}
                 classNames={{
-                    base: "!overflow-hidden !text-white",
-                    trigger: "text-sm text-gray-100 !bg-white/20",
-                    value: "text-sm !text-white",
+                    base: "!overflow-hidden !text-black ",
+                    trigger: "text-sm text-black !bg-white",
+                    value: "text-sm !text-black font-medium",
                     innerWrapper: "!overflow-hidden",
-                    popoverContent: "bg-white/20 backdrop-blur-lg gap-1",
+                    popoverContent: "bg-blackAlpha-100 backdrop-blur-lg gap-1",
                 }}
                 variant={variant}
                 label={label}
@@ -43,7 +43,7 @@ function CustomSelect({
                                 <span
                                     className={`w-4 h-4 rounded-full border-3 ${item.border}`}
                                 ></span>
-                                <div className={`${item?.className} text-sm font-medium text-white `}>{item.name}</div>
+                                <div className={`${item?.className} text-sm font-medium text-black `}>{item.name}</div>
                             </div>
                         </SelectItem>
                     ))}

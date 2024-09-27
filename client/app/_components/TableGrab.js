@@ -54,13 +54,13 @@ const TableGrab = () => {
         <div className="">
             <div
                 ref={overflowContainer}
-                className="overflow-x-auto mt-6"
+                className="!overflow-x-auto mt-6"
                 onMouseDown={handleMouseDown}
                 onMouseLeave={handleMouseLeaveOrUp}
                 onMouseUp={handleMouseLeaveOrUp}
                 onMouseMove={handleMouseMove}
             >
-                <table className="text-sm text-left table overflow-hidden">
+                <table className="text-sm text-left table table-auto  !overflow-x-scroll">
                     <thead>
                         <tr>
                             {['Mã tiệc', 'Loại tiệc', 'Chủ tiệc', 'Ngày đặt', 'Tổng giá trị', 'Tiền cọc', 'Ngày đặt cọc', 'Còn lại phải thanh toán', 'Ngày tổ chức', 'Giờ tổ chức', 'Ngày thanh toán', 'Tình trạng thanh toán', 'Số lượng khách dự kiến', 'Số bàn', 'Chi nhánh', 'Sảnh', ''].map((header) => (

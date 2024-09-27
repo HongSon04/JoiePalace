@@ -2,26 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Select, SelectItem } from "@nextui-org/react";
 
 const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options = [], name }) => {
-    const [defaultValue, setDefaultValue] = useState('');
+    const [value, setValue] = useState('');
 
     useEffect(() => {
-        // This will run every time options or value changes
-        const initialValue = options.find((item) => item.value === defaultValue)?.value;
-        if (initialValue) {
-            setDefaultValue(initialValue);
+        if (options.length > 0 && !options.some(item => item.value === value)) {
+            setValue(options[0].value);
         }
-    }, [options, defaultValue]);
+    }, [options, value]);
 
     const handleInputChange = (e) => {
         const { value } = e.target;
 
-        if (type === 'number') {
-            e.target.value = /^\d*$/.test(value) ? value : '';
+        if (type === 'number' && !/^\d*$/.test(value)) {
+            return;
         }
 
+        setValue(value);
         console.log(value, name);
     };
 
@@ -29,39 +27,30 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
         <div className='flex flex-col gap-2'>
             <div className='flex gap-2 items-center'>
                 {svg}
-                <span className='font-bold leading-6 text-base'>{title}</span>
+                <span className='font-bold leading-6 text-base text-gray-600'>{title}</span>
             </div>
             {type === 'select' ? (
-                <Select
-                    aria-label={title}
-                    className='rounded-lg'
-                    classNames={{
-                        base: "!overflow-hidden !text-white",
-                        trigger: "text-sm text-gray-100 !bg-white/20 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-                        value: "text-sm !text-white",
-                        innerWrapper: "!overflow-hidden",
-                        popoverContent: "bg-white/20 backdrop-blur-lg gap-1 rounded-lg",
-                    }}
-                    defaultSelectedKeys={defaultValue ? [defaultValue] : []}
+                <select
+                    value={value}
+                    onChange={handleInputChange}
+                    className="border w-full bg-white border-gray-300 rounded-md p-2 font-normal text-black leading-6"
+                    name={name}
                 >
-                    {options.map((option) => (
-                        <SelectItem
-                            className='p-3 text-white text-base font-medium'
-                            key={option.value}
-                            value={option.value}
-                        >
+                    {options.map(option => (
+                        <option key={option.id} value={option.value}>
                             {option.label}
-                        </SelectItem>
+                        </option>
                     ))}
-                </Select>
+                </select>
             ) : (
                 <input
                     id={name}
                     name={name}
                     type={type}
-                    className='p-3 bg-whiteAlpha-200 rounded-lg appearance-none'
+                    className='p-3 bg-gray-100 rounded-lg text-gray-700 placeholder-gray-400'
                     placeholder={placeholder}
                     min={type === 'number' ? 1 : undefined}
+                    value={value}
                     onChange={handleInputChange}
                     aria-labelledby={name}
                 />
@@ -76,8 +65,9 @@ InputDetailCustomer.propTypes = {
     type: PropTypes.string,
     placeholder: PropTypes.string,
     options: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number.isRequired,
         value: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
     })),
     name: PropTypes.string.isRequired,
 };

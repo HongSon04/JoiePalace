@@ -22,6 +22,7 @@ const TextFade = (props) => {
       variants={props.settings}
       className={props.styles}
       initial="hidden"
+      {...props}
     >
       {props.children}
     </motion.div>

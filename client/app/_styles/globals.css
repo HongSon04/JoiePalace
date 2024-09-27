@@ -218,11 +218,6 @@ body {
   }
 }
 
-body::-webkit-scrollbar {
-  display: none;
-  /* Ẩn thanh cuộn trên Chrome, Safari */
-}
-
 .bgYellow::before {
   content: "";
   position: absolute;
@@ -362,7 +357,7 @@ body::-webkit-scrollbar {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(33, 15, 15, 0.3);
   border-radius: 100rem;
 }
 

@@ -36,10 +36,15 @@
 .section-event-listCard::-webkit-scrollbar {
     display: none;
 }
+#section-offers2 .react-multiple-carousel__arrow,
 #section-offers .react-multiple-carousel__arrow {
     display: none;
 }
 #section-information .fp-overflow {
     display: flex;
     gap: 40px;
+}
+#section-offers2 .react-multi-carousel-track {
+    gap: 14px;
+    margin-inline: -0px;
 }

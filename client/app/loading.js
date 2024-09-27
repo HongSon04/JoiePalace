@@ -1,6 +1,6 @@
 "use client";
 
-function loading() {
+function Loading() {
   return (
     <div className="w-screen h-screen flex justify-center items-center">
       <div className="w-full gap-x-2 flex justify-center items-center">
@@ -12,4 +12,4 @@ function loading() {
   );
 }
 
-export default loading;
+export default Loading;
