@@ -19,15 +19,16 @@ function CustomInput({
   value = "",
   className,
   classNames = {
-    label: "!text-gray-600 font-bold",
-    inputWrapper: "!bg-blackAlpha-100",
-    input: "!text-gray-600",
+    label: "!text-white font-bold",
+    inputWrapper: "!bg-whiteAlpha-100",
+    input: "!text-white",
     placeholder: "!text-gray-400",
   },
   placeholder = "",
   children: startContent,
   name = "",
   errorMessage,
+  ariaLabel,
 }) {
   const {
     register,
@@ -49,6 +50,7 @@ function CustomInput({
         classNames={classNames}
         isInvalid={isInvalid}
         {...register(name, validation)}
+        aria-label={ariaLabel}
       />
     );
 
@@ -67,41 +69,48 @@ function CustomInput({
         startContent={startContent}
         isInvalid={isInvalid}
         {...register(name, validation)}
+        aria-label={ariaLabel}
       />
     );
 
   return (
-    <Input
-      autoFocus={autoFocus}
-      name={name}
-      value={value}
-      label={label}
-      labelPlacement={labelPlacement}
-      placeholder={placeholder}
-      className={className}
-      classNames={classNames}
-      startContent={startContent}
-      isInvalid={isInvalid}
-      {...register(name, validation)}
-      onChange={onChange}
-      errorMessage={errorMessage}
-    >
+    <div className="w-full">
+      <Input
+        autoFocus={autoFocus}
+        name={name}
+        value={value}
+        label={label}
+        labelPlacement={labelPlacement}
+        placeholder={placeholder}
+        className={className}
+        classNames={classNames}
+        startContent={startContent}
+        // isInvalid={isInvalid}
+        {...register(name, validation)}
+        onChange={onChange}
+        errorMessage={`${ariaLabel} ${
+          inputError?.error?.message || errorMessage
+        }`}
+        aria-label={ariaLabel}
+      />
       <AnimatePresence mode="wait" initial={false}>
         {isInvalid && (
           <InputError
-            message={inputError.error.message}
-            key={inputError.error.message}
+            message={`${ariaLabel} ${
+              inputError?.error?.message || errorMessage
+            }`}
+            key={inputError?.error?.message}
           />
         )}
       </AnimatePresence>
-    </Input>
+    </div>
   );
 }
 
 function InputError({ message }) {
   return (
     <motion.p
-      className="flex items-center gap-1 px-2 font-semibold text-red-500 bg-red-100 rounded-md"
+      className="flex items-center justify-start gap-1 font-semibold text-[10px] text-red-500"
       {...framer_error}
     >
       <ExclamationCircleIcon className="w-4 h-4" />
@@ -111,8 +120,8 @@ function InputError({ message }) {
 }
 
 const framer_error = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 10 },
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: 10 },
   transition: { duration: 0.2 },
 };

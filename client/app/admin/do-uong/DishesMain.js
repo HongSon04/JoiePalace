@@ -1,14 +1,13 @@
 "use client";
 
+import { beverageCategories } from "@/app/_utils/config";
 import DishesSection from "./DishesSection";
 
 function DishesMain() {
-  const dishesType = ["Khai Vị", "Món chính", "Món tráng miệng"];
-
   return (
     <div className="w-full mt-8">
-      {dishesType.map((type, index) => (
-        <DishesSection key={index} dishesType={type} />
+      {beverageCategories.map((category, index) => (
+        <DishesSection key={index} dishesType={category.label} />
       ))}
     </div>
   );

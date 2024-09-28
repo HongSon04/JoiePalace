@@ -7,7 +7,7 @@ import Image from "next/image";
 
 // import icons
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import dashboardIcon from "@/public/bang-dieu-khien.svg";
+import dashboardIcon from "@/public/admin-sidebar/bang-dieu-khien.svg";
 import SearchForm from "./SearchForm";
 import NotificationButton from "./NotificationButton";
 import { useRouter } from "next/navigation";
@@ -47,10 +47,10 @@ function AdminHeader({
       />
       {showBackButton && (
         <IconButton onClick={handleBack}>
-          <ArrowLeftIcon width={20} height={20} className="text-gray-600" />
+          <ArrowLeftIcon width={20} height={20} className="text-white" />
         </IconButton>
       )}
-      <h1 className="text-2xl font-bold leading-8 flex-1 text-left text-gray-600">
+      <h1 className="text-2xl font-bold leading-8 flex-1 text-left text-white">
         {title}
       </h1>
       <div className="flex items-center gap-5 relative">

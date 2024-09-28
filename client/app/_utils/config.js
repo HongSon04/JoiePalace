@@ -1,17 +1,92 @@
 export const requestStatus = [
   {
+    key: "pending",
+    label: "Chờ xử lý",
+  },
+  {
+    key: "approved",
+    label: "Đã duyệt",
+  },
+  {
+    key: "rejected",
+    label: "Đã hủy",
+  },
+  {
+    key: "completed",
+    label: "Đã hoàn thành",
+  },
+];
+
+export const roles = [
+  {
+    key: "admin",
+    label: "Admin",
+  },
+  {
+    key: "manager",
+    label: "Manager",
+  },
+  {
+    key: "chef",
+    label: "Chef",
+  },
+  {
+    key: "accountant",
+    label: "Accountant",
+  },
+];
+
+export const partyTypes = [
+  {
+    key: "wedding",
+    label: "Wedding",
+  },
+  {
+    key: "birthday",
+    label: "Birthday",
+  },
+  {
+    key: "corporate",
+    label: "Corporate",
+  },
+  {
+    key: "other",
+    label: "Other",
+  },
+];
+
+export const dishCategories = [
+  {
     id: 1,
-    name: "Chờ xử lý",
-    value: 1,
+    key: "khai-vi",
+    label: "Khai vị",
   },
   {
     id: 2,
-    name: "Đã xử lý",
-    value: 2,
+    key: "mon-chinh",
+    label: "Món chính",
   },
   {
     id: 3,
-    name: "Đã hủy",
-    value: 3,
+    key: "mon-trang-mieng",
+    label: "Món tráng miệng",
+  },
+];
+
+export const beverageCategories = [
+  {
+    id: 1,
+    key: "nuoc-ngot",
+    label: "Nước ngọt",
+  },
+  {
+    id: 2,
+    key: "do-uong-co-con",
+    label: "Đồ uống có cồn",
+  },
+  {
+    id: 4,
+    key: "nuoc-tinh-khiet",
+    label: "Nước tinh khiết",
   },
 ];

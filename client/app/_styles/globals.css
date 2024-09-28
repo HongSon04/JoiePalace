@@ -171,18 +171,18 @@ body {
     @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
   }
 
-  .bg-primary {
+  /* .bg-primary {
     background-color: #022C25 !important;
-  }
+  } */
 
   .admin-panel {
-    border-radius: 24px;
+    /* border-radius: 24px; */
     /* padding: 20px; */
     display: flex;
     flex-direction: column;
     flex: 1 0 0;
     gap: 30px;
-    background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
+    /* background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08)); */
     /* backdrop-filter: blur(20px); */
   }
 
@@ -215,6 +215,14 @@ body {
 
   .glass-button {
     @apply glass rounded-full px-4 py-2 text-white font-semibold hover:bg-whiteAlpha-300 hover:text-gray-100
+  }
+
+  .select {
+    @apply bg-whiteAlpha-200 rounded-xl px-4 py-2 text-white text-base hover:bg-whiteAlpha-300 hover:text-gray-100
+  }
+
+  .option {
+    @apply bg-whiteAlpha-200 rounded-md px-4 py-2 text-gray-600 font-normal hover:bg-whiteAlpha-300 hover:text-gray-100
   }
 }
 
@@ -366,22 +374,21 @@ body {
   width: 100%;
   overflow: hidden;
   border-radius: 10px !important;
-  background: white;
 }
 
 .table td:is(:not(:last-child)) {
-  border-right: 1px solid #e0e0e0;
-  border-top: 1px solid #e0e0e0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table th:is(:not(:last-child)) {
-  border-right: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table td:last-child,
 .table th:last-child {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .table tr:last-child td:last-child {
@@ -391,13 +398,13 @@ body {
 .table th,
 .table td {
   overflow: hidden;
-  color: gray;
+  color: white;
 }
 
 .table th {
   font-weight: 600;
   padding: 10px 12px;
-  background: white;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .table td {
@@ -405,6 +412,7 @@ body {
   padding: 10px 12px;
   font-size: 14px;
   font-weight: 400;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .bg-image-tintuc {
@@ -419,4 +427,12 @@ body {
 .thongbao:hover div {
   background-color: red;
   color: white;
+}
+
+select {
+  padding: 12px 16px;
+  border: none;
+  background: white;
+  border-radius: 10px;
+  color: gray
 }

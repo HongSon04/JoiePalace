@@ -30,13 +30,14 @@ function Dish({ dish }) {
       }}
       onClick={handleClick}
     >
-      <div className="bg-white p-3 group rounded-lg shadow-md flex items-center hover:brightness-95 relative">
+      <div className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 relative">
         <Link
           className={"absolute inset-0"}
           href={`/admin/mon-an?id=${dish.id}`}
         ></Link>
         <div className="w-14 h-14 mr-3 relative group-hover:scale-125 transition-transform">
           <Image
+            sizes="80px"
             priority
             src={dish.image}
             alt={dish.name}
@@ -44,10 +45,10 @@ function Dish({ dish }) {
             className="rounded-full w-fit object-cover "
           />
         </div>
-        <h3 className="text-gray-600 text-sm leading-5 font-semibold flex-1 text-left pr-4">
+        <h3 className="text-white text-sm leading-5 font-semibold flex-1 text-left pr-4">
           {dish.name}
         </h3>
-        <p className="text-gray-600">{formatPrice(dish.price)}</p>
+        <p className="text-white">{formatPrice(dish.price)}</p>
       </div>
 
       {isOpen && (

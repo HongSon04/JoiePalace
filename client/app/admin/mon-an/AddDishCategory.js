@@ -2,9 +2,9 @@
 
 import CustomInput from "@/app/_components/CustomInput";
 import { _require } from "@/app/_utils/validations";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Button } from "@nextui-org/react";
+import { Button, ButtonGroup } from "@nextui-org/react";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -29,9 +29,9 @@ function AddDishCategory() {
       <PopoverTrigger>
         <Button
           radius="full"
-          className="bg-white text-gray-600 font-semibold !shrink-0"
+          className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 text-white font-medium !shrink-0"
           startContent={
-            <PlusIcon className="w-5 h-5 text-gray-600 font-semibold shrink-0" />
+            <PlusIcon className="w-5 h-5 text-white font-semibold shrink-0" />
           }
         >
           Thêm danh mục món ăn
@@ -47,20 +47,38 @@ function AddDishCategory() {
           >
             <CustomInput
               name={"categoryName"}
+              ariaLabel={"Tên danh mục"}
               validation={{ ..._require }}
               label="Tên danh mục"
               placeholder="Nhập tên danh mục"
               autoFocus={true}
               value={categoryName}
               errorMessage="Vui lòng điền tên danh mục"
+              classNames={{
+                input: "w-full",
+                label: "text-gray-600 font-semibold",
+              }}
               onChange={(e) => setCategoryName(e.target.value)}
             />
-            <Button
-              className="bg-blue-400 hover:bg-blue-500 text-white font-semibold"
-              onClick={handleSubmit}
-            >
-              Thêm
-            </Button>
+            <div className="flex w-full justify-end items-center gap-5">
+              <Button
+                className="bg-gray-100 hover:brightness-95 text-gray-600 font-semibold shadow-sm"
+                startContent={
+                  <XMarkIcon className="w-5 h-5 text-gray-600 font-semibold shrink-0" />
+                }
+              >
+                Hủy
+              </Button>
+              <Button
+                className="bg-blue-400 hover:bg-blue-500 text-white font-semibold"
+                startContent={
+                  <PlusIcon className="w-5 h-5 text-white font-semibold shrink-0" />
+                }
+                onClick={handleSubmit}
+              >
+                Thêm
+              </Button>
+            </div>
           </form>
         </FormProvider>
       </PopoverContent>

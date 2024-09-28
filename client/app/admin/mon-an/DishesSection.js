@@ -15,6 +15,7 @@ import CustomInput from "@/app/_components/CustomInput";
 import { _require } from "@/app/_utils/validations";
 import CustomSelect from "@/app/_components/CustomSelect";
 import { FormProvider, useForm } from "react-hook-form";
+import { dishCategories } from "@/app/_utils/config";
 
 function DishesSection({ dishesType }) {
   const dishes = {
@@ -83,24 +84,6 @@ function DishesSection({ dishesType }) {
     ],
   }[dishesType];
 
-  const categories = [
-    {
-      id: 1,
-      value: 1,
-      name: "Khai vị",
-    },
-    {
-      id: 2,
-      value: 2,
-      name: "Món chính",
-    },
-    {
-      id: 3,
-      value: 3,
-      name: "Món tráng miệng",
-    },
-  ];
-
   const methods = useForm();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -108,13 +91,14 @@ function DishesSection({ dishesType }) {
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-600">{dishesType}</h2>
+        <h2 className="text-xl font-semibold text-white">{dishesType}</h2>
         <Button
-          radius="full"
-          className="glass text-white font-semibold !shrink-0"
           isIconOnly
+          className="bg-whiteAlpha-100"
+          radius="full"
+          onClick={onOpen}
         >
-          <PlusIcon width={20} height={20} />
+          <PlusIcon className="w-5 h-5 text-white font-semibold" />
         </Button>
       </div>
       <Row gutter={[12, 12]} className="mt-3">
@@ -128,14 +112,14 @@ function DishesSection({ dishesType }) {
             span: 6,
           }}
         >
-          <div className="bg-white p-3 group rounded-lg shadow-md flex items-center hover:brightness-95 flex-center h-full">
+          <div className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-full">
             <Button
               onPress={onOpen}
               isIconOnly
-              className="bg-blackAlpha-100"
+              className="!bg-transparent"
               radius="full"
             >
-              <PlusIcon className="w-5 h-5 text-gray-600 font-semibold" />
+              <PlusIcon className="w-5 h-5 text-white font-semibold" />
             </Button>
           </div>
         </Col>
@@ -160,30 +144,49 @@ function DishesSection({ dishesType }) {
                       <ModalBody>
                         <CustomInput
                           name="name"
+                          ariaLabel={"Tên món ăn"}
                           autoFocus={true}
                           label="Tên món"
                           placeholder="Nhập tên món"
                           variant="bordered"
                           validation={_require}
+                          classNames={{
+                            input: "bg-blackAlpha-100",
+                            label: "text-gray-600 font-semibold",
+                          }}
                         />
                         <CustomInput
                           name="price"
+                          ariaLabel={"Giá món"}
                           label="Giá món / 1 suất"
                           placeholder="Nhập giá món"
                           type="password"
                           variant="bordered"
                           validation={_require}
                           className={"mt-5"}
+                          classNames={{
+                            input: "bg-blackAlpha-100",
+                            label: "text-gray-600 font-semibold",
+                          }}
                         />
-                        <CustomSelect
-                          labelClassName={"text-gray-600"}
-                          labelPlacement="outside"
-                          label="Danh mục món ăn"
-                          areaLabel="Danh mục món ăn"
-                          name="category"
-                          value="1"
-                          options={categories}
-                        ></CustomSelect>
+                        <div className="flex flex-col">
+                          <h4 className="text-gray-600 font-semibold text-small mb-1">
+                            Danh mục món ăn
+                          </h4>
+                          <select
+                            required
+                            className="w-full bg-gray-100"
+                            label="Danh mục món ăn"
+                            areaLabel="Danh mục món ăn"
+                            name="dishCategory"
+                          >
+                            {dishCategories.map((category) => (
+                              <option key={category.id} value={category.key}>
+                                {category.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </ModalBody>
                       <ModalFooter>
                         <Button
@@ -196,7 +199,7 @@ function DishesSection({ dishesType }) {
                         <Button
                           className="bg-blue-400 hover:bg-blue-500 text-white"
                           onPress={onClose}
-                          startContent={<PlusIcon />}
+                          startContent={<PlusIcon className="w-4 h-4" />}
                         >
                           Thêm
                         </Button>

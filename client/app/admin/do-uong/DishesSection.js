@@ -1,24 +1,24 @@
+import CustomInput from "@/app/_components/CustomInput";
 import Dish from "@/app/_components/Dish";
-import { EnvelopeIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Button, Input, Select, SelectItem, Spinner } from "@nextui-org/react";
-import { Col, Row } from "antd";
+import { dishCategories } from "@/app/_utils/config";
+import { _require } from "@/app/_utils/validations";
+import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   Modal,
-  ModalContent,
-  ModalHeader,
   ModalBody,
+  ModalContent,
   ModalFooter,
+  ModalHeader,
   useDisclosure,
 } from "@nextui-org/modal";
+import { Button, Spinner } from "@nextui-org/react";
+import { Col, Row } from "antd";
 import { Suspense } from "react";
-import CustomInput from "@/app/_components/CustomInput";
-import { _require } from "@/app/_utils/validations";
-import CustomSelect from "@/app/_components/CustomSelect";
 import { FormProvider, useForm } from "react-hook-form";
 
 function DishesSection({ dishesType }) {
   const dishes = {
-    "Khai Vị": [
+    "Nước tinh khiết": [
       {
         id: 1,
         name: "Gỏi cuốn",
@@ -49,7 +49,7 @@ function DishesSection({ dishesType }) {
           "https://plus.unsplash.com/premium_photo-1661771822467-e516ca075314?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZGlzaHxlbnwwfHwwfHx8MA%3D%3D",
       },
     ],
-    "Món chính": [
+    "Đồ uống có cồn": [
       {
         id: 3,
         name: "Cá kho tộ",
@@ -65,7 +65,7 @@ function DishesSection({ dishesType }) {
           "https://plus.unsplash.com/premium_photo-1661771822467-e516ca075314?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZGlzaHxlbnwwfHwwfHx8MA%3D%3D",
       },
     ],
-    "Món tráng miệng": [
+    "Nước ngọt": [
       {
         id: 5,
         name: "Chè",
@@ -83,24 +83,6 @@ function DishesSection({ dishesType }) {
     ],
   }[dishesType];
 
-  const categories = [
-    {
-      id: 1,
-      value: 1,
-      name: "Khai vị",
-    },
-    {
-      id: 2,
-      value: 2,
-      name: "Món chính",
-    },
-    {
-      id: 3,
-      value: 3,
-      name: "Món tráng miệng",
-    },
-  ];
-
   const methods = useForm();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -108,13 +90,14 @@ function DishesSection({ dishesType }) {
   return (
     <div className="mb-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-600">{dishesType}</h2>
+        <h2 className="text-xl font-semibold text-white">{dishesType}</h2>
         <Button
-          radius="full"
-          className="glass text-white font-semibold !shrink-0"
           isIconOnly
+          className="bg-whiteAlpha-100"
+          radius="full"
+          onClick={onOpen}
         >
-          <PlusIcon width={20} height={20} />
+          <PlusIcon className="w-5 h-5 text-white font-semibold" />
         </Button>
       </div>
       <Row gutter={[12, 12]} className="mt-3">
@@ -128,14 +111,14 @@ function DishesSection({ dishesType }) {
             span: 6,
           }}
         >
-          <div className="bg-white p-3 group rounded-lg shadow-md flex items-center hover:brightness-95 flex-center h-full">
+          <div className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-full">
             <Button
               onPress={onOpen}
               isIconOnly
-              className="bg-blackAlpha-100"
+              className="!bg-transparent"
               radius="full"
             >
-              <PlusIcon className="w-5 h-5 text-gray-600 font-semibold" />
+              <PlusIcon className="w-5 h-5 text-white font-semibold" />
             </Button>
           </div>
         </Col>
@@ -155,35 +138,54 @@ function DishesSection({ dishesType }) {
                   <FormProvider {...methods}>
                     <form>
                       <ModalHeader className="flex flex-col gap-1">
-                        Thêm món ăn
+                        Thêm đồ uống
                       </ModalHeader>
                       <ModalBody>
                         <CustomInput
                           name="name"
+                          ariaLabel={"Tên đồ uống"}
                           autoFocus={true}
-                          label="Tên món"
-                          placeholder="Nhập tên món"
+                          label="Tên đồ uống"
+                          placeholder="Nhập tên đồ uống"
                           variant="bordered"
                           validation={_require}
+                          classNames={{
+                            input: "bg-blackAlpha-100",
+                            label: "text-gray-600 font-semibold",
+                          }}
                         />
                         <CustomInput
                           name="price"
-                          label="Giá món / 1 suất"
-                          placeholder="Nhập giá món"
+                          ariaLabel={"Giá đồ uống"}
+                          label="Giá đồ uống / 1 suất"
+                          placeholder="Nhập giá đồ uống"
                           type="password"
                           variant="bordered"
                           validation={_require}
                           className={"mt-5"}
+                          classNames={{
+                            input: "bg-blackAlpha-100",
+                            label: "text-gray-600 font-semibold",
+                          }}
                         />
-                        <CustomSelect
-                          labelClassName={"text-gray-600"}
-                          labelPlacement="outside"
-                          label="Danh mục món ăn"
-                          areaLabel="Danh mục món ăn"
-                          name="category"
-                          value="1"
-                          options={categories}
-                        ></CustomSelect>
+                        <div className="flex flex-col">
+                          <h4 className="text-gray-600 font-semibold text-small mb-1">
+                            Danh mục đồ uống
+                          </h4>
+                          <select
+                            required
+                            className="w-full bg-gray-100"
+                            label="Danh mục đồ uống"
+                            areaLabel="Danh mục đồ uống"
+                            name="dishCategory"
+                          >
+                            {dishCategories.map((category) => (
+                              <option key={category.id} value={category.key}>
+                                {category.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </ModalBody>
                       <ModalFooter>
                         <Button
@@ -196,7 +198,7 @@ function DishesSection({ dishesType }) {
                         <Button
                           className="bg-blue-400 hover:bg-blue-500 text-white"
                           onPress={onClose}
-                          startContent={<PlusIcon />}
+                          startContent={<PlusIcon className="w-4 h-4" />}
                         >
                           Thêm
                         </Button>
