@@ -26,7 +26,7 @@ function IconButton({
   return (
     <button
       type={type}
-      className={`flex-center rounded-full ${className} ${_size} ${_background} hover:bg-whiteAlpha-200 text-white`}
+      className={`flex-center rounded-full  ${className} ${_size} ${_background} hover:bg-whiteAlpha-200 text-white`}
       onClick={onClick}
     >
       {children}

@@ -27,17 +27,17 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
         <div className='flex flex-col gap-2'>
             <div className='flex gap-2 items-center'>
                 {svg}
-                <span className='font-bold leading-6 text-base text-gray-600'>{title}</span>
+                <span className='font-bold leading-6 text-base text-white'>{title}</span>
             </div>
             {type === 'select' ? (
                 <select
                     value={value}
                     onChange={handleInputChange}
-                    className="border w-full bg-white border-gray-300 rounded-md p-2 font-normal text-black leading-6"
+                    className="w-full bg-whiteAlpha-200 text-white  rounded-md p-2 font-normal  leading-6"
                     name={name}
                 >
                     {options.map(option => (
-                        <option key={option.id} value={option.value}>
+                        <option className='text-black' key={option.id} value={option.value}>
                             {option.label}
                         </option>
                     ))}
@@ -47,7 +47,7 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
                     id={name}
                     name={name}
                     type={type}
-                    className='p-3 bg-gray-100 rounded-lg text-gray-700 placeholder-gray-400'
+                    className='p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300'
                     placeholder={placeholder}
                     min={type === 'number' ? 1 : undefined}
                     value={value}

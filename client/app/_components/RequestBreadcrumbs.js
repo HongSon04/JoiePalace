@@ -10,13 +10,13 @@ function RequestBreadcrumbs({ requestId, nameLink }) {
   };
 
   return (
-    <Breadcrumb marginTop={20} className="text-gray-400">
+    <Breadcrumb className="text-gray-400 mt-5">
       <BreadcrumbItem>
         <BreadcrumbLink
           className="text-gray-400 hover:text-gray-200"
           href={`/admin/${nameLink}`}
         >
-         Quản lý tiệc
+          Quản lý tiệc
         </BreadcrumbLink>
       </BreadcrumbItem>
 
@@ -36,7 +36,7 @@ function RequestBreadcrumbs({ requestId, nameLink }) {
           {requestId}
         </BreadcrumbLink>
       </BreadcrumbItem>
-      </Breadcrumb>
+    </Breadcrumb>
   );
 }
 

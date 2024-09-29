@@ -20,6 +20,7 @@ const fieldsConfig = {
     { type: 'textarea', placeholder: 'Slogan', name: 'slogan' },
     { type: 'textarea', placeholder: 'Mô tả', name: 'description' },
   ],
+  diagram: [{ type: 'textarea', placeholder: 'Mô tả', name: 'equipmentDescription' }],
   equipment: [{ type: 'textarea', placeholder: 'Mô tả', name: 'equipmentDescription' }],
   space: [
     { type: 'text', placeholder: 'Tên không gian', name: 'spaceName' },
@@ -40,19 +41,20 @@ function ChiNhanhChiTietPage({ params }) {
     <div>
       <AdminHeader showSearchForm={false} title="Chi tiết chi nhánh" />
       <RequestBreadcrumbs requestId={chiNhanhSlug} nameLink="chi-nhanh" />
-      <div className="flex flex-col gap-6 w-full mt-6">
+      <div className="flex flex-col gap-3 w-full mt-6">
         {renderSection('Thông tin liên hệ', fieldsConfig.contact, 'Hình ảnh carousel', "image-upload-carousel")}
         {renderSection('Slogan & Mô tả', fieldsConfig.slogan, 'Hình ảnh mô tả', "image-upload-description", 'h-[80px]')}
-        {renderSection('Trang thiết bị', fieldsConfig.equipment, 'Hình ảnh sơ đồ', "image-upload-map", 'h-[160px]')}
+        {renderSection('Sơ đồ', fieldsConfig.diagram, 'Hình ảnh sơ đồ', "image-upload-diagram", 'h-[160px]')}
+        {renderSection('Trang thiết bị', fieldsConfig.equipment, 'Hình ảnh trang thiết bị', "image-upload-equipment", 'h-[160px]')}
         {renderSection('Không gian hội nghị', fieldsConfig.space, 'Hình ảnh mô tả', "image-upload-space", 'h-[100px]')}
         
         <AdminThemChiNhanhInputAndImg title="Sảnh" height="290px" inputId="input-image-upload-map" input={false} />
-        <AdminThemChiNhanhInputAndImg title="Không gian" height="321px" inputId="input-image-upload-map-space" input={true} />
+       
       </div>
 
       <div className="flex w-full mt-6">
-        <IconButton className="bg-blackAlpha-400">
-          <ArrowLeftIcon width={20} height={20} color="black" />
+        <IconButton className="bg-whiteAlpha-200 text-white">
+          <ArrowLeftIcon width={20} height={20} color="white" />
         </IconButton>
         <div className="ml-auto flex space-x-4">
           <IconButtonSave title="Hủy" color="bg-red-400" />

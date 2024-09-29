@@ -15,10 +15,10 @@ const TableDetailCost = ({ headers, data }) => {
 // TableHead Component
 const TableHead = ({ headers }) => {
   return (
-    <thead className="text-black font-semibold text-sm leading-[18px]">
+    <thead className="text-white font-semibold text-sm leading-[18px]">
       <tr>
         {headers.map((header, index) => (
-          <th key={index} className=" border border-gray-600 p-4">
+          <th key={index} className=" border border-white p-4">
             {header}
           </th>
         ))}
@@ -42,19 +42,19 @@ const TableBody = ({ data }) => {
 const TableRow = ({ row }) => {
   return (
     <tr>
-      <td className="border border-gray-600 p-4 text-black leading-[18px]">{row.service}</td>
-      <td className="border border-gray-600 p-4 text-black leading-[18px]">
+      <td className="border border-white p-4 text-white leading-[18px]">{row.service}</td>
+      <td className="border border-white p-4 text-white leading-[18px]">
         {Array.isArray(row.description) ? (
           <ul>
             {row.description.map((item, index) => (
-              <li key={index} className='text-black leading-[18px]'>{item}</li>
+              <li key={index} className='text-white leading-[18px]'>{item}</li>
             ))}
           </ul>
         ) : (
           row.description
         )}
       </td>
-      <td className="border border-gray-600 p-4 text-black leading-[18px]">{row.cost}</td>
+      <td className="border border-white p-4 text-white leading-[18px]">{row.cost}</td>
     </tr>
   );
 };

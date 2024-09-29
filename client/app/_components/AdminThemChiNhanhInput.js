@@ -1,21 +1,19 @@
 'use client';
-
-import { Heading, Stack } from '@chakra-ui/react';
 import React, { useState } from 'react';
 
 const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title, heightTextarea, name }) => {
     const [inputs, setInputs] = useState(fields);
 
     return (
-        <div className="p-4 w-[363px] bg-white rounded-lg h-fit">
-            <Stack spacing={12}>
-                <Heading as='h2' size='md' className="mb-5 font-bold leading-6 text-base text-gray-600">{title}</Heading>
+        <div className="p-4 w-[363px] bg-whiteAlpha-200 rounded-lg h-fit">
+            <div className='flex gap-3 flex-col'>
+                <span className="mb-5 font-bold leading-6 text-base text-white">{title}</span>
                 {inputs.map((field, index) => (
                     field.type === 'textarea' ? (
                         <textarea
                             key={index}
                             placeholder={field.placeholder}
-                            className={`px-[10px] py-3 bg-blackAlpha-50 text-black rounded-md placeholder:text-gray-500 ${heightTextarea} w-full`}
+                            className={`px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 ${heightTextarea} w-full`}
                         />
                     ) : (
                         <input
@@ -23,7 +21,7 @@ const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title, height
                             type={field.type || 'text'}
                             placeholder={field.placeholder}
                             name={name}
-                            className="px-[10px] py-3 bg-blackAlpha-50 text-black rounded-md placeholder:text-gray-500 w-full"
+                            className="px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
                         />
                     )
                 ))}
@@ -40,7 +38,7 @@ const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title, height
                         </button>
                     </div>
                 )} */}
-            </Stack>
+            </div>
         </div>
     );
 };
