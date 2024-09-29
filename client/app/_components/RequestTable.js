@@ -204,13 +204,14 @@ function RequestTable({ filter }) {
             color={statusColorMap[user.status]}
             size="sm"
             variant="flat"
+            color={cellValue === 1 ? "primary" : "warning"}
           >
-            {cellValue}
+            {cellValue === 1 ? "Đã xử lý" : "Chưa xử lý"}
           </Chip>
         );
       case "actions":
         return (
-          <div className="relative flex justify-end items-center gap-2">
+          <div className="relative flex justify-center items-center gap-2">
             <Dropdown>
               <DropdownTrigger>
                 <Button isIconOnly size="sm" variant="light">
