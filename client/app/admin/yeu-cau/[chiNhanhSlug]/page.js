@@ -19,7 +19,7 @@ function page({ params }) {
   return (
     <div>
       <AdminHeader title={"Yêu cầu"} showSearchForm={false} />
-      <Breadcrumb marginTop={20} className="text-gray-400">
+      <Breadcrumb className="text-gray-400 mt-5">
         <BreadcrumbItem>
           <BreadcrumbLink
             className="text-gray-400 hover:text-gray-200"
