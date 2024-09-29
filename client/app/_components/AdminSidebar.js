@@ -28,6 +28,8 @@ import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
 import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
+import feedbackIcon from "@/public/admin-sidebar/phan-hoi-danh-gia.svg";
+import blogIcon from "@/public/admin-sidebar/bai-viet.svg";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
 
@@ -150,6 +152,16 @@ function AdminSidebarNav() {
       path: "/admin/do-uong",
       icon: drinkIcon,
     },
+    {
+      title: "Phản hồi & đánh giá",
+      path: "/admin/phan-hoi-danh-gia",
+      icon: feedbackIcon,
+    },
+    {
+      title: "Bài viết",
+      path: "/admin/bai-viet",
+      icon: blogIcon,
+    },
   ];
 
   const subOptions = [
@@ -204,7 +216,7 @@ function AdminSidebarItem({ item }) {
   return (
     <li
       item={item}
-      className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative  hover:bg-whiteAlpha-50 ${
+      className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
         isActive ? "bg-whiteAlpha-100" : ""
       } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""}`}
     >

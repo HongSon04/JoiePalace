@@ -11,8 +11,6 @@
   "dependencies": {
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
     "@heroicons/react": "^2.1.5",
     "@internationalized/date": "^3.5.5",
     "@nextui-org/react": "^2.4.6",
@@ -26,6 +24,7 @@
     "fullpage.js": "^4.0.28",
     "next": "^14.2.7",
     "react": "^18.3.1",
+    "react-data-table-component": "^7.6.2",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
     "react-multi-carousel": "^2.8.5",

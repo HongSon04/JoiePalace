@@ -24,8 +24,12 @@ import {
 } from "@/app/_utils/validations";
 import logo from "@/public/logo.png";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "next/navigation";
+import { setCurrentBranch } from "@/app/_lib/features/branch/branchSlice";
 
 function Page() {
+  const { branchSlug } = useParams();
+
   const methods = useForm();
 
   const dispatch = useDispatch();
@@ -37,6 +41,8 @@ function Page() {
     const submitData = {
       ...data,
     };
+
+    dispatch(setCurrentBranch(branchSlug));
 
     console.log(submitData);
   });
