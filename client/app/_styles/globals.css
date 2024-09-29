@@ -224,6 +224,10 @@ body {
   .option {
     @apply bg-whiteAlpha-200 rounded-md px-4 py-2 text-gray-600 font-normal hover:bg-whiteAlpha-300 hover:text-gray-100
   }
+
+  .abs-center {
+    @apply absolute inset-0 flex-center
+  }
 }
 
 .bgYellow::before {

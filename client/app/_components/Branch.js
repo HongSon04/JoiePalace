@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-function Branch({ branch, nameLink }) {
+function Branch({ branch, nameLink, buttonText = "Chi tiết", to }) {
   return (
     <div className="branch group min-w-[310px] h-[200px] relative rounded-xl overflow-hidden flex justify-center items-end">
       <Image src={branch.image} fill alt={branch.name} objectFit="cover" />
@@ -13,10 +13,10 @@ function Branch({ branch, nameLink }) {
           {branch.name}
         </div>
         <Link
-          href={`/admin/${nameLink}/${branch.slug}`}
+          href={to || `/admin/${nameLink}/${branch.slug}`}
           className="p-3 w-full flex-center bg-white hover:bg-gold text-black hover:text-white font-bold rounded-full transition"
         >
-          Chi tiết
+          {buttonText}
         </Link>
       </div>
     </div>

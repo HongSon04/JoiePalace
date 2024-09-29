@@ -92,6 +92,15 @@ function RequestTable({ filter }) {
       expectedDate: "2024-08-28T00:00:00.000Z",
       status: 1,
     },
+    {
+      id: 6,
+      name: "Nguyễn Thị F",
+      phone: "0123456789",
+      email: "f@gmail.com",
+      numsOfGuests: 300,
+      expectedDate: "2024-08-28T00:00:00.000Z",
+      status: 1,
+    },
   ];
 
   const statusOptions = [
@@ -219,8 +228,12 @@ function RequestTable({ filter }) {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>Xem</DropdownItem>
-                <DropdownItem>Chỉnh sửa</DropdownItem>
+                <DropdownItem>
+                  <Link href={`${pathname}/${user.id}`}>Xem</Link>
+                </DropdownItem>
+                <DropdownItem>
+                  <Link href={`${pathname}/${user.id}`}>Chỉnh sửa</Link>
+                </DropdownItem>
                 <DropdownItem className="text-red-400">Xóa</DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -411,7 +424,7 @@ function RequestTable({ filter }) {
           "!bg-whiteAlpha-100 has-[role=columnheader]:bg-whiteAlpha-200 [&>tr>th]:bg-whiteAlpha-200",
         wrapper: "!bg-whiteAlpha-100",
         root: "w-full",
-        td: "!text-white group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 before:bg-whiteAlpha-50 data-[hover=true]:before:bg-whiteAlpha-50",
+        td: "!text-white group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-100 before:bg-whiteAlpha-50 data-[hover=true]:before:bg-whiteAlpha-100",
         row: "hover:!bg-whiteAlpha-50 !bg-whiteAlpha-100 !text-white",
         cell: "!text-white",
         pagination: "bg-default-100",

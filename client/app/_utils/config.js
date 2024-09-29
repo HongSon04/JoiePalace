@@ -58,17 +58,17 @@ export const partyTypes = [
 export const dishCategories = [
   {
     id: 1,
-    key: "khai-vi",
+    key: "appetizer",
     label: "Khai vị",
   },
   {
     id: 2,
-    key: "mon-chinh",
+    key: "mainCourse",
     label: "Món chính",
   },
   {
     id: 3,
-    key: "mon-trang-mieng",
+    key: "dessert",
     label: "Món tráng miệng",
   },
 ];

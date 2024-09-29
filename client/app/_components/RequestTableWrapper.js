@@ -1,10 +1,8 @@
 "use client";
 
-import RequestFilter from "@/app/_components/RequestFilter";
 import RequestTable from "@/app/_components/RequestTable";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "../_lib/features/requests/requestsSlice";
-import { requestStatus } from "../_utils/config";
 
 function RequestTableWrapper() {
   const { filter } = useSelector((store) => store.requests);

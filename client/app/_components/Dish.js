@@ -11,13 +11,13 @@ import { formatPrice } from "../_utils/formaters";
 import DishDetailModal from "../admin/mon-an/DishDetailModal";
 import DishDetailSkeleton from "../admin/mon-an/DishDetailSkeleton";
 
-function Dish({ dish }) {
+function Dish(props) {
   const { onOpen, isOpen, onClose, onOpenChange } = useDisclosure();
 
   const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(setSelectedDish(dish));
+    dispatch(setSelectedDish(props.dish));
 
     onOpen();
   };
@@ -33,22 +33,22 @@ function Dish({ dish }) {
       <div className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 relative">
         <Link
           className={"absolute inset-0"}
-          href={`/admin/mon-an?id=${dish.id}`}
+          href={props.link || `/admin/mon-an?id=${props.dish.id}`}
         ></Link>
         <div className="w-14 h-14 mr-3 relative group-hover:scale-125 transition-transform">
           <Image
             sizes="80px"
             priority
-            src={dish.image}
-            alt={dish.name}
+            src={props.dish.image}
+            alt={props.dish.name}
             fill
             className="rounded-full w-fit object-cover "
           />
         </div>
         <h3 className="text-white text-sm leading-5 font-semibold flex-1 text-left pr-4">
-          {dish.name}
+          {props.dish.name}
         </h3>
-        <p className="text-white">{formatPrice(dish.price)}</p>
+        <p className="text-white">{formatPrice(props.dish.price)}</p>
       </div>
 
       {isOpen && (
