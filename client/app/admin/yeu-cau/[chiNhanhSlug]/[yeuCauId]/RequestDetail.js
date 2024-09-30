@@ -10,10 +10,9 @@ import {
 import { Button } from "@nextui-org/react";
 import { Col, Row } from "antd";
 import { FormProvider, useForm } from "react-hook-form";
-import SelectPartyType from "./SelectPartyType";
 
-import { _require } from "@/app/_utils/validations";
 import { partyTypes } from "@/app/_utils/config";
+import { _require } from "@/app/_utils/validations";
 
 function RequestDetail() {
   const request = {
