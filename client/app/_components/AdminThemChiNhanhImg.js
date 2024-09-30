@@ -40,8 +40,8 @@ const AdminThemChiNhanhImg = ({ title, inputId }) => {
     const isUploadLimitReached = images.length >= 2;
 
     return (
-        <div className="flex-1 p-4 bg-white rounded-lg h-fit">
-            <Heading as='h2' className="font-bold text-gray-600 leading-6 text-base">{title}</Heading>
+        <div className="flex-1 p-4 bg-whiteAlpha-200 rounded-lg h-fit">
+            <h3 className="font-bold text-white leading-6 text-base">{title}</h3>
             <div className="grid grid-cols-2 gap-5 mt-[10px] w-full">
                 {images.map((src, index) => (
                     <Box key={index} position="relative">
@@ -62,7 +62,7 @@ const AdminThemChiNhanhImg = ({ title, inputId }) => {
                         cursor="pointer"
                         as="label"
                         htmlFor={inputId}
-                        className="bg-blackAlpha-100 rounded-lg"
+                        className="bg-whiteAlpha-200 rounded-lg"
                         h='180px'
                     >
                         <div className="p-3 rounded-full bg-whiteAlpha-600 flex items-center justify-center align-middle mx-auto">

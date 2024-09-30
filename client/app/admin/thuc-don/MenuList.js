@@ -8,11 +8,7 @@ function MenuList({ menuList, isSelectAll, onCheckboxChange }) {
       {menuList.map((menu, index) => {
         return (
           <Col key={index} span={6} className="overflow-hidden">
-            <Menu
-              menu={menu}
-              isSelectAll={isSelectAll}
-              onCheckboxChange={onCheckboxChange}
-            />
+            <Menu menu={menu} />
           </Col>
         );
       })}

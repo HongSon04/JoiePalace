@@ -37,7 +37,7 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
                         height="170px"
                         className="rounded-lg object-cover"
                     />
-                    <span className="absolute top-4 left-4 bg-blackAlpha-400 p-1 rounded-lg w-fit font-medium">
+                    <span className="absolute top-4 left-4 bg-gray-500 text-white p-1 rounded-lg w-fit font-medium">
                         HALL {String.fromCharCode(65 + index)}
                     </span>
                 </div>
@@ -45,11 +45,11 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
                     <input
                         type='text'
                         placeholder='Tên không gian'
-                        className="px-2 py-1 bg-blackAlpha-50 text-black rounded-md placeholder:text-gray-500 w-full"
+                        className="px-2 py-1 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
                     />
                 )}
                 <textarea
-                    className="px-2 py-1 bg-blackAlpha-50 text-black rounded-md placeholder:text-gray-500 h-[100px] w-full"
+                    className="px-2 py-1 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 h-[100px] w-full"
                     placeholder="Mô tả"
                 />
             </div>
@@ -57,15 +57,15 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
     );
 
     return (
-        <div className="flex p-4 flex-col gap-2 bg-white rounded-lg">
-            <Heading as="h2" size="md" className="font-bold text-gray-600">
+        <div className="flex p-4 flex-col gap-2 bg-whiteAlpha-200 rounded-lg">
+            <span className="font-bold text-white text-base">
                 {title}
-            </Heading>
-            <Grid templateColumns="repeat(3, 1fr)" gap="20" className="mt-2">
+            </span>
+            <Grid templateColumns="repeat(3, 1fr)" gap="20px" className="mt-2">
                 {description.map(renderImageItem)}
                 {description.length < 6 && (
                     <GridItem w="100%" className="rounded-lg" h={height}>
-                        <div className="flex items-center justify-center bg-blackAlpha-100 h-full rounded-lg">
+                        <div className="flex items-center justify-center bg-whiteAlpha-200 h-full rounded-lg">
                             <label
                                 htmlFor={inputId}
                                 className="flex items-center justify-center mt-5 rounded-full p-3 text-xl font-semibold bg-whiteAlpha-600 cursor-pointer transition-all"

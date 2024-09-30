@@ -29,9 +29,9 @@ const HeaderSelect = ({ title, slugOrID,  showBackButton = true }) => {
                 // className={"absolute"}
             />
                 <IconButton onClick={handleBack}>
-                    <ArrowLeftIcon width={20} height={20} color='black' />
+                    <ArrowLeftIcon width={20} height={20} color='white' />
                 </IconButton>
-                <h1 className="text-2xl w-fit font-bold leading-8 flex-1 text-left text-black">
+                <h1 className="text-2xl w-fit font-bold leading-8 flex-1 text-left text-white">
                     {title} <span className="font-bold">- {slugOrID}</span>
                 </h1>
             </div>

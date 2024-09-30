@@ -5,6 +5,7 @@ import requestsSlice from "./features/requests/requestsSlice";
 import dishesSlice from "./features/dishes/dishesSlice";
 import sidebarSlice from "./features/sidebar/sidebarSlice";
 import menuSlice from "./features/menu/menuSlice";
+import branchSlice from "./features/branch/branchSlice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     dishes: dishesSlice.reducer,
     sidebar: sidebarSlice.reducer,
     menu: menuSlice.reducer,
+    branch: branchSlice.reducer,
   },
 });
 
