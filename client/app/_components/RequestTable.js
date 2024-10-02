@@ -1,30 +1,28 @@
+import { EllipsisVerticalIcon as VerticalDotsIcon } from "@heroicons/react/24/outline";
+import {
+  Button,
+  Chip,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  User,
+} from "@nextui-org/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { formatDateTime } from "../_utils/formaters";
-import CustomPagination from "./CustomPagination";
 import React from "react";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Input,
-  Button,
-  DropdownTrigger,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
-  Chip,
-  User,
-  Pagination,
-} from "@nextui-org/react";
-import { EllipsisVerticalIcon as VerticalDotsIcon } from "@heroicons/react/24/outline";
+import { formatDateTime } from "../_utils/formaters";
 import { capitalize } from "../_utils/helpers";
-import { SearchIcon } from "./SearchIcon";
 import { ChevronDownIcon } from "./ChevronDownIcon";
-import { PlusIcon } from "./PlusIcon";
+import { SearchIcon } from "./SearchIcon";
 
 const statusColorMap = {
   active: "success",

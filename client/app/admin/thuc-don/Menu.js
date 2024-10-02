@@ -35,7 +35,7 @@ function Menu({ menu }) {
                   <div className="flex flex-col gap-3 mt-3">
                     {menu.dishes.map((dish, index) => {
                       return (
-                        dish.category === category.label && (
+                        dish.category === category.key && (
                           <div
                             key={index}
                             className="flex items-center justify-between p-3 rounded-md hover:bg-whiteAlpha-100"

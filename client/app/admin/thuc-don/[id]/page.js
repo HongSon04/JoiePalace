@@ -17,19 +17,32 @@ import setMeal from "@/public/set_meal.svg";
 import textSnippet from "@/public/text_snippet.svg";
 import {
   DocumentArrowUpIcon,
+  PlusIcon,
   SquaresPlusIcon,
   TrashIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Button, Chip } from "@nextui-org/react";
 import { Col, Row } from "antd";
 import Image from "next/image";
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import MenuBreadcrumbs from "./MenuBreadcrumbs";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+  Chip,
+} from "@nextui-org/react";
+import DishesModal from "./DishesModal";
 
 function Page({ params }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const methods = useForm();
 
   const { id } = params;
@@ -263,11 +276,36 @@ function Page({ params }) {
                   </Chip>
                 </div>
                 {/* DISHES LIST */}
-                {menu.dishes
-                  .map((dish) => dish.category === category.key)
-                  .map((dish, index) => (
-                    <Dish key={index} dish={dish} menuId={id} />
-                  ))}
+                {menu.dishes.map((dish) => {
+                  if (dish.category === category.key) {
+                    return (
+                      <Dish
+                        key={dish.id}
+                        dish={dish}
+                        className={"mt-3 !h-fit !hover:brightness-95"}
+                      />
+                    );
+                  }
+                })}
+                {menu[`max${capitalize(category.key)}`] -
+                  menu.dishes.filter((dish) => dish.category === category.key)
+                    .length && (
+                  <>
+                    <Button
+                      onPress={onOpen}
+                      isIconOnly
+                      className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
+                      radius="full"
+                    >
+                      <PlusIcon className="w-5 h-5 text-white font-semibold" />
+                    </Button>
+                    <DishesModal
+                      category={category.key}
+                      isOpen={isOpen}
+                      onOpenChange={onOpenChange}
+                    />
+                  </>
+                )}
               </Col>
             ))}
           </Row>
