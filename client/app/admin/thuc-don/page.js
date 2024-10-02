@@ -1,35 +1,13 @@
 "use client";
 
 import AdminHeader from "@/app/_components/AdminHeader";
-import {
-  fetchMenuItems,
-  setSelectedMenuId,
-  toggleCheckbox,
-  toggleSelectAll,
-} from "@/app/_lib/features/menu/menuSlice";
-import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@chakra-ui/react";
-import { ChevronDownIcon, PlusIcon } from "@heroicons/react/24/outline";
-import {
-  Button,
-  ButtonGroup,
-  Checkbox,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@nextui-org/react";
-import { FormProvider } from "antd/es/form/context";
+import { fetchMenuItems } from "@/app/_lib/features/menu/menuSlice";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MenuList from "./MenuList";
-import { useToast } from "@chakra-ui/react";
 
 function Page() {
   const dispatch = useDispatch();

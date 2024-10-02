@@ -54,45 +54,47 @@ function CustomInput({
       />
     );
 
-  if (multiLine)
-    return (
-      <Textarea
-        onChange={onChange}
-        autoFocus={autoFocus}
-        name={name}
-        value={value}
-        label={label}
-        labelPlacement={labelPlacement}
-        placeholder={placeholder}
-        className={className}
-        classNames={classNames}
-        startContent={startContent}
-        isInvalid={isInvalid}
-        {...register(name, validation)}
-        aria-label={ariaLabel}
-      />
-    );
-
   return (
     <div className="w-full">
-      <Input
-        autoFocus={autoFocus}
-        name={name}
-        value={value}
-        label={label}
-        labelPlacement={labelPlacement}
-        placeholder={placeholder}
-        className={className}
-        classNames={classNames}
-        startContent={startContent}
-        // isInvalid={isInvalid}
-        {...register(name, validation)}
-        onChange={onChange}
-        errorMessage={`${ariaLabel} ${
-          inputError?.error?.message || errorMessage
-        }`}
-        aria-label={ariaLabel}
-      />
+      {multiLine ? (
+        <Textarea
+          onChange={onChange}
+          autoFocus={autoFocus}
+          name={name}
+          value={value}
+          label={label}
+          labelPlacement={labelPlacement}
+          placeholder={placeholder}
+          className={className}
+          classNames={classNames}
+          startContent={startContent}
+          {...register(name, validation)}
+          errorMessage={`${ariaLabel} ${
+            inputError?.error?.message || errorMessage
+          }`}
+          aria-label={ariaLabel}
+        />
+      ) : (
+        <Input
+          autoFocus={autoFocus}
+          name={name}
+          value={value}
+          label={label}
+          labelPlacement={labelPlacement}
+          placeholder={placeholder}
+          className={className}
+          classNames={classNames}
+          startContent={startContent}
+          // isInvalid={isInvalid}
+          {...register(name, validation)}
+          onChange={onChange}
+          errorMessage={`${ariaLabel} ${
+            inputError?.error?.message || errorMessage
+          }`}
+          aria-label={ariaLabel}
+        />
+      )}
+
       <AnimatePresence mode="wait" initial={false}>
         {isInvalid && (
           <InputError
@@ -110,7 +112,7 @@ function CustomInput({
 function InputError({ message }) {
   return (
     <motion.p
-      className="flex items-center justify-start gap-1 font-semibold text-[10px] text-red-500"
+      className="flex items-center justify-start gap-1 font-semibold text-[12px] text-red-500"
       {...framer_error}
     >
       <ExclamationCircleIcon className="w-4 h-4" />
