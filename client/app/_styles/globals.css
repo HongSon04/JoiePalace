@@ -171,9 +171,9 @@ body {
     @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
   }
 
-  /* .bg-primary {
+  .bg-primary {
     background-color: #022C25 !important;
-  } */
+  }
 
   .admin-panel {
     /* border-radius: 24px; */

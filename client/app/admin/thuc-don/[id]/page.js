@@ -294,7 +294,7 @@ function Page({ params }) {
                     <Button
                       onPress={onOpen}
                       isIconOnly
-                      className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-full"
+                      className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
                       radius="full"
                     >
                       <PlusIcon className="w-5 h-5 text-white font-semibold" />

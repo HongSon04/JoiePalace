@@ -16,9 +16,6 @@ import { useDispatch, useSelector } from "react-redux";
 function DishesModal({ isOpen, onOpenChange, category }) {
   const { dishes } = useSelector((state) => state.dishes);
   const categoryDishes = dishes.filter((dish) => dish.category === category);
-  console.log(category);
-  console.log(dishes);
-  console.log(categoryDishes);
   const dispatch = useDispatch();
 
   useEffect(() => {
