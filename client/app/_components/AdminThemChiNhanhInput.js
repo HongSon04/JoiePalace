@@ -4,6 +4,13 @@ import React, { useState } from 'react';
 const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title, heightTextarea, name }) => {
     const [inputs, setInputs] = useState(fields);
 
+    const handlePhoneInputChange = (e) => {
+        const value = e.target.value;
+        if (!/^\d*$/.test(value)) {
+            e.target.value = value.replace(/[^\d]/g, '');
+        }
+    };
+
     return (
         <div className="p-4 w-[363px] bg-whiteAlpha-200 rounded-lg h-fit">
             <div className='flex gap-3 flex-col'>
@@ -22,6 +29,9 @@ const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title, height
                             placeholder={field.placeholder}
                             name={name}
                             className="px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
+                            min={field.type === 'number' ? 0 : undefined}
+                            onWheel={(e) => (field.type === 'number' ? e.currentTarget.blur() : null)}
+                            onInput={field.name === 'phone' ? handlePhoneInputChange : undefined}
                         />
                     )
                 ))}
