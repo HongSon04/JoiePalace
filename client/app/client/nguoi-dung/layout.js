@@ -5,7 +5,7 @@ const Layout = ({ children }) => {
     return (
         <div className="bg-primary min-h-screen">
             <div className="flex justify-center">
-                <div className='w-full max-w-[1170px] flex gap-[30px] '>
+                <div className='w-full max-w-[1130px] flex gap-[30px] '>
                     <aside className='w-[25%] rounded-lg'>
                         <SideBarUser />
                     </aside>

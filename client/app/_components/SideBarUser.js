@@ -9,7 +9,7 @@ const SideBarUser = () => {
     const linkUser = [
         {
             title: 'Chung',
-            link: '/client/nguoi-dung/chung',
+            link: ['/client/nguoi-dung/chung', '/client/nguoi-dung'],
             color: "text-white"
         },
         {
@@ -44,18 +44,23 @@ const SideBarUser = () => {
         }
     ];
 
+    const isActiveLink = (link) => {
+        if (Array.isArray(link)) {
+            return link.includes(pathName);
+        }
+        return pathName === link;   
+    };
+
     return (
         <div className='w-full'>
             <ul className='flex flex-col gap-4 w-full'>
                 {linkUser && linkUser.map((item, index) => (
                     <li 
                         key={index} 
-                        className={`rounded-lg ${
-                            pathName === item.link ? 'bg-gold' : ''
-                        } hover:bg-gold  hover:shadow-lg transition-all duration-300 ease-in-out`}
+                        className={`rounded-lg ${isActiveLink(item.link) ? 'bg-gold' : ''} hover:bg-gold  hover:shadow-lg transition-all duration-300 ease-in-out`}
                     >
-                        <Link href={item.link} className={`block py-3 px-6 font-bold leading-[22px] text-base ${item.color || 'text-gray-700'} hover:text-white`} >
-                                {item.title}
+                        <Link href={Array.isArray(item.link) ? item.link[0] : item.link} className={`block py-3 px-6 font-bold leading-[22px] text-base ${item.color || 'text-gray-700'} hover:text-white`}>
+                            {item.title}
                         </Link>
                     </li>
                 ))}
