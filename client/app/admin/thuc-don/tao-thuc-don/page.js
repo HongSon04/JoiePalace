@@ -28,22 +28,81 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import DishesModal from "./DishesModal";
+import Dish from "@/app/_components/Dish";
+import { capitalize } from "@/app/_utils/helpers";
+import { formatPrice } from "@/app/_utils/formaters";
 
 function Page() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isDisabled, setIsDisabled] = React.useState(false);
+  const [dishCategory, setDishCategory] = React.useState([]);
+  const [appetizer, setAppetizer] = React.useState([]); // Array of dishes
+  const [mainCourse, setMainCourse] = React.useState([]); // Array of dishes
+  const [dessert, setDessert] = React.useState([]); // Array of dishes
+
+  const [menuDishes, setMenuDishes] = React.useState({
+    appetizer,
+    mainCourse,
+    dessert,
+  });
+
+  useEffect(() => {
+    setMenuDishes({
+      appetizer,
+      mainCourse,
+      dessert,
+    });
+  }, [appetizer, mainCourse, dessert]);
+
+  const handleAddAppetizer = (appetizer) => {
+    setAppetizer([...appetizer, appetizer]);
+  };
+
+  const handleAddMainCourse = (mainCourse) => {
+    setMainCourse([...mainCourse, mainCourse]);
+  };
+
+  const handleAddDessert = (dessert) => {
+    setDessert([...dessert, dessert]);
+  };
+
+  const handleAddingDishes = (dishes, category) => {
+    switch (category) {
+      case "appetizer":
+        handleAddAppetizer(dishes);
+        break;
+      case "mainCourse":
+        handleAddMainCourse(dishes);
+        break;
+      case "dessert":
+        handleAddDessert(dishes);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleOnOpen = () => {
+    if (
+      menuDishes[dishCategory].length >=
+      formState[`max${capitalize(dishCategory)}`]
+    ) {
+      setIsDisabled(true);
+    } else {
+      setIsDisabled(false);
+    }
+    onOpen();
+  };
 
   const pathname = usePathname();
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const dishesCategory = searchParams.get("dishesCategory");
 
-  // Get a new searchParams string by merging the current
-  // searchParams with a provided key/value pair
   const createQueryString = useCallback(
     (name, value) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -54,11 +113,16 @@ function Page() {
     [searchParams]
   );
 
+  React.useEffect(() => {
+    const dishCategory = searchParams.get("dishesCategory");
+    setDishCategory(dishCategory);
+  }, [searchParams]);
+
   const methods = useForm();
 
   const { id } = params;
 
-  const { menu, status } = useSelector((store) => store.menu);
+  const { status } = useSelector((store) => store.menu);
 
   const dispatch = useDispatch();
 
@@ -66,7 +130,29 @@ function Page() {
     dispatch(fetchMenu(id));
   }, [dispatch, id]);
 
-  // console.log(menu);
+  // FORM HANDLING
+  const [formState, setFormState] = React.useState({
+    name: "",
+    maxDishes: 8,
+    maxAppetizer: 2,
+    maxMainCourse: 4,
+    maxDessert: 2,
+    description: "",
+    menuDishes,
+  });
+
+  // Function to handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = methods.handleSubmit((data) => {
+    console.log(data);
+  });
 
   return (
     <div>
@@ -89,9 +175,10 @@ function Page() {
         <>
           <div className="flex gap-5 mt-8 w-fit">
             {/* IMAGE & UPLOADER */}
-            <div className="w-fit relative h-fit bg-whiteAlpha-200">
+            <div className="w-fit relative h-fit bg-whiteAlpha-200 rounded-md">
               <Image
                 // src={menu.background}
+                src={""}
                 alt="background"
                 width={345}
                 height={440}
@@ -125,31 +212,14 @@ function Page() {
                 </FileUploadButton>
               </div>
             </div>
-            {/* SUMMARY */}
-            {/* <div className="summary p-5 h-fit rounded-md bg-whiteAlpha-100 text-white min-w-[345px]">
-              <h2 className="pb-5 border-b-1 border-whiteAlpha-200">
-                Tổng chi phí
-              </h2>
-              <div className="flex justify-between py-5">
-                <h4>Khai vị:</h4>
-                <span>4.000.000 VND</span>
-              </div>
-              <div className="flex justify-between py-5">
-                <h4>Món chính:</h4>
-                <span>4.000.000 VND</span>
-              </div>
-              <div className="flex justify-between py-5 border-b-1 border-whiteAlpha-200">
-                <h4>Món tráng miệng:</h4>
-                <span>4.000.000 VND</span>
-              </div>
-              <div className="flex justify-between pt-5">
-                <h4 className="text-bold text-xl">Tổng tiền:</h4>
-                <span className="text-bold text-xl">4.000.000 VND</span>
-              </div>
-            </div> */}
             {/* FORM */}
             <FormProvider {...methods}>
-              <form className="form [&>div]:mb-5 [&>div>h4]:font-semibold [&>div>h4]:mb-3 [&>div>h4]:text-white p-5 rounded-md bg-whiteAlpha-100 min-w-[400px]">
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                noValidate
+                className="form h-fit [&>div]:mb-5 [&>div>h4]:font-semibold [&>div>h4]:mb-3 [&>div>h4]:text-white p-5 rounded-md bg-whiteAlpha-100 min-w-[400px]"
+              >
+                {/* MENU NAME */}
                 <div className="flex flex-col">
                   <h4 className="flex gap-3">
                     <Image src={docScan} width={20} height={20} alt="icon" />
@@ -157,12 +227,15 @@ function Page() {
                   </h4>
                   <CustomInput
                     name="name"
-                    // value={menu.name}
+                    value={formState.name}
                     validation={_require}
                     label=""
                     ariaLabel={"Tên thực đơn"}
+                    onChange={handleInputChange}
+                    placeholder="Ex: Thực đơn tiệc cưới"
                   ></CustomInput>
                 </div>
+                {/* MAX OF DISHES */}
                 <div className="flex flex-col">
                   <h4 className="flex gap-3">
                     <SquaresPlusIcon width={20} height={20} color="white" />
@@ -170,12 +243,14 @@ function Page() {
                   </h4>
                   <CustomInput
                     name="maxDishes"
-                    // value={menu.maxDishes}
+                    value={formState.maxDishes}
                     validation={_require}
                     label=""
                     ariaLabel={"Tên thực đơn"}
+                    onChange={handleInputChange}
                   ></CustomInput>
                 </div>
+                {/* MAX OF APPETIZER */}
                 <div className="flex flex-col">
                   <h4 className="flex gap-3">
                     <Image src={pizza} width={20} height={20} alt="icon" />
@@ -183,12 +258,14 @@ function Page() {
                   </h4>
                   <CustomInput
                     name="maxAppetizer"
-                    // value={menu.maxAppetizer}
+                    value={formState.maxAppetizer}
                     validation={_require}
                     label=""
                     ariaLabel={"Số lượng món khai vị"}
+                    onChange={handleInputChange}
                   ></CustomInput>
                 </div>
+                {/* MAX OF MAIN COURSE */}
                 <div className="flex flex-col">
                   <h4 className="flex gap-3">
                     <Image src={restaurant} width={20} height={20} alt="icon" />
@@ -196,12 +273,14 @@ function Page() {
                   </h4>
                   <CustomInput
                     name="maxMainCourse"
-                    // value={menu.maxMainCourse}
+                    value={formState.maxMainCourse}
                     validation={_require}
                     label=""
                     ariaLabel={"Số lượng món chính"}
+                    onChange={handleInputChange}
                   ></CustomInput>
                 </div>
+                {/* MAX OF DESSERT */}
                 <div className="flex flex-col">
                   <h4 className="flex gap-3">
                     <Image src={setMeal} width={20} height={20} alt="icon" />
@@ -209,12 +288,14 @@ function Page() {
                   </h4>
                   <CustomInput
                     name="maxDessert"
-                    // value={menu.maxDessert}
+                    value={formState.maxDessert}
                     validation={_require}
                     label=""
                     ariaLabel={"Số lượng món tráng miệng"}
+                    onChange={handleInputChange}
                   ></CustomInput>
                 </div>
+                {/* MENU DESCRIPTION */}
                 <div className="flex flex-col">
                   <h4 className="flex gap-3">
                     <Image
@@ -227,11 +308,13 @@ function Page() {
                   </h4>
                   <CustomInput
                     name="description"
-                    // value={menu.description}
+                    value={formState.description}
                     validation={_require}
                     label=""
                     ariaLabel={"Số lượng món khai vị"}
                     multiLine={true}
+                    onChange={handleInputChange}
+                    placeholder="Ex: Thực đơn giành cho chú rể Nguyễn Văn A và cô dâu Trần Thị B"
                   ></CustomInput>
                 </div>
                 <footer className="flex justify-end">
@@ -240,6 +323,7 @@ function Page() {
                     size="medium"
                     color="primary"
                     startContent={<SaveIcon width={20} height={20} />}
+                    onClick={handleSubmit}
                   >
                     Lưu
                   </Button>
@@ -255,76 +339,55 @@ function Page() {
                     <div className="flex flex-col gap-1">
                       <h4 className="text-lg leading-7 font-semibold text-white">
                         {category.label} -{" "}
-                        {/* {menu[`max${capitalize(category.key)}`]} món */}
+                        {formState[`max${capitalize(category.key)}`]} món
                       </h4>
                       <p className="text-md leading-6 font-normal text-white">
                         Tổng:{" "}
-                        {/* {formatPrice(
-                        menu.dishes
-                          .filter((dish) => dish.category === category.key)
-                          .map((dish) => dish.price)
-                          .reduce((a, b) => a + b, 0)
-                      )} */}
+                        {formatPrice(
+                          menuDishes[category.key]
+                            .filter((dish) => dish.category === category.key)
+                            .map((dish) => dish.price)
+                            .reduce((a, b) => a + b, 0)
+                        )}
                       </p>
                     </div>
                     <Chip className="bg-whiteAlpha-100 text-white">
-                      Đã đủ
-                      {/* {menu[`max${capitalize(category.key)}`] -
-                      menu.dishes.filter(
-                        (dish) => dish.category === category.key
-                      ).length ===
-                    0
-                      ? menu[`max${capitalize(category.key)}`] -
-                          menu.dishes.filter(
-                            (dish) => dish.category === category.key
-                          ).length <
-                        0
-                        ? "Đang thừa"
-                        : "Đã đủ"
-                      : "Chưa đủ"} */}
+                      {(() => {
+                        const maxDishes = Number(
+                          formState[`max${capitalize(category.key)}`]
+                        );
+                        const currentDishes = Number(
+                          menuDishes[category.key].length
+                        );
+                        const remainingDishes = maxDishes - currentDishes;
+                        return remainingDishes + 1 <= 0
+                          ? "Đã đủ"
+                          : remainingDishes;
+                      })()}
                     </Chip>
                   </div>
                   {/* DISHES LIST */}
-                  {/* {menu.dishes.map((dish) => {
-                  if (dish.category === category.key) {
-                    return (
-                      <Dish
-                        key={dish.id}
-                        dish={dish}
-                        className={"mt-3 !h-fit !hover:brightness-95"}
-                      />
-                    );
-                  }
-                })}
-                {menu[`max${capitalize(category.key)}`] -
-                  menu.dishes.filter((dish) => dish.category === category.key)
-                    .length && (
-                  <>
-                    <Button
-                      onPress={onOpen}
-                      isIconOnly
-                      className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
-                      radius="full"
-                    >
-                      <PlusIcon className="w-5 h-5 text-white font-semibold" />
-                    </Button>
-                    <DishesModal
-                      category={category.key}
-                      isOpen={isOpen}
-                      onOpenChange={onOpenChange}
-                    />
-                  </>
-                )} */}
+                  {menuDishes[category.key].map((dish) => {
+                    if (dish.category === category.key) {
+                      return (
+                        <Dish
+                          key={dish.id}
+                          dish={dish}
+                          className={"mt-3 !h-fit !hover:brightness-95"}
+                        />
+                      );
+                    }
+                  })}
                   <>
                     <Button
                       isIconOnly
-                      onPress={() => {
+                      onClick={() => {
                         router.push(
                           pathname +
                             "?" +
                             createQueryString("dishesCategory", category.key)
                         );
-                        onOpen();
+                        handleOnOpen();
                       }}
                       className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
                       radius="full"
@@ -332,9 +395,14 @@ function Page() {
                       <PlusIcon className="w-5 h-5 text-white font-semibold" />
                     </Button>
                     <DishesModal
-                      category={dishesCategory}
+                      category={dishCategory}
+                      disabled={isDisabled}
                       isOpen={isOpen}
                       onOpenChange={onOpenChange}
+                      onAddingDishes={handleAddingDishes}
+                      menuDishes={menuDishes}
+                      menuInfo={formState}
+                      onOpen={handleOnOpen}
                     />
                   </>
                 </Col>
