@@ -440,3 +440,58 @@ select {
   border-radius: 10px;
   color: gray
 }
+/* tag*/
+
+
+.status{
+  padding: 6px;
+  border-radius: 4px;
+}
+.da-dat-coc{
+  background-color: #FEEBCB;
+  color: #ED8936;
+}
+.da-thanh-toan{
+  background-color: #C6F6D5;
+  color: #48BB78;
+}
+.chua-thanh-toan{
+  background-color: #FEFCBF;
+  color: #B7791F;
+}
+.da-hoan-tien{
+  background-color: #38B2AC;
+  color: #B2F5EA;
+}
+.da-huy{
+  background-color: #FED7D7;
+  color:  #F56565;
+}
+
+.tag{
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-radius: 8px;
+}
+.tag p{
+  font-size: 14px;
+  font-style: medium;
+}
+.tag-copper{
+  background-color: rgba(0, 0, 0, 0.24);
+  color: #A25915;
+}
+.tag-silver{
+  background-color: #333333;
+  color: #C0C0C0;
+}
+.tag-gold{
+  background-color: #FFAE00;
+  color: white;
+}
+.tag-vip{
+  background-color: rgba(0, 0, 0, 0.92);
+  color: #FFAE00;
+}

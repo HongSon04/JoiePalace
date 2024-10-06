@@ -19,7 +19,7 @@ function Layout({ children }) {
           size={size}
         />
         <div className="flex-1 admin-panel max-h-[100vh] overflow-hidden">
-          <main className="h-full max-h-[100vh] overflow-y-auto overflow-x-hidden relative">
+          <main className="h-full max-h-[100vh] overflow-y-auto overflow-x-hidden relative text-white">
             {children}
           </main>
         </div>
