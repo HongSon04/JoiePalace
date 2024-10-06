@@ -101,6 +101,10 @@ function RequestTable({ filter }) {
     },
   ];
 
+<<<<<<< HEAD
+  const filteredRequests = requests.filter((item) => item.value == filter);
+ 
+=======
   const statusOptions = [
     { name: "Đã xử lý", uid: 1 },
     { name: "Chưa xử lý", uid: 2 },
@@ -410,6 +414,7 @@ function RequestTable({ filter }) {
       </div>
     );
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+>>>>>>> e096735a90d9c024f04117b43892eb7a3b495363
 
   return (
     <Table
