@@ -186,10 +186,6 @@ body {
     /* backdrop-filter: blur(20px); */
   }
 
-  .admin-main {
-    @apply min-h-[100vh]
-  }
-
   .flex-center {
     @apply flex items-center justify-center;
   }
