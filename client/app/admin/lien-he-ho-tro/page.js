@@ -60,7 +60,7 @@ function Page() {
                       fill="white"
                     />
                   </svg>
-                  Tên thực đơn
+                  Tên liên hệ
                 </h4>
                 <CustomInput
                   name="name"
@@ -74,7 +74,7 @@ function Page() {
               <div className="flex flex-col">
                 <h4 className="flex gap-3 text-white leading-6 font-semibold">
                   <EnvelopeIcon className="h-6 w-6 text-white" />
-                  Tên thực đơn
+                  Email
                 </h4>
                 <CustomInput
                   name="email"

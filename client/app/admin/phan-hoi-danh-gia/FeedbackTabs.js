@@ -1,5 +1,6 @@
 "use client";
 
+import CustomPagination from "@/app/_components/CustomPagination";
 import { formatDateTime } from "@/app/_utils/formaters";
 import { capitalize } from "@/app/_utils/helpers";
 import {
@@ -11,6 +12,7 @@ import {
   Tabs,
 } from "@chakra-ui/react";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import { parseDate } from "@internationalized/date";
 import {
   Avatar,
   Button,
@@ -28,8 +30,30 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Col, Row } from "antd";
+import { format } from "date-fns";
+import React from "react";
 
 function FeedbackTabs() {
+  const [selectedFeedback, setSelectedFeedback] = React.useState({
+    id: 0,
+    name: "",
+    feedback: "",
+    status: "",
+    dateTime: "",
+    bookingId: "",
+    satisLevel: "",
+  });
+
+  const [date, setDate] = React.useState({
+    start: parseDate(format(new Date().toDateString(), "yyyy-MM-dd")),
+    end: parseDate(
+      format(
+        new Date(new Date().setDate(new Date().getDate() + 7)),
+        "yyyy-MM-dd"
+      )
+    ),
+  });
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const status = ["received", "approved"];
@@ -41,7 +65,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "received",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-12T11:34:55.082Z",
       bookingId: "FDK-ED2-291",
       satisLevel: "good",
     },
@@ -51,7 +75,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "approved",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-10T11:34:55.082Z",
       bookingId: "FDK-ED2-292",
       satisLevel: "good",
     },
@@ -61,7 +85,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "received",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-10T11:34:55.082Z",
       bookingId: "FDK-ED2-293",
       satisLevel: "good",
     },
@@ -71,7 +95,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "approved",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-10T11:34:55.082Z",
       bookingId: "FDK-ED2-294",
       satisLevel: "bad",
     },
@@ -81,7 +105,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "received",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-10T11:34:55.082Z",
       bookingId: "FDK-ED2-295",
       satisLevel: "good",
     },
@@ -91,7 +115,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "approved",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-10T11:34:55.082Z",
       bookingId: "FDK-ED2-296",
       satisLevel: "normal",
     },
@@ -101,7 +125,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "received",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-12T11:34:55.082Z",
       bookingId: "FDK-ED2-297",
       satisLevel: "bad",
     },
@@ -111,7 +135,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "approved",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-12T11:34:55.082Z",
       bookingId: "FDK-ED2-298",
       satisLevel: "good",
     },
@@ -121,7 +145,7 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "received",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-22T11:34:55.082Z",
       bookingId: "FDK-ED2-299",
       satisLevel: "normal",
     },
@@ -131,49 +155,63 @@ function FeedbackTabs() {
       feedback:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
       status: "approved",
-      dateTime: "2024-10-07T11:34:55.082Z",
+      dateTime: "2024-10-22T11:34:55.082Z",
       bookingId: "FDK-ED2-300",
       satisLevel: "great",
+    },
+  ].filter((f) => f.dateTime >= date.start && f.dateTime <= date.end);
+
+  const categories = [
+    {
+      key: "requested",
+      name: "Đã nhận",
+    },
+    {
+      key: "approved",
+      name: "Đã duyệt",
     },
   ];
 
   return (
     <>
       <Tabs className="mt-8" variant={"unstyled"}>
-        <TabList width={"fit-content"}>
-          <Tab
-            color={"white"}
-            className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
-          >
-            Đã nhận
-            <Chip
-              color="danger"
-              classNames={{
-                base: "shrink-0 max-w-3 min-w-5 h-3 min-h-5 text-xs rounded-md",
-                content: "font-bold",
-              }}
-              size="small"
+        <TabList width={"fit-content"} className="!w-full flex">
+          {categories.map((c) => (
+            <Tab
+              key={c.key}
+              color={"white"}
+              className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
             >
-              1
-            </Chip>
-          </Tab>
-          <Tab
-            color={"white"}
-            className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
-          >
-            Đã duyệt
-            <Chip
-              color="default"
+              Đã nhận
+              <Chip
+                color="default"
+                classNames={{
+                  base: "shrink-0 max-w-3 min-w-5 h-3 min-h-5 text-xs rounded-md",
+                  content: "font-bold",
+                }}
+                size="small"
+              >
+                1
+              </Chip>
+            </Tab>
+          ))}
+          <div className="flex-1 justify-end flex">
+            <DateRangePicker
+              value={date}
+              onChange={setDate}
+              className="w-fit"
+              aria-label="Date Range Picker"
               classNames={{
-                base: "shrink-0 max-w-3 min-w-5 h-3 min-h-5 text-xs rounded-md",
-                content: "font-bold",
+                inputWrapper: "!bg-whiteAlpha-100",
+                "start-input": "text-white *:text-white",
+                "end-input": "text-white *:text-white",
+                innerWrapper:
+                  "text-white [&>data-[slot=start-input]>data-[slot=segment]]:text-white",
+                segment:
+                  "text-white data-[editable=true]:text-white data-[editable=true]:data-[placeholder=true]:text-white",
               }}
-              size="small"
-            >
-              1
-            </Chip>
-          </Tab>
-          <DateRangePicker />
+            />
+          </div>
         </TabList>
         <TabIndicator mt="1.5px" height="2px" bg="white" borderRadius="2px" />
         <TabPanels>
@@ -207,7 +245,7 @@ function FeedbackTabs() {
                     <Col span={12}>
                       <div className="flex items-center gap-3">
                         <Avatar className="shrink-0" />
-                        <div>
+                        <div className="w-full">
                           <div className="flex items-center gap-3 w-full">
                             <h2 className="text-md leading-6 font-semibold">
                               {feedback.name}
@@ -266,13 +304,16 @@ function FeedbackTabs() {
                       <Button
                         size="sm"
                         className={"bg-whiteAlpha-100 text-white font-bold"}
-                        onPress={onOpen}
+                        onPress={() => {
+                          setSelectedFeedback(feedback);
+                          onOpen();
+                        }}
                       >
                         Xem
                       </Button>
                     </Col>
                     <Col span={3} className="flex items-center">
-                      <Dropdown>
+                      <Dropdown variant="flat">
                         <DropdownTrigger>
                           <Button
                             size="sm"
@@ -283,15 +324,22 @@ function FeedbackTabs() {
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Static Actions">
-                          <DropdownItem key="approve">Duyệt</DropdownItem>
-                          <DropdownItem key="hide">Ẩn</DropdownItem>
-                          <DropdownItem key="edit">Chỉnh sửa</DropdownItem>
+                          <DropdownItem variant="flat" key="approve">
+                            Duyệt
+                          </DropdownItem>
+                          <DropdownItem variant="flat" key="hide">
+                            Ẩn
+                          </DropdownItem>
+                          <DropdownItem variant="flat" key="edit">
+                            Chỉnh sửa
+                          </DropdownItem>
                           <DropdownItem
                             key="delete"
                             className="text-danger"
                             color="danger"
+                            variant="flat"
                           >
-                            Delete file
+                            Delete
                           </DropdownItem>
                         </DropdownMenu>
                       </Dropdown>
@@ -301,41 +349,44 @@ function FeedbackTabs() {
             </TabPanel>
           ))}
         </TabPanels>
+        <CustomPagination total={status.length} />
       </Tabs>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Modal Title
+                <div className="flex items-center gap-3">
+                  <Avatar className="shrink-0" />
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-lg font-semibold">
+                      Mức độ hài lòng: {selectedFeedback.satisLevel}
+                    </h2>
+                    <span className="text-xs text-gray-400">
+                      {formatDateTime(new Date())}
+                    </span>
+                  </div>
+                </div>
               </ModalHeader>
               <ModalBody>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Nullam pulvinar risus non risus hendrerit venenatis.
-                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                </p>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Nullam pulvinar risus non risus hendrerit venenatis.
-                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                </p>
-                <p>
-                  Magna exercitation reprehenderit magna aute tempor cupidatat
-                  consequat elit dolor adipisicing. Mollit dolor eiusmod sunt ex
-                  incididunt cillum quis. Velit duis sit officia eiusmod Lorem
-                  aliqua enim laboris do dolor eiusmod. Et mollit incididunt
-                  nisi consectetur esse laborum eiusmod pariatur proident Lorem
-                  eiusmod et. Culpa deserunt nostrud ad veniam.
-                </p>
+                {selectedFeedback.feedback.split("\n").map((f, i) => (
+                  <p key={i} className="text-md">
+                    {f}
+                  </p>
+                ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Xóa
                 </Button>
-                <Button color="primary" onPress={onClose}>
-                  Action
+                <Button color="warning" variant="flat" onPress={onClose}>
+                  Ẩn
                 </Button>
+                {selectedFeedback.status === "received" && (
+                  <Button className="bg-teal-400 text-white" onPress={onClose}>
+                    Duyệt
+                  </Button>
+                )}
               </ModalFooter>
             </>
           )}

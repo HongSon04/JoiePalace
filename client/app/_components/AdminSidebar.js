@@ -30,6 +30,7 @@ import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import feedbackIcon from "@/public/admin-sidebar/phan-hoi-danh-gia.svg";
 import blogIcon from "@/public/admin-sidebar/bai-viet.svg";
+import tableAndChair from "@/public/admin-sidebar/ban-ghe.svg";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
 
@@ -74,7 +75,10 @@ function AdminSidebar() {
     <motion.div
       ref={scope}
       layout
-      className={`admin-sidebar items-center bg-whiteAlpha-100 *:!text-white flex flex-col max-h-screen h-full overflow-y-scroll relative rounded-xl`}
+      className={`admin-sidebar items-center bg-whiteAlpha-100 *:!text-white flex flex-col h-full overflow-y-scroll relative rounded-xl`}
+      style={{
+        maxHeight: "calc(100vh - 3rem)",
+      }}
     >
       <div className="flex-1 w-full">
         <AdminSidebarHeader />
@@ -136,6 +140,11 @@ function AdminSidebarNav() {
       title: "Quản lý tiệc",
       path: "/admin/quan-ly-tiec",
       icon: eventIcon,
+    },
+    {
+      title: "Quản lý bàn ghế",
+      path: "/admin/quan-ly-ban-ghe",
+      icon: tableAndChair,
     },
     {
       title: "Thực đơn",
