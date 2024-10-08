@@ -1,56 +1,38 @@
-'use client';
-import React, { useState } from 'react';
+import React from 'react';
+import { Controller } from 'react-hook-form';
 
-const AdminThemChiNhanhInput = ({ fields, typeADD, placeholderADD, title, heightTextarea, name }) => {
-    const [inputs, setInputs] = useState(fields);
-
-    const handlePhoneInputChange = (e) => {
-        const value = e.target.value;
-        if (!/^\d*$/.test(value)) {
-            e.target.value = value.replace(/[^\d]/g, '');
-        }
-    };
-
-    return (
-        <div className="p-4 w-[363px] bg-whiteAlpha-200 rounded-lg h-fit">
-            <div className='flex gap-3 flex-col'>
-                <span className="mb-5 font-bold leading-6 text-base text-white">{title}</span>
-                {inputs.map((field, index) => (
-                    field.type === 'textarea' ? (
-                        <textarea
-                            key={index}
-                            placeholder={field.placeholder}
-                            className={`px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 ${heightTextarea} w-full`}
-                        />
-                    ) : (
-                        <input
-                            key={index}
-                            type={field.type || 'text'}
-                            placeholder={field.placeholder}
-                            name={name}
-                            className="px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
-                            min={field.type === 'number' ? 0 : undefined}
-                            onWheel={(e) => (field.type === 'number' ? e.currentTarget.blur() : null)}
-                            onInput={field.name === 'phone' ? handlePhoneInputChange : undefined}
-                        />
-                    )
-                ))}
-                {/* Uncomment to enable adding inputs dynamically */}
-                {/* {inputs.length < 2 && (
-                    <div className='w-full flex items-center justify-center mt-4'>
-                        <button
-                            onClick={() => handleAddInput()}
-                            className='rounded-full p-3 bg-gray-600 flex items-center justify-center text-white font-medium text-xl'
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M15.8333 10.8333H10.8333V15.8333H9.16663V10.8333H4.16663V9.16667H9.16663V4.16667H10.8333V9.16667H15.8333V10.8333Z" fill="#F7F5F2"/>
-                            </svg>
-                        </button>
-                    </div>
-                )} */}
-            </div>
-        </div>
-    );
+const AdminThemChiNhanhInput = ({ fields, title, heightTextarea, control }) => {
+  return (
+    <div className="p-4 w-[363px] bg-whiteAlpha-200 rounded-lg h-fit">
+      <div className='flex gap-3 flex-col'>
+        <span className="mb-5 font-bold leading-6 text-base text-white">{title}</span>
+        {fields.map((field, index) => (
+          <Controller
+            key={index}
+            name={field.name}
+            control={control}
+            defaultValue=""
+            render={({ field: inputProps }) =>
+              field.type === 'textarea' ? (
+                <textarea
+                  {...inputProps}
+                  placeholder={field.placeholder}
+                  className={`px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 ${heightTextarea} w-full`}
+                />
+              ) : (
+                <input
+                  {...inputProps}
+                  type={field.type || 'text'}
+                  placeholder={field.placeholder}
+                  className="px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
+                />
+              )
+            }
+          />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default AdminThemChiNhanhInput;

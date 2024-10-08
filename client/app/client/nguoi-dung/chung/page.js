@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from "next/image";
-import AccountSection from '@/app/_components/AccountSection';
-import PartySection from '@/app/_components/PartySection';
+import AccountSectionClient from '@/app/_components/AccountSectionClient';
+import PartySectionClient from '@/app/_components/PartySectionClient';
 
 const Page = () => {
     const parties = [
@@ -26,17 +26,19 @@ const Page = () => {
     ];
     return (
         <div className="flex flex-col gap-8">
+        
             {/* Section Title */}
             <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
             {/* Account Section */}
-            <AccountSection title="Tài khoản" />
+            <AccountSectionClient title="Tài khoản" />
 
             {/* Bottom Divider */}
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
 
             {/* Party Section */}
-                <PartySection title="Tiệc gần nhất" data={parties}></PartySection>
+            <PartySectionClient title="Tiệc gần nhất" data={parties}></PartySectionClient>
+
         </div>
     );
 };
