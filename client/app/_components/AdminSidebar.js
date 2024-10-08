@@ -74,7 +74,7 @@ function AdminSidebar() {
     <motion.div
       ref={scope}
       layout
-      className={`admin-sidebar items-center bg-whiteAlpha-100 *:!text-white flex flex-col max-h-screen h-screen overflow-y-scroll relative rounded-xl`}
+      className={`admin-sidebar items-center bg-whiteAlpha-100 *:!text-white flex flex-col max-h-screen h-full overflow-y-scroll relative rounded-xl`}
     >
       <div className="flex-1 w-full">
         <AdminSidebarHeader />
