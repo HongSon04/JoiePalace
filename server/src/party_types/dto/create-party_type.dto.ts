@@ -2,19 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreatePartyTypeDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Tên loại tiệc không được để trống' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
   short_description: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   images: string[];
 }
 

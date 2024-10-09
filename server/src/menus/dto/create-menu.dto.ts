@@ -9,11 +9,11 @@ import {
 } from 'class-validator';
 
 export class CreateMenuDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Tên menu không được để trống' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   description: string;
 
@@ -26,9 +26,9 @@ export class CreateMenuDto {
     each: true,
     message: 'Mỗi phần tử trong danh sách món ăn phải là số nguyên',
   }) // Kiểm tra mỗi phần tử trong mảng có phải là số nguyên không
-  foods: number[];
+  products: number[];
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Giá không được để trống' })
   price: number;
 

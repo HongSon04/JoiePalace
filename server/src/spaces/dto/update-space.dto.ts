@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class updateSpaceDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   name: string;
-  @ApiProperty()
+  @ApiProperty({ required: true })
   description: string;
-  @ApiProperty()
+  @ApiProperty({ required: true })
   images: string;
 }
