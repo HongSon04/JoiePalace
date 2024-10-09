@@ -1,5 +1,4 @@
 "use client";
-
 // import custom components
 import IconButton from "./IconButton";
 
@@ -8,7 +7,7 @@ import Image from "next/image";
 
 // import icons
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import dashboardIcon from "@/public/bang-dieu-khien.svg";
+import dashboardIcon from "@/public/admin-sidebar/bang-dieu-khien.svg";
 import SearchForm from "./SearchForm";
 import NotificationButton from "./NotificationButton";
 import { useRouter } from "next/navigation";
@@ -33,14 +32,14 @@ function AdminHeader({
     router.replace("/admin/bang-dieu-khien");
   };
 
-  const {size} = useSelector((state) => state.sidebar);
+  const { size } = useSelector((state) => state.sidebar);
   const dispatch = useDispatch();
   const onSidebar = () => {
     dispatch(toggleSidebar());
   };
 
   return (
-    <div className="admin-header flex w-full justify-between items-center gap-5">
+    <div className="admin-header flex w-full justify-between items-center gap-5 relative z-40">
       <AdminSidebarButton
         onSidebar={onSidebar}
         size={size}
@@ -48,10 +47,10 @@ function AdminHeader({
       />
       {showBackButton && (
         <IconButton onClick={handleBack}>
-          <ArrowLeftIcon width={20} height={20} className="text-gray-600" />
+          <ArrowLeftIcon width={20} height={20} className="text-white" />
         </IconButton>
       )}
-      <h1 className="text-2xl font-bold leading-8 flex-1 text-left text-gray-600">
+      <h1 className="text-2xl font-bold leading-8 flex-1 text-left text-white">
         {title}
       </h1>
       <div className="flex items-center gap-5 relative">

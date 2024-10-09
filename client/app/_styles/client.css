@@ -1,0 +1,50 @@
+#section-location .fp-overflow {
+    display: flex;
+}
+.location-section-item .location-image-bg {
+    background-position: center;
+}
+.location-name {
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+.location-detail {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+.location-section-item:hover .location-detail {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.location-section-item:hover .location-name {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+.banner .react-multi-carousel-item {
+    width: 100vw !important;
+}
+#section-event .fp-overflow {
+    display: flex !important;
+    gap: 60px;
+}
+.section-event-listCard {
+    overflow-y: scroll;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    --scroll-speed: 1000ms;
+}
+.section-event-listCard::-webkit-scrollbar {
+    display: none;
+}
+#section-offers2 .react-multiple-carousel__arrow,
+#section-offers .react-multiple-carousel__arrow {
+    display: none;
+}
+#section-information .fp-overflow {
+    display: flex;
+    gap: 40px;
+}
+#section-offers2 .react-multi-carousel-track {
+    gap: 14px;
+    margin-inline: -0px;
+}

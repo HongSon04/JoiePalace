@@ -1,9 +1,6 @@
 "use client";
 
 import AdminSidebar from "@/app/_components/AdminSidebar";
-import StoreProvider from "./StoreProvider";
-import { useState } from "react";
-import AdminSidebarButton from "../_components/AdminSidebarButton";
 import { useSelector } from "react-redux";
 
 function Layout({ children }) {
@@ -14,20 +11,25 @@ function Layout({ children }) {
   }
 
   return (
-      <div className="p-3 bg-gray-100 admin-main overflow-hidden">
-        <div className="flex gap-5">
-          <AdminSidebar
-            isSidebarOpen={isSidebarOpen}
-            handleSidebar={handleSidebar}
-            size={size}
-          />
-          <div className="flex-1 admin-panel text-white max-h-[100vh]">
-            <main className="h-full max-h-[100vh] overflow-y-auto overflow-x-hidden relative">
-              {children}
-            </main>
-          </div>
+    <div
+      className="p-5 admin-main bg-darkGreen-primary overflow-hidden"
+      style={{
+        maxHeight: "calc(100vh)",
+      }}
+    >
+      <div className="flex gap-5 py-3">
+        <AdminSidebar
+          isSidebarOpen={isSidebarOpen}
+          handleSidebar={handleSidebar}
+          size={size}
+        />
+        <div className="flex-1 admin-panel overflow-hidden">
+          <main className="h-full max-h-[100vh] overflow-y-auto overflow-x-hidden relative pb-16">
+            {children}
+          </main>
         </div>
       </div>
+    </div>
   );
 }
 

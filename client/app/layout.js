@@ -2,6 +2,8 @@
 import "@/app/_styles/globals.css";
 import { Providers } from "./providers";
 import StoreProvider from "./admin/StoreProvider";
+import { ChakraProvider } from "@chakra-ui/react";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 
 // metadata for the layout
 export const metadata = {
@@ -18,7 +20,11 @@ export default function RootLayout({ children }) {
     <html lang="vn">
       <body>
         <StoreProvider>
-          <Providers>{children}</Providers>
+          <AppRouterCacheProvider>
+            <ChakraProvider>
+              <Providers>{children}</Providers>
+            </ChakraProvider>
+          </AppRouterCacheProvider>
         </StoreProvider>
       </body>
     </html>

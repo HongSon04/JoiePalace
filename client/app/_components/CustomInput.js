@@ -8,100 +8,121 @@ import { DatePicker, Input, Textarea } from "@nextui-org/react";
 import { useFormContext } from "react-hook-form";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 
-function CustomInput({
-  onChange,
-  autoFocus = false,
-  validation,
-  inputType = "text",
-  multiLine = false,
-  label = "label",
-  labelPlacement = "outside",
-  value = "",
-  className,
-  classNames = {
-    label: "!text-gray-600 font-bold",
-    inputWrapper: "!bg-blackAlpha-100",
-    input: "!text-gray-600",
-    placeholder: "!text-gray-400",
-  },
-  placeholder = "",
-  children: startContent,
-  name = "",
-  errorMessage,
-}) {
+// onChange,
+// autoFocus = false,
+// validation,
+// inputType = "text",
+// multiLine = false,
+// label = "label",
+// labelPlacement = "outside",
+// value = "",
+// className,
+// classNames = {
+//   label: "!text-white font-bold",
+//   inputWrapper: "!bg-whiteAlpha-100",
+//   input: "!text-white",
+//   placeholder: "!text-gray-400",
+// },
+// placeholder = "",
+// children: startContent,
+// name = "",
+// errorMessage,
+// ariaLabel,
+
+function CustomInput(props) {
   const {
     register,
     formState: { errors },
   } = useFormContext();
 
-  const inputError = findInputError(errors, name);
+  const inputError = findInputError(errors, props.name);
   const isInvalid = isFormInvalid(inputError);
 
-  if (inputType === "date")
+  if (props.inputType === "date")
     return (
       <DatePicker
+        {...props}
         size="md"
         variant="flat"
-        label={label}
-        labelPlacement={labelPlacement}
         value={parseAbsoluteToLocal(value)}
-        className={className}
-        classNames={classNames}
-        isInvalid={isInvalid}
-        {...register(name, validation)}
+        {...register(props.name, validation)}
+        aria-label={ariaLabel}
       />
     );
 
-  if (multiLine)
+  if (props.inputType === "select")
     return (
-      <Textarea
-        onChange={onChange}
-        autoFocus={autoFocus}
-        name={name}
-        value={value}
-        label={label}
-        labelPlacement={labelPlacement}
-        placeholder={placeholder}
-        className={className}
-        classNames={classNames}
-        startContent={startContent}
-        isInvalid={isInvalid}
-        {...register(name, validation)}
-      />
+      <div className="flex flex-col">
+        <p className="font-semibold text-small leading-8">{props.label}</p>
+        <select
+          name={props.name}
+          id={props.id}
+          className={`${props.className} bg-blackAlpha-100`}
+          value={props.value}
+          onChange={props.onChange}
+          aria-label={props.ariaLabel}
+          required
+        >
+          {props.options.map((option, index) => (
+            <option key={index} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <AnimatePresence mode="wait" initial={false}>
+          {isInvalid && (
+            <InputError
+              message={`${props.ariaLabel} ${
+                inputError?.error?.message || props.errorMessage
+              }`}
+              key={inputError?.error?.message}
+            />
+          )}
+        </AnimatePresence>
+      </div>
     );
-
   return (
-    <Input
-      autoFocus={autoFocus}
-      name={name}
-      value={value}
-      label={label}
-      labelPlacement={labelPlacement}
-      placeholder={placeholder}
-      className={className}
-      classNames={classNames}
-      startContent={startContent}
-      isInvalid={isInvalid}
-      {...register(name, validation)}
-      onChange={onChange}
-      errorMessage={errorMessage}
-    >
+    <div className="w-full">
+      {props.multiLine ? (
+        <Textarea
+          {...props}
+          aria-label={props.ariaLabel}
+          {...register(props.name, props.validation)}
+          errorMessage={`${props.ariaLabel} ${
+            inputError?.error?.message || props.errorMessage
+          }`}
+        />
+      ) : (
+        <Input
+          {...props}
+          {...register(props.name, props.validation)}
+          value={props.value}
+          onChange={props.onChange}
+          errorMessage={`${props.ariaLabel} ${
+            inputError?.error?.message || props.errorMessage
+          }`}
+          aria-label={props.ariaLabel}
+        />
+      )}
+
       <AnimatePresence mode="wait" initial={false}>
         {isInvalid && (
           <InputError
-            message={inputError.error.message}
-            key={inputError.error.message}
+            message={`${props.ariaLabel} ${
+              inputError?.error?.message || props.errorMessage
+            }`}
+            key={inputError?.error?.message}
           />
         )}
       </AnimatePresence>
-    </Input>
+    </div>
   );
 }
 
 function InputError({ message }) {
   return (
     <motion.p
-      className="flex items-center gap-1 px-2 font-semibold text-red-500 bg-red-100 rounded-md"
+      className="flex items-center justify-start gap-1 font-semibold text-[12px] text-red-500"
       {...framer_error}
     >
       <ExclamationCircleIcon className="w-4 h-4" />
@@ -111,8 +132,8 @@ function InputError({ message }) {
 }
 
 const framer_error = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 10 },
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: 10 },
   transition: { duration: 0.2 },
 };

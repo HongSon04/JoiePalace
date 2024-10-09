@@ -15,22 +15,26 @@ import { useEffect } from "react";
 import { Divider } from "@chakra-ui/react";
 
 // import images
-import logo from "@/public/admin_logo_dark.svg";
-import dashboardIcon from "@/public/bang-dieu-khien.svg";
-import settingIcon from "@/public/cai-dat.svg";
-import branchIcon from "@/public/chi-nhanh.svg";
-import drinkIcon from "@/public/do-uong.svg";
-import customerIcon from "@/public/khach-hang.svg";
-import contactIcon from "@/public/lien-he-ho-tro.svg";
-import menuIcon from "@/public/menu.svg";
-import foodIcon from "@/public/mon-an.svg";
-import notificationIcon from "@/public/thong-bao.svg";
-import statisticIcon from "@/public/thong-ke.svg";
-import eventIcon from "@/public/tiec-icon.svg";
-import requestIcon from "@/public/yeu-cau.svg";
+import logo from "@/public/logo-dark.png";
+import dashboardIcon from "@/public/admin-sidebar/bang-dieu-khien.svg";
+import settingIcon from "@/public/admin-sidebar/cai-dat.svg";
+import branchIcon from "@/public/admin-sidebar/chi-nhanh.svg";
+import drinkIcon from "@/public/admin-sidebar/do-uong.svg";
+import customerIcon from "@/public/admin-sidebar/khach-hang.svg";
+import contactIcon from "@/public/admin-sidebar/lien-he-ho-tro.svg";
+import menuIcon from "@/public/admin-sidebar/menu.svg";
+import foodIcon from "@/public/admin-sidebar/mon-an.svg";
+import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
+import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
+import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
+import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
+import feedbackIcon from "@/public/admin-sidebar/phan-hoi-danh-gia.svg";
+import blogIcon from "@/public/admin-sidebar/bai-viet.svg";
+import tableAndChair from "@/public/admin-sidebar/ban-ghe.svg";
 import { useSelector } from "react-redux";
+import AdminUser from "./AdminUser";
 
-function AdminSidebar({ handleSidebar, size }) {
+function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   const [scope, animate] = useAnimate();
@@ -40,6 +44,8 @@ function AdminSidebar({ handleSidebar, size }) {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
+        await animate();
+
         await animate(
           scope.current,
           {
@@ -69,15 +75,23 @@ function AdminSidebar({ handleSidebar, size }) {
     <motion.div
       ref={scope}
       layout
-      className={`admin-sidebar items-center bg-white flex flex-col max-h-screen h-screen overflow-y-scroll relative rounded-xl`}
+      className={`admin-sidebar items-center bg-whiteAlpha-100 *:!text-white flex flex-col h-full overflow-y-scroll relative rounded-xl`}
+      style={{
+        maxHeight: "calc(100vh - 3rem)",
+      }}
     >
-      <AdminSidebarHeader onSidebar={handleSidebar} size={size} />
-      <Divider
-        background={"rgba(0, 0, 0, 0.2)"}
-        height={0.5}
-        className={`${isSidebarOpen ? "w-5/6" : ""} shrink-0`}
-      />
-      <AdminSidebarNav></AdminSidebarNav>
+      <div className="flex-1 w-full">
+        <AdminSidebarHeader />
+        <Divider
+          background={"rgba(0, 0, 0, 0.05)"}
+          height={0.5}
+          className={`${isSidebarOpen ? "w-5/6" : ""} shrink-0`}
+        />
+        <AdminSidebarNav></AdminSidebarNav>
+      </div>
+      <div className="flex-center pb-8 w-full">
+        <AdminUser />
+      </div>
     </motion.div>
   );
 }
@@ -87,7 +101,6 @@ function AdminSidebarHeader() {
 
   return (
     <div
-      layout
       className={`${
         isSidebarOpen ? "flex-center flex-col" : ""
       } flex items-center justify-between w-full p-3`}
@@ -129,6 +142,11 @@ function AdminSidebarNav() {
       icon: eventIcon,
     },
     {
+      title: "Quản lý bàn ghế",
+      path: "/admin/quan-ly-ban-ghe",
+      icon: tableAndChair,
+    },
+    {
       title: "Thực đơn",
       path: "/admin/thuc-don",
       icon: menuIcon,
@@ -142,6 +160,16 @@ function AdminSidebarNav() {
       title: "Đồ uống",
       path: "/admin/do-uong",
       icon: drinkIcon,
+    },
+    {
+      title: "Phản hồi & đánh giá",
+      path: "/admin/phan-hoi-danh-gia",
+      icon: feedbackIcon,
+    },
+    {
+      title: "Bài viết",
+      path: "/admin/bai-viet",
+      icon: blogIcon,
     },
   ];
 
@@ -174,9 +202,9 @@ function AdminSidebarNav() {
         })}
       </ul>
       <Divider
-        background={"rgba(0, 0 , 0, 0.2)"}
+        background={"rgba(0, 0, 0, 0.05)"}
         height={0.5}
-        className={`${isSidebarOpen ? "w-5/6" : ""}`}
+        className={`${isSidebarOpen ? "w-5/6" : ""} shrink-0`}
       />
       <ul className={`flex-center flex-col px-3 w-full`}>
         {subOptions.map((item, index) => {
@@ -196,26 +224,24 @@ function AdminSidebarItem({ item }) {
 
   return (
     <li
-      layout
       item={item}
-      className={`flex w-full items-center justify-between rounded-md !text-gray-600 mb-2 transition-all relative  hover:bg-blackAlpha-50 ${
-        isActive ? "bg-blackAlpha-100" : ""
-      } ${item.qty ? "bg-red-200 animate-pulse" : ""}`}
+      className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
+        isActive ? "bg-whiteAlpha-100" : ""
+      } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""}`}
     >
-      <div
-        layout
-        className={`flex items-center gap-2 p-2 flex-1 text-gray-600 !stroke-gray-600 rounded-md flex-center relative`}
+      <Link
+        href={item.path}
+        className={`flex items-center gap-2 p-2 flex-1 text-white !stroke-gray-600 rounded-md flex-center relative`}
       >
         <Image src={item.icon} alt={item.title} className={`w-6 h-6`} />
         {isSidebarOpen && (
-          <Link
-            href={item.path}
-            className={`text-gray-600 hover:text-gray-500 flex-1 min-w-max block text-base`}
+          <span
+            className={`text-white transition flex-1 min-w-max block text-base`}
           >
             {item.title}
-          </Link>
+          </span>
         )}
-      </div>
+      </Link>
       {item.qty && (
         <span
           className={`shrink-0 w-5 h-5 bg-red-400 text-sm text-white rounded-full flex-center absolute -top-1 -right-1`}
