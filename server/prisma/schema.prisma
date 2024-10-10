@@ -112,7 +112,7 @@ model spaces {
 model staffs {
   id           Int       @id @default(autoincrement())
   branches     branches  @relation(fields: [branch_id], references: [id])
-  branch_id  Int       @unique
+  branch_id    Int       @unique
   name         String
   phone        String
   avatar       String?
