@@ -2,7 +2,6 @@
 
 import authBg from "@/public/auth-bg.png";
 import {
-  ArrowRightStartOnRectangleIcon,
   ChatBubbleLeftRightIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -10,42 +9,80 @@ import { Button, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { FormProvider, useForm } from "react-hook-form";
 
-import CustomInput from "@/app/_components/CustomInput";
 import {
+  login,
   setEmail,
   setPassword,
 } from "@/app/_lib/features/authentication/accountSlice";
-import {
-  _require,
-  emailValidation,
-  passwordValidation,
-} from "@/app/_utils/validations";
-import logo from "@/public/logo.png";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import axios from "axios";
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "next/navigation";
-import { setCurrentBranch } from "@/app/_lib/features/branch/branchSlice";
+import Form from "./Form";
+import { useToast } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 
-function Page() {
-  const { branchSlug } = useParams();
+function Page({ params: { branchSlug } }) {
+  const toast = useToast();
+  const router = useRouter();
 
   const methods = useForm();
 
   const dispatch = useDispatch();
-
   const { password, email } = useSelector((store) => store.account);
 
-  const handleSubmit = methods.handleSubmit((data) => {
-    // LATER: Handle submit
-    const submitData = {
-      ...data,
-    };
+  const handleSubmit = async (data) => {
+    try {
+      const res = await axios.post(API_CONFIG.AUTH.LOGIN, data);
+      if (res.status === 200) {
+        dispatch(
+          login({
+            email: email,
+            role: "admin",
+            accessToken: res.data.data.access_token,
+            refreshToken: res.data.refresh_token,
+          })
+        );
 
-    dispatch(setCurrentBranch(branchSlug));
+        const toastPromise = new Promise((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, 3000);
 
-    console.log(submitData);
-  });
+          toast({
+            title: res.data.data.message,
+            description: "Chào mừng bạn quay trở lại",
+            status: "success",
+            duration: 4000,
+            isClosable: true,
+            position: "top",
+          });
+        });
+
+        const routePromise = new Promise((resolve) => {
+          setTimeout(() => {
+            router.push(`/admin/bang-dieu-khien/${branchSlug}`);
+            resolve();
+          }, 3000);
+        });
+
+        Promise.race([toastPromise, routePromise]);
+
+        dispatch(setEmail(""));
+        dispatch(setPassword(""));
+      }
+    } catch (error) {
+      toast({
+        title: "Đăng nhập thất bại",
+        position: "top",
+        description: error.response.data.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    }
+  };
 
   const handleSetPassword = (e) => {
     dispatch(setPassword(e.target.value));
@@ -89,73 +126,14 @@ function Page() {
         </Tooltip>
       </div>
 
-      {/* FORM */}
-      <FormProvider {...methods}>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          noValidate
-          action="#"
-          className="p-[60px] w-[400px] absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4 bg-blackAlpha-600 backdrop-blur-lg shadow-md flex flex-center flex-col "
-        >
-          <Image src={logo} width={60} height={60} alt="Joie Palace logo" />
-          <h1 className="text-2xl leading-8 font-semibold text-white text-center mt-5">
-            Đăng nhập
-          </h1>
-          <CustomInput
-            value={email}
-            onChange={handleSetEmail}
-            placeholder="Email"
-            name="email"
-            label=""
-            className={"mt-8"}
-            classNames={{
-              inputWrapper: "!bg-whiteAlpha-200 rounded-md text-white",
-              wrapper: "mt-4",
-              placeholder: "!text-white",
-              input: "!text-white",
-            }}
-            ariaLabel="Email"
-            validation={{
-              ..._require,
-              ...emailValidation,
-            }}
-          ></CustomInput>
-          <CustomInput
-            value={password}
-            onChange={handleSetPassword}
-            placeholder="Mật khẩu"
-            name="password"
-            label=""
-            className={"mt-3"}
-            classNames={{
-              inputWrapper: "!bg-whiteAlpha-200 rounded-md !text-white",
-              value: "!text-white",
-              wrapper: "mt-4",
-              placeholder: "!text-white",
-              input: "!text-white",
-            }}
-            ariaLabel="Mật khẩu"
-            validation={{
-              ..._require,
-              ...passwordValidation,
-            }}
-            errorMessage={"Mật khẩu không được để trống"}
-          ></CustomInput>
-          <Button
-            onClick={handleSubmit}
-            className="mt-5 rounded-full w-full border-2 border-white border-solid bg-transparent text-white hover:bg-whiteAlpha-200"
-            startContent={
-              <ArrowRightStartOnRectangleIcon
-                width={24}
-                height={24}
-                color="white"
-              />
-            }
-          >
-            Đăng nhập
-          </Button>
-        </form>
-      </FormProvider>
+      <Form
+        methods={methods}
+        email={email}
+        password={password}
+        handleSetEmail={handleSetEmail}
+        handleSetPassword={handleSetPassword}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }
