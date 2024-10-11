@@ -41,5 +41,8 @@ async function bootstrap() {
 
   await app.listen(PORT);
   console.log(`Application is running on: http://localhost:${PORT}/api`);
+  console.log(`Application is running on: ${process.env.WEB_URL}`);
+  console.log(`Swagger is running on: http://localhost:${PORT}/api`);
+  console.log(`Swagger is running on: ${process.env.WEB_URL}api`);
 }
 bootstrap();
