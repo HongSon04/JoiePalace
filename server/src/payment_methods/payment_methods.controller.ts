@@ -11,8 +11,7 @@ import {
 import { PaymentMethodsService } from './payment_methods.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
-import { VNPaySuccessDto } from './dto/vnpay-success.dto';
-import { MomoSuccessDto } from './dto/momo-success.dto';
+import { MomoCallbackDto } from './dto/momo-callback.dto';
 
 @ApiTags('payment-methods')
 @Controller('payment-methods')
@@ -49,19 +48,12 @@ export class PaymentMethodsController {
     return this.paymentMethodsService.momo(id, req, res);
   }
 
-  // ! Payment Momo Success
-  @Get('momo-success')
-  @isPublic()
-  successMomo(@Query() query: MomoSuccessDto, @Response() res: any) {
-    console.log(query);
-    return this.paymentMethodsService.successMomo(query, res);
-  }
+  // ! Momo Callback
 
-  // ! Payment Momo Fail
-  @Get('momo-fail')
+  @Get('momo-callback')
   @isPublic()
-  failMomo(@Query() query: any, @Response() res: any) {
-    return this.paymentMethodsService.failMomo(query, res);
+  callbackMomo(@Query() Query: MomoCallbackDto | any, @Response() res: any) {
+    return this.paymentMethodsService.callbackMomo(Query, res);
   }
 
   // ! Payment VNPay
@@ -94,18 +86,11 @@ export class PaymentMethodsController {
     return this.paymentMethodsService.vnpay(id, req, res);
   }
 
-  // ! Payment VNPay Success
-  @Get('vnpay-success')
+  // ! VNPay Callback
+  @Get('vnpay-callback')
   @isPublic()
-  successVNPay(@Query() query: VNPaySuccessDto, @Response() res: any) {
-    return this.paymentMethodsService.successVNPay(query, res);
-  }
-
-  // ! Payment VNPay Fail
-  @Get('vnpay-fail')
-  @isPublic()
-  failVNPay(@Query() query: any, @Response() res: any) {
-    return this.paymentMethodsService.failVNPay(query, res);
+  callbackVnpay(@Query() query: any, @Response() res: any) {
+    return this.paymentMethodsService.callbackVNPay(query, res);
   }
 
   // ! OnePay
@@ -138,17 +123,10 @@ export class PaymentMethodsController {
     return this.paymentMethodsService.onepay(id, req, res);
   }
 
-  // ! OnePay Success
-  @Get('onepay-success')
+  // ! OnePay Callback
+  @Get('onepay-callback')
   @isPublic()
-  successOnePay(@Query() query: any, @Response() res: any) {
-    return this.paymentMethodsService.successOnePay(query, res);
-  }
-
-  // ! OnePay Fail
-  @Get('onepay-fail')
-  @isPublic()
-  failOnePay(@Query() query: any, @Response() res: any) {
-    return this.paymentMethodsService.failOnePay(query, res);
+  callbackOnepay(@Query() query: any, @Response() res: any) {
+    return this.paymentMethodsService.callbackOnepay(query, res);
   }
 }

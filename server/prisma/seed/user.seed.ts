@@ -191,7 +191,7 @@ export const userSeed = async (count: number) => {
     await prisma.users.create({
       data: {
         username: `${lastName[Math.floor(Math.random() * lastName.length)]} ${firstName[Math.floor(Math.random() * firstName.length)]} ${number[Math.floor(Math.random() * number.length)]}`,
-        email: `${MakeSlugger(lastName[Math.floor(Math.random() * lastName.length)])}${uid}${MakeSlugger(firstName[Math.floor(Math.random() * firstName.length)])}${number[Math.floor(Math.random() * number.length)]}${randomUnique + count + 1}${uid}${uid}@gmail.com`,
+        email: `${MakeSlugger(lastName[Math.floor(Math.random() * lastName.length)])}${MakeSlugger(firstName[Math.floor(Math.random() * firstName.length)])}${number[Math.floor(Math.random() * number.length)]}${randomUnique + count + 1 + i}${uid}${i}@gmail.com`,
         password: hashedPassword,
         phone: `0${Math.floor(Math.random() * 1000000000)}`,
       },

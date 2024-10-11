@@ -19,6 +19,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('products')
 @Controller('products')
@@ -101,6 +102,7 @@ export class ProductsController {
 
   // ! Get all products
   @Get('/get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

@@ -75,10 +75,10 @@ export class StaffsService {
       const search = query.search || '';
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
+        : '';
       const endDate = query.endDate
         ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -154,10 +154,10 @@ export class StaffsService {
       const search = query.search || '';
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
+        : '';
       const endDate = query.endDate
         ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
 
       const sortRangeDate: any =
         startDate && endDate

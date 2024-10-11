@@ -19,6 +19,7 @@ import { UpdateDecorDto } from './dto/update-decor.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('decors')
 @Controller('decors')
@@ -89,6 +90,7 @@ export class DecorsController {
 
   // ! Get All Decors
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

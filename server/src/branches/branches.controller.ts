@@ -25,6 +25,7 @@ import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { ImageUploadBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('branches')
 @UseGuards(AuthGuard)
@@ -136,6 +137,7 @@ export class BranchesController {
 
   // ! Get All Branchs
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

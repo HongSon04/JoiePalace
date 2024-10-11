@@ -249,8 +249,8 @@ export class BookingsController {
   }
 
   // ! Get Booking For Next 14 Days
-  @isPublic()
   @Get('get-booking-list')
+  @isPublic()
   getNext7Days() {
     return this.bookingsService.getBookingForNext14Days();
   }

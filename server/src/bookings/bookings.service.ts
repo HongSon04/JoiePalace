@@ -185,12 +185,21 @@ export class BookingsService {
       const priceSort = query?.priceSort?.toLowerCase();
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
       const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 99999999);
+
+      // ? Range Date Conditions
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
       // ? Where Conditions
       const whereConditions: any = {
         deleted: false,
@@ -218,6 +227,7 @@ export class BookingsService {
             },
           },
         ],
+        ...sortRangeDate,
       };
       // ? Price Conditions
       if (minPrice >= 0) {
@@ -311,12 +321,21 @@ export class BookingsService {
       const priceSort = query?.priceSort?.toLowerCase();
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
       const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 99999999);
+
+      // ? Range Date Conditions
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
       // ? Where Conditions
       const whereConditions: any = {
         deleted: true,
@@ -344,6 +363,7 @@ export class BookingsService {
             },
           },
         ],
+        ...sortRangeDate,
       };
       // ? Price Conditions
       if (minPrice >= 0) {
