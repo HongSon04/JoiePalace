@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "deposits" ALTER COLUMN "transactionID" SET DATA TYPE TEXT,
+ALTER COLUMN "name" DROP NOT NULL,
+ALTER COLUMN "email" DROP NOT NULL,
+ALTER COLUMN "payment_method" DROP NOT NULL;

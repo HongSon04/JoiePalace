@@ -16,6 +16,7 @@ import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('menus')
 @Controller('menus')
@@ -24,6 +25,7 @@ export class MenusController {
 
   // ! Create Menu
   @Post('create')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -58,6 +60,7 @@ export class MenusController {
 
   // ! Get All Menu
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -144,6 +147,7 @@ export class MenusController {
 
   // ! Get Menu By Id
   @Get('get/:menu_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

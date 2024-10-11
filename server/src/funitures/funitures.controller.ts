@@ -19,6 +19,7 @@ import { UpdateFunitureDto } from './dto/update-funiture.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterFunitureDto } from './dto/filter-funiture.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('funitures')
 @Controller('funitures')
@@ -90,6 +91,7 @@ export class FunituresController {
 
   // ! Get all funitures
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
