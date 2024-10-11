@@ -7,10 +7,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  // Enable CORS
-  app.enableCors();
-
+  const PORT = 5000;
   const config = new DocumentBuilder()
     .setTitle('JoiePlace API')
     .setDescription('HOHOHOHO')
@@ -34,10 +31,15 @@ async function bootstrap() {
     },
   });
 
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  });
+
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(5000);
-  console.log(`Application is running on: http://localhost:5000/api`);
+  await app.listen(PORT);
+  console.log(`Application is running on: http://localhost:${PORT}/api`);
 }
 bootstrap();

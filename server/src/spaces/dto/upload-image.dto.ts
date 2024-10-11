@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UploadImageDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   image: string;
 }
 
 export class DeleteImageDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   image_url: string;
 }

@@ -173,24 +173,25 @@ const number = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const MakeSlugger = (str: string): string => {
   return slugify(str, {
     replacement: '',
-    remove: undefined, // ? Loại bỏ các ký tự không mong muốn
-    lower: true, // ? Chuyển tất cả ký tự thành chữ thường
-    strict: false, // ? Loại bỏ ký tự không hợp lệ từ URL
-    locale: 'vi', // ? Chuyển đổi ký tự tiếng Việt
-    trim: true, // ? Loại bỏ khoảng trắng ở đầu và cuối chuỗi
+    remove: undefined,
+    lower: true,
+    strict: false,
+    locale: 'vi',
+    trim: true,
   });
 };
 
 const hashedPassword = bcrypt.hashSync('password123', 10);
 const dateNow = Number(new Date());
 const randomUnique = Math.floor(Math.random() * 90000000000000) + dateNow;
+const uid = uniqid();
 
 export const userSeed = async (count: number) => {
   for (let i = 0; i < count; i++) {
     await prisma.users.create({
       data: {
         username: `${lastName[Math.floor(Math.random() * lastName.length)]} ${firstName[Math.floor(Math.random() * firstName.length)]} ${number[Math.floor(Math.random() * number.length)]}`,
-        email: `${MakeSlugger(lastName[Math.floor(Math.random() * lastName.length)])}${uniqid}${MakeSlugger(firstName[Math.floor(Math.random() * firstName.length)])}${number[Math.floor(Math.random() * number.length)]}${randomUnique + count + 1}${uniqid}${uniqid}@gmail.com`,
+        email: `${MakeSlugger(lastName[Math.floor(Math.random() * lastName.length)])}${MakeSlugger(firstName[Math.floor(Math.random() * firstName.length)])}${number[Math.floor(Math.random() * number.length)]}${randomUnique + count + 1 + i}${uid}${i}@gmail.com`,
         password: hashedPassword,
         phone: `0${Math.floor(Math.random() * 1000000000)}`,
       },

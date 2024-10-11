@@ -2,19 +2,23 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
 export class StageUpdateDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsOptional()
-  location_id: number;
+  branch_id: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsOptional()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsOptional()
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
+  @IsOptional()
+  capacity: number;
+
+  @ApiProperty({ required: true })
   @IsOptional()
   images: string[];
 }

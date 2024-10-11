@@ -47,6 +47,7 @@ function CustomInput(props) {
         value={parseAbsoluteToLocal(value)}
         {...register(props.name, validation)}
         aria-label={ariaLabel}
+        ref={props.ref}
       />
     );
 
@@ -86,21 +87,39 @@ function CustomInput(props) {
       {props.multiLine ? (
         <Textarea
           {...props}
+          ref={props.ref}
           aria-label={props.ariaLabel}
           {...register(props.name, props.validation)}
           errorMessage={`${props.ariaLabel} ${
             inputError?.error?.message || props.errorMessage
           }`}
+          classNames={
+            props.classNames || {
+              label: "!text-white font-bold",
+              inputWrapper: "!bg-whiteAlpha-100",
+              input: "!text-white",
+              placeholder: "!text-gray-400",
+            }
+          }
         />
       ) : (
         <Input
           {...props}
           {...register(props.name, props.validation)}
+          ref={props.ref}
           value={props.value}
           onChange={props.onChange}
           errorMessage={`${props.ariaLabel} ${
             inputError?.error?.message || props.errorMessage
           }`}
+          classNames={
+            props.classNames || {
+              label: "!text-white font-bold",
+              inputWrapper: "!bg-whiteAlpha-100",
+              input: "!text-white",
+              placeholder: "!text-gray-400",
+            }
+          }
           aria-label={props.ariaLabel}
         />
       )}
