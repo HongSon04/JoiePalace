@@ -34,7 +34,7 @@ export class StagesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -104,7 +104,7 @@ export class StagesController {
           slug: 'string',
           description: 'string',
           images: 'object',
-          location_id: 'number',
+          branch_id: 'number',
           created_at: 'date',
           updated_at: 'date',
         },
@@ -132,8 +132,8 @@ export class StagesController {
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả sảnh theo chi nhánh' })
-  async getAll(@Query('location_id') location_id: number) {
-    return await this.stagesService.getAll(location_id);
+  async getAll(@Query('branch_id') branch_id: number) {
+    return await this.stagesService.getAll(branch_id);
   }
 
   // ! Get Stage By ID
@@ -148,7 +148,7 @@ export class StagesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -184,7 +184,7 @@ export class StagesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },

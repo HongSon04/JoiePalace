@@ -34,7 +34,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -91,8 +91,8 @@ export class SpacesController {
     return this.spacesService.createSpace(body, files);
   }
 
-  // ! Find Spaces By Location ID
-  @Get('find-by-location/:location_id')
+  // ! Find Spaces By Branch ID
+  @Get('find-by-branch/:branch_id')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -103,7 +103,7 @@ export class SpacesController {
           slug: 'string',
           description: 'string',
           images: 'object',
-          location_id: 'number',
+          branch_id: 'number',
           created_at: 'date',
           updated_at: 'date',
         },
@@ -123,8 +123,8 @@ export class SpacesController {
     },
   })
   @ApiOperation({ summary: 'Tìm kiếm không gian theo ID địa điểm' })
-  async findSpacesByLocation(@Param('location_id') location_id: number) {
-    return this.spacesService.findSpacesByLocation(location_id);
+  async findSpacesByBranch(@Param('branch_id') branch_id: number) {
+    return this.spacesService.findSpacesByBranch(branch_id);
   }
 
   // ! Find Space By ID
@@ -138,7 +138,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -172,7 +172,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -207,7 +207,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },

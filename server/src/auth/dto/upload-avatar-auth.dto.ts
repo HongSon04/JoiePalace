@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UploadAvatarAuthDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   avatar: string;
 }

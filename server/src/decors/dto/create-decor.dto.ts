@@ -2,23 +2,23 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsArray, IsString, ArrayNotEmpty } from 'class-validator';
 
 export class CreateDecorDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Tên trang trí không được để trống' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
   short_description: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Giá không được để trống' })
   price: number;
   
-  @ApiProperty()
+  @ApiProperty({ required: true })
   images: string[];
 }
 
