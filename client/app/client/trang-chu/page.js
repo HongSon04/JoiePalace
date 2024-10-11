@@ -7,7 +7,7 @@ import TextFade from "@/app/_components/TextFade";
 import MultiCarousel from "@/app/_components/MultiCarouselSlider";
 import { useEffect, useRef, useState } from "react";
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
-import "@/app/_styles/index.css";
+import "@/app/_styles/client.css";
 import IconButton from "@/app/_components/IconButton";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -143,7 +143,7 @@ function Home() {
     delay();
   }, []);
   const handleSlideChange = (nextSlide) => {
-    setCurrentSlide(nextSlide)
+    setCurrentSlide(nextSlide);
   };
   return (
     <ScrollFullPage>
@@ -590,81 +590,105 @@ function Home() {
         </Carousel>
       </section>
       {/* information */}
-      <section className="section w-screen h-screen flex px-44 pt-24 pb-9 gap-10" id="section-information">
-        <div className="w-1/2 h-full flex flex-col gap-10">
-          <h1 className="uppercase text-gold font-bold text-5xl leading-[100%]">
-            thông tin liên hệ
-          </h1>
-          <form className="w-full h-auto flex flex-col gap-5 overflow-y-scroll pr-1" id="form-information">
-            <InputIndex type="text" placeholder="Họ và tên*" />
-            <InputIndex type="number" placeholder="Số điện thoại*" />
-            <InputIndex type="email" placeholder="Email*" />
-            <InputIndex type="text" placeholder="Công ty*" />
-            <div className="w-full py-3 flex items-center justify-between border border-b-white border-t-0 border-l-0 border-r-0">
-              <span>Sự kiện*</span>
-              <div className="h-full flex items-center gap-3">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accountType"
-                    value="business"
-                    className="form-radio text-green-600 focus:ring-green-500 h-4 w-4"
-                  />
-                  <span className="ml-2 text-white">Doanh nghiệp</span>
-                </label>
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="accountType"
-                    value="business"
-                    className="form-radio text-green-600 focus:ring-green-500 h-4 w-4"
-                  />
-                  <span className="ml-2 text-white">Cá nhân</span>
-                </label>
+      <section
+        className="section w-screen h-screen flex px-44 pt-24 pb-9 gap-10"
+        id="section-information"
+      >
+        <TextFade
+          settings={{
+            hidden: { opacity: 0, x: 0, y: 70 },
+            visible: {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              transition: {
+                duration: 2,
+                delay: 0.25,
+                ease: "easeOut",
+              },
+            },
+          }}
+          styles="w-screen flex gap-10"
+          replayEffect={true}
+        >
+          <div className="w-1/2 h-full flex flex-col gap-10">
+            <h1 className="uppercase text-gold font-bold text-5xl leading-[100%]">
+              thông tin liên hệ
+            </h1>
+            <form
+              className="w-full h-auto flex flex-col gap-5 overflow-y-scroll pr-1"
+              id="form-information"
+            >
+              <InputIndex type="text" placeholder="Họ và tên*" />
+              <InputIndex type="number" placeholder="Số điện thoại*" />
+              <InputIndex type="email" placeholder="Email*" />
+              <InputIndex type="text" placeholder="Công ty*" />
+              <div className="w-full py-3 flex items-center justify-between border border-b-white border-t-0 border-l-0 border-r-0">
+                <span>Sự kiện*</span>
+                <div className="h-full flex items-center gap-3">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="accountType"
+                      value="business"
+                      className="form-radio text-green-600 focus:ring-green-500 h-4 w-4"
+                    />
+                    <span className="ml-2 text-white">Doanh nghiệp</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="accountType"
+                      value="business"
+                      className="form-radio text-green-600 focus:ring-green-500 h-4 w-4"
+                    />
+                    <span className="ml-2 text-white">Cá nhân</span>
+                  </label>
+                </div>
               </div>
-            </div>
-            <div className="w-full flex items-center justify-between">
-              <span>Địa điểm*</span>
-              <div className="w-[40%] h-full flex items-center gap-3">
-                <select
-                  name=""
-                  id=""
-                  className="w-full border border-darkGreen-700 p-3 py-2 rounded-sm"
-                >
-                  <option className="text-black" value="1">
-                    Hoàng Văn Thụ
-                  </option>
-                  <option className="text-black" value="2">
-                    Phạm Văn Đồng
-                  </option>
-                  <option className="text-black" value="3">
-                    Võ Văn Kiệt
-                  </option>
-                </select>
+              <div className="w-full flex items-center justify-between">
+                <span>Địa điểm*</span>
+                <div className="w-[40%] h-full flex items-center gap-3">
+                  <select
+                    name=""
+                    id=""
+                    className="w-full border border-darkGreen-700 p-3 py-2 rounded-sm"
+                  >
+                    <option className="text-black" value="1">
+                      Hoàng Văn Thụ
+                    </option>
+                    <option className="text-black" value="2">
+                      Phạm Văn Đồng
+                    </option>
+                    <option className="text-black" value="3">
+                      Võ Văn Kiệt
+                    </option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <InputIndex type="number" min="0" placeholder="Số lượng khách*" />
-            <InputIndex type="datetime-local" placeholder="Thời gian*" />
-            <InputIndex
-              type="text"
-              placeholder="Ghi chú*"
-              styles="overflow-hidden"
+              <InputIndex type="number" min="0" placeholder="Số lượng khách*" />
+              <InputIndex type="datetime-local" placeholder="Thời gian*" />
+              <InputIndex
+                type="text"
+                placeholder="Ghi chú*"
+                styles="overflow-hidden"
+              />
+              <div className="w-full flex justify-end">
+                <ButtonDiscover name={"Gửi"} className={"w-auto px-6"} />
+              </div>
+            </form>
+          </div>
+          <div className="w-1/2 h-full rounded-sm overflow-hidden">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7893.373649501081!2d106.68365245869786!3d10.804445099199677!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528d0911a5c55%3A0xef4a80f1f2c1a13b!2zQuG7h25oIHZp4buHbiDEkGEgS2hvYSBIb8OgbiBN4bu5IFPDoGkgR8Oybg!5e1!3m2!1svi!2s!4v1726154120512!5m2!1svi!2s"
+              width="100%"
+              height="100%"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
             />
-            <div className="w-full flex justify-end">
-              <ButtonDiscover name={"Gửi"} className={"w-auto px-6"} />
-            </div>
-          </form>
-        </div>
-        <div className="w-1/2 h-full rounded-sm overflow-hidden">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7893.373649501081!2d106.68365245869786!3d10.804445099199677!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528d0911a5c55%3A0xef4a80f1f2c1a13b!2zQuG7h25oIHZp4buHbiDEkGEgS2hvYSBIb8OgbiBN4bu5IFPDoGkgR8Oybg!5e1!3m2!1svi!2s!4v1726154120512!5m2!1svi!2s"
-            width="100%"
-            height="100%"
-            allowfullscreen=""
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-          />
-        </div>
+          </div>
+        </TextFade>
       </section>
       <section className="section">
         <Footer />

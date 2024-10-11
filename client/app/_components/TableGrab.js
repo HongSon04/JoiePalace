@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'next/link';
 import React, { useRef, useState } from 'react';
 import CustomPagination from './CustomPagination';
@@ -23,7 +24,7 @@ const TableGrab = () => {
             tables: '300 + 2',
             branch: 'Phạm Văn Đồng',
             hall: 'Hall A'
-        },
+        }
     ];
 
     const overflowContainer = useRef(null);
@@ -50,71 +51,58 @@ const TableGrab = () => {
     };
 
     return (
-        <>
-            <div className='w-full relative'>
-                <div
-                    ref={overflowContainer}
-                    className="overflow-hidden max-w-full rounded-lg mt-6 absolute w-full" 
-                    onMouseDown={handleMouseDown}
-                    onMouseLeave={handleMouseLeaveOrUp}
-                    onMouseUp={handleMouseLeaveOrUp}
-                    onMouseMove={handleMouseMove}
-                    style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-                >
-                    <table className="table min-w-[2000px] text-left text-sm">
-                        <thead>
-                            <tr>
-                                <th className='w-fit'>Mã tiệc</th>
-                                <th className='w-fit'>Loại tiệc</th>
-                                <th className='w-fit'>Chủ tiệc</th>
-                                <th className='w-fit'>Ngày đặt</th>
-                                <th className='w-fit'>Tổng giá trị</th>
-                                <th className='w-fit'>Tiền cọc</th>
-                                <th className='w-fit'>Ngày đặt cọc</th>
-                                <th className='w-fit'>Còn lại phải thanh toán</th>
-                                <th className='w-fit'>Ngày tổ chức</th>
-                                <th className='w-fit'>Giờ tổ chức</th>
-                                <th className='w-fit'>Ngày thanh toán</th>
-                                <th className='w-fit'>Tình trạng thanh toán</th>
-                                <th className='w-fit'>Số lượng khách dự kiến</th>
-                                <th className='w-fit'>Số bàn (chính thức + dự phòng)</th>
-                                <th className='w-fit'>Chi nhánh</th>
-                                <th className='w-fit'>Sảnh</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {requests.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{item.eventCode}</td>
-                                    <td>{item.eventType}</td>
-                                    <td>{item.host}</td>
-                                    <td>{item.bookingDate}</td>
-                                    <td>{item.totalValue}</td>
-                                    <td>{item.deposit}</td>
-                                    <td>{item.depositDate}</td>
-                                    <td>{item.remaining}</td>
-                                    <td>{item.eventDate}</td>
-                                    <td>{item.eventTime}</td>
-                                    <td>{item.paymentDate}</td>
-                                    <td>{item.paymentStatus}</td>
-                                    <td>{item.expectedGuests}</td>
-                                    <td>{item.tables}</td>
-                                    <td>{item.branch}</td>
-                                    <td>{item.hall}</td>
-                                    <td className='w-fit'>
-                                        <Link href='' className="text-cyan-400 hover:text-cyan-400 font-bold">Chi tiết</Link>
-                                    </td>
-                                </tr>
+        <div className="">
+            <div
+                ref={overflowContainer}
+                className="!overflow-x-auto mt-6"
+                onMouseDown={handleMouseDown}
+                onMouseLeave={handleMouseLeaveOrUp}
+                onMouseUp={handleMouseLeaveOrUp}
+                onMouseMove={handleMouseMove}
+            >
+                <table className="text-sm text-left table table-auto  !overflow-x-scroll">
+                    <thead>
+                        <tr>
+                            {['Mã tiệc', 'Loại tiệc', 'Chủ tiệc', 'Ngày đặt', 'Tổng giá trị', 'Tiền cọc', 'Ngày đặt cọc', 'Còn lại phải thanh toán', 'Ngày tổ chức', 'Giờ tổ chức', 'Ngày thanh toán', 'Tình trạng thanh toán', 'Số lượng khách dự kiến', 'Số bàn', 'Chi nhánh', 'Sảnh', ''].map((header) => (
+                                <th key={header}>
+                                    {header}
+                                </th>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
-                {/* <div className='mt-4'>
-                    <CustomPagination total={requests.length} />
-                </div> */}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {requests.map((item) => (
+                            <tr key={item.id}>
+                                <td>{item.eventCode}</td>
+                                <td>{item.eventType}</td>
+                                <td>{item.host}</td>
+                                <td>{item.bookingDate}</td>
+                                <td>{item.totalValue}</td>
+                                <td>{item.deposit}</td>
+                                <td>{item.depositDate}</td>
+                                <td>{item.remaining}</td>
+                                <td>{item.eventDate}</td>
+                                <td>{item.eventTime}</td>
+                                <td>{item.paymentDate}</td>
+                                <td>{item.paymentStatus}</td>
+                                <td>{item.expectedGuests}</td>
+                                <td>{item.tables}</td>
+                                <td>{item.branch}</td>
+                                <td>{item.hall}</td>
+                                <td className="w-fit">
+                                    <Link href="#" className="text-cyan-500 hover:text-cyan-700 font-bold">
+                                        Chi tiết
+                                    </Link>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-        </>
+            <div className="mt-4">
+                <CustomPagination total={requests.length} />
+            </div>
+        </div>
     );
 };
 

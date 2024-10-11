@@ -8,40 +8,52 @@ function CustomSelect({
   placeholder = "",
   selectClassName = "",
   itemClassName = "",
+  triggerClassName = "",
+  labelPlacement,
+  labelClassName,
+  valueClassName,
+  ariaLabel,
+  // defaultValue,
+  onSelectionChange = () => {},
   onChange = () => {},
+  selectedKeys,
+  isRequired,
 }) {
-  const defaultValue = options.find((item) => item.value === value)?.value;
+  const defaultValue = options.find((item) => item.key === value)?.key;
+  // const _defaultValue = defaultValue.value;
 
   return (
     <div className="flex justify-end w-full">
       <Select
-        onChange={onChange}
+        isRequired={isRequired}
+        value={value}
+        labelPlacement={labelPlacement}
+        onChange={(e) => onChange(e)}
         className={selectClassName}
         classNames={{
-          base: "!overflow-hidden !text-white",
-          trigger: "text-sm text-gray-100 !bg-white/20",
-          value: "text-sm !text-white",
+          base: "!overflow-hidden !text-gray-600",
+          trigger: `text-sm text-gray-600 !bg-blackAlpha-100 ${triggerClassName}`,
+          value: `text-sm !text-gray-600 ${valueClassName}`,
           innerWrapper: "!overflow-hidden",
-          popoverContent: "bg-white/20 backdrop-blur-lg gap-1",
+          popoverContent: "bg-white border border-gray-50 !text-gray-600 gap-1",
+          label: labelClassName,
         }}
         variant={variant}
         label={label}
-        aria-label="Select"
+        aria-label={ariaLabel}
         placeholder={placeholder}
         defaultSelectedKeys={defaultValue ? [defaultValue.toString()] : []}
+        selectedKeys={[selectedKeys]}
       >
-        <SelectSection className="overflow-hidden">
-          {options.map((item) => (
-            <SelectItem
-              className={itemClassName}
-              textValue={item.name}
-              key={item.id}
-              value={item.value}
-            >
-              <div className={item?.className}>{item.name}</div>
-            </SelectItem>
-          ))}
-        </SelectSection>
+        {options.map((item) => (
+          <SelectItem
+            className={itemClassName}
+            textValue={item.label}
+            key={item.key}
+          >
+            <div className={item?.className}>{item.label}</div>
+          </SelectItem>
+        ))}
       </Select>
     </div>
   );

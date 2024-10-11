@@ -170,24 +170,20 @@ body {
   .example {
     @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
   }
-  
+
   .bg-primary {
     background-color: #022C25 !important;
   }
 
   .admin-panel {
-    border-radius: 24px;
-    padding: 20px;
+    /* border-radius: 24px; */
+    /* padding: 20px; */
     display: flex;
     flex-direction: column;
     flex: 1 0 0;
     gap: 30px;
-    background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
-    backdrop-filter: blur(20px);
-  }
-
-  .admin-main {
-    @apply min-h-[100vh]
+    /* background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08)); */
+    /* backdrop-filter: blur(20px); */
   }
 
   .flex-center {
@@ -195,8 +191,9 @@ body {
   }
 
   .glass {
-    background: var(--whiteAlpha-200, rgba(255, 255, 255, 0.08));
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.08) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    /* backdrop-filter: blur(20px); */
   }
 
   .icon-button {
@@ -211,11 +208,22 @@ body {
   .no-border * {
     border: none !important;
   }
-}
 
-body::-webkit-scrollbar {
-  display: none;
-  /* Ẩn thanh cuộn trên Chrome, Safari */
+  .glass-button {
+    @apply glass rounded-full px-4 py-2 text-white font-semibold hover:bg-whiteAlpha-300 hover:text-gray-100
+  }
+
+  .select {
+    @apply bg-whiteAlpha-200 rounded-xl px-4 py-2 text-white text-base hover:bg-whiteAlpha-300 hover:text-gray-100
+  }
+
+  .option {
+    @apply bg-whiteAlpha-200 rounded-md px-4 py-2 text-gray-600 font-normal hover:bg-whiteAlpha-300 hover:text-gray-100
+  }
+
+  .abs-center {
+    @apply absolute inset-0 flex-center
+  }
 }
 
 .bgYellow::before {
@@ -357,37 +365,46 @@ body::-webkit-scrollbar {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(33, 15, 15, 0.3);
   border-radius: 100rem;
 }
 
 .table {
   border-collapse: collapse;
   width: 100%;
-  border-right: 1px solid #5B5B5B;
-  border-left: 1px solid #5B5B5B;
-  border-bottom: 1px solid #5B5B5B;
   overflow: hidden;
   border-radius: 10px !important;
-  background: rgba(255, 255, 255, 0.1);
+}
+
+.table td:is(:not(:last-child)) {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.table th:is(:not(:last-child)) {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.table td:last-child,
+.table th:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.table tr:last-child td:last-child {
+  border-bottom: none;
 }
 
 .table th,
 .table td {
-  /* display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex: 1 0 0;
-  align-self: stretch; */
-
-  border-top: 1px solid #5B5B5B;
-  border-left: 1px solid #5B5B5B;
+  overflow: hidden;
+  color: white;
 }
 
 .table th {
   font-weight: 600;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .table td {
@@ -395,16 +412,82 @@ body::-webkit-scrollbar {
   padding: 10px 12px;
   font-size: 14px;
   font-weight: 400;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.02);
 }
-.bg-image-tintuc{
+
+.bg-image-tintuc {
   background-image: url('/banner-news-detail.png');
   background-size: cover;
 }
-.div-children-banner:hover  {
+
+.div-children-banner:hover {
   opacity: 0.9;
 }
-.thongbao:hover div{
+
+.thongbao:hover div {
   background-color: red;
-  color:white;
+  color: white;
+}
+
+select {
+  padding: 12px 16px;
+  border: none;
+  background: white;
+  border-radius: 10px;
+  color: gray
+}
+/* tag*/
+
+
+.status{
+  padding: 6px;
+  border-radius: 4px;
+}
+.da-dat-coc{
+  background-color: #FEEBCB;
+  color: #ED8936;
+}
+.da-thanh-toan{
+  background-color: #C6F6D5;
+  color: #48BB78;
+}
+.chua-thanh-toan{
+  background-color: #FEFCBF;
+  color: #B7791F;
+}
+.da-hoan-tien{
+  background-color: #38B2AC;
+  color: #B2F5EA;
+}
+.da-huy{
+  background-color: #FED7D7;
+  color:  #F56565;
+}
+
+.tag{
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-radius: 8px;
+}
+.tag p{
+  font-size: 14px;
+  font-style: medium;
+}
+.tag-copper{
+  background-color: rgba(0, 0, 0, 0.24);
+  color: #A25915;
+}
+.tag-silver{
+  background-color: #333333;
+  color: #C0C0C0;
+}
+.tag-gold{
+  background-color: #FFAE00;
+  color: white;
+}
+.tag-vip{
+  background-color: rgba(0, 0, 0, 0.92);
+  color: #FFAE00;
 }

@@ -1,35 +1,31 @@
 export const _require = {
   required: {
     value: true,
-    message: "required",
+    message: "không được để trống",
   },
 };
 
 export const requireLength = {
   minLength: {
     value: 1,
-    message: "required",
+    message: "phải nhiều hơn 1 ký tự",
   },
   maxLength: {
-    value: 100,
-    message: "max length is 100",
+    value: 35,
+    message: "phải ít hơn 35 ký tự",
   },
 };
 
-export const email = {
+export const emailValidation = {
   pattern: {
     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-    message: "invalid email address",
+    message: "không hợp lệ",
   },
 };
 
-export const password = {
-  minLength: {
-    value: 6,
-    message: "password must be at least 6 characters",
-  },
-  maxLength: {
-    value: 20,
-    message: "password must not exceed 20 characters",
+export const passwordValidation = {
+  pattern: {
+    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+    message: "phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số",
   },
 };

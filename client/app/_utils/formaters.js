@@ -8,3 +8,12 @@ export function formatDateTime(dateTime) {
 export function formatRelativeTime(dateTime) {
   return formatDistanceToNow(new Date(dateTime), { addSuffix: true });
 }
+
+export function formatPrice(price) {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  })
+    .format(price)
+    .replace("₫", "VND");
+}
