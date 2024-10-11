@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateAvatarStaffDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   avatar: string;
 }

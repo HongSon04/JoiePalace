@@ -13,24 +13,24 @@ export enum FunitureType {
 }
 
 export class CreateFunitureDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Tên không được để trống' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
   short_description: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Giá không được để trống' })
   price: number;
 
-  @ApiProperty({ enum: FunitureType }) // Định nghĩa enum để Swagger nhận diện
-  @IsEnum(FunitureType, { message: 'Loại nội thất không hợp lệ' })
+  @ApiProperty({ example: 'table | chair' }) // Định nghĩa enum để Swagger nhận diện
+  @IsEnum(FunitureType, { message: 'Loại nội thất không hợp lệ table | chair' })
   type: FunitureType; // Sử dụng enum ở đây
 
   @ApiProperty({ type: [String] })

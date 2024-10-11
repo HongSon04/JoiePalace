@@ -21,7 +21,7 @@ export class MenusService {
   // ! Create Menu
   async create(createMenuDto: CreateMenuDto) {
     try {
-      const { name, description, foods, price, is_show } = createMenuDto;
+      const { name, description, products, price, is_show } = createMenuDto;
       const slug = MakeSlugger(name);
 
       const findName = await this.prismaService.menus.findFirst({
@@ -34,24 +34,36 @@ export class MenusService {
         throw new HttpException('Tên menu đã tồn tại', HttpStatus.BAD_REQUEST);
       }
 
-      const findFoods = await this.prismaService.foods.findMany({
+      const findProducts = await this.prismaService.products.findMany({
         where: {
           id: {
-            in: foods,
+            in: products,
           },
         },
       });
 
-      if (findFoods.length !== foods.length) {
+      if (findProducts.length !== products.length) {
         throw new HttpException(
           'Có món ăn không tồn tại',
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      const connectFoods = foods.map((foodId) => ({
+      const connectproducts = products.map((foodId) => ({
         id: Number(foodId),
       }));
+
+      // Check Food Price (Total Amount) equal with price of menu
+      const totalAmount = findProducts.reduce(
+        (acc, curr) => acc + curr.price,
+        0,
+      );
+      if (totalAmount !== Number(price)) {
+        throw new HttpException(
+          'Giá của menu không trùng với tổng giá của các món ăn',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
       const menus = await this.prismaService.menus.create({
         data: {
@@ -60,8 +72,8 @@ export class MenusService {
           price: Number(price),
           slug,
           is_show,
-          foods: {
-            connect: connectFoods,
+          products: {
+            connect: connectproducts,
           },
         },
       });
@@ -87,7 +99,7 @@ export class MenusService {
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
     const skip = (page - 1) * itemsPerPage;
-    const priceSort = query.priceSort.toLowerCase();
+    const priceSort = query?.priceSort?.toLowerCase();
 
     const startDate = query.startDate
       ? FormatDateToStartOfDay(query.startDate)
@@ -113,7 +125,7 @@ export class MenusService {
           },
         },
         {
-          foods: {
+          products: {
             some: {
               name: {
                 contains: search,
@@ -152,7 +164,7 @@ export class MenusService {
         this.prismaService.menus.findMany({
           where: whereConditions,
           include: {
-            foods: {
+            products: {
               include: {
                 tags: true,
               },
@@ -205,7 +217,7 @@ export class MenusService {
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
     const skip = (page - 1) * itemsPerPage;
-    const priceSort = query.priceSort.toLowerCase();
+    const priceSort = query?.priceSort?.toLowerCase();
 
     const startDate = query.startDate
       ? FormatDateToStartOfDay(query.startDate)
@@ -231,7 +243,7 @@ export class MenusService {
           },
         },
         {
-          foods: {
+          products: {
             some: {
               name: {
                 contains: search,
@@ -270,7 +282,7 @@ export class MenusService {
         this.prismaService.menus.findMany({
           where: whereConditions,
           include: {
-            foods: {
+            products: {
               include: {
                 tags: true,
               },
@@ -323,7 +335,7 @@ export class MenusService {
       const menu = await this.prismaService.menus.findUnique({
         where: { id: Number(id) },
         include: {
-          foods: {
+          products: {
             include: {
               tags: true,
             },
@@ -355,7 +367,7 @@ export class MenusService {
           slug,
         },
         include: {
-          foods: {
+          products: {
             include: {
               tags: true,
             },
@@ -381,7 +393,7 @@ export class MenusService {
 
   // ! Update Menu
   async update(id: number, updateMenuDto: UpdateMenuDto) {
-    const { name, description, foods, price } = updateMenuDto;
+    const { name, description, products, price } = updateMenuDto;
     try {
       const slug = MakeSlugger(name);
       const findMenuByname = await this.prismaService.menus.findFirst({
@@ -397,9 +409,36 @@ export class MenusService {
         throw new HttpException('Tên menu đã tồn tại', HttpStatus.BAD_REQUEST);
       }
 
-      const connectFoods = foods.map((foodId) => ({
+      const findProducts = await this.prismaService.products.findMany({
+        where: {
+          id: {
+            in: products,
+          },
+        },
+      });
+
+      if (findProducts.length !== products.length) {
+        throw new HttpException(
+          'Có món ăn không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const connectproducts = products.map((foodId) => ({
         id: foodId,
       }));
+
+      // Check Food Price (Total Amount) equal with price of menu
+      const totalAmount = findProducts.reduce(
+        (acc, curr) => acc + curr.price,
+        0,
+      );
+      if (totalAmount !== Number(price)) {
+        throw new HttpException(
+          'Giá của menu không trùng với tổng giá của các món ăn',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
       const menu = await this.prismaService.menus.update({
         where: { id: Number(id) },
@@ -408,8 +447,8 @@ export class MenusService {
           description,
           price,
           slug,
-          foods: {
-            set: connectFoods,
+          products: {
+            set: connectproducts,
           },
         },
       });

@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ChangeProfileAuthUserDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   username: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   phone: string;
 }
