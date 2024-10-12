@@ -5,13 +5,13 @@ import { useState } from "react";
 
 const HeaderClient = () => {
   const listMenu = [
-    { id: 1, name: "Địa điểm" },
-    { id: 2, name: "Sự kiện" },
-    { id: 3, name: "Hội nghị" },
-    { id: 4, name: "Tiệc cưới" },
-    { id: 5, name: "Tin tức" },
-    { id: 6, name: "Ưu đãi" },
-    { id: 7, name: "Liên hệ" },
+    { id: 1, name: "Địa điểm", categories: 'dia-diem' , href: '/#' },
+    { id: 2, name: "Sự kiện", categories: 'su-kien', href: 'su-kien' },
+    { id: 3, name: "Hội nghị", categories: 'hoi-nghi', href: 'hoi-nghi' },
+    { id: 4, name: "Tiệc cưới", categories: 'tiec-cuoi', href: 'tiec-cuoi' },
+    { id: 5, name: "Tin tức", categories: 'tin-tuc', href: 'tin-tuc' },
+    { id: 6, name: "Ưu đãi", categories: 'uu-dai', href:'uu-dai' },
+    { id: 7, name: "Liên hệ", categories: 'lien-he', href: 'lien-he' }  
   ];
   const listLocation = [
     { id: 1, name: "Joice Palace Hoàng Văn Thụ" },
@@ -23,7 +23,7 @@ const HeaderClient = () => {
     isShowMenu ? setIsShowMenu(false) : setIsShowMenu(true);
   };
   return (
-    <header className="fixed top-0 left-0 w-full z-50">
+    <header className="fixed top-0 left-0 w-full z-10 text-white">
       <div className="py-4 px-5 w-full h-[90px] flex justify-between items-center bg-transparent">
         <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
           <svg
@@ -36,15 +36,15 @@ const HeaderClient = () => {
           >
             <path d="M3.20731 1.01272C3.1105 0.993357 2.99432 0.993353 2.91687 1.03208C1.87128 1.4387 1.21294 2.92964 1.05804 3.95587C0.573969 7.28627 3.20731 10.1713 5.62766 12.0689C7.77694 13.7534 11.9012 16.5223 14.3409 13.8503C14.6507 13.5211 15.0186 13.037 14.9993 12.553C14.9412 11.7397 14.186 11.1588 13.6051 10.7135C13.1598 10.3843 12.2304 9.47427 11.6495 9.49363C11.1267 9.51299 10.7975 10.0551 10.4684 10.3843L9.88748 10.9652C9.79067 11.062 8.55145 10.2488 8.41591 10.152C7.91248 9.8228 7.4284 9.45491 7.00242 9.04829C6.57644 8.64167 6.18919 8.19632 5.86002 7.73161C5.7632 7.59607 4.96933 6.41495 5.04678 6.31813C5.04678 6.31813 5.72448 5.58234 5.91811 5.2919C6.32473 4.67229 6.63453 4.18822 6.16982 3.45243C5.99556 3.18135 5.78257 2.96836 5.55021 2.73601C5.14359 2.34875 4.73698 1.94213 4.27227 1.61296C4.02055 1.41933 3.59457 1.07081 3.20731 1.01272Z" />
           </svg>
-          <span className="uppercase text-base font-normal cursor-pointer hover:text-[#C0995A]">
+          <span className="uppercase text-base font-normal cursor-pointer hover:text-[#C0995A] max-lg:hidden">
             liên hệ
           </span>
         </div>
         <div>
-          <span className="font-normal text-4xl">JOIE PALACE</span>
+          <span className="font-normal text-4xl max-lg:text-2xl">JOIE PALACE</span>
         </div>
-        <div className="h-full flex items-center gap-14">
-          <div className="flex items-center gap-2">
+        <div className="h-full flex items-center gap-14 ">
+          <div className="flex items-center gap-2 max-lg:hidden">
             <span className="px-2 text-white h-6 flex justify-center items-center rounded-md cursor-pointer">
               en
             </span>
@@ -56,7 +56,7 @@ const HeaderClient = () => {
             className="flex px-4 gap-2 items-center"
             onClick={handleShowMenu}
           >
-            <span className="uppercase text-base font-normal leading-6">
+            <span className="uppercase text-base font-normal leading-6 max-lg:hidden">
               menu
             </span>
             <svg
@@ -76,12 +76,11 @@ const HeaderClient = () => {
       </div>
       {/* popup menu */}
       <div
-        className={`menu px-5 w-full h-screen bg-primary absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${
-          isShowMenu ? "showMenu" : ""
-        }`}
+        className={`menu px-5 w-full h-screen bg-primary z-20 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${isShowMenu ? "showMenu" : ""
+          }`}
       >
         <div className="w-full h-[90px] flex justify-between items-center bg-transparent border-b-[1px] border-white">
-          <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
+          <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer max-sm:hidden">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -92,14 +91,14 @@ const HeaderClient = () => {
             >
               <path d="M3.20731 1.01272C3.1105 0.993357 2.99432 0.993353 2.91687 1.03208C1.87128 1.4387 1.21294 2.92964 1.05804 3.95587C0.573969 7.28627 3.20731 10.1713 5.62766 12.0689C7.77694 13.7534 11.9012 16.5223 14.3409 13.8503C14.6507 13.5211 15.0186 13.037 14.9993 12.553C14.9412 11.7397 14.186 11.1588 13.6051 10.7135C13.1598 10.3843 12.2304 9.47427 11.6495 9.49363C11.1267 9.51299 10.7975 10.0551 10.4684 10.3843L9.88748 10.9652C9.79067 11.062 8.55145 10.2488 8.41591 10.152C7.91248 9.8228 7.4284 9.45491 7.00242 9.04829C6.57644 8.64167 6.18919 8.19632 5.86002 7.73161C5.7632 7.59607 4.96933 6.41495 5.04678 6.31813C5.04678 6.31813 5.72448 5.58234 5.91811 5.2919C6.32473 4.67229 6.63453 4.18822 6.16982 3.45243C5.99556 3.18135 5.78257 2.96836 5.55021 2.73601C5.14359 2.34875 4.73698 1.94213 4.27227 1.61296C4.02055 1.41933 3.59457 1.07081 3.20731 1.01272Z" />
             </svg>
-            <span className="uppercase text-base font-normal cursor-pointer hover:text-[#C0995A]">
+            <span className="uppercase text-base font-normal cursor-pointer hover:text-[#C0995A] ">
               liên hệ
             </span>
           </div>
           <div>
-            <span className="font-normal text-4xl">JOIE PALACE</span>
+            <span className="font-normal text-4xl max-sm:hidden">JOIE PALACE</span>
           </div>
-          <div className="h-full flex items-center gap-14">
+          <div className="h-full flex items-center gap-14 max-sm:w-full max-sm:justify-between">
             <div className="flex items-center gap-2">
               <span className="px-2 text-white h-6 flex justify-center items-center rounded-md cursor-pointer">
                 en
@@ -132,28 +131,37 @@ const HeaderClient = () => {
             </button>
           </div>
         </div>
-        <div className="flex justify-center gap-16">
+        <div className="flex lg:justify-center gap-16 max-lg: justify-between">
           <div>
             <ul className="flex flex-col gap-4">
               {listMenu.map((menu) => (
-                <li
-                  key={menu.id}
-                  className="font-normal h-16 text-5xl flex items-center"
-                >
-                  <Link className="hover:text-[#C0995A]" href={"/"}>
-                    {menu.name}
-                  </Link>
-                </li>
+                <div key={menu.id}>
+                  <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                    <Link className="hover:text-[#C0995A]" href={`/client/${menu.href}`}>
+                      {menu.name}
+                    </Link>
+                  </li>
+                  {menu.categories === "dia-diem" && (
+                    <ul className="lg:hidden mt-[16px]">
+                      {listLocation.map((i) => (
+                        <li key={i.id} className="text-xl my-[16px] font-light">
+                          {i.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               ))}
             </ul>
+
           </div>
           <span className="w-[1px] h-full bg-white"></span>
-          <div>
-            <ul className="flex flex-col gap-4">
+          <div className="max-lg:hidden">
+            <ul className="flex flex-col gap-4 ">
               {listLocation.map((location) => (
                 <li
                   key={location.id}
-                  className="font-normal h-16 text-3xl flex items-center"
+                  className="font-normal h-16 text-3xl flex items-center "
                 >
                   <Link className="hover:text-[#C0995A]" href={"/"}>
                     {location.name}
