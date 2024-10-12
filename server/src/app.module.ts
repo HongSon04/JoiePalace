@@ -24,8 +24,12 @@ import { DepositsModule } from './deposits/deposits.module';
 import { ProductsModule } from './products/products.module';
 import { PaymentMethodsModule } from './payment_methods/payment_methods.module';
 import { BranchesModule } from './branches/branches.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailModule } from './mail/mail.module';
+
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],
@@ -54,6 +58,7 @@ import { BranchesModule } from './branches/branches.module';
     BookingsModule,
     DepositsModule,
     PaymentMethodsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [

@@ -4,10 +4,11 @@ import { AuthController } from './auth.controller';
 import { PrismaService } from 'src/prisma.service';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports: [ConfigModule],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, CloudinaryService],
+  providers: [AuthService, PrismaService, CloudinaryService, MailService],
 })
 export class AuthModule {}

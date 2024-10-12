@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -30,7 +31,6 @@ async function bootstrap() {
       persistAuthorization: true,
     },
   });
-
   app.enableCors({
     origin: '*',
     credentials: true,
@@ -38,6 +38,9 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
+  app.useStaticAssets(join(__dirname, '../', 'public'));
+  app.setBaseViewsDir(join(__dirname, '../', 'templates'));
+  app.setViewEngine('ejs');
 
   await app.listen(PORT);
   console.log(`Application is running on: http://localhost:${PORT}/api`);
