@@ -7,7 +7,6 @@ import TextFade from "@/app/_components/TextFade";
 import MultiCarousel from "@/app/_components/MultiCarouselSlider";
 import { useEffect, useRef, useState } from "react";
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
-import "@/app/_styles/client.css";
 import IconButton from "@/app/_components/IconButton";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";

@@ -4,7 +4,7 @@ import ButtonDiscover from "@/app/_components/ButtonDiscover";
 import Footer from "@/app/_components/FooterClient";
 import InputIndex from "@/app/_components/InputIndexClient";
 import { Image } from "@chakra-ui/react";
-import "@/app/_styles/client.css";
+
 
 const LienHe = () => {
   return (
