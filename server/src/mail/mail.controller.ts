@@ -14,11 +14,10 @@ import { MailService } from './mail.service';
 import { isPublic } from 'decorator/auth.decorator';
 import { ConfirmBookingMailDto } from './dto/ConfirmBookingMail.dto';
 
-@Controller('mail')
+@Controller('api/mail')
 export class MailController {
   constructor(private readonly mailService: MailService) {}
 
-  @Get('send')
   @isPublic()
   async sendUserConfirmationBooking(@Body() body: ConfirmBookingMailDto) {
     await this.mailService.sendUserConfirmationBooking(body);

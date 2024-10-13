@@ -19,7 +19,7 @@ import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('menus')
-@Controller('menus')
+@Controller('api/menus')
 export class MenusController {
   constructor(private readonly menusService: MenusService) {}
 

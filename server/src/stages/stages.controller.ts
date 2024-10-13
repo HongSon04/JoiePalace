@@ -18,7 +18,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { StageUpdateDto } from './dto/stage-update.dto';
 
 @ApiTags('stages')
-@Controller('stages')
+@Controller('api/stages')
 export class StagesController {
   constructor(private readonly stagesService: StagesService) {}
 

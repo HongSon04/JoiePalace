@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const PORT = 5000;
   const config = new DocumentBuilder()
-    .setTitle('JoiePlace API')
+    .setTitle('JoiePalace API')
     .setDescription('HOHOHOHO')
     .setVersion('1.0')
     .addBearerAuth(

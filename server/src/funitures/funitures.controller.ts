@@ -22,7 +22,7 @@ import { FilterFunitureDto } from './dto/filter-funiture.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('funitures')
-@Controller('funitures')
+@Controller('api/funitures')
 export class FunituresController {
   constructor(private readonly funituresService: FunituresService) {}
 

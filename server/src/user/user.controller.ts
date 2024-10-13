@@ -33,7 +33,7 @@ import { Roles } from 'decorator/roles.decorator';
 import { Role } from 'helper/role.enum';
 
 @ApiTags('user')
-@Controller('user')
+@Controller('api/user')
 export class UserController {
   constructor(
     private readonly userService: UserService,

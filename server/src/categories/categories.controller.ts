@@ -19,7 +19,7 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('categories')
-@Controller('categories')
+@Controller('api/categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 

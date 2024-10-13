@@ -26,7 +26,7 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('party-types')
-@Controller('party-types')
+@Controller('api/party-types')
 export class PartyTypesController {
   constructor(private readonly partyTypesService: PartyTypesService) {}
 

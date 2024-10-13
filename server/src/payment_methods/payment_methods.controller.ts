@@ -14,7 +14,7 @@ import { isPublic } from 'decorator/auth.decorator';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 
 @ApiTags('payment-methods')
-@Controller('payment-methods')
+@Controller('api/payment-methods')
 export class PaymentMethodsController {
   constructor(private readonly paymentMethodsService: PaymentMethodsService) {}
 

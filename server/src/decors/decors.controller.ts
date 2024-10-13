@@ -22,7 +22,7 @@ import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('decors')
-@Controller('decors')
+@Controller('api/decors')
 export class DecorsController {
   constructor(private readonly decorsService: DecorsService) {}
 

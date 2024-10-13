@@ -940,6 +940,10 @@ export class BookingsService {
             where: { booking_id: findBooking.id },
           });
         if (findBookingDetail) {
+          //? Delete Old Deposit
+          await this.prismaService.deposits.delete({
+            where: { id: findBookingDetail.deposit_id },
+          });
           await this.prismaService.booking_details.update({
             where: { booking_id: Number(findBookingDetail.id) },
             data: {

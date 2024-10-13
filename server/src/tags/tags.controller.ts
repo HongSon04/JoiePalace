@@ -16,7 +16,7 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterDto } from 'helper/dto/Filter.dto';
 
 @ApiTags('tags')
-@Controller('tags')
+@Controller('api/tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 

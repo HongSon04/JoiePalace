@@ -26,6 +26,7 @@ import { PaymentMethodsModule } from './payment_methods/payment_methods.module';
 import { BranchesModule } from './branches/branches.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailModule } from './mail/mail.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { MailModule } from './mail/mail.module';
     DepositsModule,
     PaymentMethodsModule,
     MailModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

@@ -29,7 +29,7 @@ import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('branches')
 @UseGuards(AuthGuard)
-@Controller('branches')
+@Controller('api/branches')
 export class BranchesController {
   constructor(private readonly branchesService: BranchesService) {}
 
