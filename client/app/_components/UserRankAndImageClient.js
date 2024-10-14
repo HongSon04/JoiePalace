@@ -1,29 +1,30 @@
 import React from 'react';
 import Image from "next/image";
+
 const UserRankAndImageClient = ({userImage, rankImage, title}) => {
     return (
-        <div className="flex flex-col items-center gap-3">
-            <div className="relative w-12 h-12">
+        <div className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6">
+            <div className="relative w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20">
                 <Image
                     src={userImage}
                     alt="user-img"
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-full"
+                    fill
+                    className="rounded-full object-cover"
                 />
             </div>
             <div className="flex gap-2 items-center">
-                <div className="relative w-6 h-3">
+                <div className="relative w-6 h-3 sm:w-8 sm:h-4 lg:w-10 lg:h-5">
                     <Image
                         src={rankImage}
                         alt="rank-img"
-                        layout="fill"
-                        objectFit="contain"
+                        fill
+                        className="object-contain"
                     />
                 </div>
-                <span className="text-xs text-white">{title}</span>
+                <span className="text-xs sm:text-sm lg:text-base text-white">{title}</span>
             </div>
-    </div>
+        </div>
     );
 };
+
 export default UserRankAndImageClient;

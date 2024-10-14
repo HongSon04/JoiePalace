@@ -6,7 +6,6 @@ import dishesSlice from "./features/dishes/dishesSlice";
 import sidebarSlice from "./features/sidebar/sidebarSlice";
 import menuSlice from "./features/menu/menuSlice";
 import branchSlice from "./features/branch/branchSlice";
-
 const store = configureStore({
   reducer: {
     account: accountSlice.reducer,
