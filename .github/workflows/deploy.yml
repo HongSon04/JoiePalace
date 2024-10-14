@@ -1,0 +1,56 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20' 
+
+    - name: Install dependencies for client
+      run: |
+        cd client
+        npm install
+
+    - name: Install dependencies for server
+      run: |
+        cd server
+        npm install
+
+    - name: Build client
+      run: |
+        cd client
+        npm run build
+    - name: Build server
+      run: |
+        cd server
+        npm run build
+        npm run copy
+
+    - name: Deploy to VPS
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > private_key
+        chmod 600 private_key
+        ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
+          cd /path/to/your/joiepalace
+          git pull origin main
+          cd client
+          npm install
+          npm run build
+          cd ../server
+          npm install
+          pm2 restart all  # Khởi động lại ứng dụng
+        EOF

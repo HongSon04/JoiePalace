@@ -1,6 +1,4 @@
-import { API_CONFIG } from "@/app/_utils/api.config";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   username: "",
@@ -9,12 +7,22 @@ const initialState = {
   role: "",
   accessToken: "",
   refreshToken: "",
+  isLoading: false,
+  isError: false,
 };
 
 const accountSlice = createSlice({
   name: "account",
   initialState,
   reducers: {
+    loading(state) {
+      state.isLoading = true;
+      state.isError = false;
+    },
+    error(state) {
+      state.isLoading = false;
+      state.isError = true;
+    },
     login(state, action) {
       state.email = action.payload.email;
       state.role = action.payload.role;
@@ -51,6 +59,8 @@ export const {
   setPassword,
   setEmail,
   setRole,
+  loading,
+  error,
 } = accountSlice.actions;
 
 export default accountSlice;

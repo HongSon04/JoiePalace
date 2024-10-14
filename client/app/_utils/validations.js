@@ -29,3 +29,6 @@ export const passwordValidation = {
     message: "phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số",
   },
 };
+
+export const passwordPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d_!@#$%^&*()-+=]{8,}$/;

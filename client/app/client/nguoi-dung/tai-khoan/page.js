@@ -8,7 +8,7 @@ const InputField = ({ label, type, placeholder, name, value, onChange }) => (
         <input
             type={type}
             placeholder={placeholder}
-            className='w-full px-3 py-4 rounded-md text-sm border-gray-300 bg-whiteAlpha-100 placeholder:text-gray-400'
+            className='w-full px-3 py-4 rounded-md text-sm bg-whiteAlpha-100 placeholder:text-gray-400 focus:outline-none focus:border-gold focus:ring-gold focus:ring-1 transition-all'
             name={name}
             value={value}
             onChange={onChange}

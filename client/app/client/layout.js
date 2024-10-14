@@ -5,7 +5,7 @@ import HeaderClient from "../_components/HeaderClient";
 
 function layout({ children }) {
   return (
-    <div className="bg-primary min-h-screen">
+    <div className="main-layout bg-primary min-h-screen">
       <Col className="text-white">
         <HeaderClient></HeaderClient>
         <main className="h-full">{children}</main>
