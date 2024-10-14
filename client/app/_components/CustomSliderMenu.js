@@ -1,7 +1,6 @@
 "use client";
 import { useRef } from "react";
 
-import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import { Image } from "@chakra-ui/react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";

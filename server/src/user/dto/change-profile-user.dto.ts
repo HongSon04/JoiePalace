@@ -3,13 +3,16 @@ import { IsEnum } from 'class-validator';
 import { Role } from 'helper/role.enum';
 
 export class ChangeProfileUserDto {
-  @ApiProperty()
+  @ApiProperty({ required: true })
   username: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   phone: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    required: true,
+    enum: Role,
+  })
   @IsEnum(Role, { message: 'Vai trò không hợp lệ' })
   role: string;
 }

@@ -25,11 +25,11 @@ export class StaffsService {
   // ! Add Staff
   async addStaff(body: CreateStaffDto): Promise<StaffEntities | any> {
     try {
-      const { location_id, name, phone, payment_info, shift, avatar } = body;
-      const checkLocation = await this.prismaService.locations.findUnique({
-        where: { id: location_id },
+      const { branch_id, name, phone, payment_info, shift, avatar } = body;
+      const checkBranches = await this.prismaService.branches.findUnique({
+        where: { id: branch_id },
       });
-      if (!checkLocation) {
+      if (!checkBranches) {
         throw new HttpException('Địa điểm không tồn tại', HttpStatus.NOT_FOUND);
       }
       const checkStaff = await this.prismaService.staffs.findFirst({
@@ -43,7 +43,7 @@ export class StaffsService {
       }
       const staff = await this.prismaService.staffs.create({
         data: {
-          locations_id: location_id,
+          branch_id: branch_id,
           name,
           phone,
           payment_info,
@@ -75,10 +75,10 @@ export class StaffsService {
       const search = query.search || '';
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
+        : '';
       const endDate = query.endDate
         ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -94,7 +94,7 @@ export class StaffsService {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { locations: { name: { contains: search }, mode: 'insensitive' } },
+          { branches: { name: { contains: search }, mode: 'insensitive' } },
         ],
         deleted: false,
         ...sortRangeDate,
@@ -104,7 +104,7 @@ export class StaffsService {
         this.prismaService.staffs.findMany({
           where: whereConditions,
           include: {
-            locations: true,
+            branches: true,
           },
           orderBy: {
             created_at: 'desc',
@@ -154,10 +154,10 @@ export class StaffsService {
       const search = query.search || '';
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
+        : '';
       const endDate = query.endDate
         ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -173,7 +173,7 @@ export class StaffsService {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { locations: { name: { contains: search }, mode: 'insensitive' } },
+          { branches: { name: { contains: search }, mode: 'insensitive' } },
         ],
         deleted: true,
         ...sortRangeDate,
@@ -183,7 +183,7 @@ export class StaffsService {
         this.prismaService.staffs.findMany({
           where: whereConditions,
           include: {
-            locations: true,
+            branches: true,
           },
           orderBy: {
             created_at: 'desc',
@@ -231,7 +231,7 @@ export class StaffsService {
       const staff = await this.prismaService.staffs.findUnique({
         where: { id: Number(id) },
         include: {
-          locations: true,
+          branches: true,
         },
       });
       if (!staff) {
@@ -258,7 +258,7 @@ export class StaffsService {
     body: UpdateStaffDto,
   ): Promise<StaffEntities | any> {
     try {
-      const { location_id, name, phone, payment_info, shift } = body;
+      const { branch_id, name, phone, payment_info, shift } = body;
       const checkStaff = await this.prismaService.staffs.findUnique({
         where: { id: Number(staff_id) },
       });
@@ -268,16 +268,16 @@ export class StaffsService {
           HttpStatus.NOT_FOUND,
         );
       }
-      const checkLocation = await this.prismaService.locations.findUnique({
-        where: { id: location_id },
+      const checkBranches = await this.prismaService.branches.findUnique({
+        where: { id: Number(branch_id) },
       });
-      if (!checkLocation) {
+      if (!checkBranches) {
         throw new HttpException('Địa điểm không tồn tại', HttpStatus.NOT_FOUND);
       }
       const updateStaff = await this.prismaService.staffs.update({
         where: { id: Number(staff_id) },
         data: {
-          locations_id: location_id,
+          branch_id: Number(branch_id),
           name,
           phone,
           payment_info,

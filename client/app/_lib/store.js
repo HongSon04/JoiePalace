@@ -1,11 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
+// import slices
 import accountSlice from "./features/authentication/accountSlice";
-import themeSlice from "./features/theme/themeSlice";
-import requestsSlice from "./features/requests/requestsSlice";
-import dishesSlice from "./features/dishes/dishesSlice";
-import sidebarSlice from "./features/sidebar/sidebarSlice";
-import menuSlice from "./features/menu/menuSlice";
 import branchSlice from "./features/branch/branchSlice";
+import dishesSlice from "./features/dishes/dishesSlice";
+import menuSlice from "./features/menu/menuSlice";
+import requestsSlice from "./features/requests/requestsSlice";
+import sidebarSlice from "./features/sidebar/sidebarSlice";
+import themeSlice from "./features/theme/themeSlice";
+
+// import services
 
 const store = configureStore({
   reducer: {

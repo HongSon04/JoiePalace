@@ -1,4 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const initialState = {
   username: "",
@@ -14,13 +16,17 @@ const accountSlice = createSlice({
   initialState,
   reducers: {
     login(state, action) {
-      // LATER: Handle login
+      state.email = action.payload.email;
+      state.role = action.payload.role;
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
     },
-    register(state, action) {
-      // LATER: Handle register
-    },
+    register(state, action) {},
     logout(state) {
-      // LATER: Handle logout
+      state.email = "";
+      state.role = "";
+      state.accessToken = "";
+      state.refreshToken = "";
     },
     setUsername(state, action) {
       state.username = action.payload;

@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LocationsModule } from './locations/locations.module';
 import { AuthModule } from './auth/auth.module';
 import { StaffsModule } from './staffs/staffs.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
@@ -16,13 +15,22 @@ import { SpacesModule } from './spaces/spaces.module';
 import { StagesModule } from './stages/stages.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
-import { FoodsModule } from './foods/foods.module';
 import { MenusModule } from './menus/menus.module';
 import { DecorsModule } from './decors/decors.module';
 import { PartyTypesModule } from './party_types/party_types.module';
 import { FunituresModule } from './funitures/funitures.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { DepositsModule } from './deposits/deposits.module';
+import { ProductsModule } from './products/products.module';
+import { PaymentMethodsModule } from './payment_methods/payment_methods.module';
+import { BranchesModule } from './branches/branches.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailModule } from './mail/mail.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],
@@ -36,18 +44,23 @@ import { FunituresModule } from './funitures/funitures.module';
     }),
     AuthModule,
     UserModule,
-    LocationsModule,
     StaffsModule,
+    BranchesModule,
     CloudinaryModule,
     SpacesModule,
     StagesModule,
     CategoriesModule,
     TagsModule,
-    FoodsModule,
+    ProductsModule,
     MenusModule,
     DecorsModule,
     PartyTypesModule,
     FunituresModule,
+    BookingsModule,
+    DepositsModule,
+    PaymentMethodsModule,
+    MailModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

@@ -19,10 +19,10 @@ export class StagesService {
   // ! Create stage
   async create(body: StageDto, files: { images?: Express.Multer.File[] }) {
     try {
-      const findLocation = await this.prismaService.locations.findUnique({
-        where: { id: body.location_id },
+      const findBranch = await this.prismaService.branches.findUnique({
+        where: { id: Number(body.branch_id) },
       });
-      if (!findLocation) {
+      if (!findBranch) {
         throw new HttpException(
           'Không tìm thấy địa điểm',
           HttpStatus.BAD_REQUEST,
@@ -48,10 +48,11 @@ export class StagesService {
 
       const stagesRes = await this.prismaService.stages.create({
         data: {
-          location_id: body.location_id,
+          branch_id: Number(body.branch_id),
           name: body.name,
           description: body.description,
           images: stagesImages as any,
+          capacity: Number(body.capacity),
         },
       });
 
@@ -71,20 +72,20 @@ export class StagesService {
   }
 
   // ! Get all stages
-  async getAll(location_id: number) {
+  async getAll(branch_id: number) {
     try {
-      if (location_id) {
-        const findLocation = await this.prismaService.locations.findUnique({
-          where: { id: Number(location_id) },
+      if (branch_id) {
+        const findBranch = await this.prismaService.branches.findUnique({
+          where: { id: Number(branch_id) },
         });
-        if (!findLocation) {
+        if (!findBranch) {
           throw new HttpException(
             'Không tìm thấy địa điểm',
             HttpStatus.BAD_REQUEST,
           );
         }
         const stages = await this.prismaService.stages.findMany({
-          where: { id: Number(location_id) },
+          where: { id: Number(branch_id) },
         });
         throw new HttpException(
           { message: 'Thành công', data: stages },
@@ -159,9 +160,10 @@ export class StagesService {
       }
 
       const updateData: any = {
-        location_id: body.location_id,
+        branch_id: Number(body.branch_id),
         name: body.name,
         description: body.description,
+        capacity: body.capacity,
       };
 
       if (files.images && files.images.length > 0) {

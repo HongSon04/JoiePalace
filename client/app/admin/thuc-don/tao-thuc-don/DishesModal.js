@@ -12,8 +12,9 @@ import {
   ModalHeader,
 } from "@nextui-org/react";
 import { Col, Row } from "antd";
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useToast } from "@chakra-ui/react";
 
 function DishesModal({
   isOpen,
@@ -21,12 +22,14 @@ function DishesModal({
   onAddingDishes,
   menuDishes,
   menuInfo,
-  disabled,
+  onOpenChange,
+  selectedMenuDishes,
+  setSelectedMenuDishes,
 }) {
+  const toast = useToast();
   const { dishes } = useSelector((state) => state.dishes);
   const categoryDishes = dishes.filter((dish) => dish.category === category);
-  const [selectedMenuDishes, setSelectedMenuDishes] = React.useState([]);
-  const [isDisabled, setIsDisabled] = React.useState(false);
+  const [isUnCheckAll, setIsUnCheckAll] = React.useState(false);
   const dispatch = useDispatch();
 
   const handleAddSelectedMenuDishes = (selectedMenuDish) => {
@@ -47,37 +50,40 @@ function DishesModal({
     }
   };
 
-  const handleUnCheckAll = () => {
-    setSelectedMenuDishes([]);
-    setIsDisabled(false);
-  };
-
   React.useEffect(() => {
     dispatch(getDishes());
-  }, []);
+  }, [dispatch]);
 
   React.useEffect(() => {
-    if (selectedMenuDishes.length >= menuInfo[`max${capitalize(category)}`])
-      setIsDisabled(true);
-    else setIsDisabled(false);
+    if (isOpen) {
+      setSelectedMenuDishes(menuDishes[category]);
+    }
+  }, [isOpen, menuDishes, menuInfo, category]);
+
+  React.useEffect(() => {
+    if (selectedMenuDishes.length === 0) setIsUnCheckAll(false);
+    else setIsUnCheckAll(true);
   }, [selectedMenuDishes]);
 
   return (
-    <Modal scrollBehavior="inside" isOpen={isOpen}>
+    <Modal scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader
-              className={`flex ${isDisabled ? "gap-3 items-center" : ""}`}
+              className={`flex ${isUnCheckAll ? "gap-3 items-center" : ""}`}
             >
               <h2 className="text-base font-semibold p-3 rounded-md bg-zinc-100 text-gray-600 w-fit">
                 {capitalize(category)}
               </h2>
-              {isDisabled && (
+              {isUnCheckAll && (
                 <Button
                   variant="flat"
                   color="danger"
-                  onClick={handleUnCheckAll}
+                  onClick={() => {
+                    setIsUnCheckAll(true);
+                    onAddingDishes([], category);
+                  }}
                 >
                   Bỏ chọn
                 </Button>
@@ -85,10 +91,9 @@ function DishesModal({
             </ModalHeader>
             <ModalBody>
               <CheckboxGroup
-                defaultValue={
-                  disabled || menuDishes[category].map((dish) => dish.id)
-                }
-                isDisabled={isDisabled}
+                value={selectedMenuDishes.map((dish) => dish.id)}
+                lazy
+                // isDisabled={isDisabled}
               >
                 <Row gutter={[12, 12]}>
                   {categoryDishes.map((dish, index) => (
@@ -100,7 +105,6 @@ function DishesModal({
                         classNames={{
                           label: "w-full",
                         }}
-                        // isSelected={}
                         onChange={(e) => handleValueChange(dish)}
                       >
                         <Dish
@@ -123,6 +127,21 @@ function DishesModal({
               <Button
                 color="primary"
                 onPress={() => {
+                  // validate number of dishes before adding
+                  if (
+                    selectedMenuDishes.length >
+                    menuInfo[`max${capitalize(category)}`]
+                  ) {
+                    toast({
+                      title: "Chưa chọn đúng số lượng món ăn",
+                      description:
+                        "Vui lòng chọn lại, hoặc điều chỉnh số lượng món ăn",
+                      status: "warning",
+                      duration: 2000,
+                      isClosable: true,
+                    });
+                    return;
+                  }
                   onAddingDishes(selectedMenuDishes, category);
                   setSelectedMenuDishes([]);
                   onClose();

@@ -19,9 +19,10 @@ import { Request as RequestExpress } from 'express';
 import { isPublic } from 'decorator/auth.decorator';
 import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { VerifyTokenDto } from './dto/verify-token.dto';
 
 @ApiTags('auth')
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -129,12 +130,64 @@ export class AuthController {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
     },
   })
-  @ApiOperation({ summary: 'Làm mới token' })
+  @ApiOperation({ summary: 'Làm mới token (Access Token)' })
   @ApiResponse({ status: 200, description: 'Access token refreshed' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   refreshToken(@Body() body: RefreshTokenDto) {
     const { refresh_token } = body;
     return this.authService.refreshToken(refresh_token);
+  }
+
+  // ! Send Email Verify
+  @Post('send-email-verify')
+  @isPublic()
+  @ApiOperation({ summary: 'Gửi email xác thực' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Gửi email thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Email không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
+  sendEmailVerify(@Body() body: { email: string }) {
+    return this.authService.sendEmailVerify(body.email);
+  }
+
+  // ! Verify Token
+  @Post('verify-token')
+  @isPublic()
+  @ApiOperation({ summary: 'Xác thực người dùng bằng token' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xác thực thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Token không hợp lệ hoặc email không đúng',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
+  verifyToken(@Body() body: VerifyTokenDto) {
+    return this.authService.verifyToken(body.email, body.token);
   }
 
   // ! Upload Avatar

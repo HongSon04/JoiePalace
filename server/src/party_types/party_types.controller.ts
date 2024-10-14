@@ -23,9 +23,10 @@ import { UpdatePartyTypeDto } from './dto/update-party_type.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('party-types')
-@Controller('party-types')
+@Controller('api/party-types')
 export class PartyTypesController {
   constructor(private readonly partyTypesService: PartyTypesService) {}
 
@@ -92,6 +93,7 @@ export class PartyTypesController {
 
   // ! Get all party types
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

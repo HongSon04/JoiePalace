@@ -24,27 +24,43 @@ export class SpacesService {
     files: { images?: Express.Multer.File[] },
   ): Promise<string> {
     try {
-      const { location_id } = body;
-      const slug = MakeSlugger(body.name);
-      const spcaceImages = {};
-      if (files.images) {
-        const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
-          files.images,
-          'joieplace/space',
+      const { branch_id, name } = body;
+      const slug = MakeSlugger(name);
+
+      // Validate Branch
+      const findBranch = await this.prismaService.branches.findUnique({
+        where: { id: Number(branch_id) },
+      });
+
+      if (!findBranch) {
+        throw new HttpException(
+          'Không tìm thấy địa điểm',
+          HttpStatus.NOT_FOUND,
         );
-        spcaceImages['images'] = images;
-      } else {
+      }
+
+      // Validate images
+      if (!files.images || files.images.length === 0) {
         throw new HttpException(
           'Ảnh không được để trống',
           HttpStatus.BAD_REQUEST,
         );
       }
+
+      // Upload images
+      const spaceImages =
+        await this.cloudinaryService.uploadMultipleFilesToFolder(
+          files.images,
+          'joieplace/space',
+        );
+
+      // Create space
       const spaces = await this.prismaService.spaces.create({
         data: {
           ...body,
           slug,
-          images: spcaceImages as any,
-          location_id: Number(location_id),
+          images: spaceImages as any,
+          branch_id: Number(branch_id),
         },
       });
       throw new HttpException(
@@ -63,17 +79,17 @@ export class SpacesService {
   }
 
   // ? Find all spaces
-  async findSpacesByLocation(location_id: number): Promise<string> {
+  async findSpacesByBranch(branch_id: number): Promise<string> {
     try {
       const spaces = await this.prismaService.spaces.findMany({
-        where: { location_id: Number(location_id) },
+        where: { branch_id: Number(branch_id) },
       });
       throw new HttpException({ data: spaces }, HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ space.service.ts -> findSpacesByLocation: ', error);
+      console.log('Lỗi từ space.service.ts -> findSpacesByBranch: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
       );

@@ -93,13 +93,25 @@ export class DecorsService {
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
 
-    const priceSort = query.priceSort.toLowerCase();
+    const priceSort = query?.priceSort?.toLowerCase();
 
     const startDate = query.startDate
       ? FormatDateToStartOfDay(query.startDate)
       : null;
     const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
+    // ? Range Date Conditions
+    const sortRangeDate: any =
+      startDate && endDate
+        ? {
+            created_at: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          }
+        : {};
+
+    // ? Where Conditions
     const whereConditions: any = {
       deleted: false,
       OR: [
@@ -126,6 +138,7 @@ export class DecorsService {
           },
         },
       ],
+      ...sortRangeDate,
     };
 
     if (minPrice >= 0) {
@@ -176,7 +189,7 @@ export class DecorsService {
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
-total,
+        total,
       };
 
       throw new HttpException(
@@ -207,13 +220,24 @@ total,
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
 
-    const priceSort = query.priceSort.toLowerCase();
+    const priceSort = query?.priceSort?.toLowerCase();
 
     const startDate = query.startDate
       ? FormatDateToStartOfDay(query.startDate)
       : null;
     const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
+    // ? Range Date Conditions
+    const sortRangeDate: any =
+      startDate && endDate
+        ? {
+            created_at: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          }
+        : {};
+    // ? Where Conditions
     const whereConditions: any = {
       deleted: true,
       OR: [
@@ -240,6 +264,7 @@ total,
           },
         },
       ],
+      ...sortRangeDate,
     };
 
     if (minPrice >= 0) {
@@ -290,7 +315,7 @@ total,
         lastPage: lastPage,
         itemsPerPage,
         currentPage: page,
-total,
+        total,
       };
 
       throw new HttpException(

@@ -1,4 +1,4 @@
-import SideBarUser from '@/app/_components/SideBarUser';
+import SideBarUserClient from '@/app/_components/SideBarUserClient';
 import React from 'react';
 
 const Layout = ({ children }) => {
@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
             <div className="flex justify-center">
                 <div className='w-full max-w-[1130px] flex gap-[30px] '>
                     <aside className='w-[25%] rounded-lg'>
-                        <SideBarUser />
+                        <SideBarUserClient />
                     </aside>
 
                     <main className="flex-1">
