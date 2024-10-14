@@ -22,7 +22,7 @@ import { FilterFunitureDto } from './dto/filter-funiture.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('funitures')
-@Controller('funitures')
+@Controller('api/funitures')
 export class FunituresController {
   constructor(private readonly funituresService: FunituresService) {}
 
@@ -175,6 +175,7 @@ export class FunituresController {
 
   // ! Get One funiture by ID
   @Get('get/:funitures_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -208,7 +209,8 @@ export class FunituresController {
   }
 
   // ! Get One funiture by Slug
-  @Get('get-slug/:slug')
+  @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

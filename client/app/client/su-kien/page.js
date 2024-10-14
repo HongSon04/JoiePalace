@@ -8,7 +8,6 @@ import { Image } from "@chakra-ui/react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "@/app/_styles/index.css";
 import Footer from '@/app/_components/FooterClient';
 import CustomSliderMenu from '@/app/_components/CustomSliderMenu';
 import { Descriptions } from 'antd';

@@ -1,12 +1,10 @@
 "use client";
 import { useRef } from 'react';
 
-import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import { Image } from "@chakra-ui/react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "@/app/_styles/index.css";
 
 const CustomSliderMenu = ({ dataSlider }) => {
     const sliderRef = useRef(null);
@@ -46,7 +44,6 @@ const CustomSliderMenu = ({ dataSlider }) => {
         },
 
     };
-    console.log(dataSlider);
 
     return (
         <section className="h-screen max-sm:h-fit">

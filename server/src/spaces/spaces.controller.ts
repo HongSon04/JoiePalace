@@ -19,7 +19,7 @@ import { updateSpaceDto } from './dto/update-space.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('spaces')
-@Controller('spaces')
+@Controller('api/spaces')
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
 
@@ -94,10 +94,7 @@ export class SpacesController {
 
   // ! Find Spaces By Branch ID
   @Get('find-by-branch/:branch_id')
-<<<<<<< HEAD
-=======
   @isPublic()
->>>>>>> 56bdbfbc8ccc4c16166b87543d39e63ee939d1e6
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

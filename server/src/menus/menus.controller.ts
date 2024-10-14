@@ -19,7 +19,7 @@ import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('menus')
-@Controller('menus')
+@Controller('api/menus')
 export class MenusController {
   constructor(private readonly menusService: MenusService) {}
 
@@ -181,6 +181,7 @@ export class MenusController {
 
   // ! Get Menu By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

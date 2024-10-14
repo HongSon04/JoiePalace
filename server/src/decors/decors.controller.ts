@@ -22,7 +22,7 @@ import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('decors')
-@Controller('decors')
+@Controller('api/decors')
 export class DecorsController {
   constructor(private readonly decorsService: DecorsService) {}
 
@@ -177,6 +177,7 @@ export class DecorsController {
 
   // ! Get Decor By ID
   @Get('get/:decor_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -210,6 +211,7 @@ export class DecorsController {
 
   // ! Get Decor By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

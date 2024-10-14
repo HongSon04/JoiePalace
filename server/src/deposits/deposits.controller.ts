@@ -1,44 +1,43 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
-import { CreateDepositDto } from './dto/create-deposit.dto';
-import { UpdateDepositDto } from './dto/update-deposit.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UpdateDepositDto } from './dto/update-status.dto';
 
 @ApiTags('deposits')
-@Controller('deposits')
+@Controller('api/deposits')
 export class DepositsController {
   constructor(private readonly depositsService: DepositsService) {}
 
-  @Post()
-  create(@Body() createDepositDto: CreateDepositDto) {
-    return this.depositsService.create(createDepositDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.depositsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  // ? Find By ID
+  @Get('get/:id')
+  findOneById(@Param('id') id: string) {
     return this.depositsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDepositDto: UpdateDepositDto) {
+  // ? Find By Transaction ID
+  @Get('transaction/:transactionID')
+  findOneByTransactionId(@Param('transactionID') transactionID: string) {
+    return this.depositsService.findOneByTransactionId(transactionID);
+  }
+
+  // ? Update
+  @Patch('update/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateDepositDto: UpdateDepositDto,
+  ) {
     return this.depositsService.update(+id, updateDepositDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.depositsService.remove(+id);
+  // ? Update  by Transaction ID
+  @Patch('update/transaction/:transactionID')
+  updateByTransactionID(
+    @Param('transactionID') transactionID: string,
+    @Body() updateDepositDto: UpdateDepositDto,
+  ) {
+    return this.depositsService.updateByTransactionID(
+      transactionID,
+      updateDepositDto,
+    );
   }
 }

@@ -15,6 +15,8 @@ import { PrismaService } from 'src/prisma.service';
 import uniqid from 'uniqid';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
+import { MailService } from 'src/mail/mail.service';
+import dayjs from 'dayjs';
 
 interface Accessories {
   table: [
@@ -69,7 +71,10 @@ interface ExtraServices {
 
 @Injectable()
 export class BookingsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private mailService: MailService,
+  ) {}
 
   // ! Create Booking
   async create(createBookingDto: CreateBookingDto) {
@@ -105,9 +110,24 @@ export class BookingsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      // Fetching user, branch, space, stage, decor, and menu in parallel
-      const [user, branch] = await Promise.all([
-        this.prismaService.users.findUnique({ where: { id: Number(user_id) } }),
+
+      if (user_id != null || user_id != undefined) {
+        const user = await this.prismaService.users.findUnique({
+          where: { id: Number(user_id) },
+        });
+        if (!user) {
+          throw new HttpException(
+            'Không tìm thấy người dùng',
+            HttpStatus.NOT_FOUND,
+          );
+        }
+      }
+
+      // Fetching user, branch in parallel
+      const [party_types, branch] = await Promise.all([
+        this.prismaService.party_types.findUnique({
+          where: { id: Number(party_type_id) },
+        }),
         this.prismaService.branches.findUnique({
           where: { id: Number(branch_id) },
         }),
@@ -121,8 +141,8 @@ export class BookingsService {
             HttpStatus.NOT_FOUND,
           );
       };
-      validateExists(user, 'user');
-      validateExists(branch, 'branch');
+      validateExists(party_types, 'Loại tiệc');
+      validateExists(branch, 'Chi nhánh');
 
       // Create Booking
       const booking = await this.prismaService.bookings.create({
@@ -132,7 +152,7 @@ export class BookingsService {
           company_name,
           email,
           note,
-          party_type_id,
+          party_type_id: Number(party_type_id),
           phone,
           name,
           organization_date,
@@ -160,6 +180,17 @@ export class BookingsService {
         },
       });
 
+      // ? Send Mail
+      const bodyMail = {
+        shift,
+        organization_date: dayjs(organization_date).format('DD/MM/YYYY'),
+        branchName: branch.name,
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+        branchAddress: branch.address,
+      };
+      await this.mailService.sendUserConfirmationBooking(bodyMail);
       throw new HttpException(
         { message: 'Đặt tiệc thành công', data: findBooking },
         HttpStatus.OK,
@@ -909,6 +940,10 @@ export class BookingsService {
             where: { booking_id: findBooking.id },
           });
         if (findBookingDetail) {
+          //? Delete Old Deposit
+          await this.prismaService.deposits.delete({
+            where: { id: findBookingDetail.deposit_id },
+          });
           await this.prismaService.booking_details.update({
             where: { booking_id: Number(findBookingDetail.id) },
             data: {
