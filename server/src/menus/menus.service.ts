@@ -109,6 +109,18 @@ export class MenusService {
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
 
+    // ? Range Date Conditions
+    const sortRangeDate: any =
+      startDate && endDate
+        ? {
+            created_at: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          }
+        : {};
+
+    // ? Where Conditions
     const whereConditions: any = {
       deleted: false,
       OR: [
@@ -135,10 +147,8 @@ export class MenusService {
           },
         },
       ],
-      created_at: {
-        gte: startDate,
-        lte: endDate,
-      },
+
+      ...sortRangeDate,
     };
 
     if (minPrice >= 0) {
@@ -227,6 +237,18 @@ export class MenusService {
     const minPrice = Number(query.minPrice) || 0;
     const maxPrice = Number(query.maxPrice) || 999999999999;
 
+    // ? Range Date Conditions
+    const sortRangeDate: any =
+      startDate && endDate
+        ? {
+            created_at: {
+              gte: new Date(startDate),
+              lte: new Date(endDate),
+            },
+          }
+        : {};
+
+    // ? Where Conditions
     const whereConditions: any = {
       deleted: true,
       OR: [

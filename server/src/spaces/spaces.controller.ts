@@ -16,9 +16,10 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('spaces')
-@Controller('spaces')
+@Controller('api/spaces')
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
 
@@ -93,6 +94,7 @@ export class SpacesController {
 
   // ! Find Spaces By Branch ID
   @Get('find-by-branch/:branch_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -129,6 +131,7 @@ export class SpacesController {
 
   // ! Find Space By ID
   @Get('find/:space_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -163,6 +166,7 @@ export class SpacesController {
 
   // ! Find Space By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

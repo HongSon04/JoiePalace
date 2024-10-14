@@ -25,10 +25,11 @@ import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { ImageUploadBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('branches')
 @UseGuards(AuthGuard)
-@Controller('branches')
+@Controller('api/branches')
 export class BranchesController {
   constructor(private readonly branchesService: BranchesService) {}
 
@@ -48,21 +49,14 @@ export class BranchesController {
         email: 'string',
         rate: 'number',
         images: ['string', 'string'],
+        slogan_description: 'string',
+        slogan_images: ['string', 'string'],
+        diagram_description: 'string',
+        diagram_images: ['string', 'string'],
+        equipment_description: 'string',
+        equipment_images: ['string', 'string'],
         created_at: 'date',
         updated_at: 'date',
-
-        space: [
-          {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
-        ],
       },
     },
   })
@@ -136,6 +130,7 @@ export class BranchesController {
 
   // ! Get All Branchs
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -149,21 +144,14 @@ export class BranchesController {
           email: 'string',
           rate: 'number',
           images: ['string', 'string'],
+          slogan_description: 'string',
+          slogan_images: ['string', 'string'],
+          diagram_description: 'string',
+          diagram_images: ['string', 'string'],
+          equipment_description: 'string',
+          equipment_images: ['string', 'string'],
           created_at: 'date',
           updated_at: 'date',
-          Branch_detail: {
-            id: 'number',
-            branch_id: 'number',
-            slogan: 'string',
-            slogan_description: 'string',
-            slogan_images: ['string', 'string'],
-            diagram_description: 'string',
-            diagram_images: ['string', 'string'],
-            equipment_description: 'string',
-            equipment_images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
           space: [
             {
               id: 'number',
@@ -225,21 +213,14 @@ export class BranchesController {
           email: 'string',
           rate: 'number',
           images: ['string', 'string'],
+          slogan_description: 'string',
+          slogan_images: ['string', 'string'],
+          diagram_description: 'string',
+          diagram_images: ['string', 'string'],
+          equipment_description: 'string',
+          equipment_images: ['string', 'string'],
           created_at: 'date',
           updated_at: 'date',
-          Branch_detail: {
-            id: 'number',
-            branch_id: 'number',
-            slogan: 'string',
-            slogan_description: 'string',
-            slogan_images: ['string', 'string'],
-            diagram_description: 'string',
-            diagram_images: ['string', 'string'],
-            equipment_description: 'string',
-            equipment_images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
           space: [
             {
               id: 'number',
@@ -288,6 +269,7 @@ export class BranchesController {
 
   // ! Get Branch By Id
   @Get('get/:branch_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -300,9 +282,14 @@ export class BranchesController {
         email: 'string',
         rate: 'number',
         images: ['string', 'string'],
+        slogan_description: 'string',
+        slogan_images: ['string', 'string'],
+        diagram_description: 'string',
+        diagram_images: ['string', 'string'],
+        equipment_description: 'string',
+        equipment_images: ['string', 'string'],
         created_at: 'date',
         updated_at: 'date',
-
         space: [
           {
             id: 'number',
@@ -348,7 +335,8 @@ export class BranchesController {
   }
 
   // ! Get Branch By Slug
-  @Get('get-by-slug/:Branch_slug')
+  @Get('get-by-slug/:branch_slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -361,9 +349,14 @@ export class BranchesController {
         email: 'string',
         rate: 'number',
         images: ['string', 'string'],
+        slogan_description: 'string',
+        slogan_images: ['string', 'string'],
+        diagram_description: 'string',
+        diagram_images: ['string', 'string'],
+        equipment_description: 'string',
+        equipment_images: ['string', 'string'],
         created_at: 'date',
         updated_at: 'date',
-
         space: [
           {
             id: 'number',
@@ -404,7 +397,7 @@ export class BranchesController {
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo Slug' })
-  async getBranchBySlug(@Param('Branch_slug') slug: string) {
+  async getBranchBySlug(@Param('branch_slug') slug: string) {
     return this.branchesService.getBranchBySlug(slug);
   }
 

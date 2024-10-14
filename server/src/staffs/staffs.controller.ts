@@ -33,7 +33,7 @@ import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
 
 @ApiTags('staffs')
 @UseGuards(AuthGuard)
-@Controller('staffs')
+@Controller('api/staffs')
 export class StaffsController {
   constructor(
     private readonly staffsService: StaffsService,

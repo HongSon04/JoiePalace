@@ -16,9 +16,10 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('categories')
-@Controller('categories')
+@Controller('api/categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
@@ -61,6 +62,7 @@ export class CategoriesController {
 
   // ! Get All Category
   @Get('/get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -151,6 +153,7 @@ export class CategoriesController {
 
   // ! Get Category By Id
   @Get('get/:category_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -187,6 +190,7 @@ export class CategoriesController {
 
   // ! Get Category By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

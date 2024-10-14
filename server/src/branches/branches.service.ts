@@ -140,7 +140,7 @@ export class BranchesService {
     try {
       const page = Number(query.page) || 1;
       const search = query.search || '';
-      const itemsPerPage = Number(query.itemsPerPage) || 1;
+      const itemsPerPage = Number(query.itemsPerPage) || 10;
       const skip = (page - 1) * itemsPerPage;
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
@@ -148,7 +148,8 @@ export class BranchesService {
       const endDate = query.endDate
         ? FormatDateToEndOfDay(query.endDate)
         : null;
-
+      
+      // ? Range Date Conditions
       const sortRangeDate: any =
         startDate && endDate
           ? {
@@ -181,10 +182,6 @@ export class BranchesService {
             },
           },
         ],
-        created_at: {
-          gte: new Date(startDate),
-          lte: new Date(endDate),
-        },
         ...sortRangeDate,
       };
 
@@ -243,6 +240,7 @@ export class BranchesService {
         ? FormatDateToEndOfDay(query.endDate)
         : null;
 
+      // ? Range Date Conditions
       const sortRangeDate: any =
         startDate && endDate
           ? {
@@ -275,10 +273,6 @@ export class BranchesService {
             },
           },
         ],
-        created_at: {
-          gte: new Date(startDate),
-          lte: new Date(endDate),
-        },
         ...sortRangeDate,
       };
 

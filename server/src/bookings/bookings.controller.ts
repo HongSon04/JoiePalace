@@ -19,7 +19,7 @@ import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
 
 @ApiTags('bookings')
-@Controller('bookings')
+@Controller('api/bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
@@ -249,8 +249,8 @@ export class BookingsController {
   }
 
   // ! Get Booking For Next 14 Days
-  @isPublic()
   @Get('get-booking-list')
+  @isPublic()
   getNext7Days() {
     return this.bookingsService.getBookingForNext14Days();
   }

@@ -84,6 +84,36 @@ const branches = [
       'https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/xhnquxrdecjxbbialilg.jpg,https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/pakoi5ihxkxbnqlnjgl1.jpg',
     ],
   },
+  {
+    name: 'Hà Đông',
+    address: 'Đường 8, Quận 8, Hà Đông',
+    slug: MakeSlugger('Hà Đông'),
+    phone: '888888888',
+    email: 'chinhanh8@joieplace.com',
+    images: [
+      'https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/xhnquxrdecjxbbialilg.jpg,https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/pakoi5ihxkxbnqlnjgl1.jpg',
+    ],
+  },
+  {
+    name: 'Hà Tây',
+    address: 'Đường 9, Quận 9, Hà Tây',
+    slug: MakeSlugger('Hà Tây'),
+    phone: '999999999',
+    email: 'chinhanh9@joieplace.com',
+    images: [
+      'https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/xhnquxrdecjxbbialilg.jpg,https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/pakoi5ihxkxbnqlnjgl1.jpg',
+    ],
+  },
+  {
+    name: 'Cao Bằng',
+    address: 'Đường 10, Quận 10, Cao Bằng',
+    slug: MakeSlugger('Cao Bằng'),
+    phone: '1010101010',
+    email: 'chinhanh10@joieplace.com',
+    images: [
+      'https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/xhnquxrdecjxbbialilg.jpg,https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/pakoi5ihxkxbnqlnjgl1.jpg',
+    ],
+  },
 ];
 let branchIDS: number[] = [];
 export const branchSeed = async () => {

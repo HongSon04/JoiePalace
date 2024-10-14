@@ -19,15 +19,14 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('products')
-@Controller('products')
+@Controller('api/products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   // ! Create Product
-  @Post('create')
-  // ! Create product
   @Post('create')
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -101,6 +100,7 @@ export class ProductsController {
 
   // ! Get all products
   @Get('/get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -210,6 +210,7 @@ export class ProductsController {
   }
   // ! Get product by id
   @Get('get/:product_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -247,6 +248,7 @@ export class ProductsController {
 
   // ! Get product by slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -284,6 +286,7 @@ export class ProductsController {
 
   // ! Get product By Category Id
   @Get('get-by-category/:category_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -322,6 +325,7 @@ export class ProductsController {
 
   // ! Get product By Tag Id
   @Get('get-by-tag/:tag_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

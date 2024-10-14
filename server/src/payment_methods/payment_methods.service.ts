@@ -5,14 +5,43 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { MomoSuccessDto } from './dto/momo-success.dto';
 import dayjs, { locale } from 'dayjs';
-import { VNPaySuccessDto } from './dto/vnpay-success.dto';
 import { OnePayInternational, VNPay } from 'vn-payments';
-
+import { MomoCallbackDto } from './dto/momo-callback.dto';
+import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
+import { OnepayCallbackDto } from './dto/onepay-calback.dto';
+import * as CryptoJS from 'crypto-js';
+import axios from 'axios';
+import uniqid from 'uniqid';
 @Injectable()
 export class PaymentMethodsService {
   constructor(private prismaService: PrismaService) {}
+
+  // ? Other
+
+  private onepayIntl = new OnePayInternational({
+    paymentGateway: process.env.ONEPAY_PAYMENT_GATEWAY,
+    merchant: process.env.ONEPAY_MERCHANT,
+    accessCode: process.env.ONEPAY_ACCESS_CODE,
+    secureSecret: process.env.ONEPAY_SECURE_SECRET,
+  });
+
+  private sortObject(obj) {
+    let sorted = {};
+    let str = [];
+    let key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        str.push(encodeURIComponent(key));
+      }
+    }
+    str.sort();
+    for (key = 0; key < str.length; key++) {
+      sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, '+');
+    }
+    return sorted;
+  }
+
   // ! Payment Momo
   async momo(id: number, req, res) {
     try {
@@ -50,7 +79,7 @@ export class PaymentMethodsService {
       var secretKey = process.env.MOMO_SECRET_KEY;
       var orderInfo = 'Thanh toán tiền cọc';
       var partnerCode = process.env.MOMO_PARTNER_CODE;
-      var redirectUrl = `${process.env.WEB_URL}payment-methods/momo-success?deposit_id=${id}`;
+      var redirectUrl = `${process.env.WEB_URL}payment-methods/momo-callback?deposit_id=${id}`;
       var ipnUrl = 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b';
       var requestType = 'payWithMethod';
       var amount = Number(findDeposit.amount);
@@ -63,8 +92,6 @@ export class PaymentMethodsService {
       var autoCapture = true;
       var lang = 'vi';
 
-      //before sign HMAC SHA256 with format
-      //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
       var rawSignature =
         'accessKey=' +
         accessKey +
@@ -135,14 +162,14 @@ export class PaymentMethodsService {
         ress.setEncoding('utf8');
         ress.on('data', (body) => {
           const response = JSON.parse(body);
-          if (ress.statusCode === 200 && response.payUrl) {
-            res.status(200).json({
+          if (ress.statusCode === HttpStatus.CREATED && response.payUrl) {
+            return res.status(HttpStatus.CREATED).json({
               message: 'Tạo đơn đặt cọc thành công',
               status: HttpStatus.OK,
               payUrl: response.payUrl,
             });
           } else {
-            res.status(400).json({
+            return res.status(400).json({
               message: 'Tạo đơn đặt cọc thất bại',
               status: HttpStatus.BAD_REQUEST,
             });
@@ -170,7 +197,8 @@ export class PaymentMethodsService {
     }
   }
 
-  async successMomo(query: MomoSuccessDto, res) {
+  // ? Callback Momo
+  async callbackMomo(query: MomoCallbackDto, res) {
     try {
       if (Number(query.resultCode) === 0) {
         const findDeposit = await this.prismaService.deposits.findFirst({
@@ -208,32 +236,15 @@ export class PaymentMethodsService {
             is_deposit: true,
           },
         });
-        res.redirect(`${process.env.WEB_URL}thanh-toan-thanh-cong`);
+        // ? Redirect to success page
+        this.successPayment(res);
       } else {
-        res.redirect(`${process.env.WEB_URL}thanh-toan-that-bai`);
+        // ? Redirect to fail page
+        this.failPayment(res);
       }
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ payment_method.service.ts -> successMomo', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      );
-    }
-  }
-
-  async failMomo(query, res) {
-    try {
-      res.redirect(`${process.env.WEB_URL}thanh-toan-that-bai`);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ payment_method.service.ts -> failMomo', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      );
+      console.log('Lỗi từ payment_method.service.ts -> callbackVNPay', error);
+      return this.failPayment(res);
     }
   }
 
@@ -273,7 +284,7 @@ export class PaymentMethodsService {
       let tmnCode = process.env.VNP_TMN_CODE;
       let secretKey = process.env.VNP_HASH_SECRET;
       let vnpUrl = process.env.VNP_URL;
-      let returnUrl = `${process.env.WEB_URL}payment-methods/vnpay-success`;
+      let returnUrl = `${process.env.WEB_URL}payment-methods/vnpay-callback?deposit_id=${id}`;
       let orderId = dayjs(date).format('DDHHmmss');
       let amount = findDeposit.amount;
       let bankCode = '';
@@ -310,6 +321,18 @@ export class PaymentMethodsService {
       vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
 
       res.redirect(vnpUrl);
+      if (vnpUrl) {
+        return res.status(HttpStatus.CREATED).json({
+          message: 'Tạo đơn đặt cọc thành công',
+          status: HttpStatus.OK,
+          payUrl: vnpUrl,
+        });
+      } else {
+        return res.status(400).json({
+          message: 'Tạo đơn đặt cọc thất bại',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -321,7 +344,8 @@ export class PaymentMethodsService {
     }
   }
 
-  async successVNPay(query: VNPaySuccessDto, res) {
+  // ? Callback VNPay
+  async callbackVNPay(query: VNPayCallbackDto, res) {
     try {
       if (query.vnp_ResponseCode === '00') {
         await this.prismaService.deposits.update({
@@ -349,46 +373,120 @@ export class PaymentMethodsService {
             is_deposit: true,
           },
         });
-        res.redirect(`${process.env.WEB_URL}thanh-toan-thanh-cong`);
+        this.successPayment(res);
       } else {
-        res.redirect(`${process.env.WEB_URL}thanh-toan-that-bai`);
+        this.failPayment(res);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log('Lỗi từ payment_method.service.ts -> callbackVNPay', error);
+      return this.failPayment(res);
+    }
   }
 
-  async failVNPay(query, res) {
+  // ! Payment OnePay
+  async onePay(id: number, req, res) {
     try {
-      console.log('Lọt vào Fail VNPay');
-      res.redirect(`${process.env.WEB_URL}thanh-toan-that-bai`);
+      const findDeposit = await this.prismaService.deposits.findFirst({
+        where: {
+          id: Number(id),
+        },
+      });
+      if (!findDeposit) {
+        throw new HttpException(
+          { message: 'Không tìm thấy giao dịch' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (findDeposit.status === 'success') {
+        throw new HttpException(
+          { message: 'Giao dịch đã được thanh toán' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const checkoutData = {
+        amount: findDeposit.amount,
+        customerId: findDeposit.transactionID,
+        currency: 'VND',
+        returnUrl: `${process.env.WEB_URL}payment-methods/onepay-callback?deposit_id=${id}`,
+        againLink: `${process.env.WEB_URL}payment-methods/onepay/${id}`,
+        clientIp:
+          req.headers['x-forwarded-for'] ||
+          req.connection.remoteAddress ||
+          req.socket.remoteAddress ||
+          req.connection.socket.remoteAddress,
+        locale: 'vn',
+        orderId: findDeposit.transactionID,
+        transactionId: findDeposit.transactionID,
+        vpcCommand: 'pay',
+      };
+
+      this.onepayIntl
+        .buildCheckoutUrl(checkoutData as any)
+        .then((checkoutUrl) => {
+          return res.status(HttpStatus.CREATED).json({
+            message: 'Tạo đơn đặt cọc thành công',
+            status: HttpStatus.OK,
+            payUrl: checkoutUrl.href,
+          });
+          // res.end();
+        })
+        .catch((err) => {
+          console.log('Lỗi từ payment_method.service.ts -> onepay', err);
+          return res.status(400).json({
+            message: 'Tạo đơn đặt cọc thất bại',
+            status: HttpStatus.BAD_REQUEST,
+          });
+        });
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ payment_method.service.ts -> failVNPay', error);
+      console.log('Lỗi từ payment_method.service.ts -> onepay', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  private sortObject(obj) {
-    let sorted = {};
-    let str = [];
-    let key;
-    for (key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        str.push(encodeURIComponent(key));
-      }
+  // ? Callback OnePay
+  async callbackOnePay(query: OnepayCallbackDto, res) {
+    console.log('query', query);
+    if (query.vpc_TxnResponseCode === '0') {
+      await this.prismaService.deposits.update({
+        where: {
+          id: Number(query.deposit_id),
+        },
+        data: {
+          status: 'success',
+          payment_method: 'onepay',
+        },
+      });
+
+      // ? Find booking detail by deposit_id
+      const findBookingDetail =
+        await this.prismaService.booking_details.findFirst({
+          where: {
+            deposit_id: Number(query.deposit_id),
+          },
+        });
+      await this.prismaService.bookings.update({
+        where: {
+          id: Number(findBookingDetail.booking_id),
+        },
+        data: {
+          is_deposit: true,
+        },
+      });
+      this.successPayment(res);
+    } else {
+      this.failPayment(res);
     }
-    str.sort();
-    for (key = 0; key < str.length; key++) {
-      sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, '+');
-    }
-    return sorted;
   }
 
-  // ! Payment OnePay
-  async onepay(id: number, req, res) {
+  // ! Payment ZaloPay
+  async zaloPay(id, req, res) {
     try {
       const findDeposit = await this.prismaService.deposits.findFirst({
         where: {
@@ -408,93 +506,143 @@ export class PaymentMethodsService {
       //     HttpStatus.BAD_REQUEST,
       //   );
       // }
-
-      const checkoutData = {
-        amount: findDeposit.amount,
-        customerId: findDeposit.transactionID,
-        currency: 'VND',
-        returnUrl: `${process.env.WEB_URL}payment-methods/onepay-success`,
-        againLink: `${process.env.WEB_URL}payment-methods/onepay/${id}`,
-        clientIp:
-          req.headers['x-forwarded-for'] ||
-          req.connection.remoteAddress ||
-          req.socket.remoteAddress ||
-          req.connection.socket.remoteAddress,
-        locale: 'vn',
-        orderId: findDeposit.transactionID,
-        transactionId: findDeposit.transactionID,
-        vpcCommand: 'pay',
+      const config = {
+        app_id: process.env.ZALO_APP_ID,
+        key1: process.env.ZALO_KEY_1,
+        key2: process.env.ZALO_KEY_2,
+        endpoint: process.env.ZALO_ENDPOINT,
+      };
+      const embed_data = {
+        preferred_payment_method: [],
+        redirecturl: ``,
       };
 
-      // buildCheckoutUrl is async operation and will return a Promise
-      this.onepayIntl
-        .buildCheckoutUrl(checkoutData as any)
-        .then((checkoutUrl) => {
-          res.redirect(checkoutUrl);
+      const items = [{}];
+      const transID = Math.floor(Math.random() * 1000000);
+      const order = {
+        app_id: config.app_id,
+        app_trans_id: `${dayjs(Date.now()).format('YYMMDD')}-${findDeposit.transactionID}-${transID}`,
+        app_user: 'user123',
+        app_time: Date.now(), // miliseconds
+        item: JSON.stringify(items),
+        embed_data: JSON.stringify(embed_data),
+        amount: findDeposit.amount,
+        description: `Thanh toán tiền cọc cho ID: ${findDeposit.transactionID}`,
+        bank_code: '',
+        mac: '',
+        callback_url: `${process.env.WEB_URL}payment-methods/zalopay-callback?deposit_id=${id}`,
+      };
+
+      const data =
+        config.app_id +
+        '|' +
+        order.app_trans_id +
+        '|' +
+        order.app_user +
+        '|' +
+        order.amount +
+        '|' +
+        order.app_time +
+        '|' +
+        order.embed_data +
+        '|' +
+        order.item;
+      order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+      axios
+        .post(config.endpoint, null, { params: order })
+        .then(({ data }) => {
+          if (data.return_code === 1) {
+            return res.status(HttpStatus.CREATED).json({
+              message: 'Tạo đơn đặt cọc thành công',
+              status: HttpStatus.OK,
+              payUrl: data.order_url,
+            });
+          } else {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+              status: HttpStatus.BAD_REQUEST,
+              message: { data },
+            });
+          }
         })
-        .catch((err) => {
-          res.send(err);
-        });
+        .catch((err) => console.log(err));
+
+      const result = await axios.post(config.endpoint, null, { params: order });
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log('Lỗi từ payment_method.service.ts -> onepay', error);
+      console.log('Lỗi từ payment_method.service.ts -> zaloPay', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
   }
 
-  // ! Payment OnePay Success
-  async successOnePay(query, res) {
-    console.log(query);
-    // try {
-    //   this.onepayIntl.verifyReturnUrl(query).then((results) => {
-    //     if (results.isSuccess) {
-    //       res.render('success', {
-    //         title: 'Nau Store - Thank You',
-    //         orderId: results.orderId,
-    //         price: results.amount,
-    //         message: results.message,
-    //       });
-    //     } else {
-    //       res.render('errors', {
-    //         title: 'Nau Store - Payment Errors',
-    //         message: results.message,
-    //       });
-    //     }
-    //   });
-    // } catch (error) {
-    //   if (error instanceof HttpException) {
-    //     throw error;
-    //   }
-    //   console.log('Lỗi từ payment_method.service.ts -> successOnePay', error);
-    //   throw new InternalServerErrorException(
-    //     'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-    //   );
-    // }
-  }
-
-  // ! Payment OnePay Fail
-  async failOnePay(query, res) {
+  // ? Callback ZaloPay
+  async callbackZaloPay(query, req, res) {  
+    let result = {} as any;
     try {
-      res.redirect(`${process.env.WEB_URL}thanh-toan-that-bai`);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
+      let dataStr = req.body.data;
+      let reqMac = req.body.mac;
+
+      let mac = CryptoJS.HmacSHA256(dataStr, process.env.ZALO_KEY_2).toString();
+
+      // kiểm tra callback hợp lệ (đến từ ZaloPay server)
+      if (reqMac !== mac) {
+        // callback không hợp lệ
+        result.return_code = -1;
+        result.return_message = 'mac not equal';
+      } else {
+        // thanh toán thành công
+        // merchant cập nhật trạng thái cho đơn hàng
+        let dataJson = JSON.parse(dataStr, process.env.ZALO_KEY_2 as any);
+        dataJson['app_trans_id'];
+
+        result.return_code = 1;
+        result.return_message = 'success';
+        await this.prismaService.deposits.update({
+          where: {
+            id: Number(query.deposit_id),
+          },
+          data: {
+            status: 'success',
+            payment_method: 'zalopay',
+          },
+        });
+
+        const findBookingDetail =
+          await this.prismaService.booking_details.findFirst({
+            where: {
+              deposit_id: Number(query.deposit_id),
+            },
+          });
+        await this.prismaService.bookings.update({
+          where: {
+            id: Number(findBookingDetail.booking_id),
+          },
+          data: {
+            is_deposit: true,
+          },
+        });
+
+        this.successPayment(res);
       }
-      console.log('Lỗi từ payment_method.service.ts -> failOnePay', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      );
+    } catch (ex) {
+      result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
+      result.return_message = ex.message;
     }
+    console.log('result', result);
+    res.json(result);
   }
 
-  private onepayIntl = new OnePayInternational({
-    paymentGateway: 'https://mtf.onepay.vn/vpcpay/vpcpay.op',
-    merchant: 'TESTONEPAY',
-    accessCode: '6BEB2546',
-    secureSecret: '6D0870CDE5F24F34F3915FB0045120DB',
-  });
+  // *********************************************************
+  // ! Payment Success
+  private async successPayment(res) {
+    res.redirect(`${process.env.WEB_URL}thanh-toan-thanh-cong`);
+  }
+
+  // ! Payment Fail
+  private async failPayment(res) {
+    res.redirect(`${process.env.WEB_URL}thanh-toan-that-bai`);
+  }
 }

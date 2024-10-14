@@ -25,7 +25,7 @@ export const emailValidation = {
 
 export const passwordValidation = {
   pattern: {
-    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d_!@#$%^&*()-+=]{8,}$/,
     message: "phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số",
   },
 };

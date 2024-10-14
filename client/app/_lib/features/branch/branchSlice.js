@@ -1,12 +1,11 @@
+import { API_CONFIG } from "@/app/_utils/api.config";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-
-const API_URL = "https://joieplace.live/api/location";
 
 const initialState = {
   branches: [],
   currentBranch: null,
-  isLoading: false,
+  loading: false,
   error: null,
 };
 
@@ -15,7 +14,7 @@ export const postBrach = createAsyncThunk(
   "location/postBrach",
   async (BrachData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}`, BrachData);
+      const response = await axios.post(API_CONFIG.BRANCHES.GET_ALL, BrachData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -27,6 +26,12 @@ const branchSlice = createSlice({
   name: "branch",
   initialState,
   reducers: {
+    loading: (state) => {
+      state.loading = true;
+    },
+    error: (state, action) => {
+      state.error = action.payload;
+    },
     setBranches: (state, action) => {
       state.branches = action.payload;
     },
@@ -35,19 +40,24 @@ const branchSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(postBrach.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(postBrach.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.branches = action.payload;
-      })
-      .addCase(postBrach.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      });
+    builder.addCase(getBranches.fulfilled, (state, action) => {
+      state.branches = action.payload;
+      state.loading = false;
+    });
+    builder.addCase(getBranches.rejected, (state, action) => {
+      state.error = action.error.message;
+      state.loading = false;
+    });
   },
+});
+
+export const getBranches = createAsyncThunk("branch/getBranches", async () => {
+  try {
+    const res = await axios.get(API_CONFIG.BRANCHES.GET_ALL);
+    return res.data;
+  } catch (error) {
+    return error.message;
+  }
 });
 
 export const { setBranches, setCurrentBranch } = branchSlice.actions;

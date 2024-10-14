@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import authBg from "@/public/auth-bg.png";
 import {
   ChatBubbleLeftRightIcon,
@@ -11,55 +12,62 @@ import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 
 import Branch from "@/app/_components/Branch";
-import banner from "@/public/banner.png";
-import banner2 from "@/public/banner2.png";
-import logo from "@/public/admin_logo_dark.svg";
+import { getBranches } from "@/app/_lib/features/branch/branchSlice";
 import { Col, Row } from "antd";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
-const initialBranches = [
-  {
-    id: 1,
-    name: "Hoàng Văn Thụ",
-    image: banner,
-    address: "123 Hoàng Văn Thụ, Phường 4, Quận Tân Bình, TP.HCM",
-    phone: "0123456789",
-    email: "joiepalace.hoangvanthu@gmail.com",
-    status: "active",
-    slug: "hoang-van-thu",
-  },
-  {
-    id: 2,
-    image: banner2,
-    name: "Lê Văn Sỹ",
-    address: "123 Lê Vă Sỹ, Phường 4, Quận Tân Bình, TP.HCM",
-    phone: "0123456789",
-    email: "joiepalace.levansy@gmail.com",
-    status: "active",
-    slug: "le-van-sy",
-  },
-  {
-    id: 3,
-    image: banner2,
-    name: "Phạm Văn Đồng",
-    address: "123 Phạm Văn Đồng, Phường 4, Quận Tân Bình, TP.HCM",
-    phone: "0123456789",
-    email: "joiepalace.phamvandong@gmail.com",
-    status: "active",
-    slug: "pham-van-dong",
-  },
-  {
-    id: 4,
-    image: logo,
-    name: "Tổng",
-    address: "123 Phạm Văn Đồng, Phường 4, Quận Tân Bình, TP.HCM",
-    phone: "0123456789",
-    email: "joiepalace.tong@gmail.com",
-    status: "active",
-    slug: "tong",
-  },
-];
+// const initialBranches = [
+//   {
+//     id: 1,
+//     name: "Hoàng Văn Thụ",
+//     image: banner,
+//     address: "123 Hoàng Văn Thụ, Phường 4, Quận Tân Bình, TP.HCM",
+//     phone: "0123456789",
+//     email: "joiepalace.hoangvanthu@gmail.com",
+//     status: "active",
+//     slug: "hoang-van-thu",
+//   },
+//   {
+//     id: 2,
+//     image: banner2,
+//     name: "Lê Văn Sỹ",
+//     address: "123 Lê Vă Sỹ, Phường 4, Quận Tân Bình, TP.HCM",
+//     phone: "0123456789",
+//     email: "joiepalace.levansy@gmail.com",
+//     status: "active",
+//     slug: "le-van-sy",
+//   },
+//   {
+//     id: 3,
+//     image: banner2,
+//     name: "Phạm Văn Đồng",
+//     address: "123 Phạm Văn Đồng, Phường 4, Quận Tân Bình, TP.HCM",
+//     phone: "0123456789",
+//     email: "joiepalace.phamvandong@gmail.com",
+//     status: "active",
+//     slug: "pham-van-dong",
+//   },
+//   {
+//     id: 4,
+//     image: logo,
+//     name: "Tổng",
+//     address: "123 Phạm Văn Đồng, Phường 4, Quận Tân Bình, TP.HCM",
+//     phone: "0123456789",
+//     email: "joiepalace.tong@gmail.com",
+//     status: "active",
+//     slug: "tong",
+//   },
+// ];
 
 function Page() {
+  const dispatch = useDispatch();
+  const { branches } = useSelector((store) => store.branch.branches);
+
+  React.useEffect(() => {
+    dispatch(getBranches());
+  }, []);
+
   return (
     <div className="relative w-full h-screen p-8">
       <Image
@@ -101,15 +109,17 @@ function Page() {
             Chọn chi nhánh
           </h2>
           <Row className="mt-5" gutter={[20, 20]}>
-            {initialBranches.map((b) => (
-              <Col span={12} key={b.id}>
-                <Branch
-                  branch={b}
-                  buttonText={"Chọn"}
-                  to={`/auth/dang-nhap/${b.slug}`}
-                />
+            {branches && branches.length > 0 ? (
+              branches.map((branch) => (
+                <Col key={branch.id} span={8}>
+                  <Branch branch={branch} />
+                </Col>
+              ))
+            ) : (
+              <Col span={24}>
+                <p className="text-center text-white">No branches available</p>
               </Col>
-            ))}
+            )}
           </Row>
         </div>
       </div>

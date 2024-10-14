@@ -27,6 +27,7 @@ model users {
   memberships_id Int?         @unique
   memberships    memberships? @relation(fields: [memberships_id], references: [id])
   bookings       bookings[]
+  feedbacks      feedbacks[]
 }
 
 model memberships {
@@ -55,13 +56,13 @@ model verify_tokens {
 }
 
 model branches {
-  id                    Int        @id @default(autoincrement())
+  id                    Int         @id @default(autoincrement())
   name                  String
-  slug                  String     @unique
+  slug                  String      @unique
   address               String
   phone                 String
   email                 String
-  rate                  Int        @default(5)
+  rate                  Int         @default(5)
   images                String[]
   slogan                String
   slogan_description    String
@@ -70,15 +71,16 @@ model branches {
   diagram_images        String[]
   equipment_description String
   equipment_images      String[]
-  deleted               Boolean    @default(false)
+  deleted               Boolean     @default(false)
   deleted_at            DateTime?
   deleted_by            Int?
-  created_at            DateTime   @default(now())
-  updated_at            DateTime   @updatedAt
+  created_at            DateTime    @default(now())
+  updated_at            DateTime    @updatedAt
   staffs                staffs[]
   stages                stages[]
   spaces                spaces[]
   bookings              bookings[]
+  feedbacks             feedbacks[]
 }
 
 model stages {
@@ -271,6 +273,7 @@ model bookings {
   created_at        DateTime          @default(now())
   updated_at        DateTime          @updatedAt
   booking_details   booking_details[]
+  feedbacks         feedbacks[]
 }
 
 enum PaymentMethod {
@@ -307,4 +310,20 @@ model booking_details {
   total_amount   Int           @default(0)
   created_at     DateTime      @default(now())
   updated_at     DateTime      @updatedAt
+}
+
+model feedbacks {
+  id         Int      @id @default(autoincrement())
+  branch_id  Int
+  branches   branches @relation(fields: [branch_id], references: [id])
+  booking_id Int
+  bookings   bookings @relation(fields: [booking_id], references: [id])
+  user_id    Int?
+  users      users?   @relation(fields: [user_id], references: [id])
+  name       String
+  comments   String
+  rate       Int
+  is_show    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
