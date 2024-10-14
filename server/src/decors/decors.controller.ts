@@ -177,6 +177,7 @@ export class DecorsController {
 
   // ! Get Decor By ID
   @Get('get/:decor_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -210,6 +211,7 @@ export class DecorsController {
 
   // ! Get Decor By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

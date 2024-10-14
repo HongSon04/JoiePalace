@@ -175,6 +175,7 @@ export class FunituresController {
 
   // ! Get One funiture by ID
   @Get('get/:funitures_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -208,7 +209,8 @@ export class FunituresController {
   }
 
   // ! Get One funiture by Slug
-  @Get('get-slug/:slug')
+  @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

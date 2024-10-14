@@ -16,6 +16,7 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StageDto } from './dto/stage.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { StageUpdateDto } from './dto/stage-update.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('stages')
 @Controller('api/stages')
@@ -93,6 +94,7 @@ export class StagesController {
 
   // ! Get All Stages
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -138,6 +140,7 @@ export class StagesController {
 
   // ! Get Stage By ID
   @Get('get/:stage_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

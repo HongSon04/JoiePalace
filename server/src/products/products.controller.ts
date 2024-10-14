@@ -28,8 +28,6 @@ export class ProductsController {
 
   // ! Create Product
   @Post('create')
-  // ! Create product
-  @Post('create')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -212,6 +210,7 @@ export class ProductsController {
   }
   // ! Get product by id
   @Get('get/:product_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -249,6 +248,7 @@ export class ProductsController {
 
   // ! Get product by slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -286,6 +286,7 @@ export class ProductsController {
 
   // ! Get product By Category Id
   @Get('get-by-category/:category_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -324,6 +325,7 @@ export class ProductsController {
 
   // ! Get product By Tag Id
   @Get('get-by-tag/:tag_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
