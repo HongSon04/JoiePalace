@@ -53,7 +53,7 @@ const OfferPage = () => {
   }, []);
   return (
     <ScrollFullPage>
-      <section className="section w-screen h-screen" id="section-offers">
+      {/* <section className="section w-screen h-screen" id="section-offers">
         <Carousel
           afterChange={handleSlideChange}
           ref={carouselRef}
@@ -78,7 +78,7 @@ const OfferPage = () => {
           showDots={false}
           infinite={true}
           keyBoardControl={true}
-          autoPlay={true}
+          autoPlay={false}
           autoPlaySpeed={8000}
           removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
           transitionDuration={2000}
@@ -96,7 +96,7 @@ const OfferPage = () => {
                   alt=""
                 />
               </div>
-              <div className="h-full flex gap-3 relative p-20">
+              <div className="h-full flex gap-3 items-center relative pt-20 px-8 lg:p-20">
                 <div className="h-full flex justify-center items-center">
                   <TextFade
                     settings={{
@@ -113,14 +113,14 @@ const OfferPage = () => {
                     }}
                     replayEffect={false}
                   >
-                    <div className=" flex justify-center items-center shrink-0">
+                    <div className="w-[60px] sm:w-auto flex justify-center items-center shrink-0">
                       <span className="h-auto uppercase -rotate-90 whitespace-nowrap font-bold text-5xl w-auto text-gold">
                         ưu đãi
                       </span>
                     </div>
                   </TextFade>
                 </div>
-                <div className="w-[30%] h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
+                <div className="w-full lg:w-[30%] h-fit lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
                   <TextFade
                     settings={{
                       hidden: { opacity: 0, x: 50 },
@@ -134,14 +134,14 @@ const OfferPage = () => {
                       },
                     }}
                     replayEffect={false}
-                    styles="h-full flex flex-col justify-between"
+                    styles="h-full flex flex-col justify-between  gap-16 "
                   >
                     <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-4">
                       {offer.title}
                     </span>
                     <span className="font-normal text-lg">{offer.content}</span>
                     <div className="w-full flex justify-between items-center">
-                      <ButtonDiscover className="w-[40%]"></ButtonDiscover>
+                      <ButtonDiscover className="w-fit px-3"></ButtonDiscover>
                       <div className="flex items-center gap-4">
                         <IconButton
                           background="none"
@@ -175,11 +175,11 @@ const OfferPage = () => {
             </div>
           ))}
         </Carousel>
-      </section>
-      <section className="section w-screen px-44" id="section-offers2">
-        <div className="w-full h-auto flex flex-col gap-16 ">
+      </section> */}
+      <section className="section w-screen px-8 lg:px-44" id="section-offers2">
+        <div className="w-full h-auto flex flex-col gap-8 lg:gap-16 ">
           <div className="w-full h-auto flex justify-between">
-            <span className="uppercase text-gold leading-[60px] font-bold text-6xl">
+            <span className="uppercase text-gold leading-[60px] font-bold text-4xl lg:text-6xl">
               ưu đãi khác
             </span>
             <div className="flex items-center gap-4">
@@ -209,7 +209,7 @@ const OfferPage = () => {
               </IconButton>
             </div>
           </div>
-          <div className="w-full h-[240px]">
+          <div className="w-full h-full lg:h-[240px]">
             <Carousel
               afterChange={handleSlideChange}
               ref={carouselRef2}
@@ -234,13 +234,13 @@ const OfferPage = () => {
               showDots={false}
               infinite={false}
               keyBoardControl={true}
-              autoPlay={true}
+              autoPlay={false}
               autoPlaySpeed={8000}
               slidesToSlide={3}
               removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
               transitionDuration={2000}
               customTransition={"2000ms ease-in-out"}
-              containerClass="w-full h-full"
+              containerClass="w-full h-full flex flex-col lg:flex-row page-offers"
             >
               {offers.map((offer, index) => (
                 <div key={offer.id} className="w-full h-[240px] relative">

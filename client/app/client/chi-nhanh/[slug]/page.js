@@ -1,16 +1,38 @@
 "use client";
-
 import Footer from "@/app/_components/FooterClient";
 import ScrollFullPage from "@/app/_components/ScrollFullPage";
-import { motion } from "framer-motion";
 import { Image } from "@chakra-ui/react";
-import TextFade from "@/app/_components/TextFade";
 import IconButton from "@/app/_components/IconButton";
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
-import Loading from "@/app/loading";
 import { useParams } from "next/navigation";
-import { title } from "process";
+import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import Carousel from "react-multi-carousel";
+import "@/app/_styles/client.css";
+import TextFade from "@/app/_components/TextFade";
 
+const section6 = [
+  {
+    id: 1,
+    url: "/images-client/branch/hoang-van-thu/DIWA-2.jpg",
+    name: "diwa",
+  },
+  {
+    id: 2,
+    url: "/images-client/branch/hoang-van-thu/SOULIX-2-1.jpg",
+    name: "soulix",
+  },
+  {
+    id: 3,
+    url: "/images-client/branch/hoang-van-thu/ALPAS-4.jpg",
+    name: "alpas",
+  },
+  {
+    id: 4,
+    url: "/images-client/branch/hoang-van-thu/CHILLAX-2.jpg",
+    name: "chillax",
+  },
+];
 const textContainerVariants = {
   hidden: { opacity: 0, y: 150, x: 0 },
   visible: {
@@ -24,15 +46,35 @@ const textContainerVariants = {
 };
 
 const PageLocation = () => {
+  const carouselRef = useRef();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const carouselMapRef1 = useRef(null);
+  const carouselMapRef2 = useRef(null);
+
+  const handlePrevious = () => {
+    if (carouselMapRef1.current && carouselMapRef2.current) {
+      carouselMapRef1.current.previous();
+      carouselMapRef2.current.previous();
+    }
+  };
+
+  const handleNext = () => {
+    if (carouselMapRef1.current && carouselMapRef2.current) {
+      carouselMapRef1.current.next();
+      carouselMapRef2.current.next();
+    }
+  };
   const { slug } = useParams();
+  const handleSlideChange = (nextSlide) => {
+    setCurrentSlide(nextSlide);
+  };
   console.log(slug);
-  
 
   // const { slug } = router.query;
   return (
     <ScrollFullPage>
       {/* banner */}
-      {/* <section className="section banner w-full h-screen relative top-0 left-0">
+      <section className="section banner w-full h-screen relative top-0 left-0">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <Image
             src="/images-client/banners/banner-2.png"
@@ -139,8 +181,390 @@ const PageLocation = () => {
             />
           </div>
         </div>
-      </section> */}
-      <section className="section w-screen h-screen">
+      </section>
+      <section className="section w-screen h-screen" id="location__section-3">
+        <div className="w-full h-full grid grid-cols-12 grid-rows-12 gap-y-5 px-44 relative">
+          <TextFade
+            settings={{
+              hidden: { opacity: 0, x: 0, y: 70 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                transition: {
+                  duration: 2,
+                  delay: 0.25,
+                  ease: "easeOut",
+                },
+              },
+            }}
+            replayEffect={true}
+            className="absolute top-20"
+          >
+            <div className="w-full h-auto relative flex flex-col gap-7">
+              <span className="uppercase text-5xl font-semibold text-gold inline-block px-44 w-[55%]">
+                sơ đồ tổng thể công suất & kích thước
+              </span>
+              <span className="h-1 w-[150px] bg-gold flex absolute left-0 top-[50%]"></span>
+            </div>
+          </TextFade>
+          <TextFade
+            settings={{
+              hidden: { opacity: 0, x: 0, y: 70 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                transition: {
+                  duration: 2,
+                  delay: 0.25,
+                  ease: "easeOut",
+                },
+              },
+            }}
+            replayEffect={true}
+            className="row-start-9 row-end-13 col-start-7 col-end-13 z-30"
+          >
+            <div className="w-full h-auto relative flex flex-col gap-4 pl-9 pt-7">
+              <span className="text-base">
+                Trung tâm Sự kiện White Palace sở hữu 02 đại sảnh đa năng và 02
+                phòng họp cao cấp đáp ứng đa dạng các loại hình sự kiện. Hãy tìm
+                hiểu bảng Công Suất - Kích Thước và đừng quên để lại lời nhắn
+                cho chúng tôi nếu bạn cần hỗ trợ thêm thông tin.
+              </span>
+            </div>
+          </TextFade>
+          <div className="buttonSlide col-start-1 col-end-13 row-start-7 row-end-8 z-[998]  relative">
+            <IconButton
+              background="none"
+              type={"button"}
+              className="absolute left-[-50px]"
+              onClick={handlePrevious}
+            >
+              <Image
+                src="/arrow_circle_left.svg"
+                w={"100%"}
+                h={"100%"}
+                alt=""
+              />
+            </IconButton>
+            <IconButton
+              background="none"
+              type={"button"}
+              className="absolute right-[-50px]"
+              onClick={handleNext}
+            >
+              <Image
+                src="/arrow_circle_right.svg"
+                w={"100%"}
+                h={"100%"}
+                alt=""
+              />
+            </IconButton>
+          </div>
+          <div className="col-start-1 col-end-13 row-start-5 row-end-12 z-20 flex gap-10">
+            <div className="w-1/2 h-full bg-green-200 flex justify-center items-center">
+              <Carousel
+                ref={carouselMapRef1}
+                responsive={{
+                  superLargeDesktop: {
+                    breakpoint: { max: 4000, min: 1024 },
+                    items: 1,
+                  },
+                  desktop: {
+                    breakpoint: { max: 1024, min: 768 },
+                    items: 1,
+                  },
+                  tablet: {
+                    breakpoint: { max: 768, min: 464 },
+                    items: 1,
+                  },
+                  mobile: {
+                    breakpoint: { max: 464, min: 0 },
+                    items: 1,
+                  },
+                }}
+                showDots={false}
+                infinite={true}
+                keyBoardControl={true}
+                autoPlay={false}
+                autoPlaySpeed={0}
+                removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
+                transitionDuration={1000}
+                customTransition={"1000ms ease-in-out"}
+                containerClass="w-full h-full"
+              >
+                <div className="w-full h-full overflow-hidden">
+                  <Image
+                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-1.jpg"
+                    className="w-full h-full object-cover"
+                    alt=""
+                  />
+                </div>
+                <div className="w-full h-full overflow-hidden">
+                  <Image
+                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-2.jpg"
+                    className="w-full h-full object-cover"
+                    alt=""
+                  />
+                </div>
+              </Carousel>
+            </div>
+            <div className="w-[30%] h-[60%] carosel-right">
+              <Carousel
+                // afterChange={handleSlideChange}
+                ref={carouselMapRef2}
+                responsive={{
+                  superLargeDesktop: {
+                    breakpoint: { max: 4000, min: 1024 },
+                    items: 1,
+                  },
+                  desktop: {
+                    breakpoint: { max: 1024, min: 768 },
+                    items: 1,
+                  },
+                  tablet: {
+                    breakpoint: { max: 768, min: 464 },
+                    items: 1,
+                  },
+                  mobile: {
+                    breakpoint: { max: 464, min: 0 },
+                    items: 1,
+                  },
+                }}
+                showDots={false}
+                infinite={true}
+                keyBoardControl={true}
+                autoPlay={false}
+                autoPlaySpeed={0}
+                transitionDuration={1000}
+                customTransition={"1000ms ease-in-out"}
+                removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
+                containerClass="w-full h-full"
+              >
+                <div className="w-full h-full overflow-hidden">
+                  <Image
+                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-1.jpg"
+                    className="w-full h-full object-cover"
+                    alt=""
+                  />
+                </div>
+                <div className="w-full h-full overflow-hidden">
+                  <Image
+                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-2.jpg"
+                    className="w-full h-full object-cover"
+                    alt=""
+                  />
+                </div>
+              </Carousel>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="section w-screen h-screen" id="location__section-4">
+        <div className="w-full h-full grid grid-cols-12 grid-rows-12 gap-y-5 px-44 relative">
+          <TextFade
+            settings={{
+              hidden: { opacity: 0, x: 0, y: 70 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                transition: {
+                  duration: 2,
+                  delay: 0.25,
+                  ease: "easeOut",
+                },
+              },
+            }}
+            replayEffect={true}
+            className="absolute top-20"
+          >
+            <div className="w-full h-auto relative flex flex-col gap-7">
+              <span className="uppercase text-5xl font-semibold text-gold inline-block px-44">
+                trang thiết bị
+              </span>
+              <span className="text-base z-10 w-[35%] ml-44">
+                Toàn bộ sảnh tiệc đều sở hữu hệ thống trang thiết bị hiện đại,
+                đảm bảo mang đến cho khách tham dự sự kiện trải nghiệm tối ưu
+                nhất.
+              </span>
+              <span className="h-1 w-[150px] bg-gold flex absolute left-0 top-[25%]"></span>
+            </div>
+          </TextFade>
+          <TextFade
+            settings={{
+              hidden: { opacity: 0, x: 0, y: 70 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                transition: {
+                  duration: 2,
+                  delay: 0.25,
+                  ease: "easeOut",
+                },
+              },
+            }}
+            replayEffect={true}
+            className="row-start-9 row-end-13 col-start-7 col-end-13"
+          >
+            <div className="w-full h-auto relative flex flex-col gap-4">
+              <span>- Thiết bị âm thanh, ánh sáng công nghệ cao</span>
+              <span>- Màn hình LED hiện đại</span>
+              <span>- Hệ thống móc treo trần đa năng</span>
+              <span>- Hệ sàn chịu tải lớn</span>
+            </div>
+          </TextFade>
+          {/* images start */}
+          <div className="overflow-hidden row-start-5 row-end-13 col-start-3 col-end-7 pr-5 z-20">
+            <Image
+              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/meeting-4.png"
+              className="w-full h-full object-cover"
+              alt=""
+            />
+          </div>
+          <div className="overflow-hidden col-start-6 col-end-9 row-start-1 row-end-7 z-10">
+            <Image
+              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/meeting-5.png"
+              className="w-full h-full object-cover"
+              alt=""
+            />
+          </div>
+          <div className="overflow-hidden col-start-7 col-end-13 row-start-2 row-end-9">
+            <Image
+              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/meeting-6.png"
+              className="w-full h-full object-cover"
+              alt=""
+            />
+          </div>
+          {/* images end */}
+        </div>
+      </section>
+      <section
+        className="section w-screen h-screen flex flex-col gap-20 pt-20"
+        id="location__section-5"
+      >
+        <TextFade
+          settings={{
+            hidden: { opacity: 0, x: 0, y: 70 },
+            visible: {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              transition: {
+                duration: 2,
+                delay: 0.25,
+                ease: "easeOut",
+              },
+            },
+          }}
+          replayEffect={true}
+        >
+          <div className="w-full h-auto relative">
+            <span className="uppercase text-5xl font-semibold text-gold inline-block px-44">
+              không gian hội nghị
+            </span>
+            <span className="h-1 w-[150px] bg-gold flex absolute left-0 bottom-2"></span>
+          </div>
+        </TextFade>
+        <div className="w-full h-auto flex justify-between gap-16 px-44">
+          <TextFade
+            settings={{
+              hidden: { opacity: 0, x: 0, y: 100 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                transition: {
+                  duration: 2,
+                  delay: 0.25,
+                  ease: "easeOut",
+                },
+              },
+            }}
+            replayEffect={true}
+            styles="w-1/2"
+          >
+            <div className="w-full flex flex-col gap-12">
+              <div className="flex flex-col gap-12">
+                <span className="text-gold text-4xl font-medium opacity-50 space-active">
+                  Kiểu lớp học
+                </span>
+                <span className="text-gold text-4xl font-medium opacity-50">
+                  Kiểu bán nguyệt
+                </span>
+                <span className="text-gold text-4xl font-medium opacity-50">
+                  Kiểu rạp hát
+                </span>
+              </div>
+              <div className="text-white text-base">
+                Dãy bàn, ghế hội nghị hướng lên sân khấu, thường có diễn giả,
+                không gian thuận tiện cho việc ghi chép, đọc tài liệu. Thích hợp
+                cho những sự kiện có ghi chép hoặc có phát tài liệu để người
+                tham dự tham khảo hoặc dùng máy tính xách tay. Đây là giải pháp
+                sắp xếp thoải mái nhất cho những cuộc họp dài và có không gian
+                cho khách mời để vật dụng hoặc gác tay.
+              </div>
+            </div>
+          </TextFade>
+          <div className="w-1/2 overflow-hidden">
+            <Carousel
+              responsive={{
+                superLargeDesktop: {
+                  breakpoint: { max: 4000, min: 1024 },
+                  items: 2,
+                },
+                desktop: {
+                  breakpoint: { max: 1024, min: 768 },
+                  items: 2,
+                },
+                tablet: {
+                  breakpoint: { max: 768, min: 464 },
+                  items: 2,
+                },
+                mobile: {
+                  breakpoint: { max: 464, min: 0 },
+                  items: 1,
+                },
+              }}
+              showDots={false}
+              infinite={false}
+              keyBoardControl={true}
+              autoPlay={false}
+              autoPlaySpeed={0}
+              removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
+              containerClass="w-full h-full"
+            >
+              <div className="w-full h-full p-2">
+                <Image
+                  src="https://whitepalace.com.vn/wp-content/uploads/2024/06/HVT-CLASSROOM-1-260x420.jpg"
+                  w={"100%"}
+                  h={"100%"}
+                  alt=""
+                />
+              </div>
+              <div className="w-full h-full p-2">
+                <Image
+                  src="https://whitepalace.com.vn/wp-content/uploads/2024/06/HVT-CLASSROOM-2-260x420.jpg"
+                  w={"100%"}
+                  h={"100%"}
+                  alt=""
+                />
+              </div>
+              <div className="w-full h-full p-2">
+                <Image
+                  src="https://whitepalace.com.vn/wp-content/uploads/2024/06/HVT-CLASSROOM-3-260x420.jpg"
+                  w={"100%"}
+                  h={"100%"}
+                  alt=""
+                />
+              </div>
+            </Carousel>
+          </div>
+        </div>
+      </section>
+      <section className="section w-screen h-screen" id="location__section-6">
         <div className="w-screen h-screen relative top-0 left-0">
           <div className="w-screen h-screen absolute top-0 left-0 overflow-hidden">
             <Image
@@ -158,7 +582,7 @@ const PageLocation = () => {
                 <IconButton
                   background="none"
                   type={"button"}
-                  //   onClick={() => carouselRef.current.previous()}
+                  onClick={() => carouselRef.current.previous()}
                 >
                   <Image
                     src="/arrow_circle_left.svg"
@@ -170,7 +594,7 @@ const PageLocation = () => {
                 <IconButton
                   background="none"
                   type={"button"}
-                  //   onClick={() => carouselRef.current.next()}
+                  onClick={() => carouselRef.current.next()}
                 >
                   <Image
                     src="/arrow_circle_right.svg"
@@ -197,7 +621,55 @@ const PageLocation = () => {
                 </div>
               </div>
               <span className="w-[1px] h-full bg-white"></span>
-              <div className="w-1/2 h-full bg-black"></div>
+              <div className="w-1/2 h-full overflow-hidden flex">
+                <Carousel
+                  afterChange={handleSlideChange}
+                  ref={carouselRef}
+                  responsive={{
+                    superLargeDesktop: {
+                      breakpoint: { max: 4000, min: 1024 },
+                      items: 3,
+                    },
+                    desktop: {
+                      breakpoint: { max: 1024, min: 768 },
+                      items: 3,
+                    },
+                    tablet: {
+                      breakpoint: { max: 768, min: 464 },
+                      items: 2,
+                    },
+                    mobile: {
+                      breakpoint: { max: 464, min: 0 },
+                      items: 1,
+                    },
+                  }}
+                  showDots={false}
+                  infinite={false}
+                  keyBoardControl={true}
+                  autoPlay={false}
+                  autoPlaySpeed={0}
+                  removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
+                  containerClass="w-full h-full"
+                >
+                  {section6.map((item) => (
+                    <div
+                      key={item.id}
+                      className="w-full h-full px-2 flex justify-center items-center relative"
+                    >
+                      <div className="w-full h-full overflow-hidden">
+                        <Image
+                          src={item.url}
+                          className="w-full h-full object-cover"
+                          alt=""
+                        />
+                      </div>
+                      <span className="absolute uppercase bottom-4 font-bold text-2xl">
+                        {item.name}
+                      </span>
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
             </div>
           </div>
         </div>
