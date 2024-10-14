@@ -1,97 +1,23 @@
-"use client";
-
+import {
+  error,
+  fetchBranchSuccess,
+  loading,
+} from "@/app/_lib/features/branch/branchSlice";
+import { fetchBranchBySlug } from "@/app/_services/branchesServices";
+import { fetchData } from "@/app/_utils/helpers";
 import authBg from "@/public/auth-bg.png";
 import {
   ChatBubbleLeftRightIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Button, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
-
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-
-import {
-  login,
-  setEmail,
-  setPassword,
-} from "@/app/_lib/features/authentication/accountSlice";
-import { API_CONFIG } from "@/app/_utils/api.config";
-import axios from "axios";
-import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
 import Form from "./Form";
-import { useToast } from "@chakra-ui/react";
-import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 
 function Page({ params: { branchSlug } }) {
-  const toast = useToast();
-  const router = useRouter();
-
-  const methods = useForm();
-
-  const dispatch = useDispatch();
-  const { password, email } = useSelector((store) => store.account);
-
-  const handleSubmit = async (data) => {
-    try {
-      const res = await axios.post(API_CONFIG.AUTH.LOGIN, data);
-      if (res.status === 200) {
-        dispatch(
-          login({
-            email: email,
-            role: "admin",
-            accessToken: res.data.data.access_token,
-            refreshToken: res.data.refresh_token,
-          })
-        );
-
-        const toastPromise = new Promise((resolve) => {
-          setTimeout(() => {
-            resolve();
-          }, 3000);
-
-          toast({
-            title: res.data.data.message,
-            description: "Chào mừng bạn quay trở lại",
-            status: "success",
-            duration: 4000,
-            isClosable: true,
-            position: "top",
-          });
-        });
-
-        const routePromise = new Promise((resolve) => {
-          setTimeout(() => {
-            router.push(`/admin/bang-dieu-khien/${branchSlug}`);
-            resolve();
-          }, 3000);
-        });
-
-        Promise.race([toastPromise, routePromise]);
-
-        dispatch(setEmail(""));
-        dispatch(setPassword(""));
-      }
-    } catch (error) {
-      toast({
-        title: "Đăng nhập thất bại",
-        position: "top",
-        description: error.response.data.message,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      });
-    }
-  };
-
-  const handleSetPassword = (e) => {
-    dispatch(setPassword(e.target.value));
-  };
-
-  const handleSetEmail = (e) => {
-    dispatch(setEmail(e.target.value));
-  };
-
   return (
     <div className="relative w-full h-screen p-8">
       <Image
@@ -102,8 +28,13 @@ function Page({ params: { branchSlug } }) {
         className="object-cover contrast-200 saturate-150 exposure-75"
       />
       {/* BUTTONS */}
-      <div className="flex justify-end gap-5">
-        <Popover placement="bottom-end">
+      <div className="flex justify-end gap-5 z-0">
+        <Popover
+          placement="bottom-end"
+          css={{
+            zIndex: 10,
+          }}
+        >
           <PopoverTrigger>
             <Button isIconOnly className="bg-white shadow-md" radius="full">
               <QuestionMarkCircleIcon className="w-6 h-6 text-gray-600" />
@@ -113,8 +44,24 @@ function Page({ params: { branchSlug } }) {
             <div className="px-1 py-2">
               <div className="text-small font-bold">Thông tin đăng nhập</div>
               <ol className="mt-3">
-                <li>1. Email</li>
-                <li>2. Mật khẩu</li>
+                <li className="font-semibold">
+                  1. Email:
+                  <ul className="font-normal">
+                    <li>- Bắt buộc</li>
+                    <li>- Email phải hợp lệ</li>
+                  </ul>
+                </li>
+                <li className="font-semibold">
+                  2. Mật khẩu:
+                  <ul className="font-normal">
+                    <li>- Bắt buộc</li>
+                    <li>- Phải có ít nhất 8 ký tự</li>
+                    <li>- Tối đa 35 ký tự</li>
+                    <li>- Có ít nhất 1 ký tự in hoa</li>
+                    <li>- Có ít nhất 1 ký tự thường</li>
+                    <li>- Có ít nhất 1 chữ số</li>
+                  </ul>
+                </li>
               </ol>
             </div>
           </PopoverContent>
@@ -125,15 +72,8 @@ function Page({ params: { branchSlug } }) {
           </Button>
         </Tooltip>
       </div>
-
-      <Form
-        methods={methods}
-        email={email}
-        password={password}
-        handleSetEmail={handleSetEmail}
-        handleSetPassword={handleSetPassword}
-        onSubmit={handleSubmit}
-      />
+      {/* FORM */}
+      <Form branchSlug={branchSlug} />
     </div>
   );
 }

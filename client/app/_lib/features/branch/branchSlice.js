@@ -5,8 +5,9 @@ import axios from "axios";
 const initialState = {
   branches: [],
   currentBranch: null,
-  loading: false,
-  error: null,
+  isLoading: false,
+  isError: false,
+  errorMessage: null,
 };
 
 const branchSlice = createSlice({
@@ -14,38 +15,28 @@ const branchSlice = createSlice({
   initialState,
   reducers: {
     loading: (state) => {
-      state.loading = true;
+      state.isLoading = true;
     },
     error: (state, action) => {
-      state.error = action.payload;
+      state.isLoading = false;
+      state.isError = true;
+      state.errorMessage = action.payload;
     },
-    setBranches: (state, action) => {
-      state.branches = action.payload;
-    },
-    setCurrentBranch: (state, action) => {
+    fetchBranchSuccess: (state, action) => {
       state.currentBranch = action.payload;
+      state.isLoading = false;
+      state.isError = false;
+      state.errorMessage = null;
+    },
+    fetchBranchesSuccess: (state, action) => {
+      state.branches = action.payload;
+      state.isLoading = false;
+      state.isError = false;
+      state.errorMessage = null;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(getBranches.fulfilled, (state, action) => {
-      state.branches = action.payload;
-      state.loading = false;
-    });
-    builder.addCase(getBranches.rejected, (state, action) => {
-      state.error = action.error.message;
-      state.loading = false;
-    });
-  },
 });
 
-export const getBranches = createAsyncThunk("branch/getBranches", async () => {
-  try {
-    const res = await axios.get(API_CONFIG.BRANCHES.GET_ALL);
-    return res.data;
-  } catch (error) {
-    return error.message;
-  }
-});
-
-export const { setBranches, setCurrentBranch } = branchSlice.actions;
+export const { fetchBranchesSuccess, fetchBranchSuccess, loading, error } =
+  branchSlice.actions;
 export default branchSlice;

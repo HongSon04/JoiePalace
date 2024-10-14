@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import authBg from "@/public/auth-bg.png";
 import {
   ChatBubbleLeftRightIcon,
@@ -12,10 +11,18 @@ import Image from "next/image";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 
 import Branch from "@/app/_components/Branch";
-import { getBranches } from "@/app/_lib/features/branch/branchSlice";
+import Error from "@/app/_components/Error";
+import {
+  error,
+  fetchBranchesSuccess,
+  loading,
+} from "@/app/_lib/features/branch/branchSlice";
+import { fetchBranchesFromApi } from "@/app/_services/branchesServices";
+import { fetchData } from "@/app/_utils/helpers";
+import Loading from "@/app/admin/loading";
 import { Col, Row } from "antd";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 // const initialBranches = [
 //   {
@@ -62,11 +69,20 @@ import { useSelector } from "react-redux";
 
 function Page() {
   const dispatch = useDispatch();
-  const { branches } = useSelector((store) => store.branch.branches);
+
+  const { branches, isLoading, isError } = useSelector((store) => store.branch);
+
+  const getBranches = React.useCallback(() => {
+    fetchData(dispatch, fetchBranchesFromApi, {
+      loadingAction: loading,
+      successAction: fetchBranchesSuccess,
+      errorAction: error,
+    });
+  }, [dispatch]);
 
   React.useEffect(() => {
-    dispatch(getBranches());
-  }, []);
+    getBranches();
+  }, [getBranches]);
 
   return (
     <div className="relative w-full h-screen p-8">
@@ -104,23 +120,32 @@ function Page() {
 
       {/* BRANCHES */}
       <div className="abs-center">
-        <div className="flex flex-col p-5 rounded-md bg-blackAlpha-500 backdrop-blur-sm w-[1000px]">
+        <div className="flex flex-col p-5 rounded-md bg-blackAlpha-500 backdrop-blur-sm w-[1000px] h-[600px] overflow-y-auto">
           <h2 className="text-3xl leading-9 font-medium text-center text-white">
             Chọn chi nhánh
           </h2>
-          <Row className="mt-5" gutter={[20, 20]}>
-            {branches && branches.length > 0 ? (
-              branches.map((branch) => (
-                <Col key={branch.id} span={8}>
-                  <Branch branch={branch} />
+          {isLoading && <Loading />}
+          {isError && <Error />}
+          {!isLoading && !isError && (
+            <Row className="mt-8" gutter={[20, 20]}>
+              {branches && branches.length > 0 ? (
+                branches.map((branch) => (
+                  <Col key={branch.id} span={8}>
+                    <Branch
+                      branch={branch}
+                      to={`/auth/dang-nhap/${branch.slug}`}
+                    />
+                  </Col>
+                ))
+              ) : (
+                <Col span={24}>
+                  <p className="text-center text-white">
+                    No branches available
+                  </p>
                 </Col>
-              ))
-            ) : (
-              <Col span={24}>
-                <p className="text-center text-white">No branches available</p>
-              </Col>
-            )}
-          </Row>
+              )}
+            </Row>
+          )}
         </div>
       </div>
     </div>
