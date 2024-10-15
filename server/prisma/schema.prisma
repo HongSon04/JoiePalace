@@ -62,7 +62,7 @@ model branches {
   address               String
   phone                 String
   email                 String
-  rate                  Int         @default(5)
+  rate                  Float       @default(5)
   images                String[]
   slogan                String
   slogan_description    String
@@ -322,8 +322,8 @@ model feedbacks {
   users      users?   @relation(fields: [user_id], references: [id])
   name       String
   comments   String
-  rate       Int
-  is_show    Boolean  @default(false)
+  rate       Float    @default(5)
+  is_show    Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
