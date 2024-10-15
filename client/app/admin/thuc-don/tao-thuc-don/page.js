@@ -2,10 +2,13 @@
 
 import AdminHeader from "@/app/_components/AdminHeader";
 import CustomInput from "@/app/_components/CustomInput";
+import Dish from "@/app/_components/Dish";
 import SaveIcon from "@/app/_components/SaveIcon";
 import FileUploadButton from "@/app/_components/Uploader";
 import { fetchMenu } from "@/app/_lib/features/menu/menuSlice";
 import { dishCategories } from "@/app/_utils/config";
+import { formatPrice } from "@/app/_utils/formaters";
+import { capitalize } from "@/app/_utils/helpers";
 import { _require } from "@/app/_utils/validations";
 import docScan from "@/public/document_scanner.svg";
 import pizza from "@/public/local_pizza.svg";
@@ -17,7 +20,6 @@ import {
   PlusIcon,
   SquaresPlusIcon,
   TrashIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Button, Chip, useDisclosure } from "@nextui-org/react";
 import { Col, Row } from "antd";
@@ -28,18 +30,17 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import DishesModal from "./DishesModal";
-import Dish from "@/app/_components/Dish";
-import { capitalize } from "@/app/_utils/helpers";
-import { formatPrice } from "@/app/_utils/formaters";
+import DishesModal from "../[id]/DishesModal";
+import Breadcrumbs from "./Breadcrumbs";
 
 function Page() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [isDisabled, setIsDisabled] = React.useState(false);
   const [dishCategory, setDishCategory] = React.useState([]);
+  const [selectedMenuDishes, setSelectedMenuDishes] = React.useState([]);
+  const [imageSrc, setImageSrc] = React.useState(""); // State to store image source
   const [appetizer, setAppetizer] = React.useState([]); // Array of dishes
   const [mainCourse, setMainCourse] = React.useState([]); // Array of dishes
   const [dessert, setDessert] = React.useState([]); // Array of dishes
@@ -50,52 +51,13 @@ function Page() {
     dessert,
   });
 
-  useEffect(() => {
-    setMenuDishes({
-      appetizer,
-      mainCourse,
-      dessert,
-    });
-  }, [appetizer, mainCourse, dessert]);
-
-  const handleAddAppetizer = (appetizer) => {
-    setAppetizer([...appetizer, appetizer]);
-  };
-
-  const handleAddMainCourse = (mainCourse) => {
-    setMainCourse([...mainCourse, mainCourse]);
-  };
-
-  const handleAddDessert = (dessert) => {
-    setDessert([...dessert, dessert]);
-  };
-
   const handleAddingDishes = (dishes, category) => {
-    switch (category) {
-      case "appetizer":
-        handleAddAppetizer(dishes);
-        break;
-      case "mainCourse":
-        handleAddMainCourse(dishes);
-        break;
-      case "dessert":
-        handleAddDessert(dishes);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleOnOpen = () => {
-    if (
-      menuDishes[dishCategory].length >=
-      formState[`max${capitalize(dishCategory)}`]
-    ) {
-      setIsDisabled(true);
-    } else {
-      setIsDisabled(false);
-    }
-    onOpen();
+    setMenuDishes((prevMenuDishes) => {
+      return {
+        ...prevMenuDishes,
+        [category]: [...dishes],
+      };
+    });
   };
 
   const pathname = usePathname();
@@ -117,6 +79,14 @@ function Page() {
     const dishCategory = searchParams.get("dishesCategory");
     setDishCategory(dishCategory);
   }, [searchParams]);
+
+  React.useEffect(() => {
+    setMenuDishes({
+      appetizer,
+      mainCourse,
+      dessert,
+    });
+  }, [appetizer, mainCourse, dessert]);
 
   const methods = useForm();
 
@@ -154,6 +124,16 @@ function Page() {
     console.log(data);
   });
 
+  // Function to handle file upload
+  const handleFileUpload = (files) => {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageSrc(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div>
       {/* HEADER */}
@@ -167,6 +147,7 @@ function Page() {
       />
 
       {/* BREADCRUMBS */}
+      <Breadcrumbs></Breadcrumbs>
 
       {/* MAIN CONTENT */}
       {status === "loading" && <p>Loading...</p>}
@@ -175,11 +156,17 @@ function Page() {
         <>
           <div className="flex gap-5 mt-8 w-fit">
             {/* IMAGE & UPLOADER */}
-            <div className="w-fit relative h-fit bg-whiteAlpha-200 rounded-md">
+            <FileUploadButton
+              size="md"
+              accept="image/*"
+              onUpload={handleFileUpload}
+              className="w-fit relative h-fit bg-whiteAlpha-200 rounded-md"
+              acceptProps={{ className: "bg-green-200" }}
+              rejectProps={{ className: "bg-red-200" }}
+            >
               <Image
-                // src={menu.background}
-                src={""}
-                alt="background"
+                src={imageSrc}
+                alt="Upload the menu image here"
                 width={345}
                 height={440}
               />
@@ -189,29 +176,29 @@ function Page() {
                 <Button
                   startContent={<TrashIcon />}
                   className="bg-red-400 text-white rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setImageSrc("");
+                  }}
                 >
                   Xóa
                 </Button>
                 {/* UPLOADER */}
-                <FileUploadButton
+                <Button
                   size="md"
-                  accept="image/*"
                   startContent={
                     <DocumentArrowUpIcon width={20} height={20} color="white" />
                   }
-                  rejectProps={{
-                    color: "danger",
-                    startContent: <XMarkIcon />,
+                  className="bg-teal-400 text-white rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    document.querySelector('input[type="file"]').click();
                   }}
-                  onUpload={(files) => {
-                    console.log(files[0]);
-                  }}
-                  className={"bg-teal-400 text-white rounded-full"}
                 >
                   Upload
-                </FileUploadButton>
+                </Button>
               </div>
-            </div>
+            </FileUploadButton>
             {/* FORM */}
             <FormProvider {...methods}>
               <form
@@ -360,9 +347,9 @@ function Page() {
                           menuDishes[category.key].length
                         );
                         const remainingDishes = maxDishes - currentDishes;
-                        return remainingDishes + 1 <= 0
-                          ? "Đã đủ"
-                          : remainingDishes;
+                        return remainingDishes > 0
+                          ? `Còn ${remainingDishes}`
+                          : "Đã đủ";
                       })()}
                     </Chip>
                   </div>
@@ -387,7 +374,7 @@ function Page() {
                             "?" +
                             createQueryString("dishesCategory", category.key)
                         );
-                        handleOnOpen();
+                        onOpen();
                       }}
                       className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
                       radius="full"
@@ -396,13 +383,13 @@ function Page() {
                     </Button>
                     <DishesModal
                       category={dishCategory}
-                      disabled={isDisabled}
                       isOpen={isOpen}
                       onOpenChange={onOpenChange}
                       onAddingDishes={handleAddingDishes}
                       menuDishes={menuDishes}
                       menuInfo={formState}
-                      onOpen={handleOnOpen}
+                      selectedMenuDishes={selectedMenuDishes}
+                      setSelectedMenuDishes={setSelectedMenuDishes}
                     />
                   </>
                 </Col>

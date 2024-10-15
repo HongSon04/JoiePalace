@@ -200,10 +200,8 @@ export class UserService {
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -267,10 +265,8 @@ export class UserService {
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
-        : null;
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : null;
+        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate

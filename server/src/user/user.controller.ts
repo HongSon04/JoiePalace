@@ -15,7 +15,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { FilterDto } from 'helper/dto/Filter.dto';
@@ -23,10 +31,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'decorator/roles.decorator';
 import { Role } from 'helper/role.enum';
-import { get } from 'http';
 
 @ApiTags('user')
-@Controller('user')
+@Controller('api/user')
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -35,6 +42,14 @@ export class UserController {
 
   // ! Create User
   @Post('create')
+  @ApiBearerAuth()
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiOperation({ summary: 'Quản trị viên tạo tài khoản' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -100,6 +115,7 @@ export class UserController {
 
   // ! Get Profile
   @Get('profile')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -184,8 +200,8 @@ export class UserController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   getAll(@Query() query: FilterDto): Promise<any> {
     return this.userService.getAll(query);
   }
@@ -233,8 +249,8 @@ export class UserController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   getAllDeleted(@Query() query: FilterDto): Promise<any> {
     return this.userService.getAllDeleted(query);
   }
@@ -407,5 +423,4 @@ export class UserController {
   hardDelete(@Query('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);
   }
-
 }

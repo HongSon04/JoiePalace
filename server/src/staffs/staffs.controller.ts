@@ -33,7 +33,7 @@ import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
 
 @ApiTags('staffs')
 @UseGuards(AuthGuard)
-@Controller('staffs')
+@Controller('api/staffs')
 export class StaffsController {
   constructor(
     private readonly staffsService: StaffsService,
@@ -51,7 +51,7 @@ export class StaffsController {
         id: 'number',
         name: 'string',
         email: 'string',
-        location_id: 'number',
+        branch_id: 'number',
         phone: 'string',
         payment_info: 'string',
         shift: 'string',
@@ -121,7 +121,7 @@ export class StaffsController {
           id: 'number',
           name: 'string',
           email: 'string',
-          location_id: 'number',
+          branch_id: 'number',
           phone: 'string',
           payment_info: 'string',
           shift: 'string',
@@ -172,7 +172,7 @@ export class StaffsController {
           id: 'number',
           name: 'string',
           email: 'string',
-          location_id: 'number',
+          branch_id: 'number',
           phone: 'string',
           payment_info: 'string',
           shift: 'string',
@@ -224,7 +224,7 @@ export class StaffsController {
         id: 'number',
         name: 'string',
         email: 'string',
-        location_id: 'number',
+        branch_id: 'number',
         phone: 'string',
         payment_info: 'string',
         shift: 'string',
@@ -262,7 +262,7 @@ export class StaffsController {
         id: 'number',
         name: 'string',
         email: 'string',
-        location_id: 'number',
+        branch_id: 'number',
         phone: 'string',
         payment_info: 'string',
         shift: 'string',
@@ -302,7 +302,7 @@ export class StaffsController {
         id: 'number',
         name: 'string',
         email: 'string',
-        location_id: 'number',
+        branch_id: 'number',
         phone: 'string',
         payment_info: 'string',
         shift: 'string',

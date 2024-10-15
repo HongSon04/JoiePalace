@@ -2,20 +2,20 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
 
 export class UpdateStaffDto {
-  @ApiProperty()
-  location_id: number;
-  @ApiProperty()
+  @ApiProperty({ required: true })
+  branch_id: number;
+  @ApiProperty({ required: true })
   name: string;
-  @ApiProperty()
+  @ApiProperty({ required: true })
   phone: string;
-  @ApiProperty()
+  @ApiProperty({ required: true })
   payment_info: string;
-  @ApiProperty()
+  @ApiProperty({ required: true })
   @IsEnum(['Sáng', 'Tối', 'Cả ngày'], {
     message: 'Ca làm việc không hợp lệ (Sáng, Tối, Cả ngày)',
   })
   shift: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true })
   avatar: string;
 }

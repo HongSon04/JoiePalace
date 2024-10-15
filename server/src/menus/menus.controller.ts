@@ -16,14 +16,16 @@ import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('menus')
-@Controller('menus')
+@Controller('api/menus')
 export class MenusController {
   constructor(private readonly menusService: MenusService) {}
 
   // ! Create Menu
   @Post('create')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -58,6 +60,7 @@ export class MenusController {
 
   // ! Get All Menu
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -93,8 +96,8 @@ export class MenusController {
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   findAll(@Query() query: FilterPriceDto) {
     return this.menusService.findAll(query);
   }
@@ -136,14 +139,15 @@ export class MenusController {
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2024' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   findAllDeleted(@Query() query: FilterPriceDto) {
     return this.menusService.findAllDeleted(query);
   }
 
   // ! Get Menu By Id
   @Get('get/:menu_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -177,6 +181,7 @@ export class MenusController {
 
   // ! Get Menu By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

@@ -42,7 +42,7 @@ function News() {
                                         className="w-full h-full object-cover"
                                     />
                                 </Link>
-                                <div className="absolute bottom-[20px]  z-20 w-full">
+                                <div className="absolute bottom-[20px] w-full">
                                     <p className="w-[90%] font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl max-sm:left-0 m-auto">WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU</p>
                                 </div>
                             </div>
@@ -54,7 +54,7 @@ function News() {
                                         className="w-full h-full object-cover"
                                     />
                                 </Link>
-                                <div className="absolute bottom-[20px]  z-20 w-full">
+                                <div className="absolute bottom-[20px] w-full">
                                     <p className="w-[90%] font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl max-sm:left-0 m-auto">WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU</p>
                                 </div>
                             </div>
@@ -66,7 +66,7 @@ function News() {
                                         className="w-full h-full object-cover"
                                     />
                                 </Link>
-                                <div className="absolute bottom-[20px]  z-20 w-full">
+                                <div className="absolute bottom-[20px] w-full">
                                     <p className="w-[90%] font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl max-sm:left-0 m-auto">WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU</p>
                                 </div>
                             </div>

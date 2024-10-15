@@ -16,9 +16,10 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StageDto } from './dto/stage.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { StageUpdateDto } from './dto/stage-update.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('stages')
-@Controller('stages')
+@Controller('api/stages')
 export class StagesController {
   constructor(private readonly stagesService: StagesService) {}
 
@@ -34,7 +35,7 @@ export class StagesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -93,6 +94,7 @@ export class StagesController {
 
   // ! Get All Stages
   @Get('get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -104,7 +106,7 @@ export class StagesController {
           slug: 'string',
           description: 'string',
           images: 'object',
-          location_id: 'number',
+          branch_id: 'number',
           created_at: 'date',
           updated_at: 'date',
         },
@@ -132,12 +134,13 @@ export class StagesController {
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả sảnh theo chi nhánh' })
-  async getAll(@Query('location_id') location_id: number) {
-    return await this.stagesService.getAll(location_id);
+  async getAll(@Query('branch_id') branch_id: number) {
+    return await this.stagesService.getAll(branch_id);
   }
 
   // ! Get Stage By ID
   @Get('get/:stage_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -148,7 +151,7 @@ export class StagesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -184,7 +187,7 @@ export class StagesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },

@@ -117,20 +117,12 @@ const page = () => {
 
 
       <div className="container  flex gap-8 w-full h-full">
-        <div className="">
-          <div className=" p-4 bg-whiteAlpha-100 mb-[1rem]  rounded-xl ">
-            <div className="flex items-center justify-between mb-[10px]">
-              <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
-              <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
-            </div>
-            <Chart  data={data} chartType="line" />
-          </div>
-          <div className="p-4  h-auto  bg-whiteAlpha-100  rounded-xl " >
+      <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl " >
             <div className="flex justify-between gap-[10px] items-center">
               <p className="text-base font-semibold ">Khách hàng</p>
               <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
             </div>
-            <div className="flex flex-col gap-3 max-h-[355px] overflow-y-auto hide-scrollbar">
+            <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
               <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
                 <img className="rounded-full w-[48px]" src="/image/user.jpg" />
                 <div className="w-full flex justify-between items-center">
@@ -225,7 +217,6 @@ const page = () => {
          
             </div>
           </div>
-        </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
           <div className="flex justify-between items-center mb-[10px]">
             <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
@@ -254,13 +245,13 @@ const page = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-between gap-3 p-4">
+      <div className="flex justify-between gap-6 p-4">
         <div className="w-1/2">
           <div className="flex items-center justify-between mb-[10px]">
-            <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
+            <p className="text-base  font-semibold">Yêu cầu mới nhất</p>
             <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
           </div>
-        <div className="overflow-y-auto h-72">
+        <div className="overflow-y-auto max-h-[335px]">
           <table className="table w-full">
             <thead>
               <tr>
@@ -325,12 +316,16 @@ const page = () => {
 
         </div>
         <div className=" w-1/2">
-          <div className="flex items-center justify-between mb-[10px] h-[24px] w-full">
-
+          <div className="flex items-center justify-between mb-[10px]">
+            <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
+            <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
           </div>
-          <div className="rounded-lg w-full h-72 mt-[10px]">
-
+          <div className="p-4  bg-blackAlpha-100  rounded-xl">
+            <Chart  data={data} chartType="line" />
           </div>
+       
+         
+         
         </div>
         
         

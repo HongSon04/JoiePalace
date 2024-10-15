@@ -13,7 +13,9 @@ import * as bcrypt from 'bcrypt';
 import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-
+import uniqid from 'uniqid';
+import { MailService } from 'src/mail/mail.service';
+import { Cron } from '@nestjs/schedule';
 @Injectable()
 export class AuthService {
   constructor(
@@ -21,6 +23,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private cloudinaryService: CloudinaryService,
+    private mailService: MailService,
   ) {}
   // ! Register
   async register(createUserDto: CreateAuthUserDto) {
@@ -49,9 +52,28 @@ export class AuthService {
       });
       // ? Generate token
       const token = await this.generateToken(user);
+
+      // ! Send mail
+      const randomToken = uniqid();
+      await this.prismaService.verify_tokens.create({
+        data: {
+          token: randomToken,
+          email: user.email,
+          expired_at: new Date(Date.now() + 1000 * 60 * 15),
+        },
+      });
+      await this.mailService.confirmRegister(
+        user.username,
+        user.email,
+        randomToken,
+      );
       // ? Return token
       throw new HttpException(
-        { message: 'Đăng ký thành công', data: token },
+        {
+          message:
+            'Đăng ký thành công bạn vui lòng kiểm tra email để xác nhận tài khoản',
+          data: token,
+        },
         HttpStatus.CREATED,
       );
     } catch (error) {
@@ -234,6 +256,120 @@ export class AuthService {
     }
   }
 
+  // ! Send Email Verify
+  async sendEmailVerify(email: string) {
+    try {
+      const findUserByEmail = await this.prismaService.users.findFirst({
+        where: {
+          email,
+        },
+      });
+      if (!findUserByEmail) {
+        throw new HttpException('Email không tồn tại', HttpStatus.BAD_REQUEST);
+      }
+
+      if (findUserByEmail.verify_at) {
+        throw new HttpException(
+          'Email đã được xác thực',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const randomToken = uniqid();
+      await this.prismaService.verify_tokens.create({
+        data: {
+          token: randomToken,
+          email,
+          expired_at: new Date(Date.now() + 1000 * 60 * 15),
+        },
+      });
+      await this.mailService.confirmRegister(
+        findUserByEmail.username,
+        email,
+        randomToken,
+      );
+    } catch (error) {}
+  }
+
+  // ! Verify Token
+  async verifyToken(email: string, token: string) {
+    try {
+      const findToken = await this.prismaService.verify_tokens.findFirst({
+        where: {
+          token,
+          email,
+        },
+      });
+
+      if (!findToken) {
+        throw new HttpException(
+          'Token không hợp lệ hoặc email không đúng',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (findToken.expired_at < new Date()) {
+        await this.prismaService.verify_tokens.delete({
+          where: {
+            id: findToken.id,
+          },
+        });
+        throw new HttpException('Token đã hết hạn', HttpStatus.BAD_REQUEST);
+      }
+
+      await this.prismaService.users.update({
+        where: {
+          email: findToken.email,
+        },
+        data: {
+          verify_at: new Date(),
+        },
+      });
+
+      await this.prismaService.verify_tokens.delete({
+        where: {
+          id: findToken.id,
+        },
+      });
+
+      throw new HttpException('Xác thực thành công', HttpStatus.OK);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ auth.service.ts -> verifyEmail', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
+    }
+  }
+
+  // ! Cron Job Check Token Expired Date
+  @Cron('0 0 * * * *') // ? Run every hour
+  async checkTokenExpiredDate() {
+    try {
+      const findTokens = await this.prismaService.verify_tokens.findMany({
+        where: {
+          expired_at: {
+            lt: new Date(),
+          },
+        },
+      });
+
+      if (findTokens.length > 0) {
+        await this.prismaService.verify_tokens.deleteMany({
+          where: {
+            id: {
+              in: findTokens.map((token) => token.id),
+            },
+          },
+        });
+      }
+    } catch (error) {
+      console.log('Lỗi từ auth.service.ts -> checkTokenExpiredDate', error);
+    }
+  }
+
   // ! Generate Token
   async generateToken(user: UserEntity) {
     const payload = {
@@ -268,6 +404,7 @@ export class AuthService {
       refresh_token,
     };
   }
+
   // ! Hashed Password
   hashedPassword(password: string) {
     const hashedPassword = bcrypt.hashSync(password, 10);

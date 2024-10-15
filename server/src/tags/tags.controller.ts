@@ -14,9 +14,10 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('tags')
-@Controller('tags')
+@Controller('api/tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
@@ -54,6 +55,7 @@ export class TagsController {
 
   // ! Get All Tags
   @Get('/get-all')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -97,6 +99,7 @@ export class TagsController {
   }
 
   @Get('/get/:tag_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -127,6 +130,7 @@ export class TagsController {
   }
 
   @Get('/get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

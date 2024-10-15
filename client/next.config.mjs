@@ -6,8 +6,30 @@ const nextConfig = {
         protocol: "https",
         hostname: "plus.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/dlpvcsewd/**",
+      },
     ],
   },
+  experimental: {
+    modern: true,
+    granularChunks: true,
+  },
+  webpack: (
+    config,
+    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
+  ) => {
+    if (config.cache && !dev) {
+      config.cache = Object.freeze({
+        type: "memory",
+      });
+    }
+    // Important: return the modified config
+    return config;
+  },
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;

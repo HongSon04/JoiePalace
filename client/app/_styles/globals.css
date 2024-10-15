@@ -186,10 +186,6 @@ body {
     /* backdrop-filter: blur(20px); */
   }
 
-  .admin-main {
-    @apply min-h-[100vh]
-  }
-
   .flex-center {
     @apply flex items-center justify-center;
   }
@@ -431,6 +427,22 @@ body {
 .thongbao:hover div {
   background-color: red;
   color: white;
+}
+
+.bg-confence::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/Diwa-background_page-0001.jpg');
+  background-size: cover;
+  opacity: 0.2;
+  z-index:-1;
+}
+.activeConference{
+  opacity: 1;
 }
 
 select {

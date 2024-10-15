@@ -16,9 +16,10 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('spaces')
-@Controller('spaces')
+@Controller('api/spaces')
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
 
@@ -34,7 +35,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -91,8 +92,9 @@ export class SpacesController {
     return this.spacesService.createSpace(body, files);
   }
 
-  // ! Find Spaces By Location ID
-  @Get('find-by-location/:location_id')
+  // ! Find Spaces By Branch ID
+  @Get('find-by-branch/:branch_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -103,7 +105,7 @@ export class SpacesController {
           slug: 'string',
           description: 'string',
           images: 'object',
-          location_id: 'number',
+          branch_id: 'number',
           created_at: 'date',
           updated_at: 'date',
         },
@@ -123,12 +125,13 @@ export class SpacesController {
     },
   })
   @ApiOperation({ summary: 'Tìm kiếm không gian theo ID địa điểm' })
-  async findSpacesByLocation(@Param('location_id') location_id: number) {
-    return this.spacesService.findSpacesByLocation(location_id);
+  async findSpacesByBranch(@Param('branch_id') branch_id: number) {
+    return this.spacesService.findSpacesByBranch(branch_id);
   }
 
   // ! Find Space By ID
   @Get('find/:space_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -138,7 +141,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -163,6 +166,7 @@ export class SpacesController {
 
   // ! Find Space By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -172,7 +176,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
@@ -207,7 +211,7 @@ export class SpacesController {
         slug: 'string',
         description: 'string',
         images: 'object',
-        location_id: 'number',
+        branch_id: 'number',
         created_at: 'date',
         updated_at: 'date',
       },
