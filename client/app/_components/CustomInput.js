@@ -82,13 +82,16 @@ function CustomInput(props) {
         </AnimatePresence>
       </div>
     );
+
   return (
     <div className="w-full">
       {props.multiLine ? (
         <Textarea
           {...props}
-          ref={props.ref}
+          ref={props.inputRef}
           aria-label={props.ariaLabel}
+          value={props.value}
+          onChange={props.onChange}
           {...register(props.name, props.validation)}
           errorMessage={`${props.ariaLabel} ${
             inputError?.error?.message || props.errorMessage
@@ -106,7 +109,7 @@ function CustomInput(props) {
         <Input
           {...props}
           {...register(props.name, props.validation)}
-          ref={props.ref}
+          ref={props.inputRef}
           value={props.value}
           onChange={props.onChange}
           errorMessage={`${props.ariaLabel} ${

@@ -12,19 +12,18 @@ import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
 import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import * as CryptoJS from 'crypto-js';
 import axios from 'axios';
-import uniqid from 'uniqid';
 @Injectable()
 export class PaymentMethodsService {
   constructor(private prismaService: PrismaService) {}
 
   // ? Other
 
-  private onepayIntl = new OnePayInternational({
-    paymentGateway: process.env.ONEPAY_PAYMENT_GATEWAY,
-    merchant: process.env.ONEPAY_MERCHANT,
-    accessCode: process.env.ONEPAY_ACCESS_CODE,
-    secureSecret: process.env.ONEPAY_SECURE_SECRET,
-  });
+  // private onepayIntl = new OnePayInternational({
+  //   paymentGateway: process.env.ONEPAY_PAYMENT_GATEWAY,
+  //   merchant: process.env.ONEPAY_MERCHANT,
+  //   accessCode: process.env.ONEPAY_ACCESS_CODE,
+  //   secureSecret: process.env.ONEPAY_SECURE_SECRET,
+  // });
 
   private sortObject(obj) {
     let sorted = {};
@@ -382,7 +381,7 @@ export class PaymentMethodsService {
       return this.failPayment(res);
     }
   }
-
+/* 
   // ! Payment OnePay
   async onePay(id: number, req, res) {
     try {
@@ -484,7 +483,7 @@ export class PaymentMethodsService {
       this.failPayment(res);
     }
   }
-
+ */
   // ! Payment ZaloPay
   async zaloPay(id, req, res) {
     try {

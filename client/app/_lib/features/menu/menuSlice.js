@@ -1,5 +1,5 @@
-import menuBg from "@/public/Alacarte-Menu-Thumbnail.png";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import menuBg from "@/public/Alacarte-Menu-Thumbnail.png";
 
 const initialState = {
   selectAll: false,

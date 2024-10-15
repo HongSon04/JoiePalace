@@ -5,8 +5,9 @@ import axios from "axios";
 const initialState = {
   branches: [],
   currentBranch: null,
-  loading: false,
-  error: null,
+  isLoading: false,
+  isError: false,
+  errorMessage: null,
 };
 
 const branchSlice = createSlice({
@@ -14,65 +15,28 @@ const branchSlice = createSlice({
   initialState,
   reducers: {
     loading: (state) => {
-      state.loading = true;
+      state.isLoading = true;
     },
     error: (state, action) => {
-      state.error = action.payload;
+      state.isLoading = false;
+      state.isError = true;
+      state.errorMessage = action.payload;
     },
-    setBranches: (state, action) => {
-      state.branches = action.payload;
-    },
-    setCurrentBranch: (state, action) => {
+    fetchBranchSuccess: (state, action) => {
       state.currentBranch = action.payload;
+      state.isLoading = false;
+      state.isError = false;
+      state.errorMessage = null;
+    },
+    fetchBranchesSuccess: (state, action) => {
+      state.branches = action.payload;
+      state.isLoading = false;
+      state.isError = false;
+      state.errorMessage = null;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(getBranches.fulfilled, (state, action) => {
-      state.branches = action.payload;
-      state.loading = false;
-    });
-    builder.addCase(getBranches.rejected, (state, action) => {
-      state.error = action.error.message;
-      state.loading = false;
-    });
-
-    builder
-      .addCase(postBranch.pending, (state) => {
-        state.loading = true; 
-        state.error = null; 
-      })
-      .addCase(postBranch.fulfilled, (state, action) => {
-        state.branches = action.payload;
-        state.loading = false; 
-      })
-      .addCase(postBranch.rejected, (state, action) => {
-        state.error = action.error.message; 
-        state.loading = false;
-      });
-  },
 });
 
-// Async thunk for Branch data
-export const postBranch = createAsyncThunk(
-  "location/postBranch",
-  async (BranchData, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(API_CONFIG.BRANCHES.CREATE, BranchData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
-  }
-);
-
-export const getBranches = createAsyncThunk("branch/getBranches", async () => {
-  try {
-    const res = await axios.get(API_CONFIG.BRANCHES.GET_ALL);
-    return res.data;
-  } catch (error) {
-    return error.message;
-  }
-});
-
-export const { setBranches, setCurrentBranch } = branchSlice.actions;
+export const { fetchBranchesSuccess, fetchBranchSuccess, loading, error } =
+  branchSlice.actions;
 export default branchSlice;
