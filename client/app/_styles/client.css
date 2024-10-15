@@ -124,3 +124,9 @@
         width:  calc(100%/3) !important;
     }
 }
+.section {
+background-color: #022C25;
+}
+* {
+    color: white;
+}

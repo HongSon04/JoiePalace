@@ -119,17 +119,6 @@ const offers = [
     image: "/images-client/offers/offer3.png",
   },
 ];
-const textContainerVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: -150,
-    transition: {
-      duration: 1.5,
-      ease: "easeIn",
-    },
-  },
-};
 function Home() {
   const [timeAutoPlay, setTimeAutoPlay] = useState(false);
   const carouselRef = useRef();
@@ -165,10 +154,20 @@ function Home() {
           ))}
         </MultiCarousel>
         <motion.div
-          variants={textContainerVariants}
+          variants={{
+            hidden: { opacity: 0, y: 50 },
+            visible: {
+              opacity: 1,
+              y: -150,
+              transition: {
+                duration: 1.5,
+                ease: "easeIn",
+              },
+            },
+          }}
           initial="hidden"
           animate="visible"
-          className="absolute top-1/2 !-translate-y-[60%] flex flex-col gap-8 items-center 2md:-translate-y-1/2"
+          className="absolute  flex flex-col gap-8 items-center top-1/2 !-translate-y-[60%] 2md:-translate-y-1/2"
         >
           <h1 className="font-medium text-center w-full text-4xl leading-[56px] sm:text-6xl sm:leading-[80px] 2md:w-4/6">
             NƠI CỦA SỰ THANH LỊCH, <br />
@@ -316,7 +315,7 @@ function Home() {
                 />
                 <span className="absolute w-9 h-[40vh] bg-gold right-0 bottom-0 translate-y-[-75%]"></span>
               </div>
-              <div className=" w-[80%] left-1/2 top-1/2 translate-y-[-50%] lg:translate-y-0 lg:w-1/4 absolute bg-black lg:left-3/4 translate-x-[-50%]  backdrop-blur-[15px] bg-blackAlpha-500 overflow-hidden">
+              <div className=" w-[80%] left-1/2 top-1/2 translate-y-[-50%] lg:translate-y-[-50%] lg:py-10 lg:w-1/4 absolute bg-black lg:left-3/4 translate-x-[-50%]  backdrop-blur-[15px] bg-blackAlpha-500 overflow-hidden">
                 <TextFade
                   settings={{
                     hidden: { opacity: 0, x: 30 },
