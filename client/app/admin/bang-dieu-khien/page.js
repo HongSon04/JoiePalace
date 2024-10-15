@@ -48,7 +48,7 @@ const page = () => {
         ]
       };
   return (
-    <main className="grid gap-6 ">
+    <main className="grid gap-6  text-white ">
       <AdminHeader
         title="Chung"
         showBackButton = {false}
@@ -117,8 +117,8 @@ const page = () => {
 
 
       <div className="container  flex gap-8 w-full h-full">
-      <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl " >
-            <div className="flex justify-between gap-[10px] items-center">
+      <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl" >
+            <div className="flex justify-between gap-[10px] items-center mb-[10px]">
               <p className="text-base font-semibold ">Khách hàng</p>
               <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
             </div>

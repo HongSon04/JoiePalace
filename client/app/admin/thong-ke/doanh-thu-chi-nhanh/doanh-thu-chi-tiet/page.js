@@ -39,7 +39,7 @@ const Page = () => {
   };
 
   return (
-    <main className="font-gilroy grid gap-6 p-4">
+    <main className="font-gilroy grid gap-6 p-4 text-white">
           <AdminHeader
             title="Doanh thu tuần"
             showSearchForm = {false}

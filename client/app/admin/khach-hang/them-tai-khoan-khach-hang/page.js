@@ -5,7 +5,7 @@ import { FiUpload } from "react-icons/fi";
 import { RiDeleteBin2Line } from "react-icons/ri";
 const page = () => {
     return (
-        <main className="grid gap-6 p-4">
+        <main className="grid gap-6 p-4 text-white">
             <AdminHeader
                 title="Thêm tài khoản khách hàng "
                 showSearchForm = {false}

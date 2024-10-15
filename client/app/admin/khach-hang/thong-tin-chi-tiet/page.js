@@ -5,7 +5,7 @@ import React, { Suspense } from 'react';
 import { PiMedalLight } from "react-icons/pi";
 const page = () => {
     return (
-        <main className='grid gap-6 p-4 '>
+        <main className='grid gap-6 p-4 text-white'>
             <AdminHeader
                 title="Khách hàng"
                 showSearchForm = {false}
