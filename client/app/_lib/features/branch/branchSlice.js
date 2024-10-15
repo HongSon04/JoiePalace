@@ -9,19 +9,6 @@ const initialState = {
   error: null,
 };
 
-// Async thunk for posting location data
-export const postBrach = createAsyncThunk(
-  "location/postBrach",
-  async (BrachData, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(API_CONFIG.BRANCHES.GET_ALL, BrachData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
-  }
-);
-
 const branchSlice = createSlice({
   name: "branch",
   initialState,
@@ -48,8 +35,35 @@ const branchSlice = createSlice({
       state.error = action.error.message;
       state.loading = false;
     });
+
+    builder
+      .addCase(postBranch.pending, (state) => {
+        state.loading = true; 
+        state.error = null; 
+      })
+      .addCase(postBranch.fulfilled, (state, action) => {
+        state.branches = action.payload;
+        state.loading = false; 
+      })
+      .addCase(postBranch.rejected, (state, action) => {
+        state.error = action.error.message; 
+        state.loading = false;
+      });
   },
 });
+
+// Async thunk for Branch data
+export const postBranch = createAsyncThunk(
+  "location/postBranch",
+  async (BranchData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(API_CONFIG.BRANCHES.CREATE, BranchData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 export const getBranches = createAsyncThunk("branch/getBranches", async () => {
   try {
