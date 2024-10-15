@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import AdminHeader from "@/app/_components/AdminHeader";
 import AdminThemChiNhanhImg from "@/app/_components/AdminThemChiNhanhImg";
 import AdminThemChiNhanhInput from "@/app/_components/AdminThemChiNhanhInput";
@@ -10,6 +10,7 @@ import IconButtonSave from "@/app/_components/IconButtonSave";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Stack } from "@chakra-ui/react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 const fieldsConfig = {
   contact: [
@@ -29,8 +30,21 @@ const fieldsConfig = {
     { type: 'textarea', placeholder: 'Mô tả không gian', name: 'space_description' },
   ],
 };
+const createSlug = (str) => {
+  // Chuyển chữ thành chữ thường và loại bỏ dấu
+  const fromVietnamese = str
+    .toLowerCase()
+    .normalize('NFD') // Tách các dấu ra khỏi ký tự
+    .replace(/[\u0300-\u036f]/g, ''); // Loại bỏ các dấu
 
+  // Thay thế khoảng trắng và ký tự đặc biệt thành dấu gạch ngang
+  return fromVietnamese
+    .replace(/[^a-z0-9\s]/g, '') // Loại bỏ các ký tự đặc biệt
+    .trim() // Loại bỏ khoảng trắng ở đầu và cuối chuỗi
+    .replace(/\s+/g, '-'); // Thay thế khoảng trắng bằng dấu gạch ngang
+};
 function ChiNhanhAddPage() {
+  const dispatch = useDispatch();
   const { handleSubmit, control } = useForm();
   const [imagesData, setImagesData] = useState({
     images: [],  // Carousel images
@@ -49,9 +63,15 @@ function ChiNhanhAddPage() {
 
   const onSubmit = (data) => {
     const formData = {
-      ...data,
-      "rate": 0,
-      images: imagesData.images,
+      data: {
+        name: data.name,
+        slug: createSlug(data.name),
+        address: data.address,
+        phone: data.phone,
+        email: data.email,
+        rate: 5, 
+        images: imagesData.images,
+      },
       location_detail: {
         slogan: data.slogan,
         slogan_description: data.slogan_description,

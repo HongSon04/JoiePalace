@@ -153,6 +153,7 @@ export class CategoriesController {
 
   // ! Get Category By Id
   @Get('get/:category_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -189,6 +190,7 @@ export class CategoriesController {
 
   // ! Get Category By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

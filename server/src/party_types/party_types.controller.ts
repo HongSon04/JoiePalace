@@ -160,6 +160,7 @@ export class PartyTypesController {
 
   // ! Get party type by id
   @Get('get/:party_types_id')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -192,6 +193,7 @@ export class PartyTypesController {
 
   // ! Get party type by slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

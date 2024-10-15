@@ -12,7 +12,6 @@ import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
 import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import * as CryptoJS from 'crypto-js';
 import axios from 'axios';
-import uniqid from 'uniqid';
 @Injectable()
 export class PaymentMethodsService {
   constructor(private prismaService: PrismaService) {}

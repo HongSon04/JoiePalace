@@ -10,6 +10,16 @@ module.exports = {
   ],
   theme: {
     extend: {
+      scrollbar: {
+        thin: {
+            'scrollbar-width': 'thin',
+            'scrollbar-color': 'white transparent',
+        },
+        DEFAULT: {
+            'scrollbar-width': 'thin',
+            'scrollbar-color': 'white transparent',
+        },
+    },
       fontFamily: {
         gilroy: ["Gilroy", "sans-serif"],
       },
@@ -247,6 +257,7 @@ module.exports = {
       },
     },
   },
+  
   darkMode: "class",
   plugins: [nextui()],
 };

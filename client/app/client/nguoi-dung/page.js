@@ -4,6 +4,7 @@ import React from 'react';
 
 const parties = [
     {
+        id: '1',
         nameParty: "Tiệc cưới của cô dâu Trần Thị A và chú rể Nguyễn Văn B",
         address: "Địa chỉ: Tổ chức tại: Chi nhánh 1, số 447, Hoàng Văn Thụ, Quận Phú Nhuận, TP. HCM",
         phoneAddress: "0123456789",
@@ -37,7 +38,15 @@ const Page = () => {
         <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
 
         {/* Party Section */}
-        <PartySectionClient title="Tiệc gần nhất" data={parties}></PartySectionClient>
+        {parties && parties.length > 0 ? (
+                parties.map(party => (
+                    <div key={party.id} className="cursor-pointer">
+                        <PartySectionClient  showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
+                    </div>
+                ))
+            ) : (
+                <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
+            )}
 
     </div>
     );

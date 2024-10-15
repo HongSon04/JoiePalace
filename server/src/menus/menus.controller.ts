@@ -181,6 +181,7 @@ export class MenusController {
 
   // ! Get Menu By Slug
   @Get('get-by-slug/:slug')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

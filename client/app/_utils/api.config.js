@@ -1,6 +1,6 @@
 // HOST URL
-// const HOST = `https://joieplace.live`;
-const HOST = `http://localhost:5000`;
+const HOST = `https://joieplace.live/api`;
+// const HOST = `http://localhost:5000`;
 
 // Base API URLs
 const AUTH_API = `${HOST}/auth`;

@@ -13,7 +13,7 @@ import InputDetailCustomer from '../[slug]/[id]/InputDetailCustomer';
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
 );
-const Page = ({params}) => {
+const Page = ({ params }) => {
     const { id } = params;
     const inputInfoUser = [
         {
@@ -55,7 +55,7 @@ const Page = ({params}) => {
     const inputOrganization = [
         {
             svg: (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M13 9.5H18V7.5H13V9.5ZM13 16.5H18V14.5H13V16.5ZM19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21ZM6 11H11V6H6V11ZM7 7H10V10H7V7ZM6 18H11V13H6V18ZM7 14H10V17H7V14Z" fill="white" />
+                <path fillRule="evenodd" clipRule="evenodd" d="M13 9.5H18V7.5H13V9.5ZM13 16.5H18V14.5H13V16.5ZM19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21ZM6 11H11V6H6V11ZM7 7H10V10H7V7ZM6 18H11V13H6V18ZM7 14H10V17H7V14Z" fill="white" />
             </svg>),
             title: 'Loại tiệc',
             type: 'select',
@@ -289,14 +289,14 @@ const Page = ({params}) => {
             title: 'Ngày đặt cọc',
             type: 'date',
             name: 'depositDate',
-            placeholder : '29/12/2024'
+            placeholder: '29/12/2024'
         },
         {
             svg: null,
             title: 'Số tiền còn lại phải thanh toán',
             type: 'input',
             name: 'remainingAmountPaid',
-            placeholder : '10000000000'
+            placeholder: '10000000000'
         },
         {
             svg: null,
@@ -313,15 +313,15 @@ const Page = ({params}) => {
             title: 'Ngày thanh toán',
             type: 'date',
             name: 'dataPay',
-            placeholder : '29/12/2024'
+            placeholder: '29/12/2024'
         },
     ]
     return (
         <div>
-             <HeaderSelect title={'Tạo tiệc'} slugOrID={id} />
-             <RequestBreadcrumbsForQuanLyTiec requestId={id} nameLink={'quan-ly-tiec'} />
-             <div className='p-4 mt-[30px] w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
-                <TitleSpanInfo title={'Thông tin liên hệ'}/>
+            <HeaderSelect title={'Tạo tiệc'} slugOrID={id} />
+            <RequestBreadcrumbsForQuanLyTiec requestId={id} nameLink={'quan-ly-tiec'} />
+            <div className='p-4 mt-[30px] w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
+                <TitleSpanInfo title={'Thông tin liên hệ'} />
                 <div className='grid grid-cols-3 gap-[30px]'>
                     {inputInfoUser.map((detail, index) => (
                         <InputDetailCustomer
@@ -331,13 +331,13 @@ const Page = ({params}) => {
                             type={detail.type}
                             name={detail.name}
                             placeholder={detail.placeholder}
-                            
+
                         />
                     ))}
                 </div>
             </div>
             <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
-            <TitleSpanInfo title={'Thông tin tổ chức'}/>
+                <TitleSpanInfo title={'Thông tin tổ chức'} />
                 <div className='grid grid-cols-3 gap-[30px]'>
                     {inputOrganization.map((detail, index) => (
                         <InputDetailCustomer
@@ -376,7 +376,7 @@ const Page = ({params}) => {
                 </div>
             </div>
             <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
-            <TitleSpanInfo title={'Thông tin thanh toán'}/>
+                <TitleSpanInfo title={'Thông tin thanh toán'} />
                 <div className='grid grid-cols-3 gap-[30px]'>
                     {inputsCost.map((detail, index) => (
                         <InputDetailCustomer
