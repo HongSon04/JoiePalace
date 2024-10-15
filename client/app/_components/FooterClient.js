@@ -3,12 +3,7 @@
 import { Image } from "@chakra-ui/react";
 
 const Footer = () => {
-  const images = [
-    "Zalo.png",
-    "Facebook.svg",
-    "Instagram.svg",
-    "TwitterX.png",
-  ];
+  const images = ["Zalo.png", "Facebook.svg", "Instagram.svg", "TwitterX.png"];
   const locations = [
     { id: 1, name: "hoàng văn thụ" },
     { id: 2, name: "phạm văn đồng" },
@@ -52,7 +47,7 @@ const Footer = () => {
             </div>
           ))}
         </div>
-        <div className="flex flex-col gap-8 max-lg:gap-4" >
+        <div className="flex flex-col gap-8 max-lg:gap-4">
           <span className="uppercase text-2xl font-normal text-[#B5905B] text-nowrap max-lg:text-xl max-sm:text-xs">
             Dịch vụ
           </span>
@@ -76,8 +71,8 @@ const Footer = () => {
           ))}
           <div className="flex items-center justify-between">
             {images.map((image, index) => (
-              <div className="h-[24px] w-[24px]">
-                <Image src={`/${image}`} alt=""  />
+              <div key={index} className="h-[24px] w-[24px]">
+                <Image src={`/${image}`} alt="" />
               </div>
             ))}
           </div>

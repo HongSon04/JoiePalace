@@ -120,4 +120,7 @@
     .page-offers .react-multi-carousel-item {
         width: 100% !important;
     }
+    #location__section-5 .react-multi-carousel-item {
+        width:  calc(100%/3) !important;
+    }
 }

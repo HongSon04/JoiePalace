@@ -14,6 +14,8 @@ module.exports = {
         gilroy: ["Gilroy", "sans-serif"],
       },
       screens: {
+        sxs: "420px",
+        xs: "520px",
         sm: "640px",
         md: "768px",
         "2md": "800px",

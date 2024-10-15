@@ -53,7 +53,7 @@ const OfferPage = () => {
   }, []);
   return (
     <ScrollFullPage>
-      {/* <section className="section w-screen h-screen" id="section-offers">
+      <section className="section w-screen h-screen" id="section-offers">
         <Carousel
           afterChange={handleSlideChange}
           ref={carouselRef}
@@ -120,7 +120,7 @@ const OfferPage = () => {
                     </div>
                   </TextFade>
                 </div>
-                <div className="w-full lg:w-[30%] h-fit lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
+                <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
                   <TextFade
                     settings={{
                       hidden: { opacity: 0, x: 50 },
@@ -134,7 +134,7 @@ const OfferPage = () => {
                       },
                     }}
                     replayEffect={false}
-                    styles="h-full flex flex-col justify-between  gap-16 "
+                    styles="h-full flex flex-col justify-center gap-[50px] gap-16 "
                   >
                     <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-4">
                       {offer.title}
@@ -175,7 +175,7 @@ const OfferPage = () => {
             </div>
           ))}
         </Carousel>
-      </section> */}
+      </section>
       <section className="section w-screen px-8 lg:px-44" id="section-offers2">
         <div className="w-full h-auto flex flex-col gap-8 lg:gap-16 ">
           <div className="w-full h-auto flex justify-between">
