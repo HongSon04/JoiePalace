@@ -148,9 +148,8 @@ function Home() {
   };
   return (
     <ScrollFullPage>
-       <HeaderClient ></HeaderClient>
       {/* banner */}
-      <section className="section banner w-full h-screen relative top-0 left-0 text-white">
+      <section className="section banner w-full h-screen relative top-0 left-0">
         <MultiCarousel
           removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
           autoplaySpeed={5000}
@@ -170,13 +169,13 @@ function Home() {
           variants={textContainerVariants}
           initial="hidden"
           animate="visible"
-          className="absolute top-1/2 -translate-y-1/2 flex flex-col gap-8 items-center "
+          className="absolute top-1/2 !-translate-y-[60%] flex flex-col gap-8 items-center 2md:-translate-y-1/2"
         >
-          <h1 className="text-6xl font-medium leading-[80px] text-center w-4/6">
+          <h1 className="font-medium text-center w-full text-4xl leading-[56px] sm:text-6xl sm:leading-[80px] 2md:w-4/6">
             NƠI CỦA SỰ THANH LỊCH, <br />
             LÒNG HIẾU KHÁCH <br /> VÀ TINH THẦN DUY MỸ
           </h1>
-          <span className="text-base font-normal leading-6 text-center w-[50%]">
+          <span className="text-base font-normal leading-6 text-center w-[80%] 2md:w-[50%]">
             Được xây dựng và phát triển bởi IN Hospitality vào năm 2007, White
             Palace là thương hiệu đầu tiên tại Việt Nam mở ra mô hình trung tâm
             hội nghị và sự kiện. Với sự đầu tư bài bản và chuyên biệt cho các
@@ -185,7 +184,7 @@ function Home() {
             trí có tầm ảnh hưởng và yến tiệc đẳng cấp.
           </span>
         </motion.div>
-        <div className="w-full h-auto absolute bottom-[10%] flex justify-center items-center">
+        <div className="w-full h-auto absolute bottom-[10%] hidden justify-center items-center lg:flex">
           <motion.div
             animate={{
               y: [0, -20, 20, 10, 20, 15, 20],
@@ -203,8 +202,8 @@ function Home() {
         </div>
       </section>
       {/* location */}
-      <section className="section w-full h-full flex text-white" id="section-location">
-        <div className="w-[9%] h-screen flex justify-center items-center bg-gold shrink-0">
+      <section className="section w-full h-full flex" id="section-location">
+        <div className="w-[9%] p-3 box-content sm:p-0 h-screen flex justify-center items-center bg-gold shrink-0">
           <span className="h-auto uppercase -rotate-90 whitespace-nowrap font-bold text-5xl w-auto">
             địa điểm
           </span>
@@ -228,7 +227,7 @@ function Home() {
                   alt=""
                 ></Image>
               </div>
-              <div className="w-full h-full absolute top-0 left-0 z-[1] bg-blackAlpha-700 flex items-center pl-24">
+              <div className="w-full h-full absolute top-0 left-0 z-[1] bg-blackAlpha-700 flex items-center pl-12 sm:pl-24">
                 <TextFade
                   settings={{
                     hidden: { opacity: 0, x: 150 },
@@ -241,8 +240,9 @@ function Home() {
                       },
                     },
                   }}
+                  replayEffect={false}
                 >
-                  <span className="location-name uppercase text-gold text-6xl font-normal leading-[80px] pointer-events-none">
+                  <span className="location-name uppercase text-gold text-5xl sm:text-6xl font-normal leading-[80px] pointer-events-none">
                     {location.name}
                   </span>
                 </TextFade>
@@ -268,7 +268,7 @@ function Home() {
         </div>
       </section>
       {/* events */}
-      <section className="section relative w-screen text-white bg-primary" id="section-services">
+      <section className="section relative w-screen" id="section-services">
         <TextFade
           settings={{
             hidden: { opacity: 0, y: 200 },
@@ -281,15 +281,15 @@ function Home() {
               },
             },
           }}
-          replayEffect={false}
-          styles="absolute z-10 w-screen top-[0%] left-[10%]"
+          replayEffect={true}
+          styles="absolute z-10 w-screen top-[0%] left-[10%] "
         >
-          <span className="uppercase text-gold absolute text-6xl font-bold leading-[100%]">
+          <span className="uppercase text-gold absolute text-4xl sm:text-6xl font-bold leading-[100%]">
             dịch vụ
           </span>
         </TextFade>
         <MultiCarousel
-          removeArrowOnDeviceType={["tablet", "mobile", ""]}
+          removeArrowOnDeviceType={["", "", ""]}
           autoplaySpeed={2000}
           transitionDuration={3000}
           customTransition={"3000ms ease-in-out"}
@@ -317,7 +317,7 @@ function Home() {
                 />
                 <span className="absolute w-9 h-[40vh] bg-gold right-0 bottom-0 translate-y-[-75%]"></span>
               </div>
-              <div className="w-1/4 absolute bg-black left-3/4 translate-x-[-50%] bottom-[8%] backdrop-blur-[15px] bg-blackAlpha-500 overflow-hidden">
+              <div className=" w-[80%] left-1/2 top-1/2 translate-y-[-50%] lg:translate-y-0 lg:w-1/4 absolute bg-black lg:left-3/4 translate-x-[-50%]  backdrop-blur-[15px] bg-blackAlpha-500 overflow-hidden">
                 <TextFade
                   settings={{
                     hidden: { opacity: 0, x: 30 },
@@ -331,20 +331,20 @@ function Home() {
                     },
                   }}
                   replayEffect={false}
-                  styles="p-[30px] flex flex-col gap-[4em]"
+                  styles="p-[30px] flex flex-col gap-[20px] lg:gap-[4em]"
                 >
-                  <span className="uppercase text-gold leading-[60px] text-[4em] font-normal">
+                  <span className="uppercase text-gold leading-[60px] text-[2em] sm:text-[4em] font-normal">
                     {service.name}
                   </span>
                   <div className="flex flex-col gap-7">
                     <span className="uppercase font-bold text-[1.2em] leading-[120%]">
                       {service.title}
                     </span>
-                    <span className="leading-[150%] font-normal text-base">
+                    <span className="leading-[150%] font-normal text-xs sm:text-base">
                       {service.description}
                     </span>
                   </div>
-                  <ButtonDiscover className={"w-[45%]"} />
+                  <ButtonDiscover className={"w-fit px-3"} />
                 </TextFade>
               </div>
             </div>
@@ -353,122 +353,144 @@ function Home() {
       </section>
       {/* services */}
       <section
-        className="section w-screen h-screen relative flex flex-row gap-28 text-white bg-primary"
+        className="section w-screen h-screen relative flex flex-row gap-28"
         id="section-event"
       >
-        <div className="w-[50%] h-screen relative flex justify-center items-center pl-20">
-          <Image
-            src="/decor-cover.png"
-            className="absolute top-1/2 -translate-y-1/2 -left-[50%] translate-x-[50%] object-cover"
-            h={"60vh"}
-            w={"auto"}
-            alt=""
-          />
-          <div className="flex flex-col gap-14 z-10">
-            <TextFade
-              settings={{
-                hidden: { opacity: 0, y: 100 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 1,
-                    ease: "easeIn",
+        <div className="flex flex-col gap-8 lg:flex-row lg:gap-[60px]">
+          <div className=" w-full pl-8 lg:w-[50%] h-fit lg:h-screen relative flex lg:justify-center items-center lg:pl-20">
+            <Image
+              src="/decor-cover.png"
+              className="absolute top-1/2 -translate-y-1/2 -left-[50%] translate-x-[50%] object-cover"
+              h={"60vh"}
+              w={"auto"}
+              alt=""
+            />
+            <div className="flex flex-col gap-14 z-10">
+              <TextFade
+                settings={{
+                  hidden: { opacity: 0, y: 100 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 1,
+                      ease: "easeIn",
+                    },
                   },
-                },
-              }}
-              replayEffect={false}
-              styles="w-[79%]"
-            >
-              <span className="uppercase text-gold font-bold text-[4em] leading-[64px]">
-                TIN TỨC & SỰ KIỆN MỚI NHẤT
-              </span>
-            </TextFade>
-            <TextFade
-              settings={{
-                hidden: { opacity: 0, y: 100 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 1,
-                    delay: 0.15,
-                    ease: "easeIn",
+                }}
+                replayEffect={false}
+                styles="w-[79%]"
+              >
+                <span className="uppercase text-gold font-bold text-[4em] leading-[64px]">
+                  TIN TỨC & SỰ KIỆN MỚI NHẤT
+                </span>
+              </TextFade>
+              <TextFade
+                settings={{
+                  hidden: { opacity: 0, y: 100 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 1,
+                      delay: 0.15,
+                      ease: "easeIn",
+                    },
                   },
-                },
-              }}
-              replayEffect={false}
-            >
-              <span className="leading-[150%] font-normal text-[18px] w-[85%]">
-                Cảm ơn quý khách đã ghé thăm chuyên mục tin tức của chúng
-                tôi.Tại đây, quý khách có thể cập nhật những tin tức mới
-                nhất,điểm lại những sự kiện nổi bật nhất tại White Palace vàkhám
-                phá những ưu đãi đặc biệt dành cho sự kiện của bạn.
-              </span>
-            </TextFade>
-            <TextFade
-              settings={{
-                hidden: { opacity: 0, y: 100 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 1,
-                    delay: 0.25,
-                    ease: "easeIn",
+                }}
+                replayEffect={false}
+                styles="hidden lg:block"
+              >
+                <span className="leading-[150%] font-normal text-[18px] w-[85%]">
+                  Cảm ơn quý khách đã ghé thăm chuyên mục tin tức của chúng
+                  tôi.Tại đây, quý khách có thể cập nhật những tin tức mới
+                  nhất,điểm lại những sự kiện nổi bật nhất tại White Palace
+                  vàkhám phá những ưu đãi đặc biệt dành cho sự kiện của bạn.
+                </span>
+              </TextFade>
+              <TextFade
+                settings={{
+                  hidden: { opacity: 0, y: 100 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 1,
+                      delay: 0.25,
+                      ease: "easeIn",
+                    },
                   },
-                },
-              }}
-              replayEffect={false}
-            >
-              <ButtonDiscover className={"w-[20%]"} />
-            </TextFade>
+                }}
+                replayEffect={false}
+                styles="hidden lg:block"
+              >
+                <ButtonDiscover className={"w-fit px-3"} />
+              </TextFade>
+            </div>
           </div>
-        </div>
-        <div className="w-[50%] h-screen pr-20 pt-[100px] pb-[40px] flex gap-6">
-          {events.map((event, indexEvent) => (
-            <div
-              key={indexEvent}
-              className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${
-                indexEvent === 0 ? "flex-col-reverse" : "flex-col"
-              } gap-6 overflow-y-scroll cursor-pointer`}
-            >
-              {event.map((item, indexItem) => (
-                <div
-                  key={indexItem}
-                  className="w-full h-[65%] flex-shrink-0 relative"
-                >
-                  <div className="w-full h-full overflow-hidden relative">
-                    <Image
-                      src={`${item.urlImage}`}
-                      className="object-cover"
-                      w={"100%"}
-                      h={"100%"}
-                      alt=""
-                    />
-                    <div className="absolute inset-0 bg-blackAlpha-600"></div>
-                  </div>
-                  <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-between py-10 px-5">
-                    <span className="font-semibold text-lg leading-7">
-                      {item.content}
-                    </span>
-                    <IconButton background="none" type={"button"}>
+          <div className=" w-full px-8 h-[70vh] lg:w-[50%] lg:h-screen lg:pr-20 lg:pt-[100px] lg:pb-[40px] flex gap-6">
+            {events.map((event, indexEvent) => (
+              <div
+                key={indexEvent}
+                className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${
+                  indexEvent === 0 ? "flex-col-reverse" : "flex-col"
+                } gap-6 overflow-y-scroll cursor-pointer`}
+              >
+                {event.map((item, indexItem) => (
+                  <div
+                    key={indexItem}
+                    className="w-full h-1/3 sm:h-[65%] flex-shrink-0 relative"
+                  >
+                    <div className="w-full h-full overflow-hidden relative">
                       <Image
-                        src="/arrow_circle_right.svg"
+                        src={`${item.urlImage}`}
+                        className="object-cover"
                         w={"100%"}
                         h={"100%"}
                         alt=""
                       />
-                    </IconButton>
+                      <div className="absolute inset-0 bg-blackAlpha-600"></div>
+                    </div>
+                    <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-between py-10 px-5">
+                      <span className="font-semibold text-xs leading-[22px] 500px:text-sm sm:text-lg sm:leading-7">
+                        {item.content}
+                      </span>
+                      <IconButton background="none" type={"button"}>
+                        <Image
+                          src="/arrow_circle_right.svg"
+                          w={"100%"}
+                          h={"100%"}
+                          alt=""
+                        />
+                      </IconButton>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            ))}
+          </div>
+          <TextFade
+            settings={{
+              hidden: { opacity: 0, y: -100 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: {
+                  duration: 1,
+                  delay: 0.25,
+                  ease: "easeIn",
+                },
+              },
+            }}
+            replayEffect={false}
+            styles="block lg:hidden pl-8"
+          >
+            <ButtonDiscover className={"w-fit px-3"} />
+          </TextFade>
         </div>
       </section>
       {/* offers */}
-      <section className="section w-screen h-screen bg-primary text-white" id="section-offers">
+      <section className="section w-screen h-screen" id="section-offers">
         <Carousel
           afterChange={handleSlideChange}
           ref={carouselRef}
@@ -493,7 +515,7 @@ function Home() {
           showDots={false}
           infinite={true}
           keyBoardControl={true}
-          autoPlay={true}
+          autoPlay={false}
           autoPlaySpeed={8000}
           removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
           transitionDuration={2000}
@@ -511,7 +533,7 @@ function Home() {
                   alt=""
                 />
               </div>
-              <div className="h-full flex gap-3 relative p-20">
+              <div className="h-full flex items-center lg:items-stretch gap-3 relative py-20 px-8 lg:p-20">
                 <div className="h-full flex justify-center items-center">
                   <TextFade
                     settings={{
@@ -528,14 +550,14 @@ function Home() {
                     }}
                     replayEffect={true}
                   >
-                    <div className=" flex justify-center items-center shrink-0">
+                    <div className="w-[60px] sm:w-auto flex justify-center items-center lg:shrink-0">
                       <span className="h-auto uppercase -rotate-90 whitespace-nowrap font-bold text-5xl w-auto text-gold">
                         ưu đãi
                       </span>
                     </div>
                   </TextFade>
                 </div>
-                <div className="w-[30%] h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
+                <div className="w-[70%] flex-1 sm:flex-none h-fit lg:w-[30%] lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
                   <TextFade
                     settings={{
                       hidden: { opacity: 0, x: 50 },
@@ -549,14 +571,14 @@ function Home() {
                       },
                     }}
                     replayEffect={true}
-                    styles="h-full flex flex-col justify-between"
+                    styles="h-full flex flex-col gap-[40px] lg:gap-0 lg:justify-between"
                   >
                     <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-4">
                       {offer.title}
                     </span>
                     <span className="font-normal text-lg">{offer.content}</span>
                     <div className="w-full flex justify-between items-center">
-                      <ButtonDiscover className="w-[40%]"></ButtonDiscover>
+                      <ButtonDiscover className="w-fit px-3"></ButtonDiscover>
                       <div className="flex items-center gap-4">
                         <IconButton
                           background="none"
@@ -593,7 +615,7 @@ function Home() {
       </section>
       {/* information */}
       <section
-        className="section w-screen h-screen flex px-44 pt-24 pb-9 gap-10 bg-primary text-white"
+        className="section w-screen h-screen flex px-8 lg:px-44 pt-24 pb-9 gap-10"
         id="section-information"
       >
         <TextFade
@@ -610,10 +632,10 @@ function Home() {
               },
             },
           }}
-          styles="w-screen flex gap-10"
+          styles="w-screen flex flex-col items-center lg:flex-row gap-10"
           replayEffect={true}
         >
-          <div className="w-1/2 h-full flex flex-col gap-10">
+          <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col gap-10">
             <h1 className="uppercase text-gold font-bold text-5xl leading-[100%]">
               thông tin liên hệ
             </h1>
@@ -680,7 +702,7 @@ function Home() {
               </div>
             </form>
           </div>
-          <div className="w-1/2 h-full rounded-sm overflow-hidden">
+          <div className="w-full lg:w-1/2 h-1/2 lg:h-full rounded-sm overflow-hidden">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7893.373649501081!2d106.68365245869786!3d10.804445099199677!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528d0911a5c55%3A0xef4a80f1f2c1a13b!2zQuG7h25oIHZp4buHbiDEkGEgS2hvYSBIb8OgbiBN4bu5IFPDoGkgR8Oybg!5e1!3m2!1svi!2s!4v1726154120512!5m2!1svi!2s"
               width="100%"
@@ -692,7 +714,7 @@ function Home() {
           </div>
         </TextFade>
       </section>
-      <section className="section bg-primary text-white">
+      <section className="section">
         <Footer />
       </section>
     </ScrollFullPage>
