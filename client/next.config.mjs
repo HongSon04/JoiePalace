@@ -13,10 +13,6 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    modern: true,
-    granularChunks: true,
-  },
   webpack: (
     config,
     { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }

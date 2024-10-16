@@ -70,7 +70,9 @@ import { useDispatch, useSelector } from "react-redux";
 function Page() {
   const dispatch = useDispatch();
 
-  const { branches, isLoading, isError } = useSelector((store) => store.branch);
+  const { branches, isLoading, isError, errorMessage } = useSelector(
+    (store) => store.branch
+  );
 
   const getBranches = React.useCallback(() => {
     fetchData(dispatch, fetchBranchesFromApi, {
@@ -125,7 +127,7 @@ function Page() {
             Chọn chi nhánh
           </h2>
           {isLoading && <Loading />}
-          {isError && <Error />}
+          {isError && <Error withOverlay={true} error={errorMessage} />}
           {!isLoading && !isError && (
             <Row className="mt-8" gutter={[20, 20]}>
               {branches && branches.length > 0 ? (
@@ -138,7 +140,7 @@ function Page() {
                   </Col>
                 ))
               ) : (
-                <Col span={24}>
+                <Col span={24} className="flex flex-center">
                   <p className="text-center text-white">
                     No branches available
                   </p>
