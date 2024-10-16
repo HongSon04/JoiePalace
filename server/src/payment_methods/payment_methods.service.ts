@@ -78,10 +78,10 @@ export class PaymentMethodsService {
         );
       }
 
-      var accessKey = process.env.MOMO_ACCESS_KEY;
-      var secretKey = process.env.MOMO_SECRET_KEY;
+      var accessKey = this.configService.get<string>('MOMO_ACCESS_KEY');
+      var secretKey = this.configService.get<string>('MOMO_SECRET_KEY');
       var orderInfo = 'Thanh toán tiền cọc';
-      var partnerCode = process.env.MOMO_PARTNER_CODE;
+      var partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE');
       var redirectUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/momo-callback?deposit_id=${id}`;
       var ipnUrl = 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b';
       var requestType = 'payWithMethod';
@@ -273,8 +273,6 @@ export class PaymentMethodsService {
         );
       }
 
-      process.env.TZ = 'Asia/Ho_Chi_Minh';
-
       let date = new Date();
       let createDate = dayjs(date).format('YYYYMMDDHHmmss');
 
@@ -284,9 +282,9 @@ export class PaymentMethodsService {
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
 
-      let tmnCode = process.env.VNP_TMN_CODE;
-      let secretKey = process.env.VNP_HASH_SECRET;
-      let vnpUrl = process.env.VNP_URL;
+      let tmnCode = this.configService.get<string>('VNP_TMN_CODE');
+      let secretKey = this.configService.get<string>('VNP_HASH_SECRET');
+      let vnpUrl = this.configService.get<string>('VNP_URL');
       let returnUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/vnpay-callback?deposit_id=${id}`;
       let orderId = dayjs(date).format('DDHHmmss');
       let amount = findDeposit.amount;
@@ -511,9 +509,9 @@ export class PaymentMethodsService {
       // }
       const config = {
         app_id: this.configService.get<string>('ZALO_APP_ID'),
-        key1: process.env.ZALO_KEY_1,
-        key2: process.env.ZALO_KEY_2,
-        endpoint: process.env.ZALO_ENDPOINT,
+        key1: this.configService.get<string>('ZALO_KEY_1'),
+        key2: this.configService.get<string>('ZALO_KEY_2'),
+        endpoint: this.configService.get<string>('ZALO_ENDPOINT'),
       };
       const embed_data = {
         preferred_payment_method: [],
@@ -588,7 +586,10 @@ export class PaymentMethodsService {
       let dataStr = req.body.data;
       let reqMac = req.body.mac;
 
-      let mac = CryptoJS.HmacSHA256(dataStr, process.env.ZALO_KEY_2).toString();
+      let mac = CryptoJS.HmacSHA256(
+        dataStr,
+        this.configService.get<string>('ZALO_KEY_2'),
+      ).toString();
 
       // kiểm tra callback hợp lệ (đến từ ZaloPay server)
       if (reqMac !== mac) {
@@ -598,7 +599,10 @@ export class PaymentMethodsService {
       } else {
         // thanh toán thành công
         // merchant cập nhật trạng thái cho đơn hàng
-        let dataJson = JSON.parse(dataStr, process.env.ZALO_KEY_2 as any);
+        let dataJson = JSON.parse(
+          dataStr,
+          this.configService.get<string>('ZALO_KEY_2') as any,
+        );
         dataJson['app_trans_id'];
 
         result.return_code = 1;

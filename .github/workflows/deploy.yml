@@ -3,42 +3,40 @@ name: CI/CD
 on:
   push:
     branches:
-      - main  
+      - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '20' 
+        node-version: '20'
 
-    - name: Install dependencies for server
-      run: |
-        cd server
-        npm install
+    - name: Install dependencies
+      run: npm install
+      working-directory: ./server
 
-    - name: Build server
-      run: |
-        cd server
-        npm run build
-        npm run copy
+    - name: Build
+      run: npm run build
+      working-directory: ./server
+
+    - name: Copy
+      run: npm run copy
+      working-directory: ./server
 
     - name: Deploy to VPS
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        HOST: 159.223.95.182
+        USER: root
       run: |
         echo "$SSH_PRIVATE_KEY" > private_key
         chmod 600 private_key
-        ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
-          cd /path/to/your/joiepalace
-          git pull origin main
-          cd client
-          npm install
-          npm run build
-          cd ../server
-          npm install
-          pm2 restart all  # Khởi động lại ứng dụng
-        EOF
+        scp -o StrictHostKeyChecking=no -i private_key -r ./server/* $USER@$HOST:/path/to/your/app
+        ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST "cd /path/to/your/app && npm install && pm2 restart all"

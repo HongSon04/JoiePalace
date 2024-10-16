@@ -15,15 +15,12 @@ async function bootstrap() {
     .setTitle('JoiePalace API')
     .setDescription('HOHOHOHO')
     .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'Bearer',
-        bearerFormat: 'JWT',
-        in: 'header',
-      },
-      'token',
-    )
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'Bearer',
+      bearerFormat: 'JWT',
+      in: 'header',
+    })
     .addSecurityRequirements('token')
     .build();
 
