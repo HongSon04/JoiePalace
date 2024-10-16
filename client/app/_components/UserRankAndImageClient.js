@@ -4,7 +4,7 @@ import Image from "next/image";
 const UserRankAndImageClient = ({userImage, rankImage, title}) => {
     return (
         <div className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6">
-            <div className="relative w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20">
+            <div className="relative w-12 h-12 sm:w-16 sm:h-16 lg:w-12 lg:h-12">
                 <Image
                     src={userImage}
                     alt="user-img"
@@ -21,7 +21,7 @@ const UserRankAndImageClient = ({userImage, rankImage, title}) => {
                         className="object-contain"
                     />
                 </div>
-                <span className="text-xs sm:text-sm lg:text-base text-white">{title}</span>
+                <span className="text-sm text-white">{title}</span>
             </div>
         </div>
     );
