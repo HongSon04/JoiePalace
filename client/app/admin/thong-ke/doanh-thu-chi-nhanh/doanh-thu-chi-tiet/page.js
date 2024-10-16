@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { IoFilter } from 'react-icons/io5';
 import { DateRangePicker } from '@nextui-org/date-picker';
 import { Input } from '@nextui-org/react';
@@ -12,6 +12,8 @@ import Chart from '@/app/_components/Chart';
 import { MdOutlineHome, MdOutlineNotificationsNone } from 'react-icons/md';
 import "../../../../_styles/globals.css";
 import CustomPagination from '@/app/_components/CustomPagination';
+import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
+import TableGrab from '@/app/_components/TableGrab';
 const Page = () => {
   const [isFilterVisible, setIsFilterVisible] = useState(false);
 
@@ -37,7 +39,7 @@ const Page = () => {
   };
 
   return (
-    <main className="font-gilroy grid gap-6 p-4">
+    <main className="font-gilroy grid gap-6 p-4 text-white">
           <AdminHeader
             title="Doanh thu tuần"
             showSearchForm = {false}
@@ -111,188 +113,9 @@ const Page = () => {
           </div>
         )}
        <div className='w-full'>
-            <div className="overflow-x-auto  max-w-[1150px]">
-                <table className="table table-chinhanh rounded-lg">
-                    <thead>
-                        <tr>
-                            <th>Mã tiệc</th>
-                            <th>Chủ tiệc</th>
-                            <th>Loại tiệc</th>
-                            <th>Ngày đặt</th>
-                            <th>Tổng giá trị</th>
-                            <th>Tiền cọc</th>
-                            <th>Ngày đặt cọc</th>
-                            <th>Còn lại phải thanh toán</th>
-                            <th>Ngày tổ chức</th>
-                            <th>Giờ tổ chức</th>
-                            <th>Ngày thanh toán</th>
-                            <th>Tình trạng thanh toán</th>
-                            <th>Số lượng khách dự kiến</th>
-                            <th>Số lượng bàn (chính thức + dự phòng)</th>
-                            <th>Chi nhánh</th>
-                            <th>Sảnh</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-                        <tr>
-                            <td>#12DKAF</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>Tiệc cưới</td>
-                            <td>22/12/2024</td>
-                            <td>200.000.000VND</td>
-                            <td>60.000.000 VND</td>
-                            <td>24/12/2024</td>
-                            <td>140.000.000 VND</td>
-                            <td>1/1/2025</td>
-                            <td>18:00</td>
-                            <td>1/1/2025</td>
-                            <td><li className="status da-dat-coc">Đã đặt cọc</li></td>
-                            <td>300</td>
-                            <td>50 + 2</td>
-                            <td>Phạm Văn Đồng</td>
-                            <td>Hall A</td>
-                            <td><p className="text-teal-400 text-xs font-bold">Chi tiết</p></td>
-                        </tr>
-
-                    
-                    </tbody>
-                </table>
-            </div>
-            <CustomPagination></CustomPagination>
+          <Suspense fallback={<TableSkeleton/>}>
+            <TableGrab></TableGrab>
+          </Suspense>
        </div>
       </div>
     

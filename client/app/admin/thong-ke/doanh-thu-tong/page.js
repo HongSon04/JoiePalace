@@ -17,7 +17,7 @@ const page = () => {
         ],
     };
     return (
-        <main className="grid gap-6 p-4">
+        <main className="grid gap-6 p-4 text-white">
             <AdminHeader
                 title="Doanh thu tổng"
                 

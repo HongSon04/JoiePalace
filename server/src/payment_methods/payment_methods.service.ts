@@ -18,12 +18,12 @@ export class PaymentMethodsService {
 
   // ? Other
 
-  private onepayIntl = new OnePayInternational({
-    paymentGateway: process.env.ONEPAY_PAYMENT_GATEWAY,
-    merchant: process.env.ONEPAY_MERCHANT,
-    accessCode: process.env.ONEPAY_ACCESS_CODE,
-    secureSecret: process.env.ONEPAY_SECURE_SECRET,
-  });
+  // private onepayIntl = new OnePayInternational({
+  //   paymentGateway: process.env.ONEPAY_PAYMENT_GATEWAY,
+  //   merchant: process.env.ONEPAY_MERCHANT,
+  //   accessCode: process.env.ONEPAY_ACCESS_CODE,
+  //   secureSecret: process.env.ONEPAY_SECURE_SECRET,
+  // });
 
   private sortObject(obj) {
     let sorted = {};
@@ -381,7 +381,7 @@ export class PaymentMethodsService {
       return this.failPayment(res);
     }
   }
-
+/* 
   // ! Payment OnePay
   async onePay(id: number, req, res) {
     try {
@@ -483,7 +483,7 @@ export class PaymentMethodsService {
       this.failPayment(res);
     }
   }
-
+ */
   // ! Payment ZaloPay
   async zaloPay(id, req, res) {
     try {
