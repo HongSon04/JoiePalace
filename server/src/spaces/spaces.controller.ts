@@ -12,7 +12,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SpacesService } from './spaces.service';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
@@ -25,6 +31,13 @@ export class SpacesController {
 
   // ! Create A New Space
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -201,6 +214,13 @@ export class SpacesController {
 
   // ? Update Space
   @Patch('update/:space_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -316,6 +336,13 @@ export class SpacesController {
 
   // ! Delete Space
   @Delete('destroy/:space_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

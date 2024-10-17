@@ -14,7 +14,13 @@ import {
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
@@ -25,6 +31,13 @@ export class CategoriesController {
 
   // ! Add Category
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -108,6 +121,13 @@ export class CategoriesController {
 
   // ! Get All Category Deleted
   @Get('/get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -227,6 +247,13 @@ export class CategoriesController {
 
   // ! Update Category
   @Patch('update/:category_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -255,6 +282,13 @@ export class CategoriesController {
 
   // ! Delete Category
   @Delete('delete/:category_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -280,6 +314,13 @@ export class CategoriesController {
 
   // ! Restore Category
   @Put('restore/:category_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -305,6 +346,13 @@ export class CategoriesController {
 
   // ! Delete Category
   @Delete('destroy/:category_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

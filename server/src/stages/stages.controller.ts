@@ -12,7 +12,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { StagesService } from './stages.service';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StageDto } from './dto/stage.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { StageUpdateDto } from './dto/stage-update.dto';
@@ -25,6 +31,13 @@ export class StagesController {
 
   // ! Create A New Stage
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -177,6 +190,13 @@ export class StagesController {
 
   // ! Update Stage
   @Post('update/:stage_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -247,6 +267,13 @@ export class StagesController {
 
   // ! Delete Stage
   @Delete('destroy/:stage_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

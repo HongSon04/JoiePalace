@@ -2,6 +2,7 @@ import { Controller, Get, HttpStatus, Param } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { isPublic } from 'decorator/auth.decorator';
 import {
+  ApiHeaders,
   ApiOperation,
   ApiParam,
   ApiProperty,
@@ -10,6 +11,13 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('dashboard')
+@ApiHeaders([
+  {
+    name: 'authorization',
+    description: 'Bearer token',
+    required: true,
+  },
+])
 @Controller('api/dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}

@@ -7,8 +7,14 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdateDepositDto } from './dto/update-status.dto';
+import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('deposits')
 @Controller('api/deposits')
@@ -17,6 +23,7 @@ export class DepositsController {
 
   // ? Find By ID
   @Get('get/:id')
+  @isPublic()
   @ApiOperation({ summary: 'Lấy chi tiết thông tin đặt cọc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -49,6 +56,7 @@ export class DepositsController {
 
   // ? Find By Transaction ID
   @Get('transaction/:transactionID')
+  @isPublic()
   @ApiOperation({ summary: 'Lấy chi tiết thông tin đặt cọc theo mã giao dịch' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -81,6 +89,13 @@ export class DepositsController {
 
   // ? Update
   @Patch('update/:id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -113,6 +128,13 @@ export class DepositsController {
 
   // ? Update  by Transaction ID
   @Patch('update/transaction/:transactionID')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc theo mã giao dịch' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -139,7 +161,6 @@ export class DepositsController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Đã có lỗi xảy ra',
   })
-  
   updateByTransactionID(
     @Param('transactionID') transactionID: string,
     @Body() updateDepositDto: UpdateDepositDto,

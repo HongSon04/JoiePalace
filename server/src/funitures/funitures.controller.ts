@@ -16,7 +16,13 @@ import {
 import { FunituresService } from './funitures.service';
 import { CreateFunitureDto, ImageFunitureDto } from './dto/create-funiture.dto';
 import { UpdateFunitureDto } from './dto/update-funiture.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterFunitureDto } from './dto/filter-funiture.dto';
 import { isPublic } from 'decorator/auth.decorator';
@@ -28,6 +34,13 @@ export class FunituresController {
 
   // ! Create funiture
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -134,6 +147,13 @@ export class FunituresController {
 
   // ! Get All funitures by Deleted
   @Get('get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -245,6 +265,13 @@ export class FunituresController {
 
   // ! Update funiture
   @Patch('update/:funitures_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -309,6 +336,13 @@ export class FunituresController {
 
   // ! Soft delete funiture
   @Delete('delete/:funitures_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -334,6 +368,13 @@ export class FunituresController {
 
   // ! Restore funiture
   @Patch('restore/:funitures_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -359,6 +400,13 @@ export class FunituresController {
 
   // ! Hard delete funiture
   @Delete('destroy/:funitures_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

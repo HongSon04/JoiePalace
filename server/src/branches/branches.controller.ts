@@ -19,7 +19,13 @@ import {
 import { AuthGuard } from 'src/guards/auth.guard';
 
 import { FilterDto } from 'helper/dto/Filter.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
@@ -35,6 +41,13 @@ export class BranchesController {
 
   // ! Create A New Branch
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiOperation({ summary: 'Tạo chi nhánh mới' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -403,6 +416,13 @@ export class BranchesController {
 
   // ! Update Branch Info
   @Patch('update/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -513,6 +533,13 @@ export class BranchesController {
 
   // ! Soft Delete Branch
   @Delete('delete/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -541,6 +568,13 @@ export class BranchesController {
 
   // ! Restore Branch
   @Put('restore/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -566,6 +600,13 @@ export class BranchesController {
 
   // ! Hard Delete Branch
   @Delete('destroy/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

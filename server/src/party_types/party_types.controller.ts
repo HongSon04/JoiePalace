@@ -20,7 +20,13 @@ import {
   ImagePartyTypesDto,
 } from './dto/create-party_type.dto';
 import { UpdatePartyTypeDto } from './dto/update-party_type.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
@@ -32,6 +38,13 @@ export class PartyTypesController {
 
   // ! Create party type
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -131,6 +144,13 @@ export class PartyTypesController {
 
   // ! Get all party types deleted
   @Get('get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -225,6 +245,13 @@ export class PartyTypesController {
   }
   // ! Update party type
   @Patch('update/:party_types_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -286,6 +313,13 @@ export class PartyTypesController {
 
   // ! Soft delete party type
   @Delete('delete/:party_types_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -311,6 +345,13 @@ export class PartyTypesController {
 
   // ! Restore party type
   @Put('restore/:party_types_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -336,6 +377,13 @@ export class PartyTypesController {
 
   // ! Hard delete party type
   @Delete('hard-delete/:party_types_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: { message: 'Xóa loại tiệc thành công' },

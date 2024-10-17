@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
 import {
+  ApiHeaders,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -33,6 +34,13 @@ import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
 
 @ApiTags('staffs')
 @UseGuards(AuthGuard)
+@ApiHeaders([
+  {
+    name: 'authorization',
+    description: 'Bearer token',
+    required: true,
+  },
+])
 @Controller('api/staffs')
 export class StaffsController {
   constructor(

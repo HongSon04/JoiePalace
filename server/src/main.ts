@@ -6,13 +6,11 @@ import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT') || 5000;
-  const theme = new SwaggerTheme();
   const config = new DocumentBuilder()
     .setTitle('JoiePalace API')
     .setDescription('HOHOHOHO')
@@ -33,7 +31,6 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true,
     },
-    customCss: theme.getBuffer(SwaggerThemeNameEnum.ONE_DARK),
   });
 
   app.enableCors({
