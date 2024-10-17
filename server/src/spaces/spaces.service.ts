@@ -51,7 +51,7 @@ export class SpacesService {
       const spaceImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/space',
+          'joiepalace/space',
         );
 
       // Create space
@@ -136,7 +136,7 @@ export class SpacesService {
         const spacesImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/spaces',
+            'joiepalace/spaces',
           );
 
         if (!spacesImages || spacesImages.length === 0) {
@@ -216,7 +216,7 @@ export class SpacesService {
     try {
       const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
         files,
-        'joieplace/space',
+        'joiepalace/space',
       );
       const findSpace = await this.prismaService.spaces.findUnique({
         where: { id: Number(id) },

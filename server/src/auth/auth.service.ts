@@ -378,6 +378,9 @@ export class AuthService {
       email: user.email,
       role: user.role,
       phone: user.phone,
+      platform: user.platform,
+      active: user.active,
+      verify_at: user.verify_at,
     };
 
     const access_token = this.jwtService.sign(payload, {

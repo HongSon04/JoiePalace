@@ -103,7 +103,7 @@ export class UserController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       createUserDto.avatar = avatar;
     } else {

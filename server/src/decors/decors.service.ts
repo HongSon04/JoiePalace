@@ -47,7 +47,7 @@ export class DecorsService {
       const imagesDecor =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/decors',
+          'joiepalace/decors',
         );
 
       if (imagesDecor.length === 0) {
@@ -431,7 +431,7 @@ export class DecorsService {
         const imagesDecor =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/decors',
+            'joiepalace/decors',
           );
 
         if (!imagesDecor.length) {

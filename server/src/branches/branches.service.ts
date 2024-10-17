@@ -68,11 +68,11 @@ export class BranchesService {
 
       // Upload tất cả các hình ảnh đồng thời
       await Promise.all([
-        uploadImages('images', 'joieplace/branch'),
-        uploadImages('diagram_images', 'joieplace/diagram'),
-        uploadImages('slogan_images', 'joieplace/slogan'),
-        uploadImages('equipment_images', 'joieplace/equipment'),
-        uploadImages('space_images', 'joieplace/space'),
+        uploadImages('images', 'joiepalace/branch'),
+        uploadImages('diagram_images', 'joiepalace/diagram'),
+        uploadImages('slogan_images', 'joiepalace/slogan'),
+        uploadImages('equipment_images', 'joiepalace/equipment'),
+        uploadImages('space_images', 'joiepalace/space'),
       ]);
 
       const { name, address, phone, email } = branch;

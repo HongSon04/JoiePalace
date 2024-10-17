@@ -57,7 +57,7 @@ export class FunituresService {
 
       const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
         files.images as any,
-        'joieplace/funitures',
+        'joiepalace/funitures',
       );
       data.images = images;
 
@@ -349,7 +349,7 @@ export class FunituresService {
       if (files.images) {
         const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images as any,
-          'joieplace/funitures',
+          'joiepalace/funitures',
         );
         if (!images) {
           throw new HttpException(

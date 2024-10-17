@@ -259,7 +259,7 @@ export class AuthController {
   ) {
     const avatar = await this.cloudinaryService.uploadFileToFolder(
       file,
-      'joieplace/avatar',
+      'joiepalace/avatar',
     );
     return this.authService.changeAvatar(req.user, avatar);
   }

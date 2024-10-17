@@ -50,7 +50,7 @@ export class PartyTypesService {
 
       const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
         files.images as any,
-        'joieplace/party',
+        'joiepalace/party',
       );
       const slug = MakeSlugger(name);
       const partyType = await this.prismaService.party_types.create({
@@ -364,7 +364,7 @@ export class PartyTypesService {
       if (files.images) {
         const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images as any,
-          'joieplace/party',
+          'joiepalace/party',
         );
         if (!images) {
           throw new HttpException(

@@ -39,13 +39,6 @@ export class ProductsService {
         );
       }
 
-      if (!category_id || !name || !price) {
-        throw new HttpException(
-          'Thông tin không đầy đủ',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
       // Check product existence
       const existingproduct = await this.prismaService.products.findFirst({
         where: { name },
@@ -83,7 +76,7 @@ export class ProductsService {
       const uploadImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/products',
+          'joiepalace/products',
         );
 
       if (!uploadImages) {
@@ -659,7 +652,7 @@ export class ProductsService {
         const uploadImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/products',
+            'joiepalace/products',
           );
         if (!uploadImages) {
           throw new HttpException(

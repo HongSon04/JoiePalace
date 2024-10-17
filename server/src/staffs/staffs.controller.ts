@@ -110,7 +110,7 @@ export class StaffsController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       body.avatar = avatar;
     } else {
@@ -363,7 +363,7 @@ export class StaffsController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       body.avatar = avatar;
     } else {
