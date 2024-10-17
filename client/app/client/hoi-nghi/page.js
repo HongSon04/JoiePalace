@@ -84,7 +84,7 @@ function Conference() {
                                         <Image src="/meeting-5.png" alt="" />
                                     </div>
                                 </div>
-                                <div className="relative right-[135px] z-[-1]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
+                                <div className="relative right-[135px] z-[-1] max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
                                     <div className="max-w-[641px] max-h-[430px] ">
                                         <Image src="/meeting-6.png" alt="" />
                                     </div>

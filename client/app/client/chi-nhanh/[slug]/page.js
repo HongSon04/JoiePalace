@@ -239,7 +239,7 @@ const PageLocation = () => {
             className="row-start-9 row-end-13 col-start-1 lg:col-start-7 col-end-13 z-30"
           >
             <div className="w-full h-auto relative flex flex-col gap-4 px-[12%] lg:pl-9 pt-7">
-              <span className="text-xs sm:text-sm lg:text-base">
+              <span className="text-xs sm:text-sm lg:text-lg">
                 Trung tâm Sự kiện White Palace sở hữu 02 đại sảnh đa năng và 02
                 phòng họp cao cấp đáp ứng đa dạng các loại hình sự kiện. Hãy tìm
                 hiểu bảng Công Suất - Kích Thước và đừng quên để lại lời nhắn
