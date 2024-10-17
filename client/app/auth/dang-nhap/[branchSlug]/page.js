@@ -1,10 +1,3 @@
-import {
-  error,
-  fetchBranchSuccess,
-  loading,
-} from "@/app/_lib/features/branch/branchSlice";
-import { fetchBranchBySlug } from "@/app/_services/branchesServices";
-import { fetchData } from "@/app/_utils/helpers";
 import authBg from "@/public/auth-bg.png";
 import {
   ChatBubbleLeftRightIcon,
@@ -13,9 +6,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Button, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
-import React from "react";
 import Form from "./Form";
-import { useDispatch } from "react-redux";
 
 function Page({ params: { branchSlug } }) {
   return (

@@ -132,12 +132,9 @@ function Form({}) {
           error={"Lỗi khi lấy dữ liệu chi nhánh hoặc chi nhánh không tồn tại"}
           withOverlay={true}
         >
-          <Link
-            href={"/auth/chon-chi-nhanh"}
-            className="text-base font-semibold text-white bg-red-400 rounded-full mt-5 p-2"
-          >
+          <Button className="text-base font-semibold bg-whiteAlpha-100 text-white underline rounded-full mt-5 p-2 px-5">
             Chọn lại chi nhánh
-          </Link>
+          </Button>
         </Error>
       )}
       {!isLoading && !isError && currentBranch && (

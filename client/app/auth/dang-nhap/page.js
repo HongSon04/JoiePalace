@@ -55,7 +55,7 @@ function Page() {
       </div>
 
       {/* FORM */}
-      <div className="flex-center bg-white flex-col p-5 rounded-md text-gray-800 gap-5 absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
+      <div className="flex-center bg-whiteAlpha-200 flex-col p-5 rounded-md text-gray-800 gap-5 absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
         <ExclamationCircleIcon className="w-24 h-w-24" />
         <h1 className="text-xl font-bold">Chưa chọn chi nhánh</h1>
         <p className="text-base">Vui lòng chọn chi nhánh trước khi đăng nhập</p>

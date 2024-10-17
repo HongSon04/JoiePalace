@@ -14,10 +14,10 @@ const page = () => {
             data: [300000000, 500000000, 700000000]
   
           },
-        ],
-    };
+            ],
+        };
   return (
-    <main className=" grid gap-6 p-4">
+    <main className=" grid gap-6 p-4 text-white">
         <AdminHeader
             title="Khách hàng"
             showBackButton={false}

@@ -5,25 +5,29 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import dayjs, { locale } from 'dayjs';
+import dayjs from 'dayjs';
 import { OnePayInternational, VNPay } from 'vn-payments';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
 import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import * as CryptoJS from 'crypto-js';
 import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class PaymentMethodsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private configService: ConfigService,
+    private prismaService: PrismaService,
+  ) {}
 
   // ? Other
 
-  // private onepayIntl = new OnePayInternational({
-  //   paymentGateway: process.env.ONEPAY_PAYMENT_GATEWAY,
-  //   merchant: process.env.ONEPAY_MERCHANT,
-  //   accessCode: process.env.ONEPAY_ACCESS_CODE,
-  //   secureSecret: process.env.ONEPAY_SECURE_SECRET,
-  // });
+  private onepayIntl = new OnePayInternational({
+    paymentGateway: this.configService.get<string>('ONEPAY_PAYMENT_GATEWAY'),
+    merchant: this.configService.get<string>('ONEPAY_MERCHANT'),
+    accessCode: this.configService.get<string>('ONEPAY_ACCESS_CODE'),
+    secureSecret: this.configService.get<string>('ONEPAY_SECURE_SECRET'),
+  });
 
   private sortObject(obj) {
     let sorted = {};
@@ -74,11 +78,11 @@ export class PaymentMethodsService {
         );
       }
 
-      var accessKey = process.env.MOMO_ACCESS_KEY;
-      var secretKey = process.env.MOMO_SECRET_KEY;
+      var accessKey = this.configService.get<string>('MOMO_ACCESS_KEY');
+      var secretKey = this.configService.get<string>('MOMO_SECRET_KEY');
       var orderInfo = 'Thanh toán tiền cọc';
-      var partnerCode = process.env.MOMO_PARTNER_CODE;
-      var redirectUrl = `${process.env.WEB_URL}payment-methods/momo-callback?deposit_id=${id}`;
+      var partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE');
+      var redirectUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/momo-callback?deposit_id=${id}`;
       var ipnUrl = 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b';
       var requestType = 'payWithMethod';
       var amount = Number(findDeposit.amount);
@@ -269,8 +273,6 @@ export class PaymentMethodsService {
         );
       }
 
-      process.env.TZ = 'Asia/Ho_Chi_Minh';
-
       let date = new Date();
       let createDate = dayjs(date).format('YYYYMMDDHHmmss');
 
@@ -280,10 +282,10 @@ export class PaymentMethodsService {
         req.socket.remoteAddress ||
         req.connection.socket.remoteAddress;
 
-      let tmnCode = process.env.VNP_TMN_CODE;
-      let secretKey = process.env.VNP_HASH_SECRET;
-      let vnpUrl = process.env.VNP_URL;
-      let returnUrl = `${process.env.WEB_URL}payment-methods/vnpay-callback?deposit_id=${id}`;
+      let tmnCode = this.configService.get<string>('VNP_TMN_CODE');
+      let secretKey = this.configService.get<string>('VNP_HASH_SECRET');
+      let vnpUrl = this.configService.get<string>('VNP_URL');
+      let returnUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/vnpay-callback?deposit_id=${id}`;
       let orderId = dayjs(date).format('DDHHmmss');
       let amount = findDeposit.amount;
       let bankCode = '';
@@ -381,7 +383,7 @@ export class PaymentMethodsService {
       return this.failPayment(res);
     }
   }
-/* 
+
   // ! Payment OnePay
   async onePay(id: number, req, res) {
     try {
@@ -408,8 +410,8 @@ export class PaymentMethodsService {
         amount: findDeposit.amount,
         customerId: findDeposit.transactionID,
         currency: 'VND',
-        returnUrl: `${process.env.WEB_URL}payment-methods/onepay-callback?deposit_id=${id}`,
-        againLink: `${process.env.WEB_URL}payment-methods/onepay/${id}`,
+        returnUrl: `${this.configService.get<string>('BACKEND_URL')}payment-methods/onepay/callback`,
+        againLink: `${this.configService.get<string>('BACKEND_URL')}payment-methods/onepay/${id}`,
         clientIp:
           req.headers['x-forwarded-for'] ||
           req.connection.remoteAddress ||
@@ -483,7 +485,7 @@ export class PaymentMethodsService {
       this.failPayment(res);
     }
   }
- */
+
   // ! Payment ZaloPay
   async zaloPay(id, req, res) {
     try {
@@ -506,10 +508,10 @@ export class PaymentMethodsService {
       //   );
       // }
       const config = {
-        app_id: process.env.ZALO_APP_ID,
-        key1: process.env.ZALO_KEY_1,
-        key2: process.env.ZALO_KEY_2,
-        endpoint: process.env.ZALO_ENDPOINT,
+        app_id: this.configService.get<string>('ZALO_APP_ID'),
+        key1: this.configService.get<string>('ZALO_KEY_1'),
+        key2: this.configService.get<string>('ZALO_KEY_2'),
+        endpoint: this.configService.get<string>('ZALO_ENDPOINT'),
       };
       const embed_data = {
         preferred_payment_method: [],
@@ -529,7 +531,7 @@ export class PaymentMethodsService {
         description: `Thanh toán tiền cọc cho ID: ${findDeposit.transactionID}`,
         bank_code: '',
         mac: '',
-        callback_url: `${process.env.WEB_URL}payment-methods/zalopay-callback?deposit_id=${id}`,
+        callback_url: `${this.configService.get<string>('BACKEND_URL')}payment-methods/zalopay-callback?deposit_id=${id}`,
       };
 
       const data =
@@ -578,13 +580,16 @@ export class PaymentMethodsService {
   }
 
   // ? Callback ZaloPay
-  async callbackZaloPay(query, req, res) {  
+  async callbackZaloPay(query, req, res) {
     let result = {} as any;
     try {
       let dataStr = req.body.data;
       let reqMac = req.body.mac;
 
-      let mac = CryptoJS.HmacSHA256(dataStr, process.env.ZALO_KEY_2).toString();
+      let mac = CryptoJS.HmacSHA256(
+        dataStr,
+        this.configService.get<string>('ZALO_KEY_2'),
+      ).toString();
 
       // kiểm tra callback hợp lệ (đến từ ZaloPay server)
       if (reqMac !== mac) {
@@ -594,7 +599,10 @@ export class PaymentMethodsService {
       } else {
         // thanh toán thành công
         // merchant cập nhật trạng thái cho đơn hàng
-        let dataJson = JSON.parse(dataStr, process.env.ZALO_KEY_2 as any);
+        let dataJson = JSON.parse(
+          dataStr,
+          this.configService.get<string>('ZALO_KEY_2') as any,
+        );
         dataJson['app_trans_id'];
 
         result.return_code = 1;
@@ -637,11 +645,15 @@ export class PaymentMethodsService {
   // *********************************************************
   // ! Payment Success
   private async successPayment(res) {
-    res.redirect(`${process.env.WEB_URL}thanh-toan-thanh-cong`);
+    res.redirect(
+      `${this.configService.get<string>('FRONTEND_URL')}thanh-toan-thanh-cong`,
+    );
   }
 
   // ! Payment Fail
   private async failPayment(res) {
-    res.redirect(`${process.env.WEB_URL}thanh-toan-that-bai`);
+    res.redirect(
+      `${this.configService.get<string>('FRONTEND_URL')}thanh-toan-that-bai`,
+    );
   }
 }

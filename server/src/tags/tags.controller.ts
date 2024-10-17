@@ -12,7 +12,13 @@ import {
 import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
@@ -23,6 +29,13 @@ export class TagsController {
 
   // ! Add Tag
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -161,6 +174,13 @@ export class TagsController {
   }
 
   @Patch('/update/:tag_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -192,6 +212,13 @@ export class TagsController {
   }
 
   @Delete('/destroy/:tag_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

@@ -5,7 +5,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 
 const page = () => {
     return (
-        <main className="grid gap-6 p-4">
+        <main className="grid gap-6 p-4 text-white">
             <AdminHeader
                 title="Thông tin tài khoản"
                 showSearchForm = {false}

@@ -23,7 +23,7 @@ const page = () => {
         { id: 3, name: "Option 3", value: "option3" },
     ];
     return (
-        <main className="font-gilroy grid gap-6 p-4">
+        <main className="font-gilroy grid gap-6 p-4 text-white" >
             <AdminHeader
                 title="Thống kê"
                 showBackButton = {false}

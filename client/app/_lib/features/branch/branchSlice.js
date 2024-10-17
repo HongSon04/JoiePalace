@@ -10,19 +10,6 @@ const initialState = {
   errorMessage: null,
 };
 
-// Async thunk for posting location data
-export const postBrach = createAsyncThunk(
-  "location/postBrach",
-  async (BrachData, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(API_CONFIG.BRANCHES.GET_ALL, BrachData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
-  }
-);
-
 const branchSlice = createSlice({
   name: "branch",
   initialState,

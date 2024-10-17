@@ -16,8 +16,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
-  ApiBearerAuth,
-  ApiBody,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -42,15 +40,16 @@ export class UserController {
 
   // ! Create User
   @Post('create')
-  @ApiBearerAuth()
   @ApiHeaders([
     {
-      name: 'Authorization',
+      name: 'authorization',
       description: 'Bearer token',
       required: true,
     },
   ])
-  @ApiOperation({ summary: 'Quản trị viên tạo tài khoản' })
+  @ApiOperation({
+    summary: 'Quản trị viên tạo tài khoản',
+  })
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -115,8 +114,14 @@ export class UserController {
 
   // ! Get Profile
   @Get('profile')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -155,6 +160,15 @@ export class UserController {
   }
 
   // ! Get All User
+  @Get('get-all')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
+  @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Lấy danh sách tài khoản (trừ tài khoản bị xóa tạm)',
   })
@@ -195,8 +209,6 @@ export class UserController {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
     },
   })
-  @Get('get-all')
-  @Roles(Role.ADMIN)
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -208,6 +220,13 @@ export class UserController {
 
   // ! Get All User Deleted
   @Get('get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -257,6 +276,13 @@ export class UserController {
 
   // ! Get User By Id
   @Get('get/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -297,6 +323,13 @@ export class UserController {
 
   // ! Change Password
   @Put('change-password')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -326,6 +359,13 @@ export class UserController {
 
   // ! Change Profile
   @Patch('change-profile')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -351,6 +391,13 @@ export class UserController {
 
   // ! Soft Delete User
   @Delete('delete/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -376,6 +423,13 @@ export class UserController {
 
   // ! Restore User
   @Put('restore/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -401,6 +455,13 @@ export class UserController {
 
   // ! Hard Delete User
   @Delete('destroy/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

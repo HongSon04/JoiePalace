@@ -16,7 +16,13 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
@@ -28,6 +34,13 @@ export class ProductsController {
 
   // ! Create Product
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -156,6 +169,13 @@ export class ProductsController {
 
   // ! Get All product Deleted
   @Get('/get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -373,6 +393,13 @@ export class ProductsController {
 
   // ! Update product
   @Patch('/update/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -446,6 +473,13 @@ export class ProductsController {
 
   // ! Soft delete product
   @Delete('/delete/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -471,6 +505,13 @@ export class ProductsController {
 
   // ! Restore product
   @Post('/restore/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -496,6 +537,13 @@ export class ProductsController {
 
   // ! Delete product
   @Delete('/destroy/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
