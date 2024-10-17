@@ -42,6 +42,10 @@ import { DashboardModule } from './dashboard/dashboard.module';
       }),
       inject: [ConfigService],
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     AuthModule,
     UserModule,
     StaffsModule,

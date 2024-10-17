@@ -9,7 +9,12 @@ import {
   Response,
 } from '@nestjs/common';
 import { PaymentMethodsService } from './payment_methods.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 
@@ -34,6 +39,7 @@ export class PaymentMethodsController {
 
   @Get('momo-callback')
   @isPublic()
+  @ApiExcludeEndpoint()
   callbackMomo(@Query() Query: MomoCallbackDto | any, @Response() res: any) {
     return this.paymentMethodsService.callbackMomo(Query, res);
   }
@@ -53,11 +59,12 @@ export class PaymentMethodsController {
   // ! VNPay Callback
   @Get('vnpay-callback')
   @isPublic()
+  @ApiExcludeEndpoint()
   callbackVnpay(@Query() query: any, @Response() res: any) {
     return this.paymentMethodsService.callbackVNPay(query, res);
   }
 
-  /* // ! OnePay
+  // ! OnePay
   @Get('onepay/:deposit_id')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua OnePay' })
@@ -72,10 +79,11 @@ export class PaymentMethodsController {
   // ! OnePay Callback
   @Get('onepay-callback')
   @isPublic()
+  @ApiExcludeEndpoint()
   callbackOnepay(@Query() query: any, @Response() res: any) {
     return this.paymentMethodsService.callbackOnePay(query, res);
   }
- */
+
   // ! Payment ZaloPay
   @Post('zalopay/:deposit_id')
   @isPublic()
@@ -91,6 +99,7 @@ export class PaymentMethodsController {
   // ! ZaloPay Callback
   @Post('zalopay-callback')
   @isPublic()
+  @ApiExcludeEndpoint()
   callbackZaloPay(@Query() query: any, @Request() req, @Response() res: any) {
     return this.paymentMethodsService.callbackZaloPay(query, req, res);
   }

@@ -16,8 +16,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
-  ApiBearerAuth,
-  ApiBody,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -42,7 +40,6 @@ export class UserController {
 
   // ! Create User
   @Post('create')
-  @ApiBearerAuth()
   @ApiHeaders([
     {
       name: 'Authorization',
@@ -115,7 +112,6 @@ export class UserController {
 
   // ! Get Profile
   @Get('profile')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
   @ApiResponse({
     status: HttpStatus.OK,

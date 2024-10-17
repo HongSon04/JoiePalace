@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import dayjs, { locale } from 'dayjs';
+import dayjs from 'dayjs';
 import { OnePayInternational, VNPay } from 'vn-payments';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 import { VNPayCallbackDto } from './dto/vnpay-callback.dto';

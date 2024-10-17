@@ -192,8 +192,8 @@ export class BranchesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   async getAllBranchs(@Query() query: FilterDto): Promise<any> {
     return this.branchesService.getAllBranches(query);
   }
@@ -261,8 +261,8 @@ export class BranchesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   async getAllDeletedBranches(@Query() query: FilterDto): Promise<any> {
     return this.branchesService.getAllDeletedBranches(query);
   }

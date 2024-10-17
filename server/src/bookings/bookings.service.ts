@@ -529,16 +529,15 @@ export class BookingsService {
     }
   }
 
-  // ! Get Booking For Next 14 Days Timezone
+  // ! Get Booking For Next 2 Weeks to 5 Weeks
   async getBookingForNext14Days() {
     try {
       const currentDate = new Date();
       const startDate = new Date(currentDate);
       const endDate = new Date(currentDate);
-      startDate.setDate(currentDate.getDate() + 7);
-      endDate.setDate(currentDate.getDate() + 21);
-      console.log('Start Date:', startDate);
-      console.log('End Date:', endDate);
+      startDate.setDate(currentDate.getDate() + 14);
+      endDate.setDate(currentDate.getDate() + 35);
+
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           organization_date: {
@@ -553,19 +552,27 @@ export class BookingsService {
           shift: true,
         },
       });
+
+      // Tạo một Map để tra cứu booking nhanh hơn
+      const bookingMap = new Map();
+      for (const booking of bookings) {
+        const dateKey = new Date(booking.organization_date).toDateString();
+        bookingMap.set(`${dateKey}-${booking.shift}`, booking);
+      }
+
       const response = [];
-      for (let i = 7; i <= 21; i++) {
+      const shifts = ['Sáng', 'Tối'];
+
+      for (let i = 14; i <= 35; i++) {
         const dateToCheck = new Date(currentDate);
         dateToCheck.setDate(currentDate.getDate() + i);
-        const shifts = ['Sáng', 'Tối'];
+        const dateKey = dateToCheck.toDateString();
+
         for (const shift of shifts) {
-          const existingBooking = bookings.find(
-            (booking) =>
-              new Date(booking.organization_date).toDateString() ===
-                dateToCheck.toDateString() && booking.shift === shift,
-          );
+          const existingBooking = bookingMap.get(`${dateKey}-${shift}`);
           const organi_date = dateToCheck.toISOString().split('T')[0];
           const [year, month, date] = organi_date.split('-');
+
           response.push({
             id: existingBooking ? existingBooking.id : null,
             name: existingBooking ? existingBooking.name : null,
@@ -575,17 +582,20 @@ export class BookingsService {
           });
         }
       }
-      return {
-        success: true,
-        data: response,
-        message: 'Lấy dữ liệu đặt chỗ thành công!',
-      };
+
+      throw new HttpException(
+        {
+          message: 'Lấy dữ liệu đặt chỗ thành công!',
+          data: response,
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       console.log(
-        'Lỗi từ booking.service.ts -> getBookingForNext7Days: ',
+        'Lỗi từ booking.service.ts -> getBookingForNext14Days: ',
         error,
       );
       throw new InternalServerErrorException(
@@ -1096,32 +1106,52 @@ export class BookingsService {
 
   // ! Destroy Booking
   async destroy(id: number) {
-    // try {
-    //   const findBooking = await this.prismaService.bookings.findUnique({
-    //     where: { id: Number(id) },
-    //   });
-    //   if (!findBooking) {
-    //     throw new HttpException(
-    //       'Không tìm thấy đơn đặt tiệc',
-    //       HttpStatus.NOT_FOUND,
-    //     );
-    //   }
-    //   await this.prismaService.bookings.delete({
-    //     where: { id: Number(id) },
-    //   });
-    //   await this.prismaService.deposits.delete({
-    //     where: { id: findBooking.deposit_id },
-    //   });
-    //   throw new HttpException('Xóa đơn đặt tiệc thành công', HttpStatus.OK);
-    // } catch (error) {
-    //   if (error instanceof HttpException) {
-    //     throw error;
-    //   }
-    //   console.log('Lỗi từ booking.service.ts -> destroy: ', error);
-    //   throw new InternalServerErrorException(
-    //     'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-    //   );
-    // }
+    try {
+      const booking = await this.prismaService.bookings.findUnique({
+        where: { id: Number(id) },
+        include: {
+          booking_details: {
+            include: {
+              deposits: true,
+            },
+          },
+        },
+      });
+
+      if (!booking) {
+        throw new HttpException(
+          'Không tìm thấy đơn đặt tiệc',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Xóa deposit nếu có
+      if (booking.booking_details.length > 0) {
+        const depositId = booking.booking_details[0].deposit_id;
+        if (depositId) {
+          await this.prismaService.deposits.delete({
+            where: { id: depositId },
+          });
+        }
+        await this.prismaService.booking_details.deleteMany({
+          where: { booking_id: booking.id },
+        });
+      }
+
+      await this.prismaService.bookings.delete({
+        where: { id: Number(id) },
+      });
+
+      throw new HttpException('Xóa đơn đặt tiệc thành công', HttpStatus.OK);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ booking.service.ts -> destroy: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+      );
+    }
   }
 
   // ! Calculate accessory amounts
