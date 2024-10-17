@@ -21,12 +21,14 @@ import {
   ApiOperation,
   ApiQuery,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@Controller('blogs')
+@Controller('/api/blogs')
+@ApiTags('blogs')
 export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
@@ -184,6 +186,7 @@ export class BlogsController {
       message: 'Đã có lỗi xảy ra !',
     },
   })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết đã xóa' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -464,6 +467,7 @@ export class BlogsController {
       message: 'Không tìm thấy bài viết !',
     },
   })
+  @ApiOperation({ summary: 'Khôi phục bài viết theo id' })
   restore(@Param('blog_id') id: string) {
     return this.blogsService.restore(+id);
   }
