@@ -38,7 +38,7 @@ export class ProductsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -173,7 +173,7 @@ export class ProductsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -227,6 +227,46 @@ export class ProductsController {
   @ApiQuery({ name: 'endDate', required: false })
   findAllDeleted(@Query() query: FilterPriceDto) {
     return this.productsService.findAllDeleted(query);
+  }
+
+  // ! Get 10 product per category
+  @Get('/get-ten-per-category')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          slug: 'string',
+          price: 'number',
+          images: 'array',
+          description: 'string',
+          short_description: 'string',
+          category_id: 'number',
+          tags: 'array',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy sản phẩm',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Lỗi server vui lòng thử lại sau',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy 10 sản phẩm mới nhất của mỗi danh mục' })
+  get10PerCategory() {
+    return this.productsService.get10PerCategory();
   }
   // ! Get product by id
   @Get('get/:product_id')
@@ -397,7 +437,7 @@ export class ProductsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -477,7 +517,7 @@ export class ProductsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -509,7 +549,7 @@ export class ProductsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -541,7 +581,7 @@ export class ProductsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({

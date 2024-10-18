@@ -6,6 +6,7 @@ const HOST = `https://joieplace.live/api`;
 const AUTH_API = `${HOST}/auth`;
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
+const CATEGORIES_API = `${HOST}/categories`;
 
 // API Endpoints
 export const API_CONFIG = {
@@ -43,5 +44,18 @@ export const API_CONFIG = {
     DELETE: (id) => `${BRANCHES_API}/delete/${id}`,
     RESTORE: (id) => `${BRANCHES_API}/restore/${id}`,
     DESTROY: (id) => `${BRANCHES_API}/destroy/${id}`,
+  },
+
+  // CATEGORIES API
+  CATEGORIES: {
+    CREATE: `${CATEGORIES_API}/create`,
+    GET_ALL: `${CATEGORIES_API}/get-all`,
+    GET_ALL_DELETED: `${CATEGORIES_API}/get-all-deleted`,
+    GET_BY_ID: (id) => `${CATEGORIES_API}/get/${id}`,
+    GET_BY_SLUG: (slug) => `${CATEGORIES_API}/get-by-slug/${slug}`,
+    UPDATE: (id) => `${CATEGORIES_API}/update/${id}`,
+    DELETE: (id) => `${CATEGORIES_API}/delete/${id}`,
+    RESTORE: (id) => `${CATEGORIES_API}/restore/${id}`,
+    DESTROY: (id) => `${CATEGORIES_API}/destroy/${id}`,
   },
 };

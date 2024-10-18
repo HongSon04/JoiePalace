@@ -38,7 +38,7 @@ import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
   {
     name: 'authorization',
     description: 'Bearer token',
-    required: true,
+    required: false,
   },
 ])
 @Controller('api/staffs')
@@ -110,7 +110,7 @@ export class StaffsController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       body.avatar = avatar;
     } else {
@@ -363,7 +363,7 @@ export class StaffsController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       body.avatar = avatar;
     } else {

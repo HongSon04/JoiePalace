@@ -451,7 +451,7 @@ export class DashboardService {
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           branch_id: {
-            in: branches.map((branch) => branch.id),
+            in: branches.map((branch) => Number(branch.id)),
           },
         },
         include: {
@@ -527,7 +527,7 @@ export class DashboardService {
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           branch_id: {
-            in: branches.map((branch) => branch.id),
+            in: branches.map((branch) => Number(branch.id)),
           },
           created_at: {
             gte: startOfWeek,
@@ -607,7 +607,7 @@ export class DashboardService {
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           branch_id: {
-            in: branches.map((branch) => branch.id),
+            in: branches.map((branch) => Number(branch.id)),
           },
           created_at: {
             gte: startOfMonth,
@@ -687,7 +687,7 @@ export class DashboardService {
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           branch_id: {
-            in: branches.map((branch) => branch.id),
+            in: branches.map((branch) => Number(branch.id)),
           },
           created_at: {
             gte: startOfYear,
@@ -751,7 +751,7 @@ export class DashboardService {
         const bookingPromises = branches.map(async (branch) => {
           const bookings = await this.prismaService.bookings.findMany({
             where: {
-              branch_id: branch.id,
+              branch_id: Number(branch.id),
               created_at: {
                 gte: startOfYear,
                 lte: endOfYear,
@@ -905,7 +905,7 @@ export class DashboardService {
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           branch_id: {
-            in: branches.map((branch) => branch.id),
+            in: branches.map((branch) => Number(branch.id)),
           },
         },
         select: {

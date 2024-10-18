@@ -5,7 +5,6 @@ import {
   ApiHeaders,
   ApiOperation,
   ApiParam,
-  ApiProperty,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -15,7 +14,7 @@ import {
   {
     name: 'authorization',
     description: 'Bearer token',
-    required: true,
+    required: false,
   },
 ])
 @Controller('api/dashboard')

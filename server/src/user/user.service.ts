@@ -472,7 +472,7 @@ export class UserService {
 
     await this.prismaService.users.update({
       where: {
-        id: user.id,
+        id: Number(user.id),
       },
       data: {
         refresh_token,

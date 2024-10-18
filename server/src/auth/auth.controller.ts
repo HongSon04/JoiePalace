@@ -95,7 +95,7 @@ export class AuthController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -208,7 +208,7 @@ export class AuthController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Người dùng tải ảnh đại diện' })
@@ -259,7 +259,7 @@ export class AuthController {
   ) {
     const avatar = await this.cloudinaryService.uploadFileToFolder(
       file,
-      'joieplace/avatar',
+      'joiepalace/avatar',
     );
     return this.authService.changeAvatar(req.user, avatar);
   }

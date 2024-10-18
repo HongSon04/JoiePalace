@@ -137,7 +137,7 @@ export class AuthService {
     try {
       const findUser = await this.prismaService.users.findUnique({
         where: {
-          id: user.id,
+          id: Number(user.id),
         },
       });
       if (!findUser) {
@@ -148,7 +148,7 @@ export class AuthService {
       }
       await this.prismaService.users.update({
         where: {
-          id: user.id,
+          id: Number(user.id),
         },
         data: {
           refresh_token: null,
@@ -215,7 +215,7 @@ export class AuthService {
       const user = await this.prismaService.users.findFirst({
         where: {
           refresh_token: refreshToken,
-          id: payload.id,
+          id: Number(payload.id),
         },
       });
 
@@ -311,7 +311,7 @@ export class AuthService {
       if (findToken.expired_at < new Date()) {
         await this.prismaService.verify_tokens.delete({
           where: {
-            id: findToken.id,
+            id: Number(findToken.id),
           },
         });
         throw new HttpException('Token đã hết hạn', HttpStatus.BAD_REQUEST);
@@ -328,7 +328,7 @@ export class AuthService {
 
       await this.prismaService.verify_tokens.delete({
         where: {
-          id: findToken.id,
+          id: Number(findToken.id),
         },
       });
 
@@ -360,7 +360,7 @@ export class AuthService {
         await this.prismaService.verify_tokens.deleteMany({
           where: {
             id: {
-              in: findTokens.map((token) => token.id),
+              in: findTokens.map((token) => Number(token.id)),
             },
           },
         });
@@ -373,11 +373,14 @@ export class AuthService {
   // ! Generate Token
   async generateToken(user: UserEntity) {
     const payload = {
-      id: user.id,
+      id: Number(user.id),
       username: user.username,
       email: user.email,
       role: user.role,
       phone: user.phone,
+      platform: user.platform,
+      active: user.active,
+      verify_at: user.verify_at,
     };
 
     const access_token = this.jwtService.sign(payload, {
@@ -392,7 +395,7 @@ export class AuthService {
 
     await this.prismaService.users.update({
       where: {
-        id: user.id,
+        id: Number(user.id),
       },
       data: {
         refresh_token,
