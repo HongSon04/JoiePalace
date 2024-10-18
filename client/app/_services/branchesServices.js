@@ -27,3 +27,7 @@ export const fetchBranchBySlug = async (slug) => {
 
   return response.data.data;
 };
+
+export const getBranchClient = (location) => {
+  
+}
