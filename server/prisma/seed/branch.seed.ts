@@ -98,7 +98,7 @@ const branches = [
     name: 'Hà Tây',
     address: 'Đường 9, Quận 9, Hà Tây',
     slug: MakeSlugger('Hà Tây'),
-    phone: '999999999',
+    phone: '09',
     email: 'chinhanh9@joieplace.com',
     images: [
       'https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/xhnquxrdecjxbbialilg.jpg,https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/pakoi5ihxkxbnqlnjgl1.jpg',

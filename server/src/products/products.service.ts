@@ -133,10 +133,7 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -167,7 +164,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo
@@ -239,10 +241,7 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -273,7 +272,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo
@@ -402,10 +406,7 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
@@ -425,7 +426,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo
@@ -497,10 +503,7 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
@@ -524,7 +527,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo

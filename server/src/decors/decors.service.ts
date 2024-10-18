@@ -91,7 +91,7 @@ export class DecorsService {
     const skip = (page - 1) * itemsPerPage;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     const priceSort = query?.priceSort?.toLowerCase();
 
@@ -147,6 +147,16 @@ export class DecorsService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -218,7 +228,7 @@ export class DecorsService {
     const skip = (page - 1) * itemsPerPage;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     const priceSort = query?.priceSort?.toLowerCase();
 
@@ -273,6 +283,16 @@ export class DecorsService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },

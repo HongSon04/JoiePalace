@@ -219,7 +219,7 @@ export class BookingsService {
         : '';
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 99999999);
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -263,7 +263,12 @@ export class BookingsService {
       // ? Price Conditions
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ amount: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ amount: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
       // ? Date Conditions
       if (startDate && endDate) {
@@ -355,7 +360,7 @@ export class BookingsService {
         : '';
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 99999999);
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -399,7 +404,12 @@ export class BookingsService {
       // ? Price Conditions
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ amount: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ amount: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
       // ? Date Conditions
       if (startDate && endDate) {
