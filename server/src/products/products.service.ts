@@ -85,7 +85,7 @@ export class ProductsService {
 
       // Create product entry
       const slug = MakeSlugger(name);
-      const tagsConnect = existingTags.map((tag) => ({ id: tag.id }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       const createproduct = await this.prismaService.products.create({
         data: {
@@ -648,12 +648,11 @@ export class ProductsService {
       }
 
       // Handle tags
-      const tagsArray = JSON.parse(tags as any) || [];
       const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray.map((tagId: number) => Number(tagId)) } },
+        where: { id: { in: tags } },
       });
 
-      if (existingTags.length !== tagsArray.length) {
+      if (existingTags.length !== tags.length) {
         throw new HttpException(
           'Một hoặc nhiều tag không tồn tại',
           HttpStatus.BAD_REQUEST,
@@ -673,7 +672,7 @@ export class ProductsService {
 
       // Ready data for update
       const slug = MakeSlugger(name);
-      const tagsSet = existingTags.map((tag) => ({ id: tag.id }));
+      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       const updateData: any = {
         category_id,

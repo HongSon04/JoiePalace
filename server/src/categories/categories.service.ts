@@ -13,44 +13,80 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class CategoriesService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
   // ! Create Categories
-  async create(createCategoryDto: CreateCategoryDto) {
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    files: { images?: Express.Multer.File[] },
+  ) {
     try {
-      const { name, description, short_description } = createCategoryDto;
+      const { name, description, short_description, category_id, tags } =
+        createCategoryDto;
+
+      // Check Name and Slug
       const slug = MakeSlugger(name);
-      // ? Check Name and Slug
-      const findCategories = await this.prismaService.categories.findFirst({
+      const existingCategory = await this.prismaService.categories.findFirst({
         where: {
-          OR: [
-            {
-              name,
-            },
-            {
-              slug,
-            },
-          ],
+          OR: [{ name }, { slug }],
         },
       });
-      if (findCategories) {
+
+      if (existingCategory) {
         throw new HttpException(
           { message: 'Tên danh mục đã tồn tại' },
           HttpStatus.BAD_REQUEST,
         );
       }
-      // ? Create Categories
+
+      // Upload images if available
+      const images =
+        files.images && files.images.length > 0
+          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
+              files.images,
+              'joiepalace/products',
+            )
+          : ([] as any);
+
+      if (files.images && files.images.length > 0 && !images) {
+        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+      }
+
+      // Validate tags
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tags } },
+      });
+
+      if (existingTags.length !== tags.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
+
+      // Create Categories
       const categories = await this.prismaService.categories.create({
         data: {
           name,
           slug,
           description,
           short_description,
+          category_id: category_id || null,
+          images,
+          tags: { connect: tagsSet },
         },
       });
+
       throw new HttpException(
         { message: 'Tạo danh mục thành công', data: categories },
         HttpStatus.CREATED,
@@ -77,9 +113,7 @@ export class CategoriesService {
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
         : '';
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -140,9 +174,12 @@ export class CategoriesService {
         total,
       };
 
+      let FormatData = FormatReturnData(res, []);
+      const categories = this.buildCategoryTree(FormatData);
+
       throw new HttpException(
         {
-          data: res,
+          data: categories,
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -169,9 +206,7 @@ export class CategoriesService {
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
         : '';
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -232,9 +267,12 @@ export class CategoriesService {
         total,
       };
 
+      let FormatData = FormatReturnData(res, []);
+      const categories = this.buildCategoryTree(FormatData);
+
       throw new HttpException(
         {
-          data: res,
+          data: categories,
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -462,5 +500,22 @@ export class CategoriesService {
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
+  }
+
+  // ! Đệ quy lấy danh sách danh mục
+  buildCategoryTree(categories, parentId = null) {
+    const categoryTree = [];
+
+    categories.forEach((category) => {
+      if (category.category_id === parentId) {
+        const children = this.buildCategoryTree(categories, category.id);
+        if (children.length) {
+          category.children = children;
+        }
+        categoryTree.push(category);
+      }
+    });
+
+    return categoryTree;
   }
 }

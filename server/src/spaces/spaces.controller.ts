@@ -35,7 +35,7 @@ export class SpacesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -218,7 +218,7 @@ export class SpacesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -340,7 +340,7 @@ export class SpacesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({

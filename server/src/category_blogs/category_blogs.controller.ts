@@ -38,7 +38,7 @@ export class CategoryBlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -235,7 +235,7 @@ export class CategoryBlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -314,7 +314,7 @@ export class CategoryBlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -347,7 +347,7 @@ export class CategoryBlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -378,7 +378,7 @@ export class CategoryBlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({

@@ -38,7 +38,7 @@ import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
   {
     name: 'authorization',
     description: 'Bearer token',
-    required: true,
+    required: false,
   },
 ])
 @Controller('api/staffs')

@@ -93,7 +93,7 @@ export class DepositsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc' })
@@ -132,7 +132,7 @@ export class DepositsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc theo mã giao dịch' })

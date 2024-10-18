@@ -44,7 +44,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({
@@ -119,7 +119,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -165,7 +165,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @Roles(Role.ADMIN)
@@ -224,7 +224,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -280,7 +280,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -327,7 +327,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -363,7 +363,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -395,7 +395,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -427,7 +427,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -459,7 +459,7 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({

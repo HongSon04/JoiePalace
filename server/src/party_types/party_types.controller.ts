@@ -42,7 +42,7 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -148,7 +148,7 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -249,7 +249,7 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -317,7 +317,7 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -349,7 +349,7 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -381,7 +381,7 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({

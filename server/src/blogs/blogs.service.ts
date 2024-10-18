@@ -90,7 +90,7 @@ export class BlogsService {
       }
 
       // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(Number(tag.id)) }));
 
       const createBlog = await this.prismaService.blogs.create({
         data: {
@@ -410,7 +410,7 @@ export class BlogsService {
       }
 
       // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(Number(tag.id)) }));
 
       const updateBlog = await this.prismaService.blogs.update({
         where: { id: Number(id) },
@@ -525,7 +525,7 @@ export class BlogsService {
       }
 
       // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(Number(tag.id)) }));
 
       const updateBlog = await this.prismaService.blogs.update({
         where: { id: Number(existingBlog.id) },

@@ -30,7 +30,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Tạo feedback' })
@@ -73,7 +73,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Lấy tất cả feedback đã được duyệt' })
@@ -109,7 +109,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Lấy tất cả feedback bị ẩn' })
@@ -145,7 +145,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Lấy feedback theo id' })
@@ -185,7 +185,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Lấy feedback theo ID của đơn tiệc' })
@@ -225,7 +225,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Lấy feedback theo ID của chi nhánh' })
@@ -265,7 +265,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Lấy feedback theo ID của người dùng' })
@@ -305,7 +305,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Cập nhật feedback' })
@@ -350,7 +350,7 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Xóa feedback' })

@@ -129,26 +129,32 @@ model staffs {
 
 model categories {
   id                Int        @id @default(autoincrement())
+  category_id       Int?
   name              String
   slug              String     @unique
   description       String
   short_description String?
+  images            String[]
   deleted           Boolean    @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
+  created_by        Int?
+  updated_by        Int?
   created_at        DateTime   @default(now())
   updated_at        DateTime   @updatedAt
   products          products[]
+  tags              tags[]     @relation("CategoryTags")
 }
 
 model tags {
-  id         Int        @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   name       String
-  slug       String     @unique
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  products   products[] @relation("ProductTags")
-  blogs      blogs[]    @relation("BlogTags")
+  slug       String       @unique
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  products   products[]   @relation("ProductTags")
+  blogs      blogs[]      @relation("BlogTags")
+  categories categories[] @relation("CategoryTags")
 }
 
 model products {

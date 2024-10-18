@@ -38,7 +38,7 @@ export class FunituresController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -151,7 +151,7 @@ export class FunituresController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -269,7 +269,7 @@ export class FunituresController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -340,7 +340,7 @@ export class FunituresController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -372,7 +372,7 @@ export class FunituresController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -404,7 +404,7 @@ export class FunituresController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({

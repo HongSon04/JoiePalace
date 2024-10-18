@@ -3,17 +3,6 @@ import slugify from 'slugify';
 import { CreateBookingDto } from 'src/bookings/dto/create-booking.dto';
 const prisma = new PrismaClient();
 
-const MakeSlugger = (str: string): string => {
-  return slugify(str, {
-    replacement: '-',
-    remove: undefined,
-    lower: true,
-    strict: false,
-    locale: 'vi',
-    trim: true,
-  });
-};
-
 const booking: CreateBookingDto[] = [
   {
     user_id: 1,
@@ -38,7 +27,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 300,
     organization_date: '2024-01-15T00:00:00.000Z',
-    party_type_id: 2,
+    party_type_id: 1,
     shift: 'Tối',
   },
   {
@@ -64,7 +53,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 200,
     organization_date: '2024-03-25T00:00:00.000Z',
-    party_type_id: 3,
+    party_type_id: 1,
     shift: 'Tối',
   },
   {
@@ -77,7 +66,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 400,
     organization_date: '2024-04-10T00:00:00.000Z',
-    party_type_id: 2,
+    party_type_id: 1,
     shift: 'Sáng',
   },
   {
@@ -103,7 +92,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 600,
     organization_date: '2024-06-15T00:00:00.000Z',
-    party_type_id: 3,
+    party_type_id: 1,
     shift: 'Sáng',
   },
   {
@@ -116,7 +105,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 100,
     organization_date: '2024-07-20T00:00:00.000Z',
-    party_type_id: 2,
+    party_type_id: 1,
     shift: 'Tối',
   },
   {
@@ -155,7 +144,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 450,
     organization_date: '2024-09-10T00:00:00.000Z',
-    party_type_id: 2,
+    party_type_id: 1,
     shift: 'Tối',
   },
   {
@@ -168,7 +157,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 700,
     organization_date: '2024-10-05T00:00:00.000Z',
-    party_type_id: 3,
+    party_type_id: 1,
     shift: 'Sáng',
   },
   {
@@ -194,7 +183,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 200,
     organization_date: '2024-12-01T00:00:00.000Z',
-    party_type_id: 2,
+    party_type_id: 1,
     shift: 'Sáng',
   },
   {
@@ -220,7 +209,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 400,
     organization_date: '2024-12-20T00:00:00.000Z',
-    party_type_id: 3,
+    party_type_id: 1,
     shift: 'Sáng',
   },
   {
@@ -233,7 +222,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 500,
     organization_date: '2024-12-31T00:00:00.000Z',
-    party_type_id: 2,
+    party_type_id: 1,
     shift: 'Tối',
   },
   {
@@ -249,4 +238,591 @@ const booking: CreateBookingDto[] = [
     party_type_id: 1,
     shift: 'Sáng',
   },
+  {
+    user_id: 18,
+    branch_id: 1,
+    company_name: 'Công ty R',
+    email: 'congtyr@gmail.com',
+    phone: '123456789',
+    name: 'Tiệc mừng ngày Quốc tế Lao động',
+    note: 'Ghi chú',
+    number_of_guests: 350,
+    organization_date: '2024-05-01T00:00:00.000Z',
+    party_type_id: 1,
+    shift: 'Tối',
+  },
 ];
+
+const booking_details = [
+  {
+    booking_id: 1,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 2,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 3,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 4,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 5,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 6,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 7,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 8,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 9,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 10,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 11,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 12,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 13,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 14,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 15,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 16,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 17,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+  {
+    booking_id: 18,
+    stage_id: 1,
+    space_id: 1,
+    decor_id: 1,
+    menu_id: 1,
+    payment_method: 'momo',
+    stage: ['ABC'],
+    space: ['ABC'],
+    decor: ['ABC'],
+    menu: ['ABC'],
+    extra_service: ['ABC'],
+    images: ['ABC'],
+    accessories: {
+      table: [
+        { id: 1, quantity: 2 },
+        { id: 2, quantity: 1 },
+      ],
+      chair: {
+        id: 3,
+      },
+      extra_services: [
+        { id: 4, quantity: 1 },
+        { id: 5, quantity: 1 },
+      ],
+    } as any,
+    amount_booking: 10000000,
+    fee: 10,
+    total_amount: 110000000,
+  },
+];
+
+export const bookingSeed = async () => {
+  // for (let i = 0; i < booking.length; i++) {
+  //   await prisma.bookings.create({
+  //     data: booking[i],
+  //   });
+  // }
+
+  for (let i = 6; i < booking_details.length; i++) {
+    await prisma.booking_details.create({
+      data: {
+        booking_id: i,
+        stage_id: booking_details[i].stage_id,
+        space_id: booking_details[i].space_id,
+        decor_id: booking_details[i].decor_id,
+        menu_id: booking_details[i].menu_id,
+        payment_method: 'momo',
+        stage: booking_details[i].stage,
+        accessories: booking_details[i].accessories,
+        amount_booking: booking_details[i].amount_booking,
+        deposit_id: 1,
+        fee: booking_details[i].fee,
+        total_amount: booking_details[i].total_amount,
+        menu: booking_details[i].menu,
+        space: booking_details[i].space,
+        decor: booking_details[i].decor,
+        extra_service: booking_details[i].extra_service,
+      } as any,
+    });
+  }
+};

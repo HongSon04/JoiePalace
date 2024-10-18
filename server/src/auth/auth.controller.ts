@@ -95,7 +95,7 @@ export class AuthController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiResponse({
@@ -208,7 +208,7 @@ export class AuthController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
   @ApiOperation({ summary: 'Người dùng tải ảnh đại diện' })
