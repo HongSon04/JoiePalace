@@ -13,6 +13,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 
 import { useRouter } from "next/navigation";
 
+export const metadata = {
+  title: "Chưa chọn chi nhánh",
+  description: "Chọn chi nhánh trước khi đăng nhập",
+};
+
 function Page() {
   const router = useRouter();
 

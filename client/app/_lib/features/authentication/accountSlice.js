@@ -1,10 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  username: "",
-  password: "",
-  email: "",
-  role: "",
+  user: JSON.parse(localStorage.getItem("user")) || {},
   accessToken: "",
   refreshToken: "",
   isLoading: false,
@@ -23,30 +20,35 @@ const accountSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
     },
+    logingIn(state) {
+      state.isLoading = true;
+      state.isError = false;
+    },
     login(state, action) {
-      state.email = action.payload.email;
-      state.role = action.payload.role;
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+      state.user = action.payload;
+      state.isLoading = false;
+      state.isError = false;
+    },
+    loginSuccess(state) {
+      state.isLoading = false;
+      state.isError = false;
+    },
+    loginFailed(state) {
+      state.isLoading = false;
+      state.isError = true;
     },
     register(state, action) {},
     logout(state) {
-      state.email = "";
-      state.role = "";
+      state.user.email = "";
+      state.user.role = "";
       state.accessToken = "";
       state.refreshToken = "";
     },
-    setUsername(state, action) {
-      state.username = action.payload;
+    setUser(state, action) {
+      state.user = action.payload;
     },
-    setPassword(state, action) {
-      state.password = action.payload;
-    },
-    setEmail(state, action) {
-      state.email = action.payload;
-    },
-    setRole(state, action) {
-      state.role = action.payload;
+    fetchUserProfileSuccess(state, action) {
+      state.user = action.payload;
     },
   },
 });
@@ -55,12 +57,13 @@ export const {
   login,
   register,
   logout,
-  setUsername,
-  setPassword,
-  setEmail,
-  setRole,
+  setUser,
   loading,
+  logingIn,
+  loginSuccess,
+  loginFailed,
   error,
+  fetchUserProfileSuccess,
 } = accountSlice.actions;
 
 export default accountSlice;
