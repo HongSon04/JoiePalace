@@ -1,16 +1,21 @@
+"use client";
+
 import {
   ArrowRightStartOnRectangleIcon,
   ArrowsRightLeftIcon,
   EllipsisHorizontalIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
-import { Avatar, Button } from "@nextui-org/react";
-import { useSelector } from "react-redux";
-import { motion } from "framer-motion";
-import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/popover";
 import { Link } from "@nextui-org/link";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
+import { Avatar, Button } from "@nextui-org/react";
+import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
 
 function AdminUser() {
+  const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.account);
+
   const { isSidebarOpen } = useSelector((store) => store.sidebar);
 
   return (
@@ -21,13 +26,13 @@ function AdminUser() {
             isSidebarOpen ? "justify-between" : "justify-center"
           }`}
         >
-          <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
+          <Avatar />
           <motion.h2
             className={`font-semibold text-sm text-white flex-1 text-left ml-2 ${
               isSidebarOpen ? "block" : "hidden"
             }`}
           >
-            Joie Admin 1
+            {user.username}
           </motion.h2>
           <Button
             isIconOnly
@@ -43,7 +48,7 @@ function AdminUser() {
           <li className="w-full">
             <Link
               color={"foreground"}
-              href="/admin/profile"
+              href={`/admin/profile/${user.id}`}
               className="text-gray-600 w-full flex items-center px-2 py-1 gap-2 hover:bg-gray-50"
             >
               <UserIcon className="w-6 h-6 text-gray-600" />
