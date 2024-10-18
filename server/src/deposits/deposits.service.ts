@@ -10,7 +10,7 @@ export class DepositsService {
   async findOne(id: number) {
     try {
       const findDeposit = await this.prismaService.deposits.findUnique({
-        where: { id },
+        where: { id: Number(id) },
       });
       if (!findDeposit) {
         throw new HttpException(
@@ -63,7 +63,7 @@ export class DepositsService {
     try {
       const { status, payment_method } = updateDepositDto;
       const findDeposit = await this.prismaService.deposits.findUnique({
-        where: { id },
+        where: { id: Number(id) },
       });
       if (!findDeposit) {
         throw new HttpException(
@@ -72,13 +72,13 @@ export class DepositsService {
         );
       }
       const updateDeposit = await this.prismaService.deposits.update({
-        where: { id },
+        where: { id: Number(id) },
         data: { status, payment_method },
       });
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =
         await this.prismaService.booking_details.findFirst({
-          where: { deposit_id: id },
+          where: { deposit_id: Number(id) },
         });
 
       if (!findBookingDetail) {
@@ -89,7 +89,7 @@ export class DepositsService {
       }
 
       await this.prismaService.bookings.update({
-        where: { id: findBookingDetail.booking_id },
+        where: { id: Number(findBookingDetail.booking_id) },
         data: { is_deposit: status === 'completed' ? true : false },
       });
 
@@ -135,7 +135,7 @@ export class DepositsService {
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =
         await this.prismaService.booking_details.findFirst({
-          where: { deposit_id: findDeposit.id },
+          where: { deposit_id: Number(findDeposit.id) },
         });
 
       if (!findBookingDetail) {
@@ -146,7 +146,7 @@ export class DepositsService {
       }
 
       await this.prismaService.bookings.update({
-        where: { id: findBookingDetail.booking_id },
+        where: { id: Number(findBookingDetail.booking_id) },
         data: { is_deposit: status === 'completed' ? true : false },
       });
 

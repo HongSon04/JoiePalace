@@ -148,7 +148,7 @@ export class BranchesService {
       const endDate = query.endDate
         ? FormatDateToEndOfDay(query.endDate)
         : null;
-      
+
       // ? Range Date Conditions
       const sortRangeDate: any =
         startDate && endDate
@@ -378,12 +378,12 @@ export class BranchesService {
 
       const spaces = await this.prismaService.spaces.findMany({
         where: {
-          branch_id: branch.id,
+          branch_id: Number(branch.id),
         },
       });
       const stages = await this.prismaService.stages.findMany({
         where: {
-          branch_id: branch.id,
+          branch_id: Number(branch.id),
         },
       });
       const { deleted, deleted_at, deleted_by, ...data } = branch;
@@ -646,11 +646,11 @@ export class BranchesService {
       await deleteEntityImagesAndRecords(
         () =>
           this.prismaService.stages.findMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         () =>
           this.prismaService.stages.deleteMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         (stage) => stage.images || [],
       );
@@ -659,11 +659,11 @@ export class BranchesService {
       await deleteEntityImagesAndRecords(
         () =>
           this.prismaService.spaces.findMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         () =>
           this.prismaService.spaces.deleteMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         (space) => space.images || [],
       );
@@ -735,7 +735,7 @@ export class BranchesService {
                 }, {});
 
             return this.prismaService[name].update({
-              where: { id: record.id },
+              where: { id: Number(record.id) },
               data: updatedData,
             });
           });

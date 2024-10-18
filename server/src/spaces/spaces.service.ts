@@ -305,7 +305,7 @@ export class SpacesService {
       // ? Delete images from cloudinary
       await this.cloudinaryService.deleteMultipleImagesByUrl(findSpace.images);
       // ? Delete space
-      await this.prismaService.spaces.delete({ where: { id } });
+      await this.prismaService.spaces.delete({ where: { id: Number(id) } });
       throw new HttpException('Xóa không gian thành công', HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {

@@ -266,7 +266,7 @@ export class FeedbacksService {
 
     await this.prismaService.branches.update({
       where: {
-        id: branch_id,
+        id: Number(branch_id),
       },
       data: {
         rate: parseFloat(rateBranch),

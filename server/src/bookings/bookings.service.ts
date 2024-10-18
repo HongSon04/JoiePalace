@@ -163,7 +163,7 @@ export class BookingsService {
 
       // Fetch booking with relations
       const findBooking = await this.prismaService.bookings.findUnique({
-        where: { id: booking.id },
+        where: { id: Number(booking.id) },
         include: {
           users: {
             select: {
@@ -860,11 +860,11 @@ export class BookingsService {
         // ! Find Deposit By Booking Relations
         const findBookingDetail =
           await this.prismaService.booking_details.findFirst({
-            where: { booking_id: findBooking.id },
+            where: { booking_id: Number(findBooking.id) },
             select: { deposit_id: true },
           });
         const findDeposit = await this.prismaService.deposits.findUnique({
-          where: { id: findBookingDetail.deposit_id },
+          where: { id: Number(findBookingDetail.deposit_id) },
         });
         const depositAmount = findDeposit.amount;
         const bookingAmount = Number(
@@ -873,7 +873,7 @@ export class BookingsService {
 
         // ! Update Booking
         await this.prismaService.booking_details.update({
-          where: { booking_id: findBooking.id },
+          where: { booking_id: Number(findBooking.id) },
           data: {
             decor_id: Number(decor_id),
             stage_id: Number(stage_id),
@@ -894,7 +894,7 @@ export class BookingsService {
 
         // ! Fetch booking with relations
         const findBookings = await this.prismaService.bookings.findUnique({
-          where: { id: findBooking.id },
+          where: { id: Number(findBooking.id) },
           include: {
             users: {
               select: {
@@ -957,12 +957,12 @@ export class BookingsService {
         // ! Create Or Update Booking
         const findBookingDetail =
           await this.prismaService.booking_details.findFirst({
-            where: { booking_id: findBooking.id },
+            where: { booking_id: Number(findBooking.id) },
           });
         if (findBookingDetail) {
           //? Delete Old Deposit
           await this.prismaService.deposits.delete({
-            where: { id: findBookingDetail.deposit_id },
+            where: { id: Number(findBookingDetail.deposit_id) },
           });
           await this.prismaService.booking_details.update({
             where: { booking_id: Number(findBookingDetail.id) },
@@ -1009,7 +1009,7 @@ export class BookingsService {
 
         // ! Fetch booking with relations
         const findBookings = await this.prismaService.bookings.findUnique({
-          where: { id: findBooking.id },
+          where: { id: Number(findBooking.id) },
           include: {
             users: {
               select: {
@@ -1140,11 +1140,11 @@ export class BookingsService {
         const depositId = booking.booking_details[0].deposit_id;
         if (depositId) {
           await this.prismaService.deposits.delete({
-            where: { id: depositId },
+            where: { id: Number(depositId) },
           });
         }
         await this.prismaService.booking_details.deleteMany({
-          where: { booking_id: booking.id },
+          where: { booking_id: Number(booking.id) },
         });
       }
 

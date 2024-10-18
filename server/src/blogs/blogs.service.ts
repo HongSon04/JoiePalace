@@ -58,7 +58,7 @@ export class BlogsService {
       // Check category existence
       const existingCategory =
         await this.prismaService.category_blogs.findFirst({
-          where: { id: category_blog_id },
+          where: { id: Number(category_blog_id) },
         });
 
       if (!existingCategory) {
@@ -90,7 +90,7 @@ export class BlogsService {
       }
 
       // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({ id: tag.id }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       const createBlog = await this.prismaService.blogs.create({
         data: {
@@ -279,7 +279,7 @@ export class BlogsService {
       }
 
       await this.prismaService.blogs.update({
-        where: { id: blog.id },
+        where: { id: Number(blog.id) },
         data: {
           views: blog.views + 1,
         },
@@ -310,7 +310,7 @@ export class BlogsService {
       }
 
       await this.prismaService.blogs.update({
-        where: { id: blog.id },
+        where: { id: Number(blog.id) },
         data: {
           views: blog.views + 1,
         },
@@ -354,7 +354,7 @@ export class BlogsService {
 
       // Check blog existence
       const existingBlog = await this.prismaService.blogs.findFirst({
-        where: { id: id },
+        where: { id: Number(id) },
       });
 
       if (!existingBlog) {
@@ -367,7 +367,7 @@ export class BlogsService {
       // Check category existence
       const existingCategory =
         await this.prismaService.category_blogs.findFirst({
-          where: { id: category_blog_id },
+          where: { id: Number(category_blog_id) },
         });
 
       if (!existingCategory) {
@@ -410,10 +410,10 @@ export class BlogsService {
       }
 
       // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({ id: tag.id }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       const updateBlog = await this.prismaService.blogs.update({
-        where: { id: id },
+        where: { id: Number(id) },
         data: {
           title,
           slug,
@@ -482,7 +482,7 @@ export class BlogsService {
       // Check category existence
       const existingCategory =
         await this.prismaService.category_blogs.findFirst({
-          where: { id: category_blog_id },
+          where: { id: Number(category_blog_id) },
         });
 
       if (!existingCategory) {
@@ -525,10 +525,10 @@ export class BlogsService {
       }
 
       // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({ id: tag.id }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       const updateBlog = await this.prismaService.blogs.update({
-        where: { id: existingBlog.id },
+        where: { id: Number(existingBlog.id) },
         data: {
           title,
           slug: newSlug,

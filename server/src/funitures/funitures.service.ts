@@ -255,7 +255,7 @@ export class FunituresService {
     try {
       const funiture = await this.prismaService.funitures.findUnique({
         where: {
-          id,
+          id : Number(id),
         },
       });
 
@@ -324,7 +324,7 @@ export class FunituresService {
         where: {
           name,
           NOT: {
-            id,
+            id : Number(id),
           },
         },
       });

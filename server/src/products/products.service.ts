@@ -411,7 +411,7 @@ export class ProductsService {
       // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: false,
-        category_id,
+        category_id: Number(category_id),
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
