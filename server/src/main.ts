@@ -5,10 +5,12 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const PORT = 5000;
+  const configService = app.get(ConfigService);
+  const PORT = configService.get<number>('PORT') || 5000;
   const config = new DocumentBuilder()
     .setTitle('JoiePalace API')
     .setDescription('HOHOHOHO')
@@ -20,17 +22,17 @@ async function bootstrap() {
         bearerFormat: 'JWT',
         in: 'header',
       },
-      'token',
+      'Authorization',
     )
-    .addSecurityRequirements('token')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('api-docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
     },
   });
+
   app.enableCors({
     origin: '*',
     credentials: true,
@@ -43,10 +45,10 @@ async function bootstrap() {
   app.setViewEngine('ejs');
 
   await app.listen(PORT);
-  console.log(`Application is running on: http://localhost:${PORT}/api`);
-  console.log(`Application is running on: ${process.env.WEB_URL}`);
-  console.log(`Swagger is running on: http://localhost:${PORT}/api`);
-  console.log(`Swagger is running on: ${process.env.WEB_URL}api`);
+  console.log(`Swagger is running on: http://localhost:${PORT}/api-docs`);
+  console.log(
+    `Swagger is running on: ${configService.get<string>('BACKEND_URL')}api-docs`,
+  );
 }
 
 bootstrap();

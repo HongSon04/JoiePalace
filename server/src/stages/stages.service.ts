@@ -37,7 +37,7 @@ export class StagesService {
       const stagesImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/stages',
+          'joiepalace/stages',
         );
       if (!stagesImages) {
         throw new HttpException(
@@ -170,7 +170,7 @@ export class StagesService {
         const stagesImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/stages',
+            'joiepalace/stages',
           );
 
         if (!stagesImages || stagesImages.length === 0) {

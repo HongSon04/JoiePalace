@@ -27,7 +27,7 @@ export class StaffsService {
     try {
       const { branch_id, name, phone, payment_info, shift, avatar } = body;
       const checkBranches = await this.prismaService.branches.findUnique({
-        where: { id: branch_id },
+        where: { id: Number(branch_id) },
       });
       if (!checkBranches) {
         throw new HttpException('Địa điểm không tồn tại', HttpStatus.NOT_FOUND);

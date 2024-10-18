@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 const MakeSlugger = (str: string): string => {
   return slugify(str, {
-    replacement: '',
+    replacement: '-',
     remove: undefined,
     lower: true,
     strict: false,

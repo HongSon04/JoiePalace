@@ -2,9 +2,13 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import dayjs from 'dayjs';
 import { ConfirmBookingMailDto } from './dto/ConfirmBookingMail.dto';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(
+    private mailerService: MailerService,
+    private configService: ConfigService,
+  ) {}
 
   async sendUserConfirmationBooking(body: ConfirmBookingMailDto) {
     try {
@@ -40,7 +44,7 @@ export class MailService {
           name,
           email,
           date: dayjs().format('DD/MM/YYYY'),
-          confirmationLink: `${process.env.WEB_URL}confirm?token=${token}`,
+          confirmationLink: `${this.configService.get<string>('FRONTEND_URL')}/confirm-register?token=${token}`,
         },
       });
     } catch (error) {

@@ -107,7 +107,7 @@ export class MenusService {
     const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     // ? Range Date Conditions
     const sortRangeDate: any =
@@ -157,6 +157,16 @@ export class MenusService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -235,7 +245,7 @@ export class MenusService {
     const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     // ? Range Date Conditions
     const sortRangeDate: any =
@@ -287,6 +297,16 @@ export class MenusService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },

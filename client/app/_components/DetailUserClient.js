@@ -4,7 +4,7 @@ const DetailUserClient = ({ nameUser, phoneUser, emailUser, partyBooked, waiting
     return (
         <div className="flex flex-col w-full">
             <div className="flex justify-between items-center mb-3 gap-[22px]">
-                <span className="text-lg sm:text-xl lg:text-2xl font-medium text-white">{nameUser}</span>
+                <span className="text-lg sm:text-xl font-medium text-white">{nameUser}</span>
                 <span className="mt-auto underline text-xs sm:text-sm lg:text-base font-normal text-gold cursor-pointer">Xem thêm</span>
             </div>
 
@@ -19,15 +19,15 @@ const DetailUserClient = ({ nameUser, phoneUser, emailUser, partyBooked, waiting
             {/* Stats */}
             <div className="flex justify-between text-center">
                 <div>
-                    <span className="text-lg sm:text-xl lg:text-2xl font-bold text-white">{partyBooked}</span>
+                    <span className="text-base font-bold text-white">{partyBooked}</span>
                     <p className="text-sm sm:text-base text-gray-400">Tiệc đã đặt</p>
                 </div>
                 <div>
-                    <span className="text-lg sm:text-xl lg:text-2xl font-bold text-white">{waitingParty}</span>
+                    <span className="text-base font-bold text-white">{waitingParty}</span>
                     <p className="text-sm sm:text-base text-gray-400">Tiệc chờ</p>
                 </div>
                 <div>
-                    <span className="text-lg sm:text-xl lg:text-2xl font-bold text-white">{totalMoney}</span>
+                    <span className="text-base font-bold text-white">{totalMoney}</span>
                     <p className="text-sm sm:text-base text-gray-400">Tổng chi</p>
                 </div>
             </div>

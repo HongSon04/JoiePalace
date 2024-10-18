@@ -16,7 +16,13 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
@@ -28,6 +34,13 @@ export class ProductsController {
 
   // ! Create Product
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -156,6 +169,13 @@ export class ProductsController {
 
   // ! Get All product Deleted
   @Get('/get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -207,6 +227,46 @@ export class ProductsController {
   @ApiQuery({ name: 'endDate', required: false })
   findAllDeleted(@Query() query: FilterPriceDto) {
     return this.productsService.findAllDeleted(query);
+  }
+
+  // ! Get 10 product per category
+  @Get('/get-ten-per-category')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          slug: 'string',
+          price: 'number',
+          images: 'array',
+          description: 'string',
+          short_description: 'string',
+          category_id: 'number',
+          tags: 'array',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy sản phẩm',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Lỗi server vui lòng thử lại sau',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy 10 sản phẩm mới nhất của mỗi danh mục' })
+  get10PerCategory() {
+    return this.productsService.get10PerCategory();
   }
   // ! Get product by id
   @Get('get/:product_id')
@@ -373,6 +433,13 @@ export class ProductsController {
 
   // ! Update product
   @Patch('/update/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -446,6 +513,13 @@ export class ProductsController {
 
   // ! Soft delete product
   @Delete('/delete/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -471,6 +545,13 @@ export class ProductsController {
 
   // ! Restore product
   @Post('/restore/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -496,6 +577,13 @@ export class ProductsController {
 
   // ! Delete product
   @Delete('/destroy/:product_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: true,
+    },
+  ])
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

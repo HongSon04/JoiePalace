@@ -57,7 +57,7 @@ export class FunituresService {
 
       const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
         files.images as any,
-        'joieplace/funitures',
+        'joiepalace/funitures',
       );
       data.images = images;
 
@@ -255,7 +255,7 @@ export class FunituresService {
     try {
       const funiture = await this.prismaService.funitures.findUnique({
         where: {
-          id,
+          id : Number(id),
         },
       });
 
@@ -324,7 +324,7 @@ export class FunituresService {
         where: {
           name,
           NOT: {
-            id,
+            id : Number(id),
           },
         },
       });
@@ -349,7 +349,7 @@ export class FunituresService {
       if (files.images) {
         const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images as any,
-          'joieplace/funitures',
+          'joiepalace/funitures',
         );
         if (!images) {
           throw new HttpException(

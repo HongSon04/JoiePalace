@@ -51,7 +51,7 @@ export class SpacesService {
       const spaceImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/space',
+          'joiepalace/space',
         );
 
       // Create space
@@ -136,7 +136,7 @@ export class SpacesService {
         const spacesImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/spaces',
+            'joiepalace/spaces',
           );
 
         if (!spacesImages || spacesImages.length === 0) {
@@ -216,7 +216,7 @@ export class SpacesService {
     try {
       const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
         files,
-        'joieplace/space',
+        'joiepalace/space',
       );
       const findSpace = await this.prismaService.spaces.findUnique({
         where: { id: Number(id) },
@@ -305,7 +305,7 @@ export class SpacesService {
       // ? Delete images from cloudinary
       await this.cloudinaryService.deleteMultipleImagesByUrl(findSpace.images);
       // ? Delete space
-      await this.prismaService.spaces.delete({ where: { id } });
+      await this.prismaService.spaces.delete({ where: { id: Number(id) } });
       throw new HttpException('Xóa không gian thành công', HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {

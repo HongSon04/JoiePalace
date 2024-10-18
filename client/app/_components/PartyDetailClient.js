@@ -170,10 +170,10 @@ const ContactInfo = ({ icon, text }) => (
       <span className='text-base font-normal leading-normal text-gray-400'>{text}</span>
   </div>
 );
-const TitleInfo = ({title, info})=>(
+const TitleInfo = ({title, info, textColor = 'text-gray-400'})=>(
     <div className="flex flex-col gap-2">
             <span className='text-base text-white'>{title}:</span>
-            <span className="text-gray-400 text-base">{info}</span>
+            <span className={`${textColor} text-base `}>{info}</span>
     </div>
 )
 const PartyDetails = ({
@@ -252,10 +252,10 @@ const CustomerInfoPayment = ({ title, payerName, paymentMethod , amountPayable, 
             <TitleInfo title={'Hình thức thanh toán'} info={paymentMethod}/>
             <TitleInfo title={'Số tiền phải thanh toán'} info={amountPayable}/>
             <TitleInfo title={'Số tiền đặt cọc (30%)'} info={depositAmount}/>
-            <TitleInfo title={'Trạng thái đặt cọc'} info={depositStatus}/>
+            <TitleInfo title={'Trạng thái đặt cọc'} info={depositStatus} textColor='text-cyan-400'/>
             <TitleInfo title={'Ngày đặt cọc'} info={depositDay}/>
             <TitleInfo title={'Còn lại phải thanh toán'} info={remainingPaid}/>
-            <TitleInfo title={'Trạng thái thanh toán'} info={menuCostTable}/>
+            <TitleInfo title={'Trạng thái thanh toán'} info={menuCostTable} textColor='text-cyan-400'/>
             <TitleInfo title={'Ngày thanh toán'} info={paymentDay}/>
         </div>
     </div>
