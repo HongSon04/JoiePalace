@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma.service';
 import { StageDto } from './dto/stage.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { StageUpdateDto } from './dto/stage-update.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class StagesService {
@@ -57,7 +58,10 @@ export class StagesService {
       });
 
       throw new HttpException(
-        { message: 'Tạo sảnh thành công', data: stagesRes },
+        {
+          message: 'Tạo sảnh thành công',
+          data: FormatReturnData(stagesRes, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -94,7 +98,7 @@ export class StagesService {
       } else {
         const stages = await this.prismaService.stages.findMany();
         throw new HttpException(
-          { message: 'Thành công', data: stages },
+          { message: 'Thành công', data: FormatReturnData(stages, []) },
           HttpStatus.OK,
         );
       }
@@ -119,7 +123,7 @@ export class StagesService {
         throw new HttpException('Không tìm thấy sảnh', HttpStatus.BAD_REQUEST);
       }
       throw new HttpException(
-        { message: 'Thành công', data: findStage },
+        { message: 'Thành công', data: FormatReturnData(findStage, []) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -194,7 +198,10 @@ export class StagesService {
       });
 
       throw new HttpException(
-        { message: 'Cập nhật sảnh thành công', data: stagesRes },
+        {
+          message: 'Cập nhật sảnh thành công',
+          data: FormatReturnData(stagesRes, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {

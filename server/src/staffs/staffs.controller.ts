@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiParam,
@@ -32,8 +33,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
 
-@ApiTags('staffs')
+@ApiTags('Staffs - Quản lý Nhân viên')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('authorization')
 @ApiHeaders([
   {
     name: 'authorization',

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateDepositDto } from './dto/update-status.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class DepositsService {
@@ -19,7 +20,13 @@ export class DepositsService {
         );
       }
 
-      throw new HttpException(findDeposit, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy chi tiết thông tin đặt cọc thành công',
+          data: FormatReturnData(findDeposit, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -45,7 +52,13 @@ export class DepositsService {
         );
       }
 
-      throw new HttpException(findDeposit, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy chi tiết thông tin đặt cọc thành công',
+          data: FormatReturnData(findDeposit, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -96,7 +109,7 @@ export class DepositsService {
       throw new HttpException(
         {
           message: 'Cập nhật giao dịch đặt cọc thành công',
-          data: updateDeposit,
+          data: FormatReturnData(updateDeposit, []),
         },
         HttpStatus.OK,
       );
@@ -153,7 +166,7 @@ export class DepositsService {
       throw new HttpException(
         {
           message: 'Cập nhật giao dịch đặt cọc thành công',
-          data: updateDeposit,
+          data: FormatReturnData(updateDeposit, []),
         },
         HttpStatus.OK,
       );

@@ -52,7 +52,7 @@ export class CategoriesService {
         files.images && files.images.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
-              'joiepalace/products',
+              'joiepalace/categories',
             )
           : ([] as any);
 
@@ -88,7 +88,10 @@ export class CategoriesService {
       });
 
       throw new HttpException(
-        { message: 'Tạo danh mục thành công', data: categories },
+        {
+          message: 'Tạo danh mục thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.CREATED,
       );
     } catch (error) {
@@ -179,7 +182,7 @@ export class CategoriesService {
 
       throw new HttpException(
         {
-          data: categories,
+          data: FormatReturnData(categories, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -272,7 +275,7 @@ export class CategoriesService {
 
       throw new HttpException(
         {
-          data: categories,
+          data: FormatReturnData(categories, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -300,7 +303,10 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
-      throw new HttpException({ data: category }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(category, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -326,7 +332,10 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
-      throw new HttpException({ data: category }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(category, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -339,7 +348,11 @@ export class CategoriesService {
   }
 
   // ! Update Categories
-  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: number,
+    updateCategoryDto: UpdateCategoryDto,
+    files: { images?: Express.Multer.File[] },
+  ) {
     try {
       // ? Check Categories
       const findCategories = await this.prismaService.categories.findUnique({
@@ -352,13 +365,14 @@ export class CategoriesService {
         );
       }
 
-      const { name, description, short_description } = updateCategoryDto;
+      const { name, description, short_description, category_id, tags } =
+        updateCategoryDto;
       const slug = MakeSlugger(name);
       // ? Check Name and Slug
       const findCategoriesByName =
         await this.prismaService.categories.findFirst({
           where: {
-            name,
+            OR: [{ name }, { slug }],
             NOT: {
               id: Number(id),
             },
@@ -370,6 +384,33 @@ export class CategoriesService {
           HttpStatus.BAD_REQUEST,
         );
       }
+
+      // Upload images if available
+      const images =
+        files.images && files.images.length > 0
+          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
+              files.images,
+              'joiepalace/categories',
+            )
+          : ([] as any);
+
+      if (files.images && files.images.length > 0 && !images) {
+        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+      }
+
+      // Validate tags
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tags } },
+      });
+
+      if (existingTags.length !== tags.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       // ? Update Categories
       const categories = await this.prismaService.categories.update({
         where: { id: Number(id) },
@@ -378,11 +419,17 @@ export class CategoriesService {
           slug,
           description,
           short_description,
+          category_id: category_id || null,
+          images: images.length > 0 ? images : findCategories.images,
+          tags: { set: tagsSet },
         },
       });
 
       throw new HttpException(
-        { message: 'Cập nhật danh mục thành công', data: categories },
+        {
+          message: 'Cập nhật danh mục thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -419,7 +466,9 @@ export class CategoriesService {
         },
       });
       throw new HttpException(
-        { message: 'Xóa danh mục thành công', data: categories },
+        {
+          message: 'Xóa danh mục thành công',
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -456,7 +505,10 @@ export class CategoriesService {
         },
       });
       throw new HttpException(
-        { message: 'Khôi phục danh mục thành công', data: categories },
+        {
+          message: 'Khôi phục danh mục thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -488,7 +540,10 @@ export class CategoriesService {
         where: { id: Number(id) },
       });
       throw new HttpException(
-        { message: 'Xóa danh mục vĩnh viễn thành công', data: categories },
+        {
+          message: 'Xóa danh mục vĩnh viễn thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
