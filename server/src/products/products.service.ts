@@ -362,6 +362,36 @@ export class ProductsService {
     }
   }
 
+  // ! Get 10 products per category
+  async get10PerCategory() {
+    try {
+      const categories = await this.prismaService.categories.findMany({
+        where: { deleted: false },
+        include: {
+          products: {
+            where: { deleted: false },
+            take: 10,
+            orderBy: { created_at: 'desc' },
+          },
+        },
+      });
+
+      throw new HttpException(
+        {
+          data: categories,
+        },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ products.service.ts -> get10PerCategory', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
+    }
+  }
   // ! Get all products by slug
   async findBySlug(slug: string) {
     try {
