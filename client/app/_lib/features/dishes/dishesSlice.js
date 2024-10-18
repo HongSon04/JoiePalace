@@ -5,6 +5,9 @@ const initialState = {
   selectedDish: {},
   dishes: [],
   categoryDishes: [],
+  error: "",
+  isLoading: false,
+  isError: false,
 };
 
 const dishesSlice = createSlice({
@@ -13,6 +16,16 @@ const dishesSlice = createSlice({
   reducers: {
     setSelectedDish: (state, action) => {
       state.selectedDish = action.payload;
+    },
+    addingDishCategory: (state, action) => {
+      state.isLoading = true;
+    },
+    addingDishCategorySuccess: (state, action) => {
+      state.isLoading = false;
+    },
+    addingDishCategoryFailure: (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
     },
   },
   extraReducers: (builder) => {
@@ -54,11 +67,19 @@ export const getDishesByCategory = createAsyncThunk(
   async (category) => {
     // const response = await fetch(`/api/dishes?category=${category}`);
     // const data = await response.json();
+
+    // return data;
+
     return dishes.filter((dish) => dish.category === category);
   }
 );
 
-export const { setSelectedDish } = dishesSlice.actions;
+export const {
+  setSelectedDish,
+  addingDishCategory,
+  addingDishCategorySuccess,
+  addingDishCategoryFailure,
+} = dishesSlice.actions;
 
 export default dishesSlice;
 

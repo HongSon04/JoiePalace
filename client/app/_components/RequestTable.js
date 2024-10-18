@@ -41,7 +41,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-function RequestTable({ filter }) {
+function RequestTable() {
   const pathname = usePathname();
 
   const requests = [

@@ -1,20 +1,15 @@
+"use client";
+
 import AdminHeader from "@/app/_components/AdminHeader";
 import RequestTableWrapper from "@/app/_components/RequestTableWrapper";
 import TableSkeleton from "@/app/_components/skeletons/TableSkeleton";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-
 import { Suspense } from "react";
+import { useSelector } from "react-redux";
 
-const branch = {
-  id: 1,
-  name: "Hoàng Văn Thụ",
-  address: "123 Hoàng Văn Thụ, Phường 4, Quận Tân Bình, TP.HCM",
-  phone: "0123456789",
-  email: "info.hoangvanthu@joiepalace.com",
-};
-
-function page({ params }) {
+function Page({ params }) {
   const { chiNhanhSlug } = params;
+  const { currentBranch } = useSelector((store) => store.branch);
 
   return (
     <div>
@@ -23,7 +18,7 @@ function page({ params }) {
         <BreadcrumbItem>
           <BreadcrumbLink
             className="text-gray-400 hover:text-gray-200"
-            href="/admin/yeu-cau"
+            href="#"
           >
             Yêu cầu
           </BreadcrumbLink>
@@ -34,7 +29,7 @@ function page({ params }) {
             className="text-gray-400 hover:text-gray-200"
             href={`/admin/yeu-cau/${chiNhanhSlug}`}
           >
-            {branch.name}
+            {currentBranch.name}
           </BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
@@ -46,4 +41,4 @@ function page({ params }) {
   );
 }
 
-export default page;
+export default Page;
