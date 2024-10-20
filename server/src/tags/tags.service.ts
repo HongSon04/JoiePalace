@@ -9,6 +9,7 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 import { PrismaService } from 'src/prisma.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class TagsService {
@@ -41,7 +42,7 @@ export class TagsService {
       });
 
       throw new HttpException(
-        { message: 'Tạo tag thành công', data: tags },
+        { message: 'Tạo tag thành công', data: FormatReturnData(tags, []) },
         HttpStatus.CREATED,
       );
     } catch (error) {
@@ -90,7 +91,7 @@ export class TagsService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: {
             total,
             itemsPerPage,
@@ -127,7 +128,10 @@ export class TagsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      throw new HttpException({ data: tag }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(tag, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -153,7 +157,10 @@ export class TagsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      throw new HttpException({ data: tag }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(tag, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -196,7 +203,7 @@ export class TagsService {
         },
       });
       throw new HttpException(
-        { message: 'Cập nhật tag thành công', data: tag },
+        { message: 'Cập nhật tag thành công', data: FormatReturnData(tag, []) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -225,10 +232,7 @@ export class TagsService {
       const tag = await this.prismaService.tags.delete({
         where: { id: Number(id) },
       });
-      throw new HttpException(
-        { message: 'Xóa tag thành công', data: tag },
-        HttpStatus.OK,
-      );
+      throw new HttpException({ message: 'Xóa tag thành công' }, HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

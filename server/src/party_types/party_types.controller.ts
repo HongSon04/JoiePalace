@@ -21,6 +21,7 @@ import {
 } from './dto/create-party_type.dto';
 import { UpdatePartyTypeDto } from './dto/update-party_type.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -31,7 +32,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('party-types')
+@ApiTags('Party Types - Quản lý loại tiệc')
 @Controller('api/party-types')
 export class PartyTypesController {
   constructor(private readonly partyTypesService: PartyTypesService) {}
@@ -42,9 +43,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -148,9 +150,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -249,9 +252,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -317,9 +321,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -349,9 +354,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -381,9 +387,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: { message: 'Xóa loại tiệc thành công' },

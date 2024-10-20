@@ -14,6 +14,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class DecorsService {
@@ -69,7 +70,10 @@ export class DecorsService {
       });
 
       throw new HttpException(
-        { message: 'Tạo trang trí thành công', data: createDecor },
+        {
+          message: 'Tạo trang trí thành công',
+          data: FormatReturnData(createDecor, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -204,7 +208,7 @@ export class DecorsService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -340,7 +344,7 @@ export class DecorsService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -371,7 +375,13 @@ export class DecorsService {
         );
       }
 
-      throw new HttpException(decor, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy thông tin trang trí thành công',
+          data: FormatReturnData(decor, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -397,7 +407,13 @@ export class DecorsService {
         );
       }
 
-      throw new HttpException(decor, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy thông tin trang trí thành công',
+          data: FormatReturnData(decor, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -471,7 +487,10 @@ export class DecorsService {
       });
 
       throw new HttpException(
-        { message: 'Cập nhật trang trí thành công', data: updatedDecor },
+        {
+          message: 'Cập nhật trang trí thành công',
+          data: FormatReturnData(updatedDecor, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -503,7 +522,7 @@ export class DecorsService {
         throw new HttpException('Trang trí đã bị xóa', HttpStatus.BAD_REQUEST);
       }
 
-      const updatedDecor = await this.prismaService.decors.update({
+      await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: { deleted: true, deleted_by: reqUser.id, deleted_at: new Date() },
       });
@@ -544,7 +563,7 @@ export class DecorsService {
         );
       }
 
-      const updatedDecor = await this.prismaService.decors.update({
+      await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: { deleted: false, deleted_by: null, deleted_at: null },
       });

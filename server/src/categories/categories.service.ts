@@ -13,46 +13,85 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class CategoriesService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
   // ! Create Categories
-  async create(createCategoryDto: CreateCategoryDto) {
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    files: { images?: Express.Multer.File[] },
+  ) {
     try {
-      const { name, description, short_description } = createCategoryDto;
+      const { name, description, short_description, category_id, tags } =
+        createCategoryDto;
+
+      // Check Name and Slug
       const slug = MakeSlugger(name);
-      // ? Check Name and Slug
-      const findCategories = await this.prismaService.categories.findFirst({
+      const existingCategory = await this.prismaService.categories.findFirst({
         where: {
-          OR: [
-            {
-              name,
-            },
-            {
-              slug,
-            },
-          ],
+          OR: [{ name }, { slug }],
         },
       });
-      if (findCategories) {
+
+      if (existingCategory) {
         throw new HttpException(
           { message: 'Tên danh mục đã tồn tại' },
           HttpStatus.BAD_REQUEST,
         );
       }
-      // ? Create Categories
+
+      // Upload images if available
+      const images =
+        files.images && files.images.length > 0
+          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
+              files.images,
+              'joiepalace/categories',
+            )
+          : ([] as any);
+
+      if (files.images && files.images.length > 0 && !images) {
+        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+      }
+
+      // Validate tags
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tags } },
+      });
+
+      if (existingTags.length !== tags.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
+
+      // Create Categories
       const categories = await this.prismaService.categories.create({
         data: {
           name,
           slug,
           description,
           short_description,
+          category_id: category_id || null,
+          images,
+          tags: { connect: tagsSet },
         },
       });
+
       throw new HttpException(
-        { message: 'Tạo danh mục thành công', data: categories },
+        {
+          message: 'Tạo danh mục thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.CREATED,
       );
     } catch (error) {
@@ -77,9 +116,7 @@ export class CategoriesService {
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
         : '';
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -140,9 +177,12 @@ export class CategoriesService {
         total,
       };
 
+      let FormatData = FormatReturnData(res, []);
+      const categories = this.buildCategoryTree(FormatData);
+
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(categories, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -169,9 +209,7 @@ export class CategoriesService {
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
         : '';
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -232,9 +270,12 @@ export class CategoriesService {
         total,
       };
 
+      let FormatData = FormatReturnData(res, []);
+      const categories = this.buildCategoryTree(FormatData);
+
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(categories, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -262,7 +303,10 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
-      throw new HttpException({ data: category }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(category, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -288,7 +332,10 @@ export class CategoriesService {
           HttpStatus.NOT_FOUND,
         );
       }
-      throw new HttpException({ data: category }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(category, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -301,7 +348,11 @@ export class CategoriesService {
   }
 
   // ! Update Categories
-  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+  async update(
+    id: number,
+    updateCategoryDto: UpdateCategoryDto,
+    files: { images?: Express.Multer.File[] },
+  ) {
     try {
       // ? Check Categories
       const findCategories = await this.prismaService.categories.findUnique({
@@ -314,13 +365,14 @@ export class CategoriesService {
         );
       }
 
-      const { name, description, short_description } = updateCategoryDto;
+      const { name, description, short_description, category_id, tags } =
+        updateCategoryDto;
       const slug = MakeSlugger(name);
       // ? Check Name and Slug
       const findCategoriesByName =
         await this.prismaService.categories.findFirst({
           where: {
-            name,
+            OR: [{ name }, { slug }],
             NOT: {
               id: Number(id),
             },
@@ -332,6 +384,33 @@ export class CategoriesService {
           HttpStatus.BAD_REQUEST,
         );
       }
+
+      // Upload images if available
+      const images =
+        files.images && files.images.length > 0
+          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
+              files.images,
+              'joiepalace/categories',
+            )
+          : ([] as any);
+
+      if (files.images && files.images.length > 0 && !images) {
+        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+      }
+
+      // Validate tags
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tags } },
+      });
+
+      if (existingTags.length !== tags.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       // ? Update Categories
       const categories = await this.prismaService.categories.update({
         where: { id: Number(id) },
@@ -340,11 +419,17 @@ export class CategoriesService {
           slug,
           description,
           short_description,
+          category_id: category_id || null,
+          images: images.length > 0 ? images : findCategories.images,
+          tags: { set: tagsSet },
         },
       });
 
       throw new HttpException(
-        { message: 'Cập nhật danh mục thành công', data: categories },
+        {
+          message: 'Cập nhật danh mục thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -381,7 +466,9 @@ export class CategoriesService {
         },
       });
       throw new HttpException(
-        { message: 'Xóa danh mục thành công', data: categories },
+        {
+          message: 'Xóa danh mục thành công',
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -418,7 +505,10 @@ export class CategoriesService {
         },
       });
       throw new HttpException(
-        { message: 'Khôi phục danh mục thành công', data: categories },
+        {
+          message: 'Khôi phục danh mục thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -450,7 +540,10 @@ export class CategoriesService {
         where: { id: Number(id) },
       });
       throw new HttpException(
-        { message: 'Xóa danh mục vĩnh viễn thành công', data: categories },
+        {
+          message: 'Xóa danh mục vĩnh viễn thành công',
+          data: FormatReturnData(categories, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -462,5 +555,22 @@ export class CategoriesService {
         'Đã có lỗi xảy ra, vui lòng thử lại sau !',
       );
     }
+  }
+
+  // ! Đệ quy lấy danh sách danh mục
+  buildCategoryTree(categories, parentId = null) {
+    const categoryTree = [];
+
+    categories.forEach((category) => {
+      if (category.category_id === parentId) {
+        const children = this.buildCategoryTree(categories, category.id);
+        if (children.length) {
+          category.children = children;
+        }
+        categoryTree.push(category);
+      }
+    });
+
+    return categoryTree;
   }
 }

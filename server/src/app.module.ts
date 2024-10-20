@@ -28,7 +28,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MailModule } from './mail/mail.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
-import { CategoryBlogsModule } from './category_blogs/category_blogs.module';
 import { BlogsModule } from './blogs/blogs.module';
 
 @Module({
@@ -69,7 +68,6 @@ import { BlogsModule } from './blogs/blogs.module';
     MailModule,
     DashboardModule,
     FeedbacksModule,
-    CategoryBlogsModule,
     BlogsModule,
   ],
   controllers: [AppController],

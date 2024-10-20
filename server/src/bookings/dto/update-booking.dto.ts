@@ -23,6 +23,9 @@ export class UpdateBookingDto {
   user_id: number;
 
   @ApiProperty({ required: true })
+  booking_id: number;
+
+  @ApiProperty({ required: true })
   branch_id: number;
 
   @ApiProperty({ required: true })

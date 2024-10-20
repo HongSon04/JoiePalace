@@ -13,9 +13,9 @@ import {
 } from '@nestjs/common';
 import { SpacesService } from './spaces.service';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -24,7 +24,7 @@ import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('spaces')
+@ApiTags('Spaces - Quản lý Không Gian')
 @Controller('api/spaces')
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
@@ -35,9 +35,10 @@ export class SpacesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -218,9 +219,10 @@ export class SpacesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -340,9 +342,10 @@ export class SpacesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

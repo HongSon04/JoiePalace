@@ -17,6 +17,7 @@ import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -27,8 +28,8 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
+@ApiTags('Blogs - Quản lý bài viết')
 @Controller('/api/blogs')
-@ApiTags('blogs')
 export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
@@ -38,9 +39,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -152,9 +154,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -192,6 +195,204 @@ export class BlogsController {
   @ApiQuery({ name: 'search', required: false })
   findAllDeleted(@Query() query: FilterDto) {
     return this.blogsService.findAllDeleted(query);
+  }
+
+  // ! Get all blogs by category
+  @Get('get-all-by-category/:category_id')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy danh mục !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo danh mục' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllByCategory(
+    @Param('category_id') category_id: string,
+    @Query() query: FilterDto,
+  ) {
+    return this.blogsService.findAllByCategory(category_id, query);
+  }
+
+  // ! Get all blogs by slug category
+  @Get('get-all-by-slug-category/:slug')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy danh mục !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo slug danh mục' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllBySlugCategory(
+    @Param('slug') slug: string,
+    @Query() query: FilterDto,
+  ) {
+    return this.blogsService.findAllBySlugCategory(slug, query);
+  }
+
+  // ! Get all blogs by tag
+  @Get('get-all-by-tag/:tag_id')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy tag !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo tag' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllByTag(@Param('tag_id') tag_id: string, @Query() query: FilterDto) {
+    return this.blogsService.findAllByTag(tag_id, query);
+  }
+
+  // ! Get all blogs by slug tag
+  @Get('get-all-by-slug-tag/:slug')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy tag !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo slug tag' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllBySlugTag(@Param('slug') slug: string, @Query() query: FilterDto) {
+    return this.blogsService.findAllBySlugTag(slug, query);
   }
 
   // ! Get a blog by id
@@ -299,9 +500,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -372,9 +574,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -420,9 +623,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -452,9 +656,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -478,9 +683,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

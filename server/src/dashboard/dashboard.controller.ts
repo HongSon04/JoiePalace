@@ -2,20 +2,21 @@ import { Controller, Get, HttpStatus, Param } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { isPublic } from 'decorator/auth.decorator';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiParam,
-  ApiProperty,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
-@ApiTags('dashboard')
+@ApiTags('Dashboard - Quản lý dashboard')
+@ApiBearerAuth('authorization')
 @ApiHeaders([
   {
     name: 'authorization',
     description: 'Bearer token',
-    required: true,
+    required: false,
   },
 ])
 @Controller('api/dashboard')

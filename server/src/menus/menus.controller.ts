@@ -15,6 +15,7 @@ import { MenusService } from './menus.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -24,7 +25,7 @@ import {
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('menus')
+@ApiTags('Menus - Quản lý thực đơn')
 @Controller('api/menus')
 export class MenusController {
   constructor(private readonly menusService: MenusService) {}
@@ -114,9 +115,10 @@ export class MenusController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -232,9 +234,10 @@ export class MenusController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -273,9 +276,10 @@ export class MenusController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -305,9 +309,10 @@ export class MenusController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -337,9 +342,10 @@ export class MenusController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

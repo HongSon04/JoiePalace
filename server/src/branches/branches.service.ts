@@ -14,6 +14,7 @@ import {
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { MakeSlugger } from 'helper/slug';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class BranchesService {
@@ -111,10 +112,9 @@ export class BranchesService {
         data: bodySpace,
       });
 
-      const { deleted, deleted_at, deleted_by, ...data } = createbranch;
       const result = {
-        ...data,
-        space: createSpace,
+        ...FormatReturnData(createbranch, []),
+        space: FormatReturnData(createSpace, []),
       };
 
       throw new HttpException(
@@ -210,7 +210,7 @@ export class BranchesService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -301,7 +301,7 @@ export class BranchesService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -349,7 +349,10 @@ export class BranchesService {
         stages,
       };
 
-      throw new HttpException({ data: result }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(result, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -393,7 +396,10 @@ export class BranchesService {
         stages,
       };
 
-      throw new HttpException({ data: result }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(result, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -521,9 +527,9 @@ export class BranchesService {
       });
 
       const result = {
-        ...updatedbranch,
-        space: updatedSpace,
-        stages,
+        ...FormatReturnData(updatedbranch, []),
+        space: FormatReturnData(updatedSpace, []),
+        stages: FormatReturnData(stages, []),
       };
 
       throw new HttpException(

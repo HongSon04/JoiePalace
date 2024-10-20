@@ -14,6 +14,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class StaffsService {
@@ -52,8 +53,11 @@ export class StaffsService {
         },
       });
       throw new HttpException(
-        { message: 'Thêm nhân viên thành công', data: staff },
-        201,
+        {
+          message: 'Thêm nhân viên thành công',
+          data: FormatReturnData(staff, []),
+        },
+        HttpStatus.CREATED,
       );
     } catch (error) {
       if (error instanceof HttpException) {
@@ -76,9 +80,7 @@ export class StaffsService {
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
         : '';
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -94,7 +96,7 @@ export class StaffsService {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { branches: { name: { contains: search }, mode: 'insensitive' } },
+          { branches: { name: { contains: search, mode: 'insensitive' } } },
         ],
         deleted: false,
         ...sortRangeDate,
@@ -129,7 +131,7 @@ export class StaffsService {
 
       throw new HttpException(
         {
-          data: staffs,
+          data: FormatReturnData(staffs, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -155,9 +157,7 @@ export class StaffsService {
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
         : '';
-      const endDate = query.endDate
-        ? FormatDateToEndOfDay(query.endDate)
-        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const sortRangeDate: any =
         startDate && endDate
@@ -208,7 +208,7 @@ export class StaffsService {
 
       throw new HttpException(
         {
-          data: staffs,
+          data: FormatReturnData(staffs, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -240,7 +240,10 @@ export class StaffsService {
           HttpStatus.NOT_FOUND,
         );
       }
-      throw new HttpException({ data: staff }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(staff, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -285,7 +288,10 @@ export class StaffsService {
         },
       });
       throw new HttpException(
-        { message: 'Cập nhật nhân viên thành công', data: updateStaff },
+        {
+          message: 'Cập nhật nhân viên thành công',
+          data: FormatReturnData(updateStaff, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -326,7 +332,10 @@ export class StaffsService {
         },
       });
       throw new HttpException(
-        { message: 'Cập nhật ảnh đại diện thành công', data: updateAvatar },
+        {
+          message: 'Cập nhật ảnh đại diện thành công',
+          data: FormatReturnData(updateAvatar, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -393,7 +402,10 @@ export class StaffsService {
         },
       });
       throw new HttpException(
-        { message: 'Khôi phục nhân viên thành công', data: restoreStaff },
+        {
+          message: 'Khôi phục nhân viên thành công',
+          data: FormatReturnData(restoreStaff, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {

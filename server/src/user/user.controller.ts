@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -29,8 +30,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'decorator/roles.decorator';
 import { Role } from 'helper/role.enum';
+import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('user')
+@ApiTags('User - Quản lý người dùng')
 @Controller('api/user')
 export class UserController {
   constructor(
@@ -44,9 +46,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({
     summary: 'Quản trị viên tạo tài khoản',
   })
@@ -119,9 +122,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -161,14 +165,15 @@ export class UserController {
 
   // ! Get All User
   @Get('get-all')
+  @Roles(Role.ADMIN)
   @ApiHeaders([
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
-  @Roles(Role.ADMIN)
+  @ApiBearerAuth('authorization')
   @ApiOperation({
     summary: 'Lấy danh sách tài khoản (trừ tài khoản bị xóa tạm)',
   })
@@ -224,9 +229,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -280,9 +286,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -327,9 +334,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -363,9 +371,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -395,9 +404,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -427,9 +437,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -459,9 +470,10 @@ export class UserController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

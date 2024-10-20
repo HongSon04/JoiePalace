@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { StagesService } from './stages.service';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiParam,
@@ -24,7 +25,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { StageUpdateDto } from './dto/stage-update.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('stages')
+@ApiTags('Stages - Quản lý sảnh')
 @Controller('api/stages')
 export class StagesController {
   constructor(private readonly stagesService: StagesService) {}
@@ -35,9 +36,10 @@ export class StagesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -194,9 +196,10 @@ export class StagesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -271,9 +274,10 @@ export class StagesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

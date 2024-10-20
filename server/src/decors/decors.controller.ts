@@ -17,6 +17,7 @@ import { DecorsService } from './decors.service';
 import { CreateDecorDto, ImageDecorDto } from './dto/create-decor.dto';
 import { UpdateDecorDto } from './dto/update-decor.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -27,7 +28,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('decors')
+@ApiTags('Decors - Quản lý trang trí')
 @Controller('api/decors')
 export class DecorsController {
   constructor(private readonly decorsService: DecorsService) {}
@@ -38,9 +39,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -151,9 +153,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -269,9 +272,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -339,9 +343,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -371,9 +376,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -403,9 +409,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

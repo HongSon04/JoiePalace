@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiResponse,
@@ -16,7 +17,7 @@ import {
 import { UpdateDepositDto } from './dto/update-status.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('deposits')
+@ApiTags('Deposits - Quản lý đặt cọc')
 @Controller('api/deposits')
 export class DepositsController {
   constructor(private readonly depositsService: DepositsService) {}
@@ -93,9 +94,10 @@ export class DepositsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -132,9 +134,10 @@ export class DepositsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc theo mã giao dịch' })
   @ApiResponse({
     status: HttpStatus.OK,
