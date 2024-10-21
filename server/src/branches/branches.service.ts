@@ -108,13 +108,8 @@ export class BranchesService {
         description: branch.spaces_description,
         images: branchImages.space_images,
       };
-      const createSpace = await this.prismaService.spaces.create({
-        data: bodySpace,
-      });
-
       const result = {
         ...FormatReturnData(createbranch, []),
-        space: FormatReturnData(createSpace, []),
       };
 
       throw new HttpException(
@@ -332,11 +327,6 @@ export class BranchesService {
         );
       }
 
-      const spaces = await this.prismaService.spaces.findMany({
-        where: {
-          branch_id: Number(id),
-        },
-      });
       const stages = await this.prismaService.stages.findMany({
         where: {
           branch_id: Number(id),
@@ -345,7 +335,6 @@ export class BranchesService {
       const { deleted, deleted_at, deleted_by, ...data } = branch;
       let result = {
         ...data,
-        spaces,
         stages,
       };
 
@@ -379,11 +368,6 @@ export class BranchesService {
         );
       }
 
-      const spaces = await this.prismaService.spaces.findMany({
-        where: {
-          branch_id: Number(branch.id),
-        },
-      });
       const stages = await this.prismaService.stages.findMany({
         where: {
           branch_id: Number(branch.id),
@@ -392,7 +376,6 @@ export class BranchesService {
       const { deleted, deleted_at, deleted_by, ...data } = branch;
       let result = {
         ...data,
-        spaces,
         stages,
       };
 
@@ -512,23 +495,12 @@ export class BranchesService {
         },
       });
 
-      // Cập nhật Space nếu có
-      const updatedSpace = await this.prismaService.spaces.update({
-        where: { branch_id: Number(id) },
-        data: {
-          name: spaces_name,
-          description: spaces_description,
-          images: branchImages.space_images,
-        },
-      });
-
       const stages = await this.prismaService.stages.findMany({
         where: { branch_id: Number(id) },
       });
 
       const result = {
         ...FormatReturnData(updatedbranch, []),
-        space: FormatReturnData(updatedSpace, []),
         stages: FormatReturnData(stages, []),
       };
 
@@ -659,19 +631,6 @@ export class BranchesService {
             where: { branch_id: Number(branch_id) },
           }),
         (stage) => stage.images || [],
-      );
-
-      // ! Xóa Spaces
-      await deleteEntityImagesAndRecords(
-        () =>
-          this.prismaService.spaces.findMany({
-            where: { branch_id: Number(branch_id) },
-          }),
-        () =>
-          this.prismaService.spaces.deleteMany({
-            where: { branch_id: Number(branch_id) },
-          }),
-        (space) => space.images || [],
       );
 
       // Xóa branch

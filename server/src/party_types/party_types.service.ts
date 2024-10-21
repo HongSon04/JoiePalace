@@ -4,16 +4,15 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { FilterDto } from 'helper/dto/Filter.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
 import {
   CreatePartyTypeDto,
   ImagePartyTypesDto,
 } from './dto/create-party_type.dto';
 import { UpdatePartyTypeDto } from './dto/update-party_type.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { PrismaService } from 'src/prisma.service';
-import { MakeSlugger } from 'helper/slug';
-import { FilterDto } from 'helper/dto/Filter.dto';
-import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class PartyTypesService {
@@ -27,8 +26,10 @@ export class PartyTypesService {
     createPartyTypeDto: CreatePartyTypeDto,
     files: ImagePartyTypesDto,
   ) {
-    const { name, description, short_description } = createPartyTypeDto;
+    const { name, description, short_description, products, price } =
+      createPartyTypeDto;
     try {
+      // Kiểm tra hình ảnh
       if (!files.images) {
         throw new HttpException(
           'Hình ảnh không được để trống',
@@ -36,31 +37,59 @@ export class PartyTypesService {
         );
       }
 
-      const findPartyByName = await this.prismaService.party_types.findFirst({
-        where: {
-          name,
-        },
+      // Kiểm tra tên loại tiệc
+      const existingPartyType = await this.prismaService.party_types.findFirst({
+        where: { name },
       });
-
-      if (findPartyByName) {
+      if (existingPartyType) {
         throw new HttpException(
           'Tên loại tiệc đã tồn tại',
           HttpStatus.BAD_REQUEST,
         );
       }
 
+      // Kiểm tra sản phẩm
+      const foundProducts = await this.prismaService.products.findMany({
+        where: { id: { in: products } },
+      });
+      if (foundProducts.length !== products.length) {
+        throw new HttpException(
+          'Sản phẩm không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Kiểm tra giá
+      const totalProductPrice = foundProducts.reduce(
+        (total, product) => total + product.price,
+        0,
+      );
+      if (totalProductPrice !== price) {
+        throw new HttpException(
+          'Giá loại tiệc không chính xác',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Tải hình ảnh lên Cloudinary
       const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
         files.images as any,
         'joiepalace/party',
       );
-      const slug = MakeSlugger(name);
+
+      // Tạo loại tiệc
       const partyType = await this.prismaService.party_types.create({
         data: {
           name,
-          slug,
           description,
+          price: totalProductPrice,
           short_description,
           images: images as any,
+          products: {
+            connect: foundProducts.map((product) => ({
+              id: Number(product.id),
+            })),
+          },
         },
       });
 
@@ -114,6 +143,9 @@ export class PartyTypesService {
                 },
               },
             ],
+          },
+          include: {
+            products: true,
           },
           skip,
           take: itemsPerPage,
@@ -210,6 +242,9 @@ export class PartyTypesService {
               },
             ],
           },
+          include: {
+            products: true,
+          },
           skip,
           take: itemsPerPage,
           orderBy: {
@@ -277,6 +312,9 @@ export class PartyTypesService {
     try {
       const partyType = await this.prismaService.party_types.findUnique({
         where: { id: Number(id) },
+        include: {
+          products: true,
+        },
       });
 
       if (!partyType) {
@@ -304,46 +342,16 @@ export class PartyTypesService {
     }
   }
 
-  // ! Get party type by slug
-  async findBySlug(slug: string) {
-    try {
-      const partyType = await this.prismaService.party_types.findFirst({
-        where: { slug },
-      });
-
-      if (!partyType) {
-        throw new HttpException(
-          'Không tìm thấy loại tiệc',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      throw new HttpException(
-        {
-          message: 'Lấy loại tiệc thành công',
-          data: FormatReturnData(partyType, []),
-        },
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ partyTypesService -> findBySlug: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      );
-    }
-  }
-
   // ! Update party type
   async update(
     id: number,
     updatePartyTypeDto: UpdatePartyTypeDto,
     files: ImagePartyTypesDto,
   ) {
-    const { name, description, short_description } = updatePartyTypeDto;
+    const { name, description, short_description, price, products } =
+      updatePartyTypeDto;
     try {
+      // Tìm loại tiệc
       const partyType = await this.prismaService.party_types.findUnique({
         where: { id: Number(id) },
       });
@@ -355,28 +363,60 @@ export class PartyTypesService {
         );
       }
 
-      const findPartyByName = await this.prismaService.party_types.findFirst({
+      // Kiểm tra tên loại tiệc
+      const existingPartyType = await this.prismaService.party_types.findFirst({
         where: {
           name,
-          NOT: {
-            id,
-          },
+          NOT: { id: Number(id) },
         },
       });
 
-      if (findPartyByName) {
+      if (existingPartyType) {
         throw new HttpException(
           'Tên loại tiệc đã tồn tại',
           HttpStatus.BAD_REQUEST,
         );
       }
 
+      // Kiểm tra sản phẩm
+      const foundProducts = await this.prismaService.products.findMany({
+        where: { id: { in: products } },
+      });
+
+      if (foundProducts.length !== products.length) {
+        throw new HttpException(
+          'Sản phẩm không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Tính toán giá
+      const totalProductPrice = foundProducts.reduce(
+        (total, product) => total + product.price,
+        0,
+      );
+
+      if (totalProductPrice !== price) {
+        throw new HttpException(
+          'Giá loại tiệc không chính xác',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Tạo đối tượng cập nhật
       const dataUpdate: any = {
         name,
         description,
         short_description,
+        price: totalProductPrice,
+        products: {
+          set: foundProducts.map((product) => ({
+            id: Number(product.id),
+          })),
+        },
       };
 
+      // Xử lý hình ảnh
       if (files.images) {
         const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images as any,
@@ -388,13 +428,14 @@ export class PartyTypesService {
             HttpStatus.BAD_REQUEST,
           );
         }
-        // Remove old images
+        // Xóa hình ảnh cũ
         await this.cloudinaryService.deleteMultipleImagesByUrl(
           partyType.images,
         );
         dataUpdate.images = images as any;
       }
 
+      // Cập nhật loại tiệc
       const updatedPartyType = await this.prismaService.party_types.update({
         where: { id: Number(id) },
         data: dataUpdate,

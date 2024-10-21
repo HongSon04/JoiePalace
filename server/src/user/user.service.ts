@@ -19,6 +19,7 @@ import {
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { Role } from 'helper/enum/role.enum';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,8 @@ export class UserService {
 
   // ! Create User
   async create(createUserDto: CreateUserDto) {
-    const { username, email, password, phone, role, avatar } = createUserDto;
+    const { username, email, password, phone, role, avatar, branch_id } =
+      createUserDto;
 
     try {
       // ? Check email exist
@@ -43,6 +45,21 @@ export class UserService {
       if (findEmail) {
         throw new HttpException('Email đã tồn tại', HttpStatus.BAD_REQUEST);
       }
+
+      if (branch_id) {
+        const checkBranch = await this.prismaService.branches.findUnique({
+          where: {
+            id: Number(branch_id),
+          },
+        });
+
+        if (!checkBranch) {
+          throw new HttpException(
+            'Chi nhánh không tồn tại',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
       // ? hashed password
       const hashedPassword = this.hashedPassword(password);
       // ? Create user
@@ -50,9 +67,10 @@ export class UserService {
         data: {
           username,
           email,
+          branch_id: branch_id ? Number(branch_id) : null,
           password: hashedPassword,
           phone,
-          role,
+          role: role as Role,
           avatar,
         },
       });
@@ -187,7 +205,7 @@ export class UserService {
         data: {
           username,
           phone,
-          role,
+          role: role as Role,
         },
       });
       throw new HttpException(
@@ -232,6 +250,7 @@ export class UserService {
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
+          { role: { contains: search, mode: 'insensitive' } },
         ],
         ...sortRangeDate,
       };
@@ -298,6 +317,7 @@ export class UserService {
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
+          { role: { contains: search, mode: 'insensitive' } },
         ],
         ...sortRangeDate,
       };
@@ -345,6 +365,33 @@ export class UserService {
       const user = await this.prismaService.users.findUnique({
         where: {
           id: Number(id),
+        },
+      });
+      if (!user) {
+        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+      }
+
+      throw new HttpException(
+        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ user.service.ts -> getById: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+      );
+    }
+  }
+
+  // ! Get User By Email
+  async getByEmail(email: string) {
+    try {
+      const user = await this.prismaService.users.findUnique({
+        where: {
+          email,
         },
       });
       if (!user) {

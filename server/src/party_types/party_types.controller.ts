@@ -214,38 +214,6 @@ export class PartyTypesController {
     return this.partyTypesService.findOne(id);
   }
 
-  // ! Get party type by slug
-  @Get('get-by-slug/:slug')
-  @isPublic()
-  @ApiResponse({
-    status: HttpStatus.OK,
-    example: {
-      data: {
-        id: 'number',
-        name: 'string',
-        slug: 'string',
-        description: 'string',
-        short_description: 'string',
-        images: 'array',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    example: {
-      message: 'Loại tiệc không tồn tại',
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    example: {
-      message: 'Lỗi server vui lòng thử lại sau',
-    },
-  })
-  @ApiOperation({ summary: 'Lấy loại tiệc theo slug' })
-  findBySlug(@Param('slug') slug: string) {
-    return this.partyTypesService.findBySlug(slug);
-  }
   // ! Update party type
   @Patch('update/:party_types_id')
   @ApiHeaders([
