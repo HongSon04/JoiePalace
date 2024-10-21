@@ -1,5 +1,3 @@
-"use client";
-
 import AdminHeader from "@/app/_components/AdminHeader";
 import AddDishCategory from "./AddDishCategory";
 import {
@@ -9,6 +7,10 @@ import {
   BreadcrumbSeparator,
 } from "@chakra-ui/react";
 import DishesMain from "./DishesMain";
+
+export const metadata = {
+  title: "Quản lý món ăn",
+};
 
 function page() {
   return (

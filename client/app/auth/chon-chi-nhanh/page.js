@@ -12,13 +12,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 
 import Branch from "@/app/_components/Branch";
 import Error from "@/app/_components/Error";
+import useApiServices from "@/app/_hooks/useApiServices";
 import {
   error,
   fetchBranchesSuccess,
   loading,
 } from "@/app/_lib/features/branch/branchSlice";
 import { fetchBranchesFromApi } from "@/app/_services/branchesServices";
-import { fetchData } from "@/app/_utils/helpers";
 import Loading from "@/app/admin/loading";
 import { Col, Row } from "antd";
 import React from "react";
@@ -68,6 +68,8 @@ import { useDispatch, useSelector } from "react-redux";
 // ];
 
 function Page() {
+  const { fetchData } = useApiServices();
+
   const dispatch = useDispatch();
 
   const { branches, isLoading, isError, errorMessage } = useSelector(

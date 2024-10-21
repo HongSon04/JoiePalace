@@ -11,17 +11,19 @@ const nextConfig = {
         hostname: "res.cloudinary.com",
         pathname: "/dlpvcsewd/**",
       },
+      {
+        protocol: "https",
+        hostname: "whitepalace.com.vn",
+        pathname: "/wp-content/**",
+      },
     ],
   },
-  webpack: (
-    config,
-    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
-  ) => {
-    if (config.cache && !dev) {
-      config.cache = Object.freeze({
-        type: "memory",
-      });
+  webpack: (config, { dev }) => {
+    // Ensure that Fast Refresh is not affected by caching in development mode
+    if (config.cache && dev) {
+      config.cache = false; // Disable caching in development for better Fast Refresh
     }
+
     // Important: return the modified config
     return config;
   },

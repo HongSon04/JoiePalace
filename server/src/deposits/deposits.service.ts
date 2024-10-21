@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateDepositDto } from './dto/update-status.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class DepositsService {
@@ -10,7 +11,7 @@ export class DepositsService {
   async findOne(id: number) {
     try {
       const findDeposit = await this.prismaService.deposits.findUnique({
-        where: { id },
+        where: { id: Number(id) },
       });
       if (!findDeposit) {
         throw new HttpException(
@@ -19,7 +20,13 @@ export class DepositsService {
         );
       }
 
-      throw new HttpException(findDeposit, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy chi tiết thông tin đặt cọc thành công',
+          data: FormatReturnData(findDeposit, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -45,7 +52,13 @@ export class DepositsService {
         );
       }
 
-      throw new HttpException(findDeposit, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy chi tiết thông tin đặt cọc thành công',
+          data: FormatReturnData(findDeposit, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -63,7 +76,7 @@ export class DepositsService {
     try {
       const { status, payment_method } = updateDepositDto;
       const findDeposit = await this.prismaService.deposits.findUnique({
-        where: { id },
+        where: { id: Number(id) },
       });
       if (!findDeposit) {
         throw new HttpException(
@@ -72,13 +85,13 @@ export class DepositsService {
         );
       }
       const updateDeposit = await this.prismaService.deposits.update({
-        where: { id },
+        where: { id: Number(id) },
         data: { status, payment_method },
       });
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =
         await this.prismaService.booking_details.findFirst({
-          where: { deposit_id: id },
+          where: { deposit_id: Number(id) },
         });
 
       if (!findBookingDetail) {
@@ -89,14 +102,14 @@ export class DepositsService {
       }
 
       await this.prismaService.bookings.update({
-        where: { id: findBookingDetail.booking_id },
+        where: { id: Number(findBookingDetail.booking_id) },
         data: { is_deposit: status === 'completed' ? true : false },
       });
 
       throw new HttpException(
         {
           message: 'Cập nhật giao dịch đặt cọc thành công',
-          data: updateDeposit,
+          data: FormatReturnData(updateDeposit, []),
         },
         HttpStatus.OK,
       );
@@ -135,7 +148,7 @@ export class DepositsService {
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =
         await this.prismaService.booking_details.findFirst({
-          where: { deposit_id: findDeposit.id },
+          where: { deposit_id: Number(findDeposit.id) },
         });
 
       if (!findBookingDetail) {
@@ -146,14 +159,14 @@ export class DepositsService {
       }
 
       await this.prismaService.bookings.update({
-        where: { id: findBookingDetail.booking_id },
+        where: { id: Number(findBookingDetail.booking_id) },
         data: { is_deposit: status === 'completed' ? true : false },
       });
 
       throw new HttpException(
         {
           message: 'Cập nhật giao dịch đặt cọc thành công',
-          data: updateDeposit,
+          data: FormatReturnData(updateDeposit, []),
         },
         HttpStatus.OK,
       );

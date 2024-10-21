@@ -12,16 +12,22 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiHeaders,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { Request as RequestExpress } from 'express';
 import { isPublic } from 'decorator/auth.decorator';
 import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyTokenDto } from './dto/verify-token.dto';
 
-@ApiTags('auth')
+@ApiTags('Auth - Xác thực')
 @Controller('api/auth')
 export class AuthController {
   constructor(
@@ -86,6 +92,14 @@ export class AuthController {
   // ! Logout
   @Post('logout')
   @ApiOperation({ summary: 'Người dùng đăng xuất' })
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -192,6 +206,14 @@ export class AuthController {
 
   // ! Upload Avatar
   @Post('upload-avatar')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Người dùng tải ảnh đại diện' })
   @UseInterceptors(
     FileInterceptor('avatar', {
@@ -240,7 +262,7 @@ export class AuthController {
   ) {
     const avatar = await this.cloudinaryService.uploadFileToFolder(
       file,
-      'joieplace/avatar',
+      'joiepalace/avatar',
     );
     return this.authService.changeAvatar(req.user, avatar);
   }

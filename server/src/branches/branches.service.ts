@@ -14,6 +14,7 @@ import {
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { MakeSlugger } from 'helper/slug';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class BranchesService {
@@ -68,11 +69,11 @@ export class BranchesService {
 
       // Upload tất cả các hình ảnh đồng thời
       await Promise.all([
-        uploadImages('images', 'joieplace/branch'),
-        uploadImages('diagram_images', 'joieplace/diagram'),
-        uploadImages('slogan_images', 'joieplace/slogan'),
-        uploadImages('equipment_images', 'joieplace/equipment'),
-        uploadImages('space_images', 'joieplace/space'),
+        uploadImages('images', 'joiepalace/branch'),
+        uploadImages('diagram_images', 'joiepalace/diagram'),
+        uploadImages('slogan_images', 'joiepalace/slogan'),
+        uploadImages('equipment_images', 'joiepalace/equipment'),
+        uploadImages('space_images', 'joiepalace/space'),
       ]);
 
       const { name, address, phone, email } = branch;
@@ -111,10 +112,9 @@ export class BranchesService {
         data: bodySpace,
       });
 
-      const { deleted, deleted_at, deleted_by, ...data } = createbranch;
       const result = {
-        ...data,
-        space: createSpace,
+        ...FormatReturnData(createbranch, []),
+        space: FormatReturnData(createSpace, []),
       };
 
       throw new HttpException(
@@ -148,7 +148,7 @@ export class BranchesService {
       const endDate = query.endDate
         ? FormatDateToEndOfDay(query.endDate)
         : null;
-      
+
       // ? Range Date Conditions
       const sortRangeDate: any =
         startDate && endDate
@@ -210,7 +210,7 @@ export class BranchesService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -301,7 +301,7 @@ export class BranchesService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -349,7 +349,10 @@ export class BranchesService {
         stages,
       };
 
-      throw new HttpException({ data: result }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(result, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -378,12 +381,12 @@ export class BranchesService {
 
       const spaces = await this.prismaService.spaces.findMany({
         where: {
-          branch_id: branch.id,
+          branch_id: Number(branch.id),
         },
       });
       const stages = await this.prismaService.stages.findMany({
         where: {
-          branch_id: branch.id,
+          branch_id: Number(branch.id),
         },
       });
       const { deleted, deleted_at, deleted_by, ...data } = branch;
@@ -393,7 +396,10 @@ export class BranchesService {
         stages,
       };
 
-      throw new HttpException({ data: result }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(result, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -521,9 +527,9 @@ export class BranchesService {
       });
 
       const result = {
-        ...updatedbranch,
-        space: updatedSpace,
-        stages,
+        ...FormatReturnData(updatedbranch, []),
+        space: FormatReturnData(updatedSpace, []),
+        stages: FormatReturnData(stages, []),
       };
 
       throw new HttpException(
@@ -646,11 +652,11 @@ export class BranchesService {
       await deleteEntityImagesAndRecords(
         () =>
           this.prismaService.stages.findMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         () =>
           this.prismaService.stages.deleteMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         (stage) => stage.images || [],
       );
@@ -659,11 +665,11 @@ export class BranchesService {
       await deleteEntityImagesAndRecords(
         () =>
           this.prismaService.spaces.findMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         () =>
           this.prismaService.spaces.deleteMany({
-            where: { branch_id: branch_id },
+            where: { branch_id: Number(branch_id) },
           }),
         (space) => space.images || [],
       );
@@ -735,7 +741,7 @@ export class BranchesService {
                 }, {});
 
             return this.prismaService[name].update({
-              where: { id: record.id },
+              where: { id: Number(record.id) },
               data: updatedData,
             });
           });

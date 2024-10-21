@@ -129,25 +129,33 @@ model staffs {
 
 model categories {
   id                Int        @id @default(autoincrement())
+  category_id       Int?
   name              String
   slug              String     @unique
   description       String
   short_description String?
+  images            String[]
   deleted           Boolean    @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
+  created_by        Int?
+  updated_by        Int?
   created_at        DateTime   @default(now())
   updated_at        DateTime   @updatedAt
   products          products[]
+  tags              tags[]     @relation("CategoryTags")
+  blogs             blogs[]
 }
 
 model tags {
-  id         Int        @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   name       String
-  slug       String     @unique
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  products   products[] @relation("ProductTags")
+  slug       String       @unique
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  products   products[]   @relation("ProductTags")
+  blogs      blogs[]      @relation("BlogTags")
+  categories categories[] @relation("CategoryTags")
 }
 
 model products {
@@ -326,4 +334,25 @@ model feedbacks {
   is_show    Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model blogs {
+  id                Int        @id @default(autoincrement())
+  category_id       Int
+  categories        categories @relation(fields: [category_id], references: [id])
+  title             String
+  slug              String     @unique
+  description       String
+  short_description String?
+  content           String
+  tags              tags[]     @relation("BlogTags")
+  images            String[]
+  views             Int        @default(0)
+  deleted           Boolean    @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_by        Int?
+  updated_by        Int?
+  created_at        DateTime   @default(now())
+  updated_at        DateTime   @updatedAt
 }

@@ -18,6 +18,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class UserService {
@@ -57,7 +58,13 @@ export class UserService {
       });
 
       // ? Return token
-      throw new HttpException('Tạo mới thành công', HttpStatus.CREATED);
+      throw new HttpException(
+        {
+          message: 'Tạo tài khoản thành công',
+          data: FormatReturnData(user, ['password', 'refresh_token']),
+        },
+        HttpStatus.CREATED,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -81,7 +88,12 @@ export class UserService {
         throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
       }
       const { password, refresh_token, ...user } = findUser;
-      throw new HttpException({ data: user }, HttpStatus.OK);
+      throw new HttpException(
+        {
+          data: FormatReturnData(user, ['password', 'refresh_token']),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -168,7 +180,7 @@ export class UserService {
         throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
       }
       // ? Update user
-      await this.prismaService.users.update({
+      const user = await this.prismaService.users.update({
         where: {
           id: Number(reqUser.id),
         },
@@ -178,7 +190,13 @@ export class UserService {
           role,
         },
       });
-      throw new HttpException('Cập nhật thông tin thành công', HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Thay đổi thông tin cá nhân thành công',
+          data: FormatReturnData(user, ['password', 'refresh_token']),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -239,7 +257,7 @@ export class UserService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -305,7 +323,7 @@ export class UserService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -332,15 +350,11 @@ export class UserService {
       if (!user) {
         throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
       }
-      const {
-        password,
-        refresh_token,
-        deleted,
-        deleted_at,
-        deleted_by,
-        ...userData
-      } = user;
-      throw new HttpException({ data: userData }, HttpStatus.OK);
+
+      throw new HttpException(
+        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -373,7 +387,7 @@ export class UserService {
           deleted_by: Number(reqUser.id) as any,
         },
       });
-      throw new HttpException('Xóa thành công', HttpStatus.OK);
+      throw new HttpException('Xóa nguời dùng thành công', HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -472,7 +486,7 @@ export class UserService {
 
     await this.prismaService.users.update({
       where: {
-        id: user.id,
+        id: Number(user.id),
       },
       data: {
         refresh_token,
@@ -490,6 +504,4 @@ export class UserService {
     const hashedPassword = bcrypt.hashSync(password, 10);
     return hashedPassword;
   }
-
-  // ! Test Api
 }

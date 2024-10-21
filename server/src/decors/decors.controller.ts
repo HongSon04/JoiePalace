@@ -16,18 +16,33 @@ import {
 import { DecorsService } from './decors.service';
 import { CreateDecorDto, ImageDecorDto } from './dto/create-decor.dto';
 import { UpdateDecorDto } from './dto/update-decor.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('decors')
+@ApiTags('Decors - Quản lý trang trí')
 @Controller('api/decors')
 export class DecorsController {
   constructor(private readonly decorsService: DecorsService) {}
 
   // ! Create Decor
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -134,6 +149,14 @@ export class DecorsController {
 
   // ! Get All Deleted Decors
   @Get('get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -245,6 +268,14 @@ export class DecorsController {
 
   // ! Update Decor
   @Patch('update/:decor_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -308,6 +339,14 @@ export class DecorsController {
 
   // ! Soft Delete Decor
   @Delete('delete/:decor_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -333,6 +372,14 @@ export class DecorsController {
 
   // ! Restore Decor
   @Patch('restore/:decor_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -358,6 +405,14 @@ export class DecorsController {
 
   // ! Hard Delete Decor
   @Delete('destroy/:decor_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

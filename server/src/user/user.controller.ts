@@ -17,7 +17,6 @@ import {
 import { UserService } from './user.service';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -31,8 +30,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'decorator/roles.decorator';
 import { Role } from 'helper/role.enum';
+import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('user')
+@ApiTags('User - Quản lý người dùng')
 @Controller('api/user')
 export class UserController {
   constructor(
@@ -42,15 +42,17 @@ export class UserController {
 
   // ! Create User
   @Post('create')
-  @ApiBearerAuth()
   @ApiHeaders([
     {
-      name: 'Authorization',
+      name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
-  @ApiOperation({ summary: 'Quản trị viên tạo tài khoản' })
+  @ApiBearerAuth('authorization')
+  @ApiOperation({
+    summary: 'Quản trị viên tạo tài khoản',
+  })
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -104,7 +106,7 @@ export class UserController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       createUserDto.avatar = avatar;
     } else {
@@ -115,8 +117,15 @@ export class UserController {
 
   // ! Get Profile
   @Get('profile')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Lấy thông tin cá nhân' })
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -155,6 +164,16 @@ export class UserController {
   }
 
   // ! Get All User
+  @Get('get-all')
+  @Roles(Role.ADMIN)
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({
     summary: 'Lấy danh sách tài khoản (trừ tài khoản bị xóa tạm)',
   })
@@ -195,8 +214,6 @@ export class UserController {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
     },
   })
-  @Get('get-all')
-  @Roles(Role.ADMIN)
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
@@ -208,6 +225,14 @@ export class UserController {
 
   // ! Get All User Deleted
   @Get('get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -257,6 +282,14 @@ export class UserController {
 
   // ! Get User By Id
   @Get('get/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -297,6 +330,14 @@ export class UserController {
 
   // ! Change Password
   @Put('change-password')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -326,6 +367,14 @@ export class UserController {
 
   // ! Change Profile
   @Patch('change-profile')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -351,6 +400,14 @@ export class UserController {
 
   // ! Soft Delete User
   @Delete('delete/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -376,6 +433,14 @@ export class UserController {
 
   // ! Restore User
   @Put('restore/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -401,6 +466,14 @@ export class UserController {
 
   // ! Hard Delete User
   @Delete('destroy/:user_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

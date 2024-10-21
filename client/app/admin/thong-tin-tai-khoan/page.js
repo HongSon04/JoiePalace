@@ -27,7 +27,7 @@ const page = () => {
                    </form>
                 </div>
                 <div className='flex justify-end'>
-                    <button className='button rounded-md flex gap-[5px] items-center p-2 bg-red-400'>
+                    <button className='button rounded-[50%] flex gap-[5px] items-center p-2 bg-red-400'>
                         <IoIosLogOut className='text-base' />
                         Đăng xuất
                     </button>
@@ -54,7 +54,7 @@ const page = () => {
                   </form>
                 </div>
                 <div className='flex justify-end'>
-                    <button className='button rounded-md flex gap-[5px] items-center p-2 bg-teal-400'>
+                    <button className='button rounded-[50%] flex gap-[5px] items-center p-2 bg-teal-400'>
                         Đổi mật khẩu
                     </button>
                 </div>
@@ -64,7 +64,7 @@ const page = () => {
             </div>
             <div className='w-full'>
                 <div className='flex justify-start'>
-                    <button className='button rounded-md flex gap-[5px] items-center p-3 bg-whiteAlpha-100 '>
+                    <button className='button rounded-[50%] flex gap-[5px] items-center p-3 bg-whiteAlpha-100 '>
                         <FaPhoneAlt /> 
                         Liên hệ kỹ thuật viên
                     </button>

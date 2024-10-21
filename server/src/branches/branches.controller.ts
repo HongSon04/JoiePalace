@@ -19,7 +19,14 @@ import {
 import { AuthGuard } from 'src/guards/auth.guard';
 
 import { FilterDto } from 'helper/dto/Filter.dto';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
@@ -27,7 +34,7 @@ import { ImageUploadBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('branches')
+@ApiTags('Branches - Quản lý Chi Nhánh')
 @UseGuards(AuthGuard)
 @Controller('api/branches')
 export class BranchesController {
@@ -35,6 +42,14 @@ export class BranchesController {
 
   // ! Create A New Branch
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Tạo chi nhánh mới' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -192,8 +207,8 @@ export class BranchesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   async getAllBranchs(@Query() query: FilterDto): Promise<any> {
     return this.branchesService.getAllBranches(query);
   }
@@ -261,8 +276,8 @@ export class BranchesController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   async getAllDeletedBranches(@Query() query: FilterDto): Promise<any> {
     return this.branchesService.getAllDeletedBranches(query);
   }
@@ -403,6 +418,14 @@ export class BranchesController {
 
   // ! Update Branch Info
   @Patch('update/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -513,6 +536,14 @@ export class BranchesController {
 
   // ! Soft Delete Branch
   @Delete('delete/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -541,6 +572,14 @@ export class BranchesController {
 
   // ! Restore Branch
   @Put('restore/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -566,6 +605,14 @@ export class BranchesController {
 
   // ! Hard Delete Branch
   @Delete('destroy/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

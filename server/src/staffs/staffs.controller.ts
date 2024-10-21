@@ -17,6 +17,8 @@ import {
 } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
 import {
+  ApiBearerAuth,
+  ApiHeaders,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -31,8 +33,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { UpdateAvatarStaffDto } from './dto/update-avatar-staff.dto';
 
-@ApiTags('staffs')
+@ApiTags('Staffs - Quản lý Nhân viên')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('authorization')
+@ApiHeaders([
+  {
+    name: 'authorization',
+    description: 'Bearer token',
+    required: false,
+  },
+])
 @Controller('api/staffs')
 export class StaffsController {
   constructor(
@@ -102,7 +112,7 @@ export class StaffsController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       body.avatar = avatar;
     } else {
@@ -156,8 +166,8 @@ export class StaffsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   async getAllStaff(@Query() query: FilterDto): Promise<StaffEntities[] | any> {
     return this.staffsService.getAllStaff(query);
   }
@@ -207,8 +217,8 @@ export class StaffsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, example: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, example: '28-10-2004' })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   async getAllStaffDeleted(
     @Query() query: FilterDto,
   ): Promise<StaffEntities[] | any> {
@@ -355,7 +365,7 @@ export class StaffsController {
     if (file) {
       const avatar = await this.cloudinaryService.uploadFileToFolder(
         file,
-        'joieplace/avatar',
+        'joiepalace/avatar',
       );
       body.avatar = avatar;
     } else {

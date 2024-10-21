@@ -12,19 +12,33 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { SpacesService } from './spaces.service';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeaders,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { updateSpaceDto } from './dto/update-space.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('spaces')
+@ApiTags('Spaces - Quản lý Không Gian')
 @Controller('api/spaces')
 export class SpacesController {
   constructor(private readonly spacesService: SpacesService) {}
 
   // ! Create A New Space
   @Post('create')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -201,6 +215,14 @@ export class SpacesController {
 
   // ? Update Space
   @Patch('update/:space_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -316,6 +338,14 @@ export class SpacesController {
 
   // ! Delete Space
   @Delete('destroy/:space_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

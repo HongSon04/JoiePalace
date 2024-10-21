@@ -48,6 +48,8 @@ const ScrollFullPage = ({ children }) => {
     });
 
     return () => {
+      if (typeof window === "undefined") return;
+      
       if (window.fullpage_api) {
         window.fullpage_api.destroy("all");
       }

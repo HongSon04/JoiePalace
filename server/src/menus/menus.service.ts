@@ -13,6 +13,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class MenusService {
@@ -79,7 +80,7 @@ export class MenusService {
       });
 
       throw new HttpException(
-        { message: 'Tạo menu thành công', data: menus },
+        { message: 'Tạo menu thành công', data: FormatReturnData(menus, []) },
         HttpStatus.CREATED,
       );
     } catch (error) {
@@ -107,7 +108,7 @@ export class MenusService {
     const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     // ? Range Date Conditions
     const sortRangeDate: any =
@@ -157,6 +158,16 @@ export class MenusService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -198,7 +209,7 @@ export class MenusService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: {
             total,
             itemsPerPage,
@@ -235,7 +246,7 @@ export class MenusService {
     const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : null;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     // ? Range Date Conditions
     const sortRangeDate: any =
@@ -287,6 +298,16 @@ export class MenusService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -328,7 +349,7 @@ export class MenusService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: {
             total,
             itemsPerPage,
@@ -369,7 +390,10 @@ export class MenusService {
         throw new HttpException('Menu không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      throw new HttpException({ data: menu }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(menu, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -401,7 +425,10 @@ export class MenusService {
         throw new HttpException('Menu không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      throw new HttpException({ data: menu }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(menu, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -476,7 +503,10 @@ export class MenusService {
       });
 
       throw new HttpException(
-        { message: 'Cập nhật menu thành công', data: menu },
+        {
+          message: 'Cập nhật menu thành công',
+          data: FormatReturnData(menu, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {

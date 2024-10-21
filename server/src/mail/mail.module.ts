@@ -5,8 +5,6 @@ import { MailController } from './mail.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
-  controllers: [MailController],
-  providers: [MailService],
   imports: [
     MailerModule.forRootAsync({
       useFactory: async () => {
@@ -34,5 +32,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       },
     }),
   ],
+  controllers: [MailController],
+  providers: [MailService],
 })
 export class MailModule {}

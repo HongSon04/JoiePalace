@@ -8,6 +8,11 @@ import { Button, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
 import Form from "./Form";
 
+export const metadata = {
+  title: "Đăng nhập",
+  description: "Đăng nhập vào hệ thống quản trị",
+};
+
 function Page({ params: { branchSlug } }) {
   return (
     <div className="relative w-full h-screen p-8">

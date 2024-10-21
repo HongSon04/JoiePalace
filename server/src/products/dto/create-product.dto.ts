@@ -26,13 +26,13 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
   short_description: string;
 
-  @ApiProperty({ example: [1, 2, 3] }) // Ví dụ mảng tags
+  @ApiProperty({ example: [1, 2, 3] })
   @IsArray({ message: 'Tags phải là một mảng' })
   @ArrayNotEmpty({ message: 'Tags không được để trống' })
   @ArrayMinSize(1, { message: 'Cần ít nhất 1 tag' })
   @ArrayMaxSize(10, { message: 'Chỉ cho phép tối đa 10 tags' })
-  @Type(() => Number) // Chuyển đổi phần tử trong mảng thành kiểu số
-  @IsInt({ each: true, message: 'Mỗi tag phải là số nguyên' }) // Kiểm tra từng phần tử trong mảng
+  @Type(() => Number)
+  @IsInt({ each: true, message: 'Mỗi tag phải là số nguyên' })
   tags: number[];
 
   @ApiProperty({ required: true })

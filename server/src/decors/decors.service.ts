@@ -14,6 +14,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class DecorsService {
@@ -47,7 +48,7 @@ export class DecorsService {
       const imagesDecor =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/decors',
+          'joiepalace/decors',
         );
 
       if (imagesDecor.length === 0) {
@@ -69,7 +70,10 @@ export class DecorsService {
       });
 
       throw new HttpException(
-        { message: 'Tạo trang trí thành công', data: createDecor },
+        {
+          message: 'Tạo trang trí thành công',
+          data: FormatReturnData(createDecor, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -91,7 +95,7 @@ export class DecorsService {
     const skip = (page - 1) * itemsPerPage;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     const priceSort = query?.priceSort?.toLowerCase();
 
@@ -147,6 +151,16 @@ export class DecorsService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -194,7 +208,7 @@ export class DecorsService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -218,7 +232,7 @@ export class DecorsService {
     const skip = (page - 1) * itemsPerPage;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     const priceSort = query?.priceSort?.toLowerCase();
 
@@ -273,6 +287,16 @@ export class DecorsService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -320,7 +344,7 @@ export class DecorsService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -351,7 +375,13 @@ export class DecorsService {
         );
       }
 
-      throw new HttpException(decor, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy thông tin trang trí thành công',
+          data: FormatReturnData(decor, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -377,7 +407,13 @@ export class DecorsService {
         );
       }
 
-      throw new HttpException(decor, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy thông tin trang trí thành công',
+          data: FormatReturnData(decor, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -431,7 +467,7 @@ export class DecorsService {
         const imagesDecor =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/decors',
+            'joiepalace/decors',
           );
 
         if (!imagesDecor.length) {
@@ -451,7 +487,10 @@ export class DecorsService {
       });
 
       throw new HttpException(
-        { message: 'Cập nhật trang trí thành công', data: updatedDecor },
+        {
+          message: 'Cập nhật trang trí thành công',
+          data: FormatReturnData(updatedDecor, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -483,7 +522,7 @@ export class DecorsService {
         throw new HttpException('Trang trí đã bị xóa', HttpStatus.BAD_REQUEST);
       }
 
-      const updatedDecor = await this.prismaService.decors.update({
+      await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: { deleted: true, deleted_by: reqUser.id, deleted_at: new Date() },
       });
@@ -524,7 +563,7 @@ export class DecorsService {
         );
       }
 
-      const updatedDecor = await this.prismaService.decors.update({
+      await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: { deleted: false, deleted_by: null, deleted_at: null },
       });

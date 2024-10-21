@@ -1,6 +1,7 @@
 import CustomInput from "@/app/_components/CustomInput";
 import CustomSelect from "@/app/_components/CustomSelect";
 import FileUploader from "@/app/_components/FileUploader";
+import FormInput from "@/app/_components/FormInput";
 import { dishCategories } from "@/app/_utils/config";
 import { _required } from "@/app/_utils/validations";
 import {
@@ -30,11 +31,16 @@ const options = [
 ];
 
 async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
-  const methods = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
 
-  const handleSubmit = methods.handleSubmit((data) => {
+  const onSubmit = async (data) => {
     console.log(data);
-  });
+  };
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -64,68 +70,66 @@ async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
               {dish.id}. {dish.name}
             </ModalHeader>
             <ModalBody>
-              <FormProvider {...methods}>
-                <form
-                  action="#"
-                  noValidate
-                  onSubmit={handleSubmit}
-                  className="w-full flex flex-col gap-5"
-                >
-                  <FileUploader image={dish.image} />
-                  <CustomInput
-                    label="Tên món"
-                    name="name"
-                    value={dish.name}
-                    validation={_required}
-                    className={"w-full"}
-                    classNames={{
-                      input: "bg-blackAlpha-100",
-                      label: "text-gray-600 font-semibold",
-                    }}
-                    placeholder="Nhập tên món ăn"
-                  />
-                  <CustomInput
-                    label="Giá (VND/1 suất)"
-                    name="price"
-                    value={dish.price}
-                    validation={_required}
-                    className={"w-full mt-14"}
-                    classNames={{
-                      input: "bg-blackAlpha-100",
-                      label: "text-gray-600 font-semibold",
-                    }}
-                    placeholder="Nhập giá món ăn"
-                  />
-                  <div className="flex flex-col">
-                    <h2 className="text-gray-600 font-semibold mb-3">
-                      Danh mục món ăn
-                    </h2>
-                    <select
-                      name="dishCategory"
-                      id="dishCategory"
-                      value={dishCategories}
-                      className="select !bg-blackAlpha-100 text-gray-600 hover:text-gray-400"
-                    >
-                      {dishCategories.map((category) => (
-                        <option
-                          value={category.id}
-                          key={category.key}
-                          className="option text-gray-600"
-                        >
-                          {category.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </form>
-              </FormProvider>
+              <form
+                action="#"
+                onSubmit={handleSubmit(onSubmit)}
+                className="w-full flex flex-col gap-5"
+              >
+                <FileUploader image={dish.image} />
+                <FormInput
+                  register={register}
+                  errors={errors}
+                  errorMessage={errors?.name?.message}
+                  label="Tên món"
+                  name="name"
+                  className={
+                    "w-full bg-slate-50 hover:bg-slate-200 focus:bg-slate-200"
+                  }
+                  placeholder="Nhập tên món ăn"
+                />
+                <FormInput
+                  register={register}
+                  errors={errors}
+                  errorMessage={errors?.price?.message}
+                  label="Giá (VND/1 suất)"
+                  name="price"
+                  className={
+                    "w-full bg-slate-50 hover:bg-slate-200 focus:bg-slate-200"
+                  }
+                  placeholder="Nhập giá món ăn"
+                />
+                <div className="flex flex-col">
+                  <h2 className="text-gray-600 font-semibold mb-3">
+                    Danh mục món ăn
+                  </h2>
+                  <select
+                    name="dishCategory"
+                    id="dishCategory"
+                    value={dishCategories}
+                    className="select !bg-blackAlpha-100 text-gray-600 hover:text-gray-400"
+                  >
+                    {dishCategories.map((category) => (
+                      <option
+                        value={category.id}
+                        key={category.key}
+                        className="option text-gray-600"
+                      >
+                        {category.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <ModalFooter>
+                  <Button color="danger">Xóa món ăn</Button>
+                  <Button
+                    type="submit"
+                    className="bg-blue-400 hover:bg-blue-500 text-white font-semibold"
+                  >
+                    Lưu
+                  </Button>
+                </ModalFooter>
+              </form>
             </ModalBody>
-            <ModalFooter>
-              <Button color="danger">Xóa món ăn</Button>
-              <Button className="bg-blue-400 hover:bg-blue-500 text-white font-semibold">
-                Lưu
-              </Button>
-            </ModalFooter>
           </>
         )}
       </ModalContent>
