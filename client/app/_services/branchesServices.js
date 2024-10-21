@@ -24,9 +24,6 @@ export const fetchBranchBySlug = async (slug) => {
   return response.data.data;
 };
 
-export const getBranchClient = (location) => {
-  
-}
 export const fetchCurrentBranch = async (slug) => {
   const response = await axios.get(API_CONFIG.BRANCHES.GET_BY_SLUG(slug), {
     params: { slug },
@@ -37,6 +34,5 @@ export const fetchCurrentBranch = async (slug) => {
   }
 
   localStorage.setItem("currentBranch", JSON.stringify(response.data.data));
-
   return response.data.data;
 };

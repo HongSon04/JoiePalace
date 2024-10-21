@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import Carousel from "react-multi-carousel";
 import "@/app/_styles/client.css";
 import TextFade from "@/app/_components/TextFade";
+import { fetchBranchBySlug } from "@/app/_services/branchesServices";
 
 const section6 = [
   {
@@ -53,7 +54,10 @@ const PageLocation = () => {
   const carouselMapRef2 = useRef(null);
 
   const { slug } = useParams();
-  // console.log(slug);
+
+  useEffect(() => {
+    console.log(fetchBranchBySlug(slug));
+  }, [slug]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -64,7 +68,6 @@ const PageLocation = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   const handlePrevious = () => {
     if (carouselMapRef1.current && carouselMapRef2.current) {
       carouselMapRef1.current.previous();
@@ -150,7 +153,7 @@ const PageLocation = () => {
               alt=""
             />
           </div>
-          <div className="grid col-start-2 col-end-12 row-start-1 row-end-4 md:col-start-5 md:col-end-9 md:row-start-1 md:row-end-13 z-30">
+          <div className="grid col-start-2 col-end-12 row-start-1 row-end-4 md:col-start-4 md:col-end-10 md:px-10 md:row-start-1 md:row-end-13 z-30">
             <TextFade
               settings={{
                 hidden: { opacity: 0, x: 0, y: 70 },
@@ -723,7 +726,9 @@ const PageLocation = () => {
                 </div>
                 <div className="w-full flex gap-6">
                   <Image src="/phone.svg" alt="" />
-                  <span className="text-xs sm:text-sm lg:text-base font-normal">035 243 1477</span>
+                  <span className="text-xs sm:text-sm lg:text-base font-normal">
+                    035 243 1477
+                  </span>
                 </div>
               </div>
             </div>
