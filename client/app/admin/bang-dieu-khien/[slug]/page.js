@@ -1,8 +1,8 @@
-  
+"use client";
 export const metadata = {
     title: "Bảng điều khiển",
   };
-  import React from "react";
+  import React, { useEffect, useState } from "react";
   import { PiArrowSquareOutLight } from "react-icons/pi";
   import { FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
   import { BsThreeDots } from "react-icons/bs";
@@ -10,7 +10,18 @@ export const metadata = {
   import "../../../_styles/globals.css";
   import Chart from "@/app/_components/Chart";
   import AdminHeader from "@/app/_components/AdminHeader";
-  const page = () => {
+  import useApiServices from "@/app/_hooks/useApiServices";
+  const Page = ({ params }) => {
+    const [storedData, setStoredData] = useState(null);
+    // Sử dụng useEffect để lấy dữ liệu từ localStorage sau khi component đã mount
+    useEffect(() => {
+      const data = localStorage.getItem('user');
+      if (data) {
+        setStoredData(JSON.parse(data)); // Parse dữ liệu nếu là JSON
+      }
+    }, []); // Mảng rỗng để chỉ chạy 1 lần khi component mount
+    
+    
       const data = {
         labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
         datasets: [
@@ -431,4 +442,4 @@ export const metadata = {
     );
   };
   
-  export default page;
+  export default Page;
