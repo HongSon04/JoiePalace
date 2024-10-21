@@ -13,6 +13,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class PartyTypesService {
@@ -64,7 +65,10 @@ export class PartyTypesService {
       });
 
       throw new HttpException(
-        { message: 'Tạo loại tiệc thành công', data: partyType },
+        {
+          message: 'Tạo loại tiệc thành công',
+          data: FormatReturnData(partyType, []),
+        },
         HttpStatus.CREATED,
       );
     } catch (error) {
@@ -150,7 +154,7 @@ export class PartyTypesService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: {
             total,
             itemsPerPage,
@@ -245,7 +249,7 @@ export class PartyTypesService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: {
             total,
             itemsPerPage,
@@ -282,7 +286,13 @@ export class PartyTypesService {
         );
       }
 
-      throw new HttpException(partyType, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy loại tiệc thành công',
+          data: FormatReturnData(partyType, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -308,7 +318,13 @@ export class PartyTypesService {
         );
       }
 
-      throw new HttpException(partyType, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy loại tiệc thành công',
+          data: FormatReturnData(partyType, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -385,7 +401,10 @@ export class PartyTypesService {
       });
 
       throw new HttpException(
-        { message: 'Cập nhật loại tiệc thành công', data: updatedPartyType },
+        {
+          message: 'Cập nhật loại tiệc thành công',
+          data: FormatReturnData(updatedPartyType, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -413,7 +432,7 @@ export class PartyTypesService {
         );
       }
 
-      const updatedPartyType = await this.prismaService.party_types.update({
+      await this.prismaService.party_types.update({
         where: { id: Number(id) },
         data: {
           deleted: true,
@@ -423,7 +442,7 @@ export class PartyTypesService {
       });
 
       throw new HttpException(
-        { message: 'Xóa loại tiệc thành công', data: updatedPartyType },
+        { message: 'Xóa loại tiệc thành công' },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -451,7 +470,7 @@ export class PartyTypesService {
         );
       }
 
-      const updatedPartyType = await this.prismaService.party_types.update({
+      await this.prismaService.party_types.update({
         where: { id: Number(id) },
         data: {
           deleted: false,
@@ -461,7 +480,7 @@ export class PartyTypesService {
       });
 
       throw new HttpException(
-        { message: 'Khôi phục loại tiệc thành công', data: updatedPartyType },
+        { message: 'Khôi phục loại tiệc thành công' },
         HttpStatus.OK,
       );
     } catch (error) {

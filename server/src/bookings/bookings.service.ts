@@ -17,6 +17,7 @@ import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
 import { MailService } from 'src/mail/mail.service';
 import dayjs from 'dayjs';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 interface Accessories {
   table: [
@@ -192,7 +193,10 @@ export class BookingsService {
       };
       await this.mailService.sendUserConfirmationBooking(bodyMail);
       throw new HttpException(
-        { message: 'Đặt tiệc thành công', data: findBooking },
+        {
+          message: 'Đặt tiệc thành công',
+          data: FormatReturnData(findBooking, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -333,7 +337,7 @@ export class BookingsService {
       };
       // ? Response
       throw new HttpException(
-        { data: result, pagination: paginationInfo },
+        { data: FormatReturnData(result, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -474,7 +478,7 @@ export class BookingsService {
       };
       // ? Response
       throw new HttpException(
-        { data: result, pagination: paginationInfo },
+        { data: FormatReturnData(result, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -527,7 +531,13 @@ export class BookingsService {
           HttpStatus.NOT_FOUND,
         );
       }
-      throw new HttpException(findBooking, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy dữ liệu đặt chỗ thành công',
+          data: FormatReturnData(findBooking, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -915,8 +925,8 @@ export class BookingsService {
         throw new HttpException(
           {
             message: 'Cập nhật tiệc thành công',
-            data: findBookings,
-            deposit: findDeposit,
+            data: FormatReturnData(findBookings, []),
+            deposit: FormatReturnData(findDeposit, []),
           },
           HttpStatus.OK,
         );
@@ -929,8 +939,6 @@ export class BookingsService {
             Number(stage.price) +
             Number(accessoriesTotal),
         );
-        console.log('Total Amount:', totalAmount);
-        console.log('FE Amount:', amount);
         if (Number(amount) !== totalAmount) {
           throw new HttpException(
             'Lỗi tính toán tổng tiền',
@@ -1028,7 +1036,11 @@ export class BookingsService {
         });
 
         throw new HttpException(
-          { message: 'Cập nhật tiệc thành công', data: findBookings, deposit },
+          {
+            message: 'Cập nhật tiệc thành công',
+            data: FormatReturnData(findBookings, []),
+            deposit: FormatReturnData(deposit, []),
+          },
           HttpStatus.OK,
         );
       }

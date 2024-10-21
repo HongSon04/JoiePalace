@@ -13,6 +13,7 @@ import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -22,7 +23,7 @@ import {
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('tags')
+@ApiTags('Tags - Quản lý tag')
 @Controller('api/tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
@@ -36,6 +37,7 @@ export class TagsController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -181,6 +183,7 @@ export class TagsController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -219,6 +222,7 @@ export class TagsController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

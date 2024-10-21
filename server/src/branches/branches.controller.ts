@@ -20,6 +20,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 
 import { FilterDto } from 'helper/dto/Filter.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -33,7 +34,7 @@ import { ImageUploadBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('branches')
+@ApiTags('Branches - Quản lý Chi Nhánh')
 @UseGuards(AuthGuard)
 @Controller('api/branches')
 export class BranchesController {
@@ -48,6 +49,7 @@ export class BranchesController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Tạo chi nhánh mới' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -423,6 +425,7 @@ export class BranchesController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -540,6 +543,7 @@ export class BranchesController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -575,6 +579,7 @@ export class BranchesController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -607,6 +612,7 @@ export class BranchesController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

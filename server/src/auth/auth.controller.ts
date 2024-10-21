@@ -13,6 +13,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
 import {
+  ApiBearerAuth,
   ApiCookieAuth,
   ApiHeaders,
   ApiOperation,
@@ -26,7 +27,7 @@ import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyTokenDto } from './dto/verify-token.dto';
 
-@ApiTags('auth')
+@ApiTags('Auth - Xác thực')
 @Controller('api/auth')
 export class AuthController {
   constructor(
@@ -98,6 +99,7 @@ export class AuthController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -211,6 +213,7 @@ export class AuthController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Người dùng tải ảnh đại diện' })
   @UseInterceptors(
     FileInterceptor('avatar', {

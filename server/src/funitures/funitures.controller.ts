@@ -17,6 +17,7 @@ import { FunituresService } from './funitures.service';
 import { CreateFunitureDto, ImageFunitureDto } from './dto/create-funiture.dto';
 import { UpdateFunitureDto } from './dto/update-funiture.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -27,7 +28,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterFunitureDto } from './dto/filter-funiture.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('funitures')
+@ApiTags('Funitures - Quản lý nội thất')
 @Controller('api/funitures')
 export class FunituresController {
   constructor(private readonly funituresService: FunituresService) {}
@@ -41,6 +42,7 @@ export class FunituresController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -154,6 +156,7 @@ export class FunituresController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -272,6 +275,7 @@ export class FunituresController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -343,6 +347,7 @@ export class FunituresController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -375,6 +380,7 @@ export class FunituresController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -407,6 +413,7 @@ export class FunituresController {
       required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

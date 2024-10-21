@@ -14,6 +14,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class ProductsService {
@@ -104,7 +105,7 @@ export class ProductsService {
 
       return {
         message: 'Tạo Sản phẩm thành công',
-        data: createproduct,
+        data: FormatReturnData(createproduct, []),
       };
     } catch (error) {
       if (error instanceof HttpException) {
@@ -211,7 +212,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -319,7 +320,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -345,9 +346,7 @@ export class ProductsService {
       });
       throw new HttpException(
         {
-          data: {
-            ...product,
-          },
+          data: FormatReturnData(product, []),
         },
         HttpStatus.OK,
       );
@@ -365,7 +364,7 @@ export class ProductsService {
   // ! Get 10 products per category
   async get10PerCategory() {
     try {
-      const categories = await this.prismaService.categories.findMany({
+      const categoriesProducts = await this.prismaService.categories.findMany({
         where: { deleted: false },
         include: {
           products: {
@@ -378,7 +377,7 @@ export class ProductsService {
 
       throw new HttpException(
         {
-          data: categories,
+          data: FormatReturnData(categoriesProducts, []),
         },
         HttpStatus.OK,
       );
@@ -405,7 +404,7 @@ export class ProductsService {
 
       throw new HttpException(
         {
-          data: product,
+          data: FormatReturnData(product, []),
         },
         HttpStatus.OK,
       );
@@ -503,7 +502,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -604,7 +603,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -711,7 +710,10 @@ export class ProductsService {
       });
 
       throw new HttpException(
-        { message: 'Cập nhật Sản phẩm thành công', data: updatedproduct },
+        {
+          message: 'Cập nhật Sản phẩm thành công',
+          data: FormatReturnData(updatedproduct, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -749,7 +751,7 @@ export class ProductsService {
       });
 
       throw new HttpException(
-        { message: 'Xóa Sản phẩm thành công', data: deleteProduct },
+        { message: 'Xóa Sản phẩm thành công' },
         HttpStatus.OK,
       );
     } catch (error) {

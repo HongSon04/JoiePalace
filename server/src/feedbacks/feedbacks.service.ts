@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { PrismaService } from 'src/prisma.service';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class FeedbacksService {
@@ -49,7 +50,7 @@ export class FeedbacksService {
       throw new HttpException(
         {
           message: 'Tạo feedback thành công',
-          data: feedback,
+          data: FormatReturnData(feedback, []),
         },
         HttpStatus.CREATED,
       );
@@ -77,7 +78,7 @@ export class FeedbacksService {
       throw new HttpException(
         {
           message: 'Lấy danh sách feedback thành công',
-          data: feedbacks,
+          data: FormatReturnData(feedbacks, []),
         },
         HttpStatus.OK,
       );
@@ -105,7 +106,7 @@ export class FeedbacksService {
       throw new HttpException(
         {
           message: 'Lấy danh sách feedback thành công',
-          data: feedbacks,
+          data: FormatReturnData(feedbacks, []),
         },
         HttpStatus.OK,
       );
@@ -135,7 +136,7 @@ export class FeedbacksService {
     throw new HttpException(
       {
         message: 'Lấy feedback thành công',
-        data: feedback,
+        data: FormatReturnData(feedback, []),
       },
       HttpStatus.OK,
     );
@@ -158,7 +159,7 @@ export class FeedbacksService {
     throw new HttpException(
       {
         message: 'Lấy feedback thành công',
-        data: feedback,
+        data: FormatReturnData(feedback, []),
       },
       HttpStatus.OK,
     );
@@ -181,7 +182,7 @@ export class FeedbacksService {
     throw new HttpException(
       {
         message: 'Lấy feedback thành công',
-        data: feedback,
+        data: FormatReturnData(feedback, []),
       },
       HttpStatus.OK,
     );
@@ -204,7 +205,7 @@ export class FeedbacksService {
     throw new HttpException(
       {
         message: 'Lấy feedback thành công',
-        data: feedback,
+        data: FormatReturnData(feedback, []),
       },
       HttpStatus.OK,
     );
@@ -228,7 +229,7 @@ export class FeedbacksService {
     throw new HttpException(
       {
         message: 'Cập nhật feedback thành công',
-        data: feedback,
+        data: FormatReturnData(feedback, []),
       },
       HttpStatus.OK,
     );
@@ -244,7 +245,6 @@ export class FeedbacksService {
     throw new HttpException(
       {
         message: 'Xóa feedback thành công',
-        data: feedback,
       },
       HttpStatus.OK,
     );

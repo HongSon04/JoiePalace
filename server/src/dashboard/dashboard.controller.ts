@@ -2,6 +2,7 @@ import { Controller, Get, HttpStatus, Param } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { isPublic } from 'decorator/auth.decorator';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiParam,
@@ -9,7 +10,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-@ApiTags('dashboard')
+@ApiTags('Dashboard - Quản lý dashboard')
+@ApiBearerAuth('authorization')
 @ApiHeaders([
   {
     name: 'authorization',

@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MakeSlugger } from 'helper/slug';
 import { FilterFunitureDto } from './dto/filter-funiture.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class FunituresService {
@@ -66,7 +67,10 @@ export class FunituresService {
       });
 
       throw new HttpException(
-        { message: 'Tạo nội thất thành công', data: createFuniture },
+        {
+          message: 'Tạo nội thất thành công',
+          data: FormatReturnData(createFuniture, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -142,7 +146,7 @@ export class FunituresService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: {
             total,
             currentPage: page,
@@ -227,7 +231,7 @@ export class FunituresService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: {
             total,
             itemsPerPage,
@@ -255,7 +259,7 @@ export class FunituresService {
     try {
       const funiture = await this.prismaService.funitures.findUnique({
         where: {
-          id : Number(id),
+          id: Number(id),
         },
       });
 
@@ -263,7 +267,13 @@ export class FunituresService {
         throw new HttpException('Nội thất không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      throw new HttpException({ data: funiture }, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy thông tin nội thất thành công',
+          data: FormatReturnData(funiture, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -288,7 +298,13 @@ export class FunituresService {
         throw new HttpException('Nội thất không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      throw new HttpException({ data: funiture }, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy thông tin nội thất thành công',
+          data: FormatReturnData(funiture, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -324,7 +340,7 @@ export class FunituresService {
         where: {
           name,
           NOT: {
-            id : Number(id),
+            id: Number(id),
           },
         },
       });
@@ -372,7 +388,10 @@ export class FunituresService {
       });
 
       throw new HttpException(
-        { message: 'Cập nhật nội thất thành công', data: updateFuniture },
+        {
+          message: 'Cập nhật nội thất thành công',
+          data: FormatReturnData(updateFuniture, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
