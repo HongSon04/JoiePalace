@@ -58,4 +58,8 @@ export const API_CONFIG = {
     RESTORE: (id) => `${CATEGORIES_API}/restore/${id}`,
     DESTROY: (id) => `${CATEGORIES_API}/destroy/${id}`,
   },
+  // DASHBOARD API
+  DASHBOARD: {
+    GET_BOOKING_STATUS: (id) => `${HOST}/dashboard/count-booking-status-for-each-branch/${id}` 
+  }
 };

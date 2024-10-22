@@ -105,11 +105,9 @@ export class DashboardService {
         totalProduct,
         totalCategory,
         totalTags,
-        totalStaff,
         totalMenus,
         totalDecors,
         totalPartyType,
-        totalFurniture,
         totalFeedBack,
       ] = await Promise.all([
         this.prismaService.users.count(),
@@ -117,11 +115,9 @@ export class DashboardService {
         this.prismaService.products.count(),
         this.prismaService.categories.count(),
         this.prismaService.tags.count(),
-        this.prismaService.staffs.count(),
         this.prismaService.menus.count(),
         this.prismaService.decors.count(),
         this.prismaService.party_types.count(),
-        this.prismaService.funitures.count(),
         this.prismaService.feedbacks.count(),
       ]);
 
@@ -131,11 +127,9 @@ export class DashboardService {
         totalProduct,
         totalCategory,
         totalTags,
-        totalStaff,
         totalMenus,
         totalDecors,
         totalPartyType,
-        totalFurniture,
         totalFeedBack,
       };
     } catch (error) {

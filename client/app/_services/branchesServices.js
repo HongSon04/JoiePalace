@@ -37,3 +37,20 @@ export const fetchCurrentBranch = async (slug) => {
 
   return response.data.data;
 };
+
+export const fetchBranchDataById = async (branchId) => {
+  try {
+    const response = await axios.get(API_CONFIG.DASHBOARD.GET_BOOKING_STATUS(branchId));
+    
+    // Kiểm tra và trả về dữ liệu đúng
+    if (Array.isArray(response.data) && response.data.length > 0) {
+      return response.data[0]; // Trả về đối tượng đầu tiên
+    } else {
+      throw new Error("Không có dữ liệu cho chi nhánh này");
+    }
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error;
+  }
+};
+

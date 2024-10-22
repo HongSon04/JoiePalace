@@ -1,7 +1,9 @@
+import { DepositStatusEnum } from './../../helper/enum/deposit.enum';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateDepositDto } from './dto/update-status.dto';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { PaymentMethod } from 'helper/enum/payment_method.enum';
 
 @Injectable()
 export class DepositsService {
@@ -86,7 +88,10 @@ export class DepositsService {
       }
       const updateDeposit = await this.prismaService.deposits.update({
         where: { id: Number(id) },
-        data: { status, payment_method },
+        data: {
+          status: status as DepositStatusEnum,
+          payment_method: payment_method as PaymentMethod,
+        },
       });
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =
@@ -143,7 +148,10 @@ export class DepositsService {
       }
       const updateDeposit = await this.prismaService.deposits.update({
         where: { transactionID },
-        data: { status, payment_method },
+        data: {
+          status: status as DepositStatusEnum,
+          payment_method: payment_method as PaymentMethod,
+        },
       });
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =

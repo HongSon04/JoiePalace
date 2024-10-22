@@ -1,7 +1,7 @@
 "use client";
-export const metadata = {
-    title: "Bảng điều khiển",
-  };
+// export const metadata = {
+//     title: "Bảng điều khiển",
+// };
   import React, { useEffect, useState } from "react";
   import { PiArrowSquareOutLight } from "react-icons/pi";
   import { FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
@@ -10,54 +10,72 @@ export const metadata = {
   import "../../../_styles/globals.css";
   import Chart from "@/app/_components/Chart";
   import AdminHeader from "@/app/_components/AdminHeader";
-  import useApiServices from "@/app/_hooks/useApiServices";
+  import { fetchBranchDataById } from "@/app/_services/branchesServices";
   const Page = ({ params }) => {
-    const [storedData, setStoredData] = useState(null);
-    // Sử dụng useEffect để lấy dữ liệu từ localStorage sau khi component đã mount
+    const [userId, setUserId] = useState(null);
+    const [dataBranch, setData] = useState(null);
+    const [error, setError] = useState(null); 
     useEffect(() => {
-      const data = localStorage.getItem('user');
-      if (data) {
-        setStoredData(JSON.parse(data)); // Parse dữ liệu nếu là JSON
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const userObject = JSON.parse(storedUser);
+          setUserId(userObject.id); 
+          const branchId = userObject.id;
+          // console.log("Branch ID:", branchId); 
+          const fetchBranchData = async () => {
+            try {
+              const fetchedData = await fetchBranchDataById(branchId); 
+              setData(fetchedData);
+              console.log(fetchedData); // In ra dữ liệu fetchedData để kiểm tra
+            } catch (error) {
+              console.error("Error fetching branch data:", error);
+              setError(error); 
+            }
+          };
+  
+          fetchBranchData(); // Gọi hàm fetchBranchData
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+        }
       }
-    }, []); // Mảng rỗng để chỉ chạy 1 lần khi component mount
-    
-    
-      const data = {
-        labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
+    }, []);  // Thêm [] để useEffect chỉ chạy một lần khi component mount
+    const data = {
+      labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
+      datasets: [
+        {
+          label: 'Doanh thu',
+          data: [300000000, 500000000, 700000000]
+
+        },
+      ],
+    };
+    const data1 = {
+        labels: [
+          ' 1', ' 2', ' 3', ' 4', ' 5', ' 6',
+          ' 7', ' 8', ' 9', ' 10', ' 11', ' 12'
+        ],
         datasets: [
           {
-            label: 'Doanh thu',
-            data: [300000000, 500000000, 700000000]
-  
-          },
-        ],
-      };
-      const data1 = {
-          labels: [
-            ' 1', ' 2', ' 3', ' 4', ' 5', ' 6',
-            ' 7', ' 8', ' 9', ' 10', ' 11', ' 12'
-          ],
-          datasets: [
-            {
-              label: 'Doanh thu', // Nhãn cho dataset
-              data: [
-                50000000, // Doanh thu Tháng 1
-                60000000, // Doanh thu Tháng 2
-                55000000, // Doanh thu Tháng 3
-                70000000, // Doanh thu Tháng 4
-                80000000, // Doanh thu Tháng 5
-                65000000, // Doanh thu Tháng 6
-                75000000, // Doanh thu Tháng 7
-                85000000, // Doanh thu Tháng 8
-                90000000, // Doanh thu Tháng 9
-                95000000, // Doanh thu Tháng 10
-                100000000, // Doanh thu Tháng 11
-                105000000 // Doanh thu Tháng 12
-              ],
-           
-            }
-          ]
-        };
+            label: 'Doanh thu', // Nhãn cho dataset
+            data: [
+              50000000, // Doanh thu Tháng 1
+              60000000, // Doanh thu Tháng 2
+              55000000, // Doanh thu Tháng 3
+              70000000, // Doanh thu Tháng 4
+              80000000, // Doanh thu Tháng 5
+              65000000, // Doanh thu Tháng 6
+              75000000, // Doanh thu Tháng 7
+              85000000, // Doanh thu Tháng 8
+              90000000, // Doanh thu Tháng 9
+              95000000, // Doanh thu Tháng 10
+              100000000, // Doanh thu Tháng 11
+              105000000 // Doanh thu Tháng 12
+            ],
+          
+          }
+        ]
+    };
     return (
       <main className="grid gap-6  text-white ">
         <AdminHeader
@@ -104,26 +122,39 @@ export const metadata = {
                   </div>
               </div>
           </div>
-          <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
+          {dataBranch ? (
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
               <div className="flex justify-between items-center">
-                  <p className=" text-2xl font-bold">111</p>
+                  <p className=" text-2xl font-bold">{dataBranch.data.pending}</p>
                   <p className="text-base font-normal ">Xem</p>
               </div>
               <div className="flex justify-between items-center">
                   <p className="text-red-400 text-base font-normal">Tiệc dự kiến</p>
                   <PiArrowSquareOutLight className="text-2xl " />
               </div>
-          </div>
-          <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8 w-[251px]">
+            </div>
+          ) : (
+            <p>Đang tải dữ liệu...</p>
+          )}
+
+      
+          {dataBranch ? (
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                  <p className=" text-2xl font-bold">111</p>
-                  <p className="text-base font-normal ">Xem</p>
+                <p className="text-2xl font-bold">{dataBranch.data?.processing}</p> {/* Sử dụng optional chaining */}
+                <p className="text-base font-normal">Xem</p>
               </div>
               <div className="flex justify-between items-center">
-                  <p className="  text-base font-normal">Tiệc đang diễn ra</p>
-                  <PiArrowSquareOutLight className="text-2xl " />
+                <p className="text-base font-normal">Tiệc đang diễn ra</p>
+                <PiArrowSquareOutLight className="text-2xl" />
               </div>
-          </div>
+            </div>
+          ) : (
+            <p>Đang tải dữ liệu...</p>
+          )}
+
+        
+          
         </div>
   
   

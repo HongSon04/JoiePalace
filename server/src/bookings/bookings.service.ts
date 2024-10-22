@@ -1,74 +1,24 @@
 import {
-  FormatDateToEndOfDay,
-  FormatDateToStartOfDay,
-  FormatDateWithShift,
-} from './../../helper/formatDate';
-import {
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingDto } from './dto/update-booking.dto';
+import { BookingStatus } from '@prisma/client';
+import dayjs from 'dayjs';
+import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { FormatReturnData } from 'helper/FormatReturnData';
+import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma.service';
 import uniqid from 'uniqid';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import {
+  FormatDateToEndOfDay,
+  FormatDateToStartOfDay,
+  FormatDateWithShift,
+} from './../../helper/formatDate';
+import { CreateBookingDto } from './dto/create-booking.dto';
+import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
-import { MailService } from 'src/mail/mail.service';
-import dayjs from 'dayjs';
-import { FormatReturnData } from 'helper/FormatReturnData';
-
-interface Accessories {
-  table: [
-    {
-      id: number;
-      name?: string;
-      total_price?: number;
-      description?: string;
-      short_description?: string;
-      images?: string[];
-      type?: string;
-      quantity: number;
-      amount?: number;
-    },
-  ];
-  chair: {
-    id: number;
-    name?: string;
-    description?: string;
-    short_description?: string;
-    images?: string[];
-    type?: string;
-    quantity: number;
-    total_price?: number;
-    amount?: number;
-  };
-  extra_services?: [
-    {
-      id: number;
-      name?: string;
-      description?: string;
-      short_description?: string;
-      images?: string[];
-      quantity: number;
-      amount?: number;
-      total_price?: number;
-    },
-  ];
-  total_price?: number;
-}
-
-interface ExtraServices {
-  id: number;
-  name?: string;
-  description?: string;
-  short_description?: string;
-  images?: string[];
-  quantity: number;
-  amount?: number;
-  total_price?: number;
-}
 
 @Injectable()
 export class BookingsService {
@@ -83,6 +33,7 @@ export class BookingsService {
       const {
         user_id,
         branch_id,
+        stage_id,
         name,
         shift,
         company_name,
@@ -124,6 +75,16 @@ export class BookingsService {
         }
       }
 
+      if (stage_id) {
+        const findStage = await this.prismaService.stages.findUnique({
+          where: { id: Number(stage_id) },
+        });
+
+        if (!findStage) {
+          throw new HttpException('Không tìm thấy sảnh', HttpStatus.NOT_FOUND);
+        }
+      }
+
       // Fetching user, branch in parallel
       const [party_types, branch] = await Promise.all([
         this.prismaService.party_types.findUnique({
@@ -154,6 +115,7 @@ export class BookingsService {
           email,
           note,
           party_type_id: Number(party_type_id),
+          stage_id: stage_id ? Number(stage_id) : null,
           phone,
           name,
           organization_date,
@@ -178,6 +140,7 @@ export class BookingsService {
             },
           },
           branches: true,
+          stages: true,
         },
       });
 
@@ -305,8 +268,6 @@ export class BookingsService {
             branches: true,
             booking_details: {
               include: {
-                stages: true,
-                spaces: true,
                 decors: true,
                 menus: {
                   include: {
@@ -316,6 +277,7 @@ export class BookingsService {
                 deposits: true,
               },
             },
+            stages: true,
           },
           orderBy: orderByConditions,
           skip,
@@ -443,11 +405,10 @@ export class BookingsService {
                 role: true,
               },
             },
+            stages: true,
             branches: true,
             booking_details: {
               include: {
-                stages: true,
-                spaces: true,
                 decors: true,
                 menus: {
                   include: {
@@ -510,10 +471,9 @@ export class BookingsService {
             },
           },
           branches: true,
+          stages: true,
           booking_details: {
             include: {
-              stages: true,
-              spaces: true,
               decors: true,
               menus: {
                 include: {
@@ -645,7 +605,7 @@ export class BookingsService {
         data: {
           is_confirm,
           is_deposit,
-          status,
+          status: status as BookingStatus,
         },
       });
       throw new HttpException(
@@ -669,13 +629,11 @@ export class BookingsService {
       const {
         user_id,
         branch_id,
-        space_id,
         stage_id,
         decor_id,
         menu_id,
         name,
         amount,
-        accessories,
         company_name,
         email,
         note,
@@ -683,7 +641,7 @@ export class BookingsService {
         is_confirm,
         is_deposit,
         party_type_id,
-        payment_method,
+        table_count,
         phone,
         extra_sevice,
         status,
@@ -697,6 +655,14 @@ export class BookingsService {
           'Không tìm thấy đơn đặt tiệc',
           HttpStatus.NOT_FOUND,
         );
+      }
+
+      const findStages = await this.prismaService.stages.findUnique({
+        where: { id: Number(stage_id) },
+      });
+
+      if (!findStages) {
+        throw new HttpException('Không tìm thấy sảnh', HttpStatus.NOT_FOUND);
       }
 
       // ! Update Booking
@@ -714,7 +680,7 @@ export class BookingsService {
           is_deposit,
           party_type_id,
           phone,
-          status,
+          status: status as BookingStatus,
         },
       });
 
@@ -746,13 +712,10 @@ export class BookingsService {
       }
 
       // Fetching user, branch, space, stage, decor, and menu in parallel
-      const [user, branch, space, stage, decor, menu] = await Promise.all([
+      const [user, branch, stage, decor, menu] = await Promise.all([
         this.prismaService.users.findUnique({ where: { id: Number(user_id) } }),
         this.prismaService.branches.findUnique({
           where: { id: Number(branch_id) },
-        }),
-        this.prismaService.spaces.findUnique({
-          where: { id: Number(space_id) },
         }),
         this.prismaService.stages.findUnique({
           where: { id: Number(stage_id) },
@@ -775,40 +738,34 @@ export class BookingsService {
       };
       validateExists(user, 'user');
       validateExists(branch, 'branch');
-      validateExists(space, 'space');
       validateExists(stage, 'stage');
       validateExists(decor, 'decor');
       validateExists(menu, 'menu');
       // ? Calculate accessory amounts
-      const {
-        totalAmount: accessoriesTotal,
-        totalTables,
-        NewAccessories,
-      } = await this.calculateAccessories(accessories as Accessories);
-      // ? Check Stage capacity
-      if (totalTables > stage.capacity)
-        throw new HttpException(
-          'Số lượng bàn vượt quá sức chứa của sảnh',
-          HttpStatus.BAD_REQUEST,
-        );
+      // const {
+      //   totalAmount: accessoriesTotal,
+      //   totalTables,
+      //   NewAccessories,
+      // } = await this.calculateAccessories(accessories as Accessories);
+      // // ? Check Stage capacity
+      // if (totalTables > stage.capacity_max)
+      //   throw new HttpException(
+      //     'Số lượng bàn vượt quá sức chứa của sảnh',
+      //     HttpStatus.BAD_REQUEST,
+      //   );
 
-      // ? Format Accessories
-      const accessoriesFormat = {
-        ...NewAccessories,
-        total_price: accessoriesTotal,
-      };
+      // if (totalTables < stage.capacity_min)
+      //   throw new HttpException(
+      //     'Số lượng bàn quá ít so với sức chứa tối thiểu của sảnh',
+      //     HttpStatus.BAD_REQUEST,
+      //   );
+
       // ? Format Stage
       const {
         created_at: createdAtStage,
         updated_at: updatedAtStage,
         ...stageFormat
       } = stage;
-      // ? Format Space
-      const {
-        created_at: createdAtSpace,
-        updated_at: updatedAtSpace,
-        ...spaceFormat
-      } = space;
 
       // ? Format Decor
       const {
@@ -851,9 +808,7 @@ export class BookingsService {
         const totalAmount = Number(
           Number(decor.price) +
             Number(menu.price) +
-            Number(space.price) +
             Number(stage.price) +
-            Number(accessoriesTotal) +
             Number(extraServiceAmount),
         );
         console.log('Total Amount:', totalAmount);
@@ -886,18 +841,12 @@ export class BookingsService {
           where: { booking_id: Number(findBooking.id) },
           data: {
             decor_id: Number(decor_id),
-            stage_id: Number(stage_id),
-            space_id: Number(space_id),
             menu_id: Number(menu_id),
-            stage: stageFormat,
-            space: spaceFormat,
             decor: decorFormat,
             menu: menuFormat,
             extra_service: extra_sevice,
             fee,
-            accessories: accessoriesFormat,
             total_amount: Number(totalAmount),
-            payment_method: payment_method as any,
             amount_booking: bookingAmount,
           },
         });
@@ -933,11 +882,7 @@ export class BookingsService {
       } else {
         // Total calculation
         const totalAmount = Number(
-          Number(decor.price) +
-            Number(menu.price) +
-            Number(space.price) +
-            Number(stage.price) +
-            Number(accessoriesTotal),
+          Number(decor.price) + Number(menu.price) + Number(stage.price),
         );
         if (Number(amount) !== totalAmount) {
           throw new HttpException(
@@ -958,6 +903,7 @@ export class BookingsService {
             name: `Tiền cọc tiệc của ${user.username}`,
             phone: user.phone,
             email: user.email,
+            // payment_method: PaymentMethod.CASH,
             amount: Number(depositAmount),
           },
         });
@@ -976,43 +922,31 @@ export class BookingsService {
             where: { booking_id: Number(findBookingDetail.id) },
             data: {
               decor_id: Number(decor_id),
-              stage_id: Number(stage_id),
-              space_id: Number(space_id),
               menu_id: Number(menu_id),
-              stage: stageFormat,
-              space: spaceFormat,
               decor: decorFormat,
               menu: menuFormat,
               extra_service: '',
               fee,
-              accessories: accessoriesFormat,
               total_amount: totalAmount,
               deposit_id: deposit.id,
-              payment_method: payment_method as any,
               amount_booking: Number(bookingAmount),
             },
           });
         } else {
-          await this.prismaService.booking_details.create({
-            data: {
-              booking_id: Number(findBooking.id),
-              decor_id: Number(decor_id),
-              stage_id: Number(stage_id),
-              space_id: Number(space_id),
-              menu_id: Number(menu_id),
-              stage: stageFormat,
-              space: spaceFormat,
-              decor: decorFormat,
-              menu: menuFormat,
-              extra_service: '',
-              fee,
-              accessories: accessoriesFormat,
-              total_amount: totalAmount,
-              deposit_id: deposit.id,
-              payment_method: payment_method as any,
-              amount_booking: Number(bookingAmount),
-            },
-          });
+          // await this.prismaService.booking_details.create({
+          //   data: {
+          //     booking_id: Number(findBooking.id),
+          //     decor_id: Number(decor_id),
+          //     menu_id: Number(menu_id),
+          //     decor: decorFormat,
+          //     menu: menuFormat,
+          //     extra_service: '',
+          //     fee,
+          //     total_amount: totalAmount,
+          //     deposit_id: deposit.id,
+          //     amount_booking: Number(bookingAmount),
+          //   },
+          // });
         }
 
         // ! Fetch booking with relations
@@ -1177,73 +1111,74 @@ export class BookingsService {
   }
 
   // ! Calculate accessory amounts
-  private async calculateAccessories(accessories: Accessories) {
+  private async calculateAccessories(accessories) {
     let accessoriesAmount = 0;
     let totalTables = 0;
 
-    // Fetch table prices in parallel
-    const tablePromises = accessories.table.map(async (table) => {
-      const findTable = await this.prismaService.funitures.findUnique({
-        where: { id: Number(table.id) },
-      });
-      if (!findTable)
-        throw new HttpException(
-          'Không tìm thấy loại bàn',
-          HttpStatus.NOT_FOUND,
-        );
-      accessoriesAmount += findTable.price * table.quantity;
-      totalTables += table.quantity;
-      table.name = findTable.name;
-      table.amount = findTable.price;
-      table.total_price = findTable.price * table.quantity;
-      table.description = findTable.description;
-      table.short_description = findTable.short_description;
-      table.images = findTable.images;
-      table.type = findTable.type;
-      return findTable.price * table.quantity;
-    });
+    // // Fetch table prices in parallel
+    // const tablePromises = accessories.table.map(async (table) => {
+    //   const findTable = await this.prismaService.funitures.findUnique({
+    //     where: { id: Number(table.id) },
+    //   });
+    //   if (!findTable)
+    //     throw new HttpException(
+    //       'Không tìm thấy loại bàn',
+    //       HttpStatus.NOT_FOUND,
+    //     );
+    //   accessoriesAmount += findTable.price * table.quantity;
+    //   totalTables += table.quantity;
+    //   table.name = findTable.name;
+    //   table.amount = findTable.price;
+    //   table.total_price = findTable.price * table.quantity;
+    //   table.description = findTable.description;
+    //   table.short_description = findTable.short_description;
+    //   table.images = findTable.images;
+    //   table.type = findTable.type;
+    //   return findTable.price * table.quantity;
+    // });
 
-    await Promise.all(tablePromises);
+    // await Promise.all(tablePromises);
 
-    // Fetch Extra Services
-    const extraServicesPromise = accessories.extra_services.map(
-      async (extra) => {
-        const findExtra = await this.prismaService.products.findUnique({
-          where: { id: Number(extra.id) },
-        });
-        if (!findExtra)
-          throw new HttpException(
-            'Không tìm thấy dịch vụ thêm',
-            HttpStatus.NOT_FOUND,
-          );
-        accessoriesAmount += findExtra.price * extra.quantity;
-        extra.name = findExtra.name;
-        extra.amount = findExtra.price;
-        extra.total_price = findExtra.price * extra.quantity;
-        extra.quantity = extra.quantity;
-        extra.description = findExtra.description;
-        extra.short_description = findExtra.short_description;
-        extra.images = findExtra.images;
-        return findExtra.price * extra.quantity;
-      },
-    );
+    // // Fetch Extra Services
+    // const extraServicesPromise = accessories.extra_services.map(
+    //   async (extra) => {
+    //     const findExtra = await this.prismaService.products.findUnique({
+    //       where: { id: Number(extra.id) },
+    //     });
+    //     if (!findExtra)
+    //       throw new HttpException(
+    //         'Không tìm thấy dịch vụ thêm',
+    //         HttpStatus.NOT_FOUND,
+    //       );
+    //     accessoriesAmount += findExtra.price * extra.quantity;
+    //     extra.name = findExtra.name;
+    //     extra.amount = findExtra.price;
+    //     extra.total_price = findExtra.price * extra.quantity;
+    //     extra.quantity = extra.quantity;
+    //     extra.description = findExtra.description;
+    //     extra.short_description = findExtra.short_description;
+    //     extra.images = findExtra.images;
+    //     return findExtra.price * extra.quantity;
+    //   },
+    // );
 
-    // Calculate chair price (1 table = 10 chairs)
-    const findChair = await this.prismaService.funitures.findUnique({
-      where: { id: Number(accessories.chair.id) },
-    });
-    if (!findChair)
-      throw new HttpException('Không tìm thấy loại ghế', HttpStatus.NOT_FOUND);
-    accessories.chair.name = findChair.name;
-    accessories.chair.amount = findChair.price;
-    accessories.chair.description = findChair.description;
-    accessories.chair.short_description = findChair.short_description;
-    accessories.chair.images = findChair.images;
-    accessories.chair.type = findChair.type;
-    accessories.chair.quantity = totalTables * 10;
-    accessories.chair.total_price = findChair.price * totalTables * 10;
+    // // Calculate chair price (1 table = 10 chairs)
+    // const findChair = await this.prismaService.funitures.findUnique({
+    //   where: { id: Number(accessories.chair.id) },
+    // });
+    // if (!findChair)
+    //   throw new HttpException('Không tìm thấy loại ghế', HttpStatus.NOT_FOUND);
+    // accessories.chair.name = findChair.name;
+    // accessories.chair.amount = findChair.price;
+    // accessories.chair.description = findChair.description;
+    // accessories.chair.short_description = findChair.short_description;
+    // accessories.chair.images = findChair.images;
+    // accessories.chair.type = findChair.type;
+    // accessories.chair.quantity = totalTables * 10;
+    // accessories.chair.total_price = findChair.price * totalTables * 10;
 
-    accessoriesAmount += findChair.price * totalTables * 10;
+    // accessoriesAmount += findChair.price * totalTables * 10;
+    accessoriesAmount = 0;
     return {
       totalAmount: accessoriesAmount,
       tableAmount: accessoriesAmount,

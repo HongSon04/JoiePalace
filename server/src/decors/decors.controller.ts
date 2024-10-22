@@ -51,7 +51,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -113,7 +112,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -164,7 +162,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -208,7 +205,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -232,40 +228,6 @@ export class DecorsController {
     return this.decorsService.findOne(id);
   }
 
-  // ! Get Decor By Slug
-  @Get('get-by-slug/:slug')
-  @isPublic()
-  @ApiResponse({
-    status: HttpStatus.OK,
-    example: {
-      data: {
-        id: 'number',
-        name: 'string',
-        price: 'number',
-        slug: 'string',
-        description: 'string',
-        short_description: 'string',
-        images: 'array',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    example: {
-      message: 'Không tìm thấy trang trí',
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    example: {
-      message: 'Lỗi server vui lòng thử lại sau',
-    },
-  })
-  @ApiOperation({ summary: 'Lấy thông tin trang trí theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
-    return this.decorsService.findOneBySlug(slug);
-  }
-
   // ! Update Decor
   @Patch('update/:decor_id')
   @ApiHeaders([
@@ -284,7 +246,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
