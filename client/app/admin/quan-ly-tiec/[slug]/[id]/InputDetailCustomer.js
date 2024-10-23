@@ -1,28 +1,25 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options = [], name }) => {
-    const [value, setValue] = useState('');
+const InputDetailCustomer = ({
+    svg,
+    title,
+    type = 'text',
+    placeholder,
+    options = [],
+    name,
+    register = () => {},  // Set default register as a no-op function
+    error,
+    trigger = () => {}  // Default trigger as a no-op function
+}) => {
 
     useEffect(() => {
-        if (options.length > 0 && !options.some(item => item.value === value)) {
-            setValue(options[0].value);  // Đặt giá trị đầu tiên làm mặc định nếu chưa có giá trị hợp lệ
+        if (type === 'select' && options.length > 0 && !options.some(item => item.value === register[name]?.value)) {
+            // Automatically set the first option as default (use React Hook Form's defaultValue instead)
         }
-    }, [options, value]);
-
-    const handleInputChange = (e) => {
-        let { value: inputValue } = e.target;
-
-        if (type === 'number' || name === 'phone') {
-            // Loại bỏ các ký tự không phải số
-            inputValue = inputValue.replace(/[^\d]/g, '');
-        }
-
-        setValue(inputValue);
-        console.log(inputValue, name);
-    };
+    }, [options, register, name, type]);
 
     return (
         <div className='flex flex-col gap-2'>
@@ -30,12 +27,13 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
                 {svg}
                 <span className='font-bold leading-6 text-base text-white'>{title}</span>
             </div>
+
             {type === 'select' ? (
                 <select
-                    value={value}
-                    onChange={handleInputChange}
                     className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
                     name={name}
+                    {...register(name)}
+                    onBlur={() => trigger(name)}
                 >
                     {options.map(option => (
                         <option className='text-black' key={option.id} value={option.value}>
@@ -44,19 +42,20 @@ const InputDetailCustomer = ({ svg, title, type = 'text', placeholder, options =
                     ))}
                 </select>
             ) : (
-                <input
-                    id={name}
-                    name={name}
-                    type={type}
-                    className='p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300'
-                    placeholder={placeholder}
-                    min={type === 'number' ? 1 : undefined}
-                    value={value}
-                    onChange={handleInputChange}
-                    aria-labelledby={name}
-                    // Ngăn không cho cuộn thay đổi giá trị số
-                    onWheel={(e) => (type === 'number' || name === 'phone') && e.currentTarget.blur()}
-                />
+                <>
+                    <input
+                        id={name}
+                        name={name}
+                        type={type}
+                        className='p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300'
+                        placeholder={placeholder}
+                        min={type === 'number' ? 1 : undefined}
+                        onWheel={(e) => (type === 'number' || name === 'phone') && e.currentTarget.blur()}
+                        {...register(name)}
+                        onBlur={() => trigger(name)}
+                    />
+                    {error && <p className="text-red-500 text-sm">{error.message}</p>}
+                </>
             )}
         </div>
     );
@@ -68,11 +67,14 @@ InputDetailCustomer.propTypes = {
     type: PropTypes.string,
     placeholder: PropTypes.string,
     options: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         value: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
     })),
     name: PropTypes.string.isRequired,
+    register: PropTypes.func,
+    error: PropTypes.object,
+    trigger: PropTypes.func,
 };
 
 export default InputDetailCustomer;
