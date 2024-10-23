@@ -6,6 +6,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Patch,
   Post,
   Put,
@@ -29,7 +30,7 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'decorator/roles.decorator';
-import { Role } from 'helper/role.enum';
+import { Role } from 'helper/enum/role.enum';
 import { isPublic } from 'decorator/auth.decorator';
 
 @ApiTags('User - Quản lý người dùng')
@@ -138,9 +139,6 @@ export class UserController {
         role: 'string',
         active: 'boolean',
         verify_at: 'date',
-        deleted: 'boolean',
-        deleted_at: 'date',
-        deleted_by: 'number',
         created_at: 'string',
         updated_at: 'string',
         membership_id: 'number',
@@ -280,6 +278,71 @@ export class UserController {
     return this.userService.getAllDeleted(query);
   }
 
+  // ! Get All User By Branch Id
+  @Get('get-all-by-branch-id/:branch_id')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
+  @ApiOperation({
+    summary: 'Lấy danh sách tài khoản theo id chi nhánh (trừ tài khoản bị xóa tạm)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          email: 'string',
+          username: 'string',
+          platform: 'string',
+          avatar: 'string',
+          role: 'string',
+          active: 'boolean',
+          verify_at: 'date',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'string',
+          updated_at: 'string',
+          membership_id: 'number',
+        },
+      ],
+      pagination: {
+        total: 'number',
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        lastPage: 'number | null',
+        nextPage: 'number | null',
+        prevPage: 'number | null',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Chi nhánh không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  getAllByBranchId(@Query() query: FilterDto, @Param('branch_id') id: number) {
+    return this.userService.getAllByBranchId(query, id);
+  }
+
   // ! Get User By Id
   @Get('get/:user_id')
   @ApiHeaders([
@@ -302,9 +365,6 @@ export class UserController {
         role: 'string',
         active: 'boolean',
         verify_at: 'date',
-        deleted: 'boolean',
-        deleted_at: 'date',
-        deleted_by: 'number',
         created_at: 'string',
         updated_at: 'string',
         membership_id: 'number',
@@ -326,6 +386,51 @@ export class UserController {
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo id' })
   getById(@Query('user_id') id: number): Promise<any> {
     return this.userService.getById(id);
+  }
+
+  // ! Get User By Email
+  @Get('get-by-email/:email')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: {
+        id: 'number',
+        email: 'string',
+        username: 'string',
+        platform: 'string',
+        avatar: 'string',
+        role: 'string',
+        active: 'boolean',
+        verify_at: 'date',
+        created_at: 'string',
+        updated_at: 'string',
+        membership_id: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'User không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy thông tin tài khoản theo email' })
+  getByEmail(@Query('email') email: string): Promise<any> {
+    return this.userService.getByEmail(email);
   }
 
   // ! Change Password

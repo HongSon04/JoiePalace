@@ -347,6 +347,48 @@ export class CategoriesService {
     }
   }
 
+  // ! Get Category By Tag Slug
+  async findCategoryByTagSlug(tag_slug: string) {
+    try {
+      const findTag = await this.prismaService.tags.findUnique({
+        where: { slug: tag_slug },
+      });
+
+      if (!findTag) {
+        throw new HttpException(
+          { message: 'Không tìm thấy tag' },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const categories = await this.prismaService.categories.findMany({
+        where: {
+          tags: {
+            some: {
+              slug: tag_slug,
+            },
+          },
+        },
+      });
+
+      throw new HttpException(
+        { data: FormatReturnData(categories, []) },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log(
+        'Lỗi từ categories.service.ts -> findCategoryByTagSlug',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      );
+    }
+  }
+
   // ! Update Categories
   async update(
     id: number,

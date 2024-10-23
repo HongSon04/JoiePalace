@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsNotEmpty } from 'class-validator';
-import { Role } from 'helper/role.enum';
+import { Role } from 'helper/enum/role.enum';
 
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Vui lòng nhập họ và tên' })
@@ -11,6 +11,9 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Vui lòng nhập Email' })
   @IsEmail({}, { message: 'Email không đúng định dạng' })
   email: string;
+
+  @ApiProperty({ required: false })
+  branch_id: number;
 
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Vui lòng nhập mật khẩu' })
@@ -27,6 +30,9 @@ export class CreateUserDto {
   @IsEnum(Role, { message: 'Vai trò không hợp lệ' })
   role: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
+  active: boolean;
+
+  @ApiProperty()
   avatar: string;
 }

@@ -13,6 +13,7 @@ import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import * as CryptoJS from 'crypto-js';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { PaymentMethod } from 'helper/enum/payment_method.enum';
 @Injectable()
 export class PaymentMethodsService {
   constructor(
@@ -613,7 +614,7 @@ export class PaymentMethodsService {
           },
           data: {
             status: 'success',
-            payment_method: 'zalopay',
+            payment_method: PaymentMethod.ZALO,
           },
         });
 

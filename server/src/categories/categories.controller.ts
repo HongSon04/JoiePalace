@@ -280,6 +280,46 @@ export class CategoriesController {
     return this.categoriesService.findOneBySlug(slug);
   }
 
+  // ! Get Category by Tag Slug
+  @Get('get-by-tag-slug/:tag_slug')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          slug: 'string',
+          description: 'string',
+          short_description: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy danh mục !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh mục theo tag slug' })
+  findOneByTagSlug(@Param('tag_slug') tag_slug: string) {
+    return this.categoriesService.findCategoryByTagSlug(tag_slug);
+  }
+
+
   // ! Update Category
   @Patch('update/:category_id')
   @ApiHeaders([

@@ -25,7 +25,7 @@ export class StagesService {
       });
       if (!findBranch) {
         throw new HttpException(
-          'Không tìm thấy địa điểm',
+          'Không tìm thấy chi nhánh',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -53,7 +53,8 @@ export class StagesService {
           name: body.name,
           description: body.description,
           images: stagesImages as any,
-          capacity: Number(body.capacity),
+          capacity_min: Number(body.capacity_min),
+          capacity_max: Number(body.capacity_max),
         },
       });
 
@@ -84,7 +85,7 @@ export class StagesService {
         });
         if (!findBranch) {
           throw new HttpException(
-            'Không tìm thấy địa điểm',
+            'Không tìm thấy chi nhánh',
             HttpStatus.BAD_REQUEST,
           );
         }
@@ -163,11 +164,13 @@ export class StagesService {
         );
       }
 
-      const updateData: any = {
+      const updateData: StageUpdateDto = {
         branch_id: Number(body.branch_id),
         name: body.name,
         description: body.description,
-        capacity: body.capacity,
+        capacity_min: Number(body.capacity_min),
+        capacity_max: Number(body.capacity_max),
+        images: findStage.images,
       };
 
       if (files.images && files.images.length > 0) {

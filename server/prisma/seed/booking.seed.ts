@@ -7,6 +7,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 1,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty A',
     email: 'congtya@gmail.com',
     phone: '123456789',
@@ -20,6 +21,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 2,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty B',
     email: 'congtyb@gmail.com',
     phone: '123456789',
@@ -33,6 +35,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 3,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty C',
     email: 'congtyc@gmail.com',
     phone: '123456789',
@@ -46,6 +49,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 4,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty D',
     email: 'congtyd@gmail.com',
     phone: '123456789',
@@ -59,6 +63,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 5,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty E',
     email: 'congtye@gmail.com',
     phone: '123456789',
@@ -72,6 +77,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 6,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty F',
     email: 'congtyf@gmail.com',
     phone: '123456789',
@@ -85,6 +91,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 7,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty G',
     email: 'congtyg@gmail.com',
     phone: '123456789',
@@ -98,6 +105,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 8,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty H',
     email: 'congtyh@gmail.com',
     phone: '123456789',
@@ -111,6 +119,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 9,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty I',
     email: 'congtyi@gmail.com',
     phone: '123456789',
@@ -124,6 +133,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 9,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty I',
     email: 'congtyi@gmail.com',
     phone: '123456789',
@@ -137,6 +147,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 10,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty J',
     email: 'congtyj@gmail.com',
     phone: '123456789',
@@ -150,6 +161,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 11,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty K',
     email: 'congtyk@gmail.com',
     phone: '123456789',
@@ -163,6 +175,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 12,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty L',
     email: 'congtyl@gmail.com',
     phone: '123456789',
@@ -176,6 +189,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 13,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty M',
     email: 'congtym@gmail.com',
     phone: '123456789',
@@ -189,6 +203,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 14,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty N',
     email: 'congtyn@gmail.com',
     phone: '123456789',
@@ -202,6 +217,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 15,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty O',
     email: 'congtyo@gmail.com',
     phone: '123456789',
@@ -215,6 +231,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 16,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty P',
     email: 'congtyp@gmail.com',
     phone: '123456789',
@@ -228,6 +245,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 17,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty Q',
     email: 'congtyq@gmail.com',
     phone: '123456789',
@@ -241,6 +259,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 18,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty R',
     email: 'congtyr@gmail.com',
     phone: '123456789',
@@ -267,19 +286,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -297,19 +303,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -327,19 +320,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -357,19 +337,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -387,19 +354,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -417,19 +371,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -447,19 +388,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -477,19 +405,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -507,19 +422,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -537,19 +439,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -567,19 +456,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -597,19 +473,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -627,19 +490,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -657,19 +507,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -687,19 +524,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -717,19 +541,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -747,19 +558,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -777,19 +575,6 @@ const booking_details = [
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -813,7 +598,6 @@ export const bookingSeed = async () => {
         menu_id: booking_details[i].menu_id,
         payment_method: 'momo',
         stage: booking_details[i].stage,
-        accessories: booking_details[i].accessories,
         amount_booking: booking_details[i].amount_booking,
         deposit_id: 1,
         fee: booking_details[i].fee,

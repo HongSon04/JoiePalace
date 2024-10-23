@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
-import { Role } from 'helper/role.enum';
+import { Role } from 'helper/enum/role.enum';
 
 export class ChangeProfileUserDto {
   @ApiProperty({ required: true })
