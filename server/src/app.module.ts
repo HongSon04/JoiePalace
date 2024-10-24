@@ -27,6 +27,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { MembershipsModule } from './memberships/memberships.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { SubscribersModule } from './subscribers/subscribers.module';
 
 @Module({
   imports: [
@@ -65,6 +67,8 @@ import { MembershipsModule } from './memberships/memberships.module';
     FeedbacksModule,
     BlogsModule,
     MembershipsModule,
+    NotificationsModule,
+    SubscribersModule,
   ],
   controllers: [AppController],
   providers: [

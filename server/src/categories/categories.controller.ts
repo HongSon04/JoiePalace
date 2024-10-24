@@ -253,7 +253,7 @@ export class CategoriesController {
   }
 
   // ! Get Category By Slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:category_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -285,7 +285,7 @@ export class CategoriesController {
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin danh mục theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
+  findOneBySlug(@Param('category_slug') slug: string) {
     return this.categoriesService.findOneBySlug(slug);
   }
 
@@ -327,7 +327,6 @@ export class CategoriesController {
   findOneByTagSlug(@Param('tag_slug') tag_slug: string) {
     return this.categoriesService.findCategoryByTagSlug(tag_slug);
   }
-
 
   // ! Update Category
   @Patch('update/:category_id')

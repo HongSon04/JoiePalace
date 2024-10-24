@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -142,7 +143,7 @@ export class AuthService {
         },
       });
       if (!findUser) {
-        throw new BadRequestException('Người dùng không tồn tại');
+        throw new NotFoundException('Người dùng không tồn tại');
       }
       await this.prismaService.users.update({
         where: {

@@ -173,7 +173,7 @@ export class MembershipsController {
   }
 
   // ! Get membership by id
-  @Get('get/:id')
+  @Get('get/:membership_id')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -201,12 +201,13 @@ export class MembershipsController {
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
   })
-  findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Lấy hạng thành viên theo id' })
+  findOne(@Param('membership_id') id: string) {
     return this.membershipsService.findOne(+id);
   }
 
   // ! Get membership by slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:membership_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -234,12 +235,13 @@ export class MembershipsController {
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
   })
-  findOneBySlug(@Param('slug') slug: string) {
+  @ApiOperation({ summary: 'Lấy hạng thành viên theo slug' })
+  findOneBySlug(@Param('membership_slug') slug: string) {
     return this.membershipsService.findOneBySlug(slug);
   }
 
   // ! Update membership
-  @Patch('update/:id')
+  @Patch('update/:membership_id')
   @ApiHeaders([
     {
       name: 'authorization',
@@ -313,7 +315,7 @@ export class MembershipsController {
     }),
   )
   update(
-    @Param('id') id: string,
+    @Param('membership_id') id: string,
     @Body() updateMembershipDto: UpdateMembershipDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
@@ -321,7 +323,7 @@ export class MembershipsController {
   }
 
   // ! Soft delete membership
-  @Delete('delete/:id')
+  @Delete('delete/:membership_id')
   @ApiHeaders([
     {
       name: 'authorization',
@@ -351,12 +353,12 @@ export class MembershipsController {
     },
   })
   @ApiOperation({ summary: 'Xóa tạm thời hạng thành viên' })
-  remove(@Request() req, @Param('id') id: string) {
+  remove(@Request() req, @Param('membership_id') id: string) {
     return this.membershipsService.remove(req.user, +id);
   }
 
   // ! Restore membership
-  @Patch('restore/:id')
+  @Patch('restore/:membership_id')
   @ApiHeaders([
     {
       name: 'authorization',
@@ -386,12 +388,12 @@ export class MembershipsController {
     },
   })
   @ApiOperation({ summary: 'Khôi phục hạng thành viên' })
-  restore(@Param('id') id: string) {
+  restore(@Param('membership_id') id: string) {
     return this.membershipsService.restore(+id);
   }
 
   // ! Hard delete membership
-  @Delete('hard-delete/:id')
+  @Delete('hard-delete/:membership_id')
   @ApiHeaders([
     {
       name: 'authorization',
@@ -420,7 +422,8 @@ export class MembershipsController {
       message: 'Lỗi server vui lòng thử lại sau',
     },
   })
-  hardDelete(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Xóa vĩnh viễn hạng thành viên' })
+  hardDelete(@Param('membership_id') id: string) {
     return this.membershipsService.hardDelete(+id);
   }
 }

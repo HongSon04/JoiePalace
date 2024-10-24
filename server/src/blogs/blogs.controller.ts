@@ -259,7 +259,7 @@ export class BlogsController {
   }
 
   // ! Get all blogs by slug category
-  @Get('get-all-by-slug-category/:slug')
+  @Get('get-all-by-slug-category/:category_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -303,7 +303,7 @@ export class BlogsController {
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
   findAllBySlugCategory(
-    @Param('slug') slug: string,
+    @Param('category_slug') slug: string,
     @Query() query: FilterDto,
   ) {
     return this.blogsService.findAllBySlugCategory(slug, query);
@@ -358,7 +358,7 @@ export class BlogsController {
   }
 
   // ! Get all blogs by slug tag
-  @Get('get-all-by-slug-tag/:slug')
+  @Get('get-all-by-slug-tag/:tag_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -401,7 +401,7 @@ export class BlogsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  findAllBySlugTag(@Param('slug') slug: string, @Query() query: FilterDto) {
+  findAllBySlugTag(@Param('tag_slug') slug: string, @Query() query: FilterDto) {
     return this.blogsService.findAllBySlugTag(slug, query);
   }
 
@@ -443,7 +443,7 @@ export class BlogsController {
   }
 
   // ! Get a blog by slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:blog_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -475,7 +475,7 @@ export class BlogsController {
     },
   })
   @ApiOperation({ summary: 'Lấy bài viết theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
+  findOneBySlug(@Param('blog_slug') slug: string) {
     return this.blogsService.findOneBySlug(slug);
   }
 
@@ -563,7 +563,7 @@ export class BlogsController {
   }
 
   // ! Update a blog by slug
-  @Patch('update-by-slug/:slug')
+  @Patch('update-by-slug/:blog_slug')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
@@ -638,7 +638,7 @@ export class BlogsController {
   })
   @ApiOperation({ summary: 'Cập nhật bài viết theo slug' })
   updateBySlug(
-    @Param('slug') slug: string,
+    @Param('blog_slug') slug: string,
     @Body() updateBlogDto: UpdateBlogDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {

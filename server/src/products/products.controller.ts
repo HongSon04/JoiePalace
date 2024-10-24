@@ -320,7 +320,7 @@ export class ProductsController {
   }
 
   // ! Get product by slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:product_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -353,7 +353,7 @@ export class ProductsController {
     },
   })
   @ApiOperation({ summary: 'Lấy sản phẩm theo slug' })
-  findBySlug(@Param('slug') slug: string) {
+  findBySlug(@Param('product_slug') slug: string) {
     return this.productsService.findBySlug(slug);
   }
 
