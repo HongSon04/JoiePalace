@@ -1,5 +1,6 @@
 import { CreateUserDto } from './dto/create-user.dto';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -75,28 +76,25 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              `Chỉ chấp nhận ảnh jpg, jpeg, png`,
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else {
-          const fileSize = parseInt(req.headers['content-length']);
-          if (fileSize > 1024 * 1024 * 5) {
-            return cb(
-              new HttpException(
-                'Kích thước ảnh tối đa 5MB',
-                HttpStatus.BAD_REQUEST,
-              ),
-              false,
-            );
-          } else {
-            cb(null, true);
-          }
         }
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+            false,
+          );
+        }
+        if (file.size > 1024 * 1024 * 5) {
+          return cb(
+            new BadRequestException('Kích thước ảnh tối đa 5MB'),
+            false,
+          );
+        }
+        cb(null, true);
       },
     }),
   )
@@ -289,7 +287,8 @@ export class UserController {
   ])
   @ApiBearerAuth('authorization')
   @ApiOperation({
-    summary: 'Lấy danh sách tài khoản theo id chi nhánh (trừ tài khoản bị xóa tạm)',
+    summary:
+      'Lấy danh sách tài khoản theo id chi nhánh (trừ tài khoản bị xóa tạm)',
   })
   @ApiResponse({
     status: HttpStatus.OK,

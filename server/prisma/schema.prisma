@@ -67,7 +67,8 @@ model users {
 model memberships {
   id                   Int        @id @default(autoincrement())
   name                 String
-  decsription          String
+  slug                 String     @unique
+  description          String
   booking_total_amount Int
   gifts                products[] @relation("MembershipGifts")
   images               String[]
@@ -289,10 +290,11 @@ model booking_details {
   menus          menus    @relation(fields: [menu_id], references: [id])
   deposit_id     Int
   deposits       deposits @relation(fields: [deposit_id], references: [id])
-  party_types    Json
-  decor          Json
-  menu           Json
-  extra_service  Json
+  party_types    Json?
+  decor          Json?
+  menu           Json?
+  extra_service  Json?
+  gift           Json?
   images         String[]
   amount_booking Int      @default(0)
   fee            Int      @default(0)

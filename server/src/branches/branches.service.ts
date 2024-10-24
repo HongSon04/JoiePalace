@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateBranchDto, ImageUploadBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
@@ -45,10 +47,7 @@ export class BranchesService {
 
     // Nếu có lỗi, trả về ngay lập tức và không tiến hành upload
     if (errors.length > 0) {
-      throw new HttpException(
-        { message: errors.join(', '), data: null },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({ message: errors.join(', '), data: null });
     }
 
     try {
@@ -125,7 +124,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> createbranch', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -216,7 +216,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> getAllbranchs', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -307,7 +308,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> getAllDeletedbranchs', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -321,10 +323,7 @@ export class BranchesService {
         },
       });
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
 
       const stages = await this.prismaService.stages.findMany({
@@ -349,6 +348,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getbranchById', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -362,10 +362,7 @@ export class BranchesService {
         },
       });
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
 
       const stages = await this.prismaService.stages.findMany({
@@ -390,6 +387,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getbranchBySlug', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -421,10 +419,10 @@ export class BranchesService {
         });
 
         if (errors.length > 0) {
-          throw new HttpException(
-            { message: errors.join(', '), data: null },
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new BadRequestException({
+            message: errors.join(', '),
+            data: null,
+          });
         }
 
         // Tạo hàm upload ảnh mới nếu cần
@@ -470,10 +468,7 @@ export class BranchesService {
       });
 
       if (checkNamebranch) {
-        throw new HttpException(
-          'Tên địa điểm đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên địa điểm đã tồn tại');
       }
 
       // Cập nhật branch
@@ -515,6 +510,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> updatebranch', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -529,10 +525,7 @@ export class BranchesService {
       });
       console.log(Number(reqUser.id));
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
       await this.prismaService.branches.update({
         where: {
@@ -551,7 +544,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> softDeletebranch', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -565,10 +559,7 @@ export class BranchesService {
         },
       });
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
       await this.prismaService.branches.update({
         where: {
@@ -587,7 +578,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> restorebranch', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -600,10 +592,7 @@ export class BranchesService {
         where: { id: Number(branch_id) },
       });
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
 
       // ! Tạo một hàm xử lý chung cho việc xóa ảnh và dữ liệu
@@ -650,6 +639,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> hardDeletebranch', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -719,6 +709,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> deleteImageByUrl', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

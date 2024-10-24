@@ -1,9 +1,11 @@
 import { User as UserEntity } from './entities/user.entity';
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -43,7 +45,7 @@ export class UserService {
         },
       });
       if (findEmail) {
-        throw new HttpException('Email đã tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Email đã tồn tại');
       }
 
       if (branch_id) {
@@ -54,10 +56,7 @@ export class UserService {
         });
 
         if (!checkBranch) {
-          throw new HttpException(
-            'Chi nhánh không tồn tại',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new NotFoundException('Chi nhánh không tồn tại');
         }
       }
       // ? hashed password
@@ -90,6 +89,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> create: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -103,7 +103,7 @@ export class UserService {
         },
       });
       if (!findUser) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       const { password, refresh_token, ...user } = findUser;
       throw new HttpException(
@@ -119,6 +119,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getProfile: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -134,13 +135,12 @@ export class UserService {
         },
       });
       if (!findUser) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       // ? Check new password !== old password
       if (oldPassword === newPassword) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Mật khẩu mới không được trùng với mật khẩu cũ',
-          HttpStatus.BAD_REQUEST,
         );
       }
       // ? Compare password
@@ -150,17 +150,11 @@ export class UserService {
       );
 
       if (!comparePassword) {
-        throw new HttpException(
-          'Mật khẩu cũ không chính xác',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Mật khẩu cũ không chính xác');
       }
       // ? Check new password
       if (newPassword !== confirmPassword) {
-        throw new HttpException(
-          'Mật khẩu xác nhận không khớp',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Mật khẩu xác nhận không khớp');
       }
       // ? Hashed password
       const hashedPassword = this.hashedPassword(newPassword);
@@ -180,6 +174,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changePassword: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -195,7 +190,7 @@ export class UserService {
         },
       });
       if (!findUser) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       // ? Update user
       const user = await this.prismaService.users.update({
@@ -222,6 +217,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changeProfile: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -288,6 +284,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAll: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -355,6 +352,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAllDeleted: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -422,6 +420,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAllByBranchId: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -435,7 +434,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
 
       throw new HttpException(
@@ -449,6 +448,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getById: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -462,7 +462,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
 
       throw new HttpException(
@@ -476,6 +476,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getById: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -489,7 +490,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       await this.prismaService.users.update({
         where: {
@@ -509,6 +510,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> softDelete: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -522,7 +524,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       await this.prismaService.users.update({
         where: {
@@ -542,6 +544,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> restore: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -555,7 +558,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       // ? Delete Image
       if (user.avatar) {
@@ -574,6 +577,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> hardDelete: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

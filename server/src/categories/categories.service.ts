@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -41,10 +43,7 @@ export class CategoriesService {
       });
 
       if (existingCategory) {
-        throw new HttpException(
-          { message: 'Tên danh mục đã tồn tại' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException({ message: 'Tên danh mục đã tồn tại' });
       }
 
       // Upload images if available
@@ -57,19 +56,17 @@ export class CategoriesService {
           : ([] as any);
 
       if (files.images && files.images.length > 0 && !images) {
-        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Upload ảnh thất bại');
       }
 
       // Validate tags
+      const tagsArray = JSON.parse(tags as any);
       const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tags } },
+        where: { id: { in: tagsArray } },
       });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (existingTags.length !== tagsArray.length) {
+        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
       }
 
       const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
@@ -100,7 +97,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> create', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -193,7 +191,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -286,7 +285,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -298,10 +298,7 @@ export class CategoriesService {
         where: { id: Number(id) },
       });
       if (!category) {
-        throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
       throw new HttpException(
         { data: FormatReturnData(category, []) },
@@ -313,7 +310,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> findOne', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -327,10 +325,7 @@ export class CategoriesService {
         },
       });
       if (!category) {
-        throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
       throw new HttpException(
         { data: FormatReturnData(category, []) },
@@ -342,7 +337,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> findOneBySlug', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -355,10 +351,7 @@ export class CategoriesService {
       });
 
       if (!findTag) {
-        throw new HttpException(
-          { message: 'Không tìm thấy tag' },
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy tag' });
       }
 
       const categories = await this.prismaService.categories.findMany({
@@ -384,7 +377,8 @@ export class CategoriesService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -401,10 +395,7 @@ export class CategoriesService {
         where: { id: Number(id) },
       });
       if (!findCategories) {
-        throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
 
       const { name, description, short_description, category_id, tags } =
@@ -421,10 +412,7 @@ export class CategoriesService {
           },
         });
       if (findCategoriesByName) {
-        throw new HttpException(
-          { message: 'Tên danh mục đã tồn tại' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException({ message: 'Tên danh mục đã tồn tại' });
       }
 
       // Upload images if available
@@ -437,19 +425,17 @@ export class CategoriesService {
           : ([] as any);
 
       if (files.images && files.images.length > 0 && !images) {
-        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Upload ảnh thất bại');
       }
 
       // Validate tags
+      const tagsArray = JSON.parse(tags as any);
       const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tags } },
+        where: { id: { in: tagsArray } },
       });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (existingTags.length !== tagsArray.length) {
+        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
       }
 
       const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
@@ -480,7 +466,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> update', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -493,10 +480,7 @@ export class CategoriesService {
         where: { id: Number(id) },
       });
       if (!findCategories) {
-        throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
       // ? Soft Delete Categories
       const categories = await this.prismaService.categories.update({
@@ -519,7 +503,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> softDelete', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -532,10 +517,7 @@ export class CategoriesService {
         where: { id: Number(id) },
       });
       if (!findCategories) {
-        throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
       // ? Restore Categories
       const categories = await this.prismaService.categories.update({
@@ -559,7 +541,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> restore', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -572,10 +555,7 @@ export class CategoriesService {
         where: { id: Number(id) },
       });
       if (!findCategories) {
-        throw new HttpException(
-          { message: 'Không tìm thấy danh mục' },
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
       // ? Destroy Categories
       const categories = await this.prismaService.categories.delete({
@@ -594,7 +574,8 @@ export class CategoriesService {
       }
       console.log('Lỗi từ categories.service.ts -> destroy', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

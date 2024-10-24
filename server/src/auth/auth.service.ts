@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -37,7 +38,7 @@ export class AuthService {
         },
       });
       if (findEmail) {
-        throw new HttpException('Email đã tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Email đã tồn tại');
       }
       // ? hashed password
       const hashedPassword = this.hashedPassword(password);
@@ -82,7 +83,8 @@ export class AuthService {
       }
       console.log('Lỗi từ auth.service.ts -> register', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -98,17 +100,15 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Tài khoản hoặc mật khẩu không chính xác',
-          HttpStatus.BAD_REQUEST,
         );
       }
       // ? Compare password
       const comparePassword = await bcrypt.compare(password, user.password);
       if (!comparePassword) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Tài khoản hoặc mật khẩu không chính xác',
-          HttpStatus.BAD_REQUEST,
         );
       }
       // ? Generate token
@@ -127,7 +127,8 @@ export class AuthService {
       }
       console.log('Lỗi từ auth.service.ts -> login', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -141,10 +142,7 @@ export class AuthService {
         },
       });
       if (!findUser) {
-        throw new HttpException(
-          'Người dùng không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Người dùng không tồn tại');
       }
       await this.prismaService.users.update({
         where: {
@@ -161,7 +159,8 @@ export class AuthService {
       }
       console.log('Lỗi từ auth.service.ts -> logout', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -195,7 +194,8 @@ export class AuthService {
       }
       console.log('Lỗi từ auth.service.ts -> changeAvatar', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -265,14 +265,11 @@ export class AuthService {
         },
       });
       if (!findUserByEmail) {
-        throw new HttpException('Email không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Email không tồn tại');
       }
 
       if (findUserByEmail.verify_at) {
-        throw new HttpException(
-          'Email đã được xác thực',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Email đã được xác thực');
       }
 
       const randomToken = uniqid();
@@ -302,9 +299,8 @@ export class AuthService {
       });
 
       if (!findToken) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Token không hợp lệ hoặc email không đúng',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -314,7 +310,7 @@ export class AuthService {
             id: Number(findToken.id),
           },
         });
-        throw new HttpException('Token đã hết hạn', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Token đã hết hạn');
       }
 
       await this.prismaService.users.update({
@@ -339,7 +335,8 @@ export class AuthService {
       }
       console.log('Lỗi từ auth.service.ts -> verifyEmail', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

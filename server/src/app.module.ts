@@ -26,6 +26,7 @@ import { MailModule } from './mail/mail.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { BlogsModule } from './blogs/blogs.module';
+import { MembershipsModule } from './memberships/memberships.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { BlogsModule } from './blogs/blogs.module';
     DashboardModule,
     FeedbacksModule,
     BlogsModule,
+    MembershipsModule,
   ],
   controllers: [AppController],
   providers: [

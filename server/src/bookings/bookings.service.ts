@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { BookingStatus } from '@prisma/client';
 import dayjs from 'dayjs';
@@ -57,9 +59,8 @@ export class BookingsService {
         },
       });
       if (checkDateAndShift.length > 0) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Đã có sự kiện tổ chức vào thời gian này',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -68,10 +69,7 @@ export class BookingsService {
           where: { id: Number(user_id) },
         });
         if (!user) {
-          throw new HttpException(
-            'Không tìm thấy người dùng',
-            HttpStatus.NOT_FOUND,
-          );
+          throw new NotFoundException('Không tìm thấy người dùng');
         }
       }
 
@@ -81,7 +79,7 @@ export class BookingsService {
         });
 
         if (!findStage) {
-          throw new HttpException('Không tìm thấy sảnh', HttpStatus.NOT_FOUND);
+          throw new NotFoundException('Không tìm thấy sảnh');
         }
       }
 
@@ -97,11 +95,7 @@ export class BookingsService {
 
       // Validate fetched data
       const validateExists = (entity: any, name: string) => {
-        if (!entity)
-          throw new HttpException(
-            `Không tìm thấy ${name}`,
-            HttpStatus.NOT_FOUND,
-          );
+        if (!entity) throw new NotFoundException(`Không tìm thấy ${name}`);
       };
       validateExists(party_types, 'Loại tiệc');
       validateExists(branch, 'Chi nhánh');
@@ -169,6 +163,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> create: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -309,6 +304,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> findAll: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -449,6 +445,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> findAllDeleted: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -486,10 +483,7 @@ export class BookingsService {
         },
       });
       if (!findBooking) {
-        throw new HttpException(
-          'Không tìm thấy đơn đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
       throw new HttpException(
         {
@@ -505,6 +499,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> findOne: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -577,6 +572,7 @@ export class BookingsService {
       );
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -592,10 +588,7 @@ export class BookingsService {
         where: { id: Number(id) },
       });
       if (!findBooking) {
-        throw new HttpException(
-          'Không tìm thấy đơn đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
       await this.prismaService.bookings.update({
         where: { id: Number(id) },
@@ -615,7 +608,8 @@ export class BookingsService {
       }
       console.log('Lỗi từ booking.service.ts -> updateStatus: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -659,7 +653,7 @@ export class BookingsService {
       });
 
       if (!findStages) {
-        throw new HttpException('Không tìm thấy sảnh', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Không tìm thấy sảnh');
       }
 
       // ! Update Booking
@@ -687,9 +681,8 @@ export class BookingsService {
       );
 
       if (findBooking.is_confirm === false) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Không thể sửa thông tin đơn đặt tiệc chưa xác nhận',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -701,9 +694,8 @@ export class BookingsService {
         const endDate = new Date(currentDate);
         endDate.setDate(currentDate.getDate() + 3);
         if (new Date(organization_date) < endDate) {
-          throw new HttpException(
+          throw new BadRequestException(
             'Không thể sửa thông tin đơn đặt tiệc khi còn 3 ngày nữa là tổ chức',
-            HttpStatus.BAD_REQUEST,
           );
         }
       }
@@ -736,11 +728,7 @@ export class BookingsService {
       );
       // Validate fetched data
       const validateExists = (entity: any, name: string) => {
-        if (!entity)
-          throw new HttpException(
-            `Không tìm thấy ${name}`,
-            HttpStatus.NOT_FOUND,
-          );
+        if (!entity) throw new NotFoundException(`Không tìm thấy ${name}`);
       };
       validateExists(user, 'user');
       validateExists(branch, 'branch');
@@ -753,16 +741,14 @@ export class BookingsService {
       let chairAmount = chair_count * 20000; // 20.000 VND / ghế
 
       if (table_count > findStages.capacity_max) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Số lượng bàn vượt quá sức chứa của sảnh',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
       if (table_count < findStages.capacity_min) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Số lượng bàn quá ít so với sức chứa tối thiểu của sảnh',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -946,6 +932,8 @@ export class BookingsService {
               decor: decorFormat,
               menu: menuFormat,
               extra_service: null,
+              gift: null,
+
               fee,
               total_amount: totalAmount,
               deposit_id: deposit.id,
@@ -962,6 +950,7 @@ export class BookingsService {
               decor: decorFormat,
               menu: menuFormat,
               extra_service: null,
+              gift: null,
               fee,
               total_amount: totalAmount,
               deposit_id: deposit.id,
@@ -1006,6 +995,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> update: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -1017,10 +1007,7 @@ export class BookingsService {
         where: { id: Number(id) },
       });
       if (!findBooking) {
-        throw new HttpException(
-          'Không tìm thấy đơn đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
 
       await this.prismaService.bookings.update({
@@ -1040,6 +1027,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> delete: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -1051,10 +1039,7 @@ export class BookingsService {
         where: { id: Number(id) },
       });
       if (!findBooking) {
-        throw new HttpException(
-          'Không tìm thấy đơn đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
 
       await this.prismaService.bookings.update({
@@ -1077,6 +1062,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> restore: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -1096,10 +1082,7 @@ export class BookingsService {
       });
 
       if (!booking) {
-        throw new HttpException(
-          'Không tìm thấy đơn đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
 
       // Xóa deposit nếu có
@@ -1127,6 +1110,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> destroy: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
