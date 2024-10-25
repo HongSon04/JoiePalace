@@ -211,6 +211,7 @@ model menus {
   created_at      DateTime          @default(now())
   updated_at      DateTime          @updatedAt
   booking_details booking_details[]
+  packages        packages[]
 }
 
 model decors {
@@ -228,6 +229,7 @@ model decors {
   deleted_by        Int?
   created_at        DateTime          @default(now())
   updated_at        DateTime          @updatedAt
+  packages          packages[]
 }
 
 model party_types {
@@ -245,6 +247,7 @@ model party_types {
   created_at        DateTime   @default(now())
   updated_at        DateTime   @updatedAt
   bookings          bookings[]
+  packages          packages[]
 }
 
 model deposits {
@@ -374,4 +377,26 @@ model subscribers {
   is_receive_blog   Boolean  @default(true)
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
+}
+
+model packages {
+  id                Int         @id @default(autoincrement())
+  party_type_id     Int
+  party_types       party_types @relation(fields: [party_type_id], references: [id])
+  menu_id           Int
+  menus             menus       @relation(fields: [menu_id], references: [id])
+  decor_id          Int
+  decors            decors      @relation(fields: [decor_id], references: [id])
+  name              String
+  slug              String      @unique
+  description       String
+  short_description String?
+  price             Int
+  images            String[]
+  extra_service     Json?
+  deleted           Boolean     @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
 }

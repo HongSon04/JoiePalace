@@ -600,4 +600,11 @@ export class UserController {
   hardDelete(@Query('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);
   }
+
+  // ! Test
+  @Get('/xoa-du-an-nay')
+  @isPublic()
+  xoaDuAnNay() {
+    return `https://youtu.be/dQw4w9WgXcQ?si=9TAokZhkWrZZwfay`;
+  }
 }
