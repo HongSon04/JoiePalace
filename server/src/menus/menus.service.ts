@@ -75,6 +75,13 @@ export class MenusService {
             connect: connectproducts,
           },
         },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
       });
 
       throw new HttpException(
@@ -497,6 +504,13 @@ export class MenusService {
           slug,
           products: {
             set: connectproducts,
+          },
+        },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
           },
         },
       });

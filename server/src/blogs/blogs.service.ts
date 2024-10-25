@@ -110,6 +110,10 @@ export class BlogsService {
           },
           images: uploadImages as any,
         },
+        include: {
+          tags: true,
+          categories: true,
+        },
       });
 
       throw new HttpException(
@@ -784,6 +788,10 @@ export class BlogsService {
           },
           images: uploadImages as any,
         },
+        include: {
+          tags: true,
+          categories: true,
+        },
       });
 
       throw new HttpException(
@@ -909,6 +917,10 @@ export class BlogsService {
             connect: tagsConnect,
           },
           images: uploadImages as any,
+        },
+        include: {
+          tags: true,
+          categories: true,
         },
       });
 

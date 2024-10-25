@@ -1,11 +1,11 @@
-import { Controller, Get, HttpStatus, Param } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { isPublic } from 'decorator/auth.decorator';
 import {
   ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
-  ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -65,11 +65,13 @@ export class DashboardController {
   }
 
   // ! Lấy tất cả thông tin của dashboard (tất cả các chi nhánh theo từng ngày, tuần, tháng, năm)
-  @Get('get-all-info-by-each-time/:branch_id')
+  @Get('get-all-info-by-each-time')
   @isPublic()
   @ApiOperation({
     summary:
       'Lấy tất cả thông tin của dashboard (tổng từng chi nhánh hoặc id chi nhánh theo từng ngày, tuần, tháng, năm)',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -209,8 +211,8 @@ export class DashboardController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
   })
-  @ApiParam({ name: 'branch_id', required: false })
-  async getAllInfoByEachTime(@Param('branch_id') branch_id: string) {
+  @ApiQuery({ name: 'branch_id', required: false })
+  async getAllInfoByEachTime(@Query('branch_id') branch_id: string) {
     return this.dashboardService.getAllInfoByEachTime(+branch_id);
   }
 
@@ -393,11 +395,13 @@ export class DashboardController {
   }
 
   // ! Tổng doanh thu của từng chi nhánh
-  @Get('total-revenue-for-each-branch/:branch_id')
+  @Get('total-revenue-for-each-branch')
   @isPublic()
-  @ApiParam({ name: 'branch_id', required: false })
+  @ApiQuery({ name: 'branch_id', required: false })
   @ApiOperation({
     summary: 'Tổng doanh thu của từng chi nhánh',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -411,16 +415,18 @@ export class DashboardController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
   })
-  async getTotalRevenueForEachBranch(@Param('branch_id') branch_id: string) {
+  async getTotalRevenueForEachBranch(@Query('branch_id') branch_id: string) {
     return this.dashboardService.getTotalRevenueForEachBranch(+branch_id);
   }
 
   // ! Tổng doanh thu của từng chi nhánh theo tuần
-  @Get('total-revenue-for-each-branch-by-week/:branch_id')
+  @Get('total-revenue-for-each-branch-by-week')
   @isPublic()
-  @ApiParam({ name: 'branch_id', required: false })
+  @ApiQuery({ name: 'branch_id', required: false })
   @ApiOperation({
     summary: 'Tổng doanh thu của từng chi nhánh theo tuần',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -435,17 +441,19 @@ export class DashboardController {
     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
   })
   async getTotalRevenueForEachBranchByWeek(
-    @Param('branch_id') branch_id: string,
+    @Query('branch_id') branch_id: string,
   ) {
     return this.dashboardService.getTotalRevenueForEachBranchByWeek(+branch_id);
   }
 
   // ! Tổng doanh thu của từng chi nhánh theo tháng
-  @Get('total-revenue-for-each-branch-by-month/:branch_id')
+  @Get('total-revenue-for-each-branch-by-month')
   @isPublic()
-  @ApiParam({ name: 'branch_id', required: false })
+  @ApiQuery({ name: 'branch_id', required: false })
   @ApiOperation({
     summary: 'Tổng doanh thu của từng chi nhánh theo tháng',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -460,7 +468,7 @@ export class DashboardController {
     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
   })
   async getTotalRevenueForEachBranchByMonth(
-    @Param('branch_id') branch_id: string,
+    @Query('branch_id') branch_id: string,
   ) {
     return this.dashboardService.getTotalRevenueForEachBranchByMonth(
       +branch_id,
@@ -468,11 +476,13 @@ export class DashboardController {
   }
 
   // ! Tổng doanh thu của từng chi nhánh theo quý
-  @Get('total-revenue-for-each-branch-by-quarter/:branch_id')
+  @Get('total-revenue-for-each-branch-by-quarter')
   @isPublic()
-  @ApiParam({ name: 'branch_id', required: false })
+  @ApiQuery({ name: 'branch_id', required: false })
   @ApiOperation({
     summary: 'Tổng doanh thu của từng chi nhánh theo quý',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -487,7 +497,7 @@ export class DashboardController {
     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
   })
   async getTotalRevenueForEachBranchByQuarter(
-    @Param('branch_id') branch_id: string,
+    @Query('branch_id') branch_id: string,
   ) {
     return this.dashboardService.getTotalRevenueForEachBranchByQuarter(
       +branch_id,
@@ -495,11 +505,13 @@ export class DashboardController {
   }
 
   // ! Tổng doanh thu của từng chi nhánh theo năm
-  @Get('total-revenue-for-each-branch-by-year/:branch_id')
+  @Get('total-revenue-for-each-branch-by-year')
   @isPublic()
-  @ApiParam({ name: 'branch_id', required: false })
+  @ApiQuery({ name: 'branch_id', required: false })
   @ApiOperation({
     summary: 'Tổng doanh thu của từng chi nhánh theo năm',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -514,17 +526,19 @@ export class DashboardController {
     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
   })
   async getTotalRevenueForEachBranchByYear(
-    @Param('branch_id') branch_id: string,
+    @Query('branch_id') branch_id: string,
   ) {
     return this.dashboardService.getTotalRevenueForEachBranchByYear(+branch_id);
   }
 
   // ! Tổng doanh thu từng tháng trong năm của từng chi nhánh
-  @Get('total-revenue-for-each-branch-each-month/:branch_id')
+  @Get('total-revenue-for-each-branch-each-month')
   @isPublic()
-  @ApiParam({ name: 'branch_id', required: false })
+  @ApiQuery({ name: 'branch_id', required: false })
   @ApiOperation({
     summary: 'Tổng doanh thu từng tháng trong năm của từng chi nhánh',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -541,7 +555,7 @@ export class DashboardController {
     description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
   })
   async getTotalRevenueForEachBranchEachMonth(
-    @Param('branch_id') branch_id: string,
+    @Query('branch_id') branch_id: string,
   ) {
     return this.dashboardService.getTotalRevenueForEachBranchEachMonth(
       +branch_id,
@@ -549,12 +563,14 @@ export class DashboardController {
   }
 
   // ! Thống kê tiệc đang pending, success, cancel, processing của từng chi nhánh
-  @Get('count-booking-status-for-each-branch/:branch_id')
+  @Get('count-booking-status-for-each-branch')
   @isPublic()
-  @ApiParam({ name: 'branch_id', required: false })
+  @ApiQuery({ name: 'branch_id', required: false })
   @ApiOperation({
     summary:
       'Thống kê tiệc đang pending, success, cancel, processing của từng chi nhánh',
+    description:
+      'Không truyền branch_id sẽ lấy tất cả thông tin của tất cả chi nhánh',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -572,7 +588,7 @@ export class DashboardController {
       },
     ],
   })
-  async countBookingStatus(@Param('branch_id') branch_id: string) {
+  async countBookingStatus(@Query('branch_id') branch_id: string) {
     return this.dashboardService.countBookingStatus(+branch_id);
   }
 }

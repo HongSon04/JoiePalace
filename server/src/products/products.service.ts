@@ -95,6 +95,7 @@ export class ProductsService {
             connect: tagsConnect,
           },
         },
+        include: { categories: true, tags: true },
       });
 
       throw new HttpException(
@@ -375,6 +376,9 @@ export class ProductsService {
             where: { deleted: false },
             take: 10,
             orderBy: { created_at: 'desc' },
+            include: {
+              tags: true,
+            },
           },
         },
       });
@@ -725,6 +729,7 @@ export class ProductsService {
       const updatedproduct = await this.prismaService.products.update({
         where: { id: Number(id) },
         data: updateData,
+        include: { categories: true, tags: true },
       });
 
       throw new HttpException(

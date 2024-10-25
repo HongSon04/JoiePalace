@@ -81,6 +81,13 @@ export class PartyTypesService {
             })),
           },
         },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
       });
 
       throw new HttpException(
@@ -136,7 +143,11 @@ export class PartyTypesService {
             ],
           },
           include: {
-            products: true,
+            products: {
+              include: {
+                tags: true,
+              },
+            },
           },
           skip,
           take: itemsPerPage,
@@ -235,7 +246,11 @@ export class PartyTypesService {
             ],
           },
           include: {
-            products: true,
+            products: {
+              include: {
+                tags: true,
+              },
+            },
           },
           skip,
           take: itemsPerPage,
@@ -306,7 +321,11 @@ export class PartyTypesService {
       const partyType = await this.prismaService.party_types.findUnique({
         where: { id: Number(id) },
         include: {
-          products: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
@@ -415,6 +434,13 @@ export class PartyTypesService {
       const updatedPartyType = await this.prismaService.party_types.update({
         where: { id: Number(id) },
         data: dataUpdate,
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
       });
 
       throw new HttpException(

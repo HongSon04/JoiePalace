@@ -100,7 +100,6 @@ export class BranchesController {
         { name: 'slogan_images', maxCount: 6 },
         { name: 'diagram_images', maxCount: 6 },
         { name: 'equipment_images', maxCount: 6 },
-        { name: 'space_images', maxCount: 6 },
       ],
       {
         fileFilter: (req, file, cb) => {
@@ -503,7 +502,6 @@ export class BranchesController {
         { name: 'slogan_images', maxCount: 6 },
         { name: 'diagram_images', maxCount: 6 },
         { name: 'equipment_images', maxCount: 6 },
-        { name: 'space_images', maxCount: 6 },
       ],
       {
         fileFilter: (req, file, cb) => {
