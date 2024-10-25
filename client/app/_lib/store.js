@@ -7,6 +7,8 @@ import menuSlice from "./features/menu/menuSlice";
 import requestsSlice from "./features/requests/requestsSlice";
 import sidebarSlice from "./features/sidebar/sidebarSlice";
 import themeSlice from "./features/theme/themeSlice";
+import categoriesSlice from "./features/categories/categoriesSlice";
+import feedbacksSlice from "./features/feedbacks/feedbacksSlice";
 
 // import services
 
@@ -19,6 +21,8 @@ const store = configureStore({
     sidebar: sidebarSlice.reducer,
     menu: menuSlice.reducer,
     branch: branchSlice.reducer,
+    categories: categoriesSlice.reducer,
+    feedbacks: feedbacksSlice.reducer,
   },
 });
 

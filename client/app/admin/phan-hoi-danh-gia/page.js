@@ -5,7 +5,7 @@ import FeedbackTabs from "./FeedbackTabs";
 function Page() {
   return (
     <div>
-      <AdminHeader title="Phản hồi đánh giá" />
+      <AdminHeader title="Phản hồi & đánh giá" />
       <FeedbackBreadcrumbs />
       <FeedbackTabs />
     </div>
