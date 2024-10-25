@@ -57,6 +57,7 @@
     "rxjs": "^7.8.1",
     "slugify": "^1.6.6",
     "streamifier": "^0.1.1",
+    "swagger-themes": "^1.4.3",
     "uniqid": "^5.4.0",
     "vn-payments": "^1.1.0"
   },

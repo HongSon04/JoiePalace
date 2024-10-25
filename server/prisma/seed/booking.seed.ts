@@ -582,31 +582,28 @@ const booking_details = [
 ];
 
 export const bookingSeed = async () => {
-  // for (let i = 0; i < booking.length; i++) {
-  //   await prisma.bookings.create({
-  //     data: booking[i],
-  //   });
-  // }
-
-  for (let i = 6; i < booking_details.length; i++) {
-    await prisma.booking_details.create({
+  for (let i = 1; i <= booking.length; i++) {
+    const created_booking = await prisma.bookings.create({
       data: {
-        booking_id: i,
-        stage_id: booking_details[i].stage_id,
-        space_id: booking_details[i].space_id,
-        decor_id: booking_details[i].decor_id,
+        ...booking[i],
+        party_type_id: 1,
+      },
+    });
+    console.log('Created booking:', created_booking.id);
+  }
+
+  for (let i = 1; i <= booking_details.length; i++) {
+    const created_booking_details = await prisma.booking_details.create({
+      data: {
+        booking_id: Number(booking_details[i].booking_id),
+        decor_id: Number(booking_details[i].decor_id),
         menu_id: booking_details[i].menu_id,
-        payment_method: 'momo',
-        stage: booking_details[i].stage,
         amount_booking: booking_details[i].amount_booking,
         deposit_id: 1,
         fee: booking_details[i].fee,
         total_amount: booking_details[i].total_amount,
-        menu: booking_details[i].menu,
-        space: booking_details[i].space,
-        decor: booking_details[i].decor,
-        extra_service: booking_details[i].extra_service,
       } as any,
     });
+    console.log('Created booking details:', created_booking_details.id);
   }
 };

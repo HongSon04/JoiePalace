@@ -1,8 +1,17 @@
 import { PrismaClient } from '@prisma/client';
 import slugify from 'slugify';
-import * as bcrypt from 'bcrypt';
-import uniqid from 'uniqid';
 const prisma = new PrismaClient();
+
+const MakeSlugger = (str: string): string => {
+  return slugify(str, {
+    replacement: '-',
+    remove: undefined,
+    lower: true,
+    strict: false,
+    locale: 'vi',
+    trim: true,
+  });
+};
 
 const lastName = [
   'Võ',
@@ -168,64 +177,25 @@ const firstName = [
   'Tâm',
 ];
 
-const number = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const comments = ['Rất tốt', 'Tốt', 'Bình thường', 'Kém', 'Rất kém'];
+const rate = [1, 2, 3, 4, 5];
 
-const MakeSlugger = (str: string): string => {
-  return slugify(str, {
-    replacement: '-',
-    remove: undefined,
-    lower: true,
-    strict: false,
-    locale: 'vi',
-    trim: true,
-  });
-};
+export const feedbackSeed = async () => {
+  const findBranch = await prisma.branches.findMany();
+  const findUser = await prisma.users.findMany();
+  const findBook = await prisma.bookings.findMany();
 
-const adminUser = [
-  {
-    username: 'admin',
-    email: 'admin1@gmail.com',
-    role: 'admin',
-  },
-  {
-    username: 'admin2',
-    email: 'admin2@gmail.com',
-    role: 'admin',
-  },
-  {
-    username: 'admin3',
-    email: 'admin3@gmail.com',
-    role: 'admin',
-  },
-];
-
-const hashedPassword = bcrypt.hashSync('password123', 10);
-const dateNow = Number(new Date());
-const randomUnique = Math.floor(Math.random() * 90000000000000) + dateNow;
-const uid = uniqid();
-
-export const userSeed = async (count: number) => {
-  // for (let i = 0; i < adminUser.length; i++) {
-  //   const user = await prisma.users.create({
-  //     data: {
-  //       username: adminUser[i].username,
-  //       email: adminUser[i].email,
-  //       password: hashedPassword,
-  //       role: adminUser[i].role as any,
-  //       phone: `0${Math.floor(Math.random() * 1000000000)}`,
-  //     },
-  //   });
-  //   console.log`Admin user created: ${user.username}`;
-  // }
-  for (let i = 0; i < count; i++) {
-    const user = await prisma.users.create({
+  for (let i = 0; i < 1000; i++) {
+    const fb = await prisma.feedbacks.create({
       data: {
-        username: `${lastName[Math.floor(Math.random() * lastName.length)]} ${firstName[Math.floor(Math.random() * firstName.length)]} ${number[Math.floor(Math.random() * number.length)]}`,
-        email: `${MakeSlugger(lastName[Math.floor(Math.random() * lastName.length)])}${MakeSlugger(firstName[Math.floor(Math.random() * firstName.length)])}${number[Math.floor(Math.random() * number.length)]}${randomUnique + count + 1 + i}${uid}${i}@gmail.com`,
-        password: hashedPassword,
-        phone: `0${Math.floor(Math.random() * 1000000000)}`,
+        branch_id: findBranch[Math.floor(Math.random() * findBranch.length)].id,
+        user_id: findUser[Math.floor(Math.random() * findUser.length)].id,
+        booking_id: findBook[Math.floor(Math.random() * findBook.length)].id,
+        rate: rate[Math.floor(Math.random() * rate.length)],
+        comments: comments[Math.floor(Math.random() * comments.length)],
+        name: `${lastName[Math.floor(Math.random() * lastName.length)]} ${firstName[Math.floor(Math.random() * firstName.length)]}`,
       },
     });
-    console.log`User created: ${user.username}`;
+    console.log('Created feedback:', fb.name);
   }
 };
