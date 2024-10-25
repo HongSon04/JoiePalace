@@ -39,35 +39,49 @@ enum DepositStatus {
   success
 }
 
+// ? TypeNotification 
+enum TypeNotification {
+  booking_created
+  booking_confirm
+  booking_success
+  booking_cancel
+  booking_updated
+  deposit_success
+  deposit_cancel
+  feedback
+}
+
 model users {
-  id             Int          @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
   branch_id      Int?
-  branches       branches?    @relation(fields: [branch_id], references: [id])
+  branches       branches?       @relation(fields: [branch_id], references: [id])
   username       String?
-  email          String       @unique
+  email          String          @unique
   password       String
   platform       String?
   phone          String?
   avatar         String?
-  role           Role         @default(user)
-  active         Boolean      @default(true)
+  role           Role            @default(user)
+  active         Boolean         @default(true)
   refresh_token  String?
   verify_at      DateTime?
-  deleted        Boolean      @default(false)
+  deleted        Boolean         @default(false)
   deleted_at     DateTime?
   deleted_by     Int?
-  created_at     DateTime     @default(now())
-  updated_at     DateTime     @updatedAt
-  memberships_id Int?         @unique
-  memberships    memberships? @relation(fields: [memberships_id], references: [id])
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  memberships_id Int?            @unique
+  memberships    memberships?    @relation(fields: [memberships_id], references: [id])
   bookings       bookings[]
   feedbacks      feedbacks[]
+  notifications  notifications[]
 }
 
 model memberships {
   id                   Int        @id @default(autoincrement())
   name                 String
-  decsription          String
+  slug                 String     @unique
+  description          String
   booking_total_amount Int
   gifts                products[] @relation("MembershipGifts")
   images               String[]
@@ -289,12 +303,12 @@ model booking_details {
   menus          menus    @relation(fields: [menu_id], references: [id])
   deposit_id     Int
   deposits       deposits @relation(fields: [deposit_id], references: [id])
-  party_types    Json
-  decor          Json
-  menu           Json
-  extra_service  Json
+  party_types    Json?
+  decor          Json?
+  menu           Json?
+  extra_service  Json?
+  gift           Json?
   images         String[]
-  accessories    Json
   amount_booking Int      @default(0)
   fee            Int      @default(0)
   total_amount   Int      @default(0)
@@ -337,4 +351,27 @@ model blogs {
   updated_by        Int?
   created_at        DateTime   @default(now())
   updated_at        DateTime   @updatedAt
+}
+
+model notifications {
+  id         Int              @id @default(autoincrement())
+  user_id    Int
+  users      users            @relation(fields: [user_id], references: [id])
+  type       TypeNotification
+  title      String
+  content    String
+  is_read    Boolean          @default(false)
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+}
+
+model subscribers {
+  id                Int      @id @default(autoincrement())
+  email             String   @unique
+  is_receive        Boolean  @default(true)
+  is_receive_sales  Boolean  @default(true)
+  is_receive_notify Boolean  @default(true)
+  is_receive_blog   Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 }

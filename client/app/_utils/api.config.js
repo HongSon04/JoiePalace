@@ -60,6 +60,7 @@ export const API_CONFIG = {
   },
   // DASHBOARD API
   DASHBOARD: {
-    GET_BOOKING_STATUS: (id) => `${HOST}/dashboard/count-booking-status-for-each-branch/${id}` 
+    GET_BOOKING_STATUS: (id) => `${HOST}/dashboard/count-booking-status-for-each-branch/${id}`,
+    GET_BOOKING_BRANCH: (id) => `${HOST}/dashboard/get-all-info-by-each-time/${id}` 
   }
 };

@@ -10,36 +10,43 @@
   import "../../../_styles/globals.css";
   import Chart from "@/app/_components/Chart";
   import AdminHeader from "@/app/_components/AdminHeader";
-  import { fetchBranchDataById } from "@/app/_services/branchesServices";
+  import { fetchBranchDataById, fetchBranchBookingById } from "@/app/_services/branchesServices";
   const Page = ({ params }) => {
     const [userId, setUserId] = useState(null);
     const [dataBranch, setData] = useState(null);
+    const [dataBooking, setDataBooking] = useState(null);
     const [error, setError] = useState(null); 
     useEffect(() => {
       const storedUser = localStorage.getItem("user");
+      
       if (storedUser) {
         try {
           const userObject = JSON.parse(storedUser);
-          setUserId(userObject.id); 
-          const branchId = userObject.id;
-          // console.log("Branch ID:", branchId); 
+          setUserId(userObject.id);
+          const branchId = userObject.id; 
+
           const fetchBranchData = async () => {
             try {
-              const fetchedData = await fetchBranchDataById(branchId); 
-              setData(fetchedData);
-              console.log(fetchedData); // In ra dữ liệu fetchedData để kiểm tra
+              const [fetchedDataBranch, fetchedDataBoocking] = await Promise.all([
+                fetchBranchDataById(branchId),
+                fetchBranchBookingById(branchId)
+              ]);
+              
+              setData(fetchedDataBranch);
+              // setDataBooking(fetchedDataBoocking);
+              // console.log(fetchedDataBoocking);
             } catch (error) {
               console.error("Error fetching branch data:", error);
-              setError(error); 
+              setError(error);
             }
           };
-  
+    
           fetchBranchData(); // Gọi hàm fetchBranchData
         } catch (error) {
           console.error("Error parsing user data:", error);
         }
       }
-    }, []);  // Thêm [] để useEffect chỉ chạy một lần khi component mount
+    }, []);    
     const data = {
       labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
       datasets: [

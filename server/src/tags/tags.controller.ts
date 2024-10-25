@@ -144,7 +144,7 @@ export class TagsController {
     return this.tagsService.findOne(id);
   }
 
-  @Get('/get-by-slug/:slug')
+  @Get('/get-by-slug/:tag_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -171,7 +171,7 @@ export class TagsController {
     },
   })
   @ApiOperation({ summary: 'Lấy tag theo slug' })
-  findBySlug(@Param('slug') slug: string) {
+  findBySlug(@Param('tag_slug') slug: string) {
     return this.tagsService.findBySlug(slug);
   }
 

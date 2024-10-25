@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { FormatReturnData } from 'helper/FormatReturnData';
@@ -31,10 +33,7 @@ export class PartyTypesService {
     try {
       // Kiểm tra hình ảnh
       if (!files.images) {
-        throw new HttpException(
-          'Hình ảnh không được để trống',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Hình ảnh không được để trống');
       }
 
       // Kiểm tra tên loại tiệc
@@ -42,10 +41,7 @@ export class PartyTypesService {
         where: { name },
       });
       if (existingPartyType) {
-        throw new HttpException(
-          'Tên loại tiệc đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên loại tiệc đã tồn tại');
       }
 
       // Kiểm tra sản phẩm
@@ -53,10 +49,7 @@ export class PartyTypesService {
         where: { id: { in: products } },
       });
       if (foundProducts.length !== products.length) {
-        throw new HttpException(
-          'Sản phẩm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Kiểm tra giá
@@ -65,10 +58,7 @@ export class PartyTypesService {
         0,
       );
       if (totalProductPrice !== price) {
-        throw new HttpException(
-          'Giá loại tiệc không chính xác',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Giá loại tiệc không chính xác');
       }
 
       // Tải hình ảnh lên Cloudinary
@@ -106,7 +96,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> create: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -204,7 +195,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -302,7 +294,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -318,10 +311,7 @@ export class PartyTypesService {
       });
 
       if (!partyType) {
-        throw new HttpException(
-          'Không tìm thấy loại tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy loại tiệc');
       }
 
       throw new HttpException(
@@ -337,7 +327,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> findOne: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -357,10 +348,7 @@ export class PartyTypesService {
       });
 
       if (!partyType) {
-        throw new HttpException(
-          'Không tìm thấy loại tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy loại tiệc');
       }
 
       // Kiểm tra tên loại tiệc
@@ -372,10 +360,7 @@ export class PartyTypesService {
       });
 
       if (existingPartyType) {
-        throw new HttpException(
-          'Tên loại tiệc đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên loại tiệc đã tồn tại');
       }
 
       // Kiểm tra sản phẩm
@@ -384,10 +369,7 @@ export class PartyTypesService {
       });
 
       if (foundProducts.length !== products.length) {
-        throw new HttpException(
-          'Sản phẩm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Tính toán giá
@@ -397,10 +379,7 @@ export class PartyTypesService {
       );
 
       if (totalProductPrice !== price) {
-        throw new HttpException(
-          'Giá loại tiệc không chính xác',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Giá loại tiệc không chính xác');
       }
 
       // Tạo đối tượng cập nhật
@@ -423,10 +402,7 @@ export class PartyTypesService {
           'joiepalace/party',
         );
         if (!images) {
-          throw new HttpException(
-            'Upload hình ảnh thất bại',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new BadRequestException('Upload hình ảnh thất bại');
         }
         // Xóa hình ảnh cũ
         await this.cloudinaryService.deleteMultipleImagesByUrl(
@@ -454,7 +430,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> update: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -467,10 +444,7 @@ export class PartyTypesService {
       });
 
       if (!partyType) {
-        throw new HttpException(
-          'Không tìm thấy loại tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy loại tiệc');
       }
 
       await this.prismaService.party_types.update({
@@ -492,7 +466,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> remove: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -505,10 +480,7 @@ export class PartyTypesService {
       });
 
       if (!partyType) {
-        throw new HttpException(
-          'Không tìm thấy loại tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy loại tiệc');
       }
 
       await this.prismaService.party_types.update({
@@ -530,7 +502,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> restore: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -543,10 +516,7 @@ export class PartyTypesService {
       });
 
       if (!partyType) {
-        throw new HttpException(
-          'Không tìm thấy loại tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy loại tiệc');
       }
 
       // Remove images
@@ -566,7 +536,8 @@ export class PartyTypesService {
       }
       console.log('Lỗi từ partyTypesService -> hardDelete: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

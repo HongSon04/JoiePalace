@@ -246,7 +246,7 @@ export class DashboardController {
   async countAll() {
     return this.dashboardService.countAll();
   }
-  // ! Tổng doanh thư của tất cả các chi nhánh
+  // ! Tổng doanh thu của tất cả các chi nhánh
   @Get('total-revenue-for-all-branch')
   @isPublic()
   @ApiOperation({
@@ -301,6 +301,25 @@ export class DashboardController {
   })
   async getTotalRevenueForAllBranchByMonth() {
     return this.dashboardService.getTotalRevenueForAllBranchByMonth();
+  }
+
+  // ! Tổng doanh thu của tất cả các chi nhánh theo quý
+  @Get('total-revenue-for-all-branch-by-quarter')
+  @isPublic()
+  @ApiOperation({
+    summary: 'Tổng doanh thu của tất cả các chi nhánh theo quý',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tổng doanh thu của tất cả các chi nhánh theo quý',
+    example: 0,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+  })
+  async getTotalRevenueForAllBranchByQuarter() {
+    return this.dashboardService.getTotalRevenueForAllBranchByQuarter();
   }
 
   // ! Tổng doanh thu của tất cả các chi nhánh theo năm
@@ -444,6 +463,33 @@ export class DashboardController {
     @Param('branch_id') branch_id: string,
   ) {
     return this.dashboardService.getTotalRevenueForEachBranchByMonth(
+      +branch_id,
+    );
+  }
+
+  // ! Tổng doanh thu của từng chi nhánh theo quý
+  @Get('total-revenue-for-each-branch-by-quarter/:branch_id')
+  @isPublic()
+  @ApiParam({ name: 'branch_id', required: false })
+  @ApiOperation({
+    summary: 'Tổng doanh thu của từng chi nhánh theo quý',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Tổng doanh thu của từng chi nhánh theo quý',
+    example: {
+      'Hà Nội': [0, 0, 0, 0],
+      'Hồ Chí Minh': [0, 0, 0, 0],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+  })
+  async getTotalRevenueForEachBranchByQuarter(
+    @Param('branch_id') branch_id: string,
+  ) {
+    return this.dashboardService.getTotalRevenueForEachBranchByQuarter(
       +branch_id,
     );
   }

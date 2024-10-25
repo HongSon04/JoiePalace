@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import {
@@ -29,10 +31,7 @@ export class DecorsService {
     try {
       // Kiểm tra hình ảnh
       if (!files.images) {
-        throw new HttpException(
-          'Hình ảnh không được để trống',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Hình ảnh không được để trống');
       }
 
       // Kiểm tra tên trang trí
@@ -40,10 +39,7 @@ export class DecorsService {
         where: { name },
       });
       if (existingDecor) {
-        throw new HttpException(
-          'Tên trang trí đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên trang trí đã tồn tại');
       }
 
       // Kiểm tra sản phẩm
@@ -52,10 +48,7 @@ export class DecorsService {
       });
 
       if (foundProducts.length !== products.length) {
-        throw new HttpException(
-          'Sản phẩm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Tính toán tổng giá
@@ -64,10 +57,7 @@ export class DecorsService {
         0,
       );
       if (totalPrice < Number(price)) {
-        throw new HttpException(
-          'Giá trang trí không hợp lệ',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Giá trang trí không hợp lệ');
       }
 
       // Tải hình ảnh lên Cloudinary
@@ -77,10 +67,7 @@ export class DecorsService {
           'joiepalace/decors',
         );
       if (imagesDecor.length === 0) {
-        throw new HttpException(
-          'Upload hình ảnh thất bại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Upload hình ảnh thất bại');
       }
 
       // Tạo trang trí
@@ -110,7 +97,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> create', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -249,7 +237,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> findAll', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -386,10 +375,9 @@ export class DecorsService {
         throw error;
       }
       console.log('Lỗi từ decors.service.ts -> findAllDeleted', error);
-      throw new HttpException(
-        { message: error.message || 'Lấy danh sách trang trí thất bại' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({
+        message: error.message || 'Lấy danh sách trang trí thất bại',
+      });
     }
   }
 
@@ -404,10 +392,7 @@ export class DecorsService {
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       throw new HttpException(
@@ -423,7 +408,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> findOne', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -442,10 +428,7 @@ export class DecorsService {
         where: { id: Number(id) },
       });
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       const findDecorByName = await this.prismaService.decors.findFirst({
@@ -453,10 +436,7 @@ export class DecorsService {
       });
 
       if (findDecorByName) {
-        throw new HttpException(
-          'Tên trang trí đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên trang trí đã tồn tại');
       }
 
       // ? Kiểm tra sản phẩm
@@ -465,10 +445,7 @@ export class DecorsService {
       });
 
       if (foundProducts.length !== products.length) {
-        throw new HttpException(
-          'Sản phẩm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // ? Tính toán tổng giá
@@ -478,10 +455,7 @@ export class DecorsService {
       );
 
       if (totalPrice < Number(price)) {
-        throw new HttpException(
-          'Giá trang trí không hợp lệ',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Giá trang trí không hợp lệ');
       }
       const dataToUpdate: any = {
         name,
@@ -501,10 +475,7 @@ export class DecorsService {
           );
 
         if (!imagesDecor.length) {
-          throw new HttpException(
-            'Upload hình ảnh thất bại',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new BadRequestException('Upload hình ảnh thất bại');
         }
         // Delete old images
         await this.cloudinaryService.deleteMultipleImagesByUrl(decor.images);
@@ -529,7 +500,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> update', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -542,14 +514,11 @@ export class DecorsService {
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       if (decor.deleted) {
-        throw new HttpException('Trang trí đã bị xóa', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Trang trí đã bị xóa');
       }
 
       await this.prismaService.decors.update({
@@ -567,7 +536,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> delete', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -580,17 +550,11 @@ export class DecorsService {
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       if (!decor.deleted) {
-        throw new HttpException(
-          'Trang trí chưa bị xóa',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Trang trí chưa bị xóa');
       }
 
       await this.prismaService.decors.update({
@@ -608,7 +572,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> restore', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -621,17 +586,11 @@ export class DecorsService {
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       if (!decor.deleted) {
-        throw new HttpException(
-          'Trang trí chưa bị xóa',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Trang trí chưa bị xóa');
       }
 
       // Delete images
@@ -651,7 +610,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> destroy', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

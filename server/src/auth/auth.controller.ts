@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpException,
@@ -218,22 +219,25 @@ export class AuthController {
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(`Chỉ chấp nhận ảnh jpg, jpeg, png`, 400),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else {
-          const fileSize = parseInt(req.headers['content-length']);
-          if (fileSize > 1024 * 1024 * 5) {
-            return cb(
-              new HttpException('Kích thước ảnh tối đa 5MB', 400),
-              false,
-            );
-          } else {
-            cb(null, true);
-          }
         }
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+            false,
+          );
+        }
+        if (file.size > 1024 * 1024 * 5) {
+          return cb(
+            new BadRequestException('Kích thước ảnh tối đa 5MB'),
+            false,
+          );
+        }
+        cb(null, true);
       },
     }),
   )
