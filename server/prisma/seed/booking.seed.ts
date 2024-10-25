@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import slugify from 'slugify';
 import { CreateBookingDto } from 'src/bookings/dto/create-booking.dto';
 const prisma = new PrismaClient();
+import uniqid from 'uniqid';
 
 const booking: CreateBookingDto[] = [
   {
@@ -272,12 +273,136 @@ const booking: CreateBookingDto[] = [
   },
 ];
 
+const deposit = [
+  {
+    name: 'Tiền cọc 1',
+    email: 'test@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 10000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 2',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 20000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 3',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 30000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 4',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 40000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 5',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 50000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 6',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 60000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 7',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 70000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 8',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 80000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 9',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 90000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 10',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 100000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 11',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 110000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 12',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 120000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 13',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 130000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 14',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 140000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 15',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 150000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+];
+
 const booking_details = [
   {
     booking_id: 1,
     stage_id: 1,
     decor_id: 1,
     menu_id: 1,
+    deposit_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
     decor: ['ABC'],
@@ -292,6 +417,7 @@ const booking_details = [
     booking_id: 2,
     stage_id: 1,
     decor_id: 1,
+    deposit_id: 2,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
@@ -307,6 +433,7 @@ const booking_details = [
     booking_id: 3,
     stage_id: 1,
     decor_id: 1,
+    deposit_id: 3,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
@@ -321,6 +448,7 @@ const booking_details = [
   {
     booking_id: 4,
     stage_id: 1,
+    deposit_id: 4,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -336,6 +464,7 @@ const booking_details = [
   {
     booking_id: 5,
     stage_id: 1,
+    deposit_id: 5,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -352,6 +481,7 @@ const booking_details = [
     booking_id: 6,
     stage_id: 1,
     decor_id: 1,
+    deposit_id: 6,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
@@ -367,6 +497,7 @@ const booking_details = [
     booking_id: 7,
     stage_id: 1,
     decor_id: 1,
+    deposit_id: 7,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
@@ -381,6 +512,7 @@ const booking_details = [
   {
     booking_id: 8,
     stage_id: 1,
+    deposit_id: 8,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -396,6 +528,7 @@ const booking_details = [
   {
     booking_id: 9,
     stage_id: 1,
+    deposit_id: 9,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -411,6 +544,7 @@ const booking_details = [
   {
     booking_id: 10,
     stage_id: 1,
+    deposit_id: 10,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -426,6 +560,7 @@ const booking_details = [
   {
     booking_id: 11,
     stage_id: 1,
+    deposit_id: 11,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -441,7 +576,9 @@ const booking_details = [
   {
     booking_id: 12,
     stage_id: 1,
+    deposit_id: 12,
     decor_id: 1,
+
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
@@ -456,6 +593,7 @@ const booking_details = [
   {
     booking_id: 13,
     stage_id: 1,
+    deposit_id: 13,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -471,6 +609,7 @@ const booking_details = [
   {
     booking_id: 14,
     stage_id: 1,
+    deposit_id: 14,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -486,6 +625,7 @@ const booking_details = [
   {
     booking_id: 15,
     stage_id: 1,
+    deposit_id: 15,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -501,6 +641,7 @@ const booking_details = [
   {
     booking_id: 16,
     stage_id: 1,
+    deposit_id: 16,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -546,15 +687,24 @@ const booking_details = [
 ];
 
 export const bookingSeed = async () => {
-  for (let i = 1; i <= booking.length; i++) {
-    const created_booking = await prisma.bookings.create({
-      data: {
-        ...booking[i],
-        party_type_id: 1,
-      },
-    });
-    console.log('Created booking:', created_booking.id);
-  }
+  // for (let i = 1; i <= booking.length; i++) {
+  //   const created_booking = await prisma.bookings.create({
+  //     data: {
+  //       ...booking[i],
+  //       party_type_id: 1,
+  //     },
+  //   });
+  //   console.log('Created booking:', created_booking.id);
+  // }
+
+  // for (let i = 1; i <= deposit.length; i++) {
+  //   const created_deposit = await prisma.deposits.create({
+  //     data: {
+  //       ...(deposit[i] as any),
+  //     },
+  //   });
+  //   console.log('Created deposit:', created_deposit.id);
+  // }
 
   for (let i = 1; i <= booking_details.length; i++) {
     const created_booking_details = await prisma.booking_details.create({
