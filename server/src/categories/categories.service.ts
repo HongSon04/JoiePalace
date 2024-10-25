@@ -331,14 +331,26 @@ export class CategoriesService {
   // ! Get One Category By Slug
   async findOneBySlug(slug: string) {
     try {
-      const category = await this.prismaService.categories.findUnique({
+      const category = (await this.prismaService.categories.findUnique({
         where: {
           slug,
         },
         include: {
           tags: true,
         },
+      })) as any;
+      // ? Find Children Categories
+      const childrenCategories = await this.prismaService.categories.findMany({
+        where: {
+          category_id: category.id,
+        },
+        include: {
+          tags: true,
+        },
       });
+      if (childrenCategories.length > 0) {
+        category.children = FormatReturnData(childrenCategories, []);
+      }
       if (!category) {
         throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
