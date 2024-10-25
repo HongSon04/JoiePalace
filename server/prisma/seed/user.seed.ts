@@ -181,14 +181,44 @@ const MakeSlugger = (str: string): string => {
   });
 };
 
+const adminUser = [
+  {
+    username: 'admin',
+    email: 'admin1@gmail.com',
+    role: 'admin',
+  },
+  {
+    username: 'admin2',
+    email: 'admin2@gmail.com',
+    role: 'admin',
+  },
+  {
+    username: 'admin3',
+    email: 'admin3@gmail.com',
+    role: 'admin',
+  },
+];
+
 const hashedPassword = bcrypt.hashSync('password123', 10);
 const dateNow = Number(new Date());
 const randomUnique = Math.floor(Math.random() * 90000000000000) + dateNow;
 const uid = uniqid();
 
 export const userSeed = async (count: number) => {
+  // for (let i = 0; i < adminUser.length; i++) {
+  //   const user = await prisma.users.create({
+  //     data: {
+  //       username: adminUser[i].username,
+  //       email: adminUser[i].email,
+  //       password: hashedPassword,
+  //       role: adminUser[i].role as any,
+  //       phone: `0${Math.floor(Math.random() * 1000000000)}`,
+  //     },
+  //   });
+  //   console.log`Admin user created: ${user.username}`;
+  // }
   for (let i = 0; i < count; i++) {
-    await prisma.users.create({
+    const user = await prisma.users.create({
       data: {
         username: `${lastName[Math.floor(Math.random() * lastName.length)]} ${firstName[Math.floor(Math.random() * firstName.length)]} ${number[Math.floor(Math.random() * number.length)]}`,
         email: `${MakeSlugger(lastName[Math.floor(Math.random() * lastName.length)])}${MakeSlugger(firstName[Math.floor(Math.random() * firstName.length)])}${number[Math.floor(Math.random() * number.length)]}${randomUnique + count + 1 + i}${uid}${i}@gmail.com`,
@@ -196,5 +226,6 @@ export const userSeed = async (count: number) => {
         phone: `0${Math.floor(Math.random() * 1000000000)}`,
       },
     });
+    console.log`User created: ${user.username}`;
   }
 };

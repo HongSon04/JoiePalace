@@ -118,7 +118,6 @@ const branches = [
 let branchIDS: number[] = [];
 export const branchSeed = async () => {
   for (const branch of branches) {
-    console.log('Creating branch:', branch.name);
     const branches = await prisma.branches.create({
       data: {
         name: branch.name,
@@ -143,5 +142,6 @@ export const branchSeed = async () => {
       },
     });
     branchIDS.push(branches.id);
+    console.log('Creating branch:', branch.name);
   }
 };

@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateBranchDto, ImageUploadBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
@@ -14,6 +16,7 @@ import {
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { MakeSlugger } from 'helper/slug';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class BranchesService {
@@ -33,7 +36,6 @@ export class BranchesService {
       diagram_images: 'Hình ảnh sơ đồ không được để trống',
       slogan_images: 'Hình ảnh slogan không được để trống',
       equipment_images: 'Hình ảnh thiết bị không được để trống',
-      space_images: 'Hình ảnh không gian không được để trống',
     };
 
     Object.keys(requiredFiles).forEach((key) => {
@@ -44,10 +46,7 @@ export class BranchesService {
 
     // Nếu có lỗi, trả về ngay lập tức và không tiến hành upload
     if (errors.length > 0) {
-      throw new HttpException(
-        { message: errors.join(', '), data: null },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({ message: errors.join(', '), data: null });
     }
 
     try {
@@ -72,7 +71,6 @@ export class BranchesService {
         uploadImages('diagram_images', 'joiepalace/diagram'),
         uploadImages('slogan_images', 'joiepalace/slogan'),
         uploadImages('equipment_images', 'joiepalace/equipment'),
-        uploadImages('space_images', 'joiepalace/space'),
       ]);
 
       const { name, address, phone, email } = branch;
@@ -97,24 +95,13 @@ export class BranchesService {
           diagram_images: branchImages.diagram_images,
           equipment_images: branchImages.equipment_images,
         },
+        include: {
+          stages: true,
+        },
       });
 
-      // Tạo Space mới
-      const bodySpace = {
-        branch_id: createbranch.id,
-        name: branch.spaces_name,
-        slug: MakeSlugger(branch.spaces_name),
-        description: branch.spaces_description,
-        images: branchImages.space_images,
-      };
-      const createSpace = await this.prismaService.spaces.create({
-        data: bodySpace,
-      });
-
-      const { deleted, deleted_at, deleted_by, ...data } = createbranch;
       const result = {
-        ...data,
-        space: createSpace,
+        ...FormatReturnData(createbranch, []),
       };
 
       throw new HttpException(
@@ -130,7 +117,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> createbranch', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -188,6 +176,9 @@ export class BranchesService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.branches.findMany({
           where: whereConditions,
+          include: {
+            stages: true,
+          },
           skip: skip,
           take: itemsPerPage,
           orderBy: {
@@ -210,7 +201,7 @@ export class BranchesService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -221,7 +212,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> getAllbranchs', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -279,6 +271,9 @@ export class BranchesService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.branches.findMany({
           where: whereConditions,
+          include: {
+            stages: true,
+          },
           skip: skip,
           take: itemsPerPage,
           orderBy: {
@@ -301,7 +296,7 @@ export class BranchesService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -312,7 +307,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> getAllDeletedbranchs', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -324,19 +320,14 @@ export class BranchesService {
         where: {
           id: Number(id),
         },
-      });
-      if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const spaces = await this.prismaService.spaces.findMany({
-        where: {
-          branch_id: Number(id),
+        include: {
+          stages: true,
         },
       });
+      if (!branch) {
+        throw new NotFoundException('Địa điểm không tồn tại');
+      }
+
       const stages = await this.prismaService.stages.findMany({
         where: {
           branch_id: Number(id),
@@ -345,11 +336,13 @@ export class BranchesService {
       const { deleted, deleted_at, deleted_by, ...data } = branch;
       let result = {
         ...data,
-        spaces,
         stages,
       };
 
-      throw new HttpException({ data: result }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(result, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -357,6 +350,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getbranchById', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -368,32 +362,18 @@ export class BranchesService {
         where: {
           slug,
         },
+        include: {
+          stages: true,
+        },
       });
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
 
-      const spaces = await this.prismaService.spaces.findMany({
-        where: {
-          branch_id: Number(branch.id),
-        },
-      });
-      const stages = await this.prismaService.stages.findMany({
-        where: {
-          branch_id: Number(branch.id),
-        },
-      });
-      const { deleted, deleted_at, deleted_by, ...data } = branch;
-      let result = {
-        ...data,
-        spaces,
-        stages,
-      };
-
-      throw new HttpException({ data: result }, HttpStatus.OK);
+      throw new HttpException(
+        { data: FormatReturnData(branch, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -401,6 +381,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getbranchBySlug', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -422,7 +403,6 @@ export class BranchesService {
           diagram_images: 'Hình ảnh sơ đồ không được để trống',
           slogan_images: 'Hình ảnh slogan không được để trống',
           equipment_images: 'Hình ảnh thiết bị không được để trống',
-          space_images: 'Hình ảnh không gian không được để trống',
         };
 
         Object.entries(requiredFiles).forEach(([key, message]) => {
@@ -432,10 +412,10 @@ export class BranchesService {
         });
 
         if (errors.length > 0) {
-          throw new HttpException(
-            { message: errors.join(', '), data: null },
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new BadRequestException({
+            message: errors.join(', '),
+            data: null,
+          });
         }
 
         // Tạo hàm upload ảnh mới nếu cần
@@ -468,8 +448,6 @@ export class BranchesService {
         slogan_description,
         diagram_description,
         equipment_description,
-        spaces_name,
-        spaces_description,
       } = branch;
 
       // Tạo slug mới nếu cần
@@ -481,10 +459,7 @@ export class BranchesService {
       });
 
       if (checkNamebranch) {
-        throw new HttpException(
-          'Tên địa điểm đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên địa điểm đã tồn tại');
       }
 
       // Cập nhật branch
@@ -504,30 +479,13 @@ export class BranchesService {
           diagram_images: branchImages.diagram_images,
           equipment_images: branchImages.equipment_images,
         },
-      });
-
-      // Cập nhật Space nếu có
-      const updatedSpace = await this.prismaService.spaces.update({
-        where: { branch_id: Number(id) },
-        data: {
-          name: spaces_name,
-          description: spaces_description,
-          images: branchImages.space_images,
+        include: {
+          stages: true,
         },
       });
 
-      const stages = await this.prismaService.stages.findMany({
-        where: { branch_id: Number(id) },
-      });
-
-      const result = {
-        ...updatedbranch,
-        space: updatedSpace,
-        stages,
-      };
-
       throw new HttpException(
-        { message: 'Cập nhật địa điểm thành công', data: result },
+        { message: 'Cập nhật địa điểm thành công', data: updatedbranch },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -537,6 +495,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> updatebranch', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -551,10 +510,7 @@ export class BranchesService {
       });
       console.log(Number(reqUser.id));
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
       await this.prismaService.branches.update({
         where: {
@@ -573,7 +529,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> softDeletebranch', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -587,10 +544,7 @@ export class BranchesService {
         },
       });
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
       await this.prismaService.branches.update({
         where: {
@@ -609,7 +563,8 @@ export class BranchesService {
       }
       console.log('Lỗi từ branches.service.ts -> restorebranch', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -622,10 +577,7 @@ export class BranchesService {
         where: { id: Number(branch_id) },
       });
       if (!branch) {
-        throw new HttpException(
-          'Địa điểm không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Địa điểm không tồn tại');
       }
 
       // ! Tạo một hàm xử lý chung cho việc xóa ảnh và dữ liệu
@@ -655,19 +607,6 @@ export class BranchesService {
         (stage) => stage.images || [],
       );
 
-      // ! Xóa Spaces
-      await deleteEntityImagesAndRecords(
-        () =>
-          this.prismaService.spaces.findMany({
-            where: { branch_id: Number(branch_id) },
-          }),
-        () =>
-          this.prismaService.spaces.deleteMany({
-            where: { branch_id: Number(branch_id) },
-          }),
-        (space) => space.images || [],
-      );
-
       // Xóa branch
 
       if (branch && branch.images?.length) {
@@ -685,6 +624,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> hardDeletebranch', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -754,6 +694,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> deleteImageByUrl', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

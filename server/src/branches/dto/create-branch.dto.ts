@@ -37,14 +37,6 @@ export class CreateBranchDto {
   @IsNotEmpty({ message: 'Mô tả thiết bị không được để trống' })
   equipment_description: string;
 
-  @ApiProperty({ required: true })
-  @IsNotEmpty({ message: 'Tên không gian không được để trống' })
-  spaces_name: string;
-
-  @ApiProperty({ required: true })
-  @IsNotEmpty({ message: 'Mô tả không gian không được để trống' })
-  spaces_description: string;
-
   @ApiProperty({ type: [String] })
   images: string[] | any;
 
@@ -56,9 +48,6 @@ export class CreateBranchDto {
 
   @ApiProperty({ type: [String] })
   equipment_images: string[] | any;
-
-  @ApiProperty({ type: [String] })
-  space_images: string[] | any;
 }
 
 export class ImageUploadBranchDto {
@@ -77,8 +66,4 @@ export class ImageUploadBranchDto {
   @ApiProperty({ type: [String] })
   @IsNotEmpty({ message: 'Hình ảnh thiết bị không được để trống' })
   equipment_images: string[] | any;
-
-  @ApiProperty({ type: [String] })
-  @IsNotEmpty({ message: 'Hình ảnh không gian không được để trống' })
-  space_images: string[] | any;
 }

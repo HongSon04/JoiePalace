@@ -1,30 +1,35 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
   Query,
   Request,
-  Put,
-  HttpStatus,
+  UploadedFiles,
+  UseInterceptors
 } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
+import { FilterDto } from 'helper/dto/Filter.dto';
+import { CategoriesService } from './categories.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
-@ApiTags('categories')
+@ApiTags('Categories - Quản lý danh mục')
 @Controller('api/categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
@@ -35,9 +40,10 @@ export class CategoriesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -69,8 +75,45 @@ export class CategoriesController {
     },
   })
   @ApiOperation({ summary: 'Tạo danh mục mới' })
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file) {
+          return cb(
+            new BadRequestException('Không có tệp nào được tải lên'),
+            false,
+          );
+        }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  create(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
+  ) {
+    return this.categoriesService.create(createCategoryDto, files);
   }
 
   // ! Get All Category
@@ -125,9 +168,10 @@ export class CategoriesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -209,7 +253,7 @@ export class CategoriesController {
   }
 
   // ! Get Category By Slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:category_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -241,8 +285,47 @@ export class CategoriesController {
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin danh mục theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
+  findOneBySlug(@Param('category_slug') slug: string) {
     return this.categoriesService.findOneBySlug(slug);
+  }
+
+  // ! Get Category by Tag Slug
+  @Get('get-by-tag-slug/:tag_slug')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          name: 'string',
+          slug: 'string',
+          description: 'string',
+          short_description: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy danh mục !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh mục theo tag slug' })
+  findOneByTagSlug(@Param('tag_slug') tag_slug: string) {
+    return this.categoriesService.findCategoryByTagSlug(tag_slug);
   }
 
   // ! Update Category
@@ -251,9 +334,10 @@ export class CategoriesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -273,11 +357,46 @@ export class CategoriesController {
     },
   })
   @ApiOperation({ summary: 'Cập nhật thông tin danh mục' })
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file) {
+          return cb(
+            new BadRequestException('Không có tệp nào được tải lên'),
+            false,
+          );
+        }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
+      },
+    }),
+  )
   update(
     @Param('category_id') id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
-    return this.categoriesService.update(id, updateCategoryDto);
+    return this.categoriesService.update(id, updateCategoryDto, files);
   }
 
   // ! Delete Category
@@ -286,9 +405,10 @@ export class CategoriesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -318,9 +438,10 @@ export class CategoriesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -350,9 +471,10 @@ export class CategoriesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

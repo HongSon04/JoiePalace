@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { PrismaService } from 'src/prisma.service';
@@ -19,6 +20,7 @@ export class DashboardService {
       const promises = [
         this.getTotalRevenueForAllBranchByWeek(),
         this.getTotalRevenueForAllBranchByMonth(),
+        this.getTotalRevenueForAllBranchByQuarter(),
         this.getTotalRevenueForAllBranchByYear(),
         this.getTotalRevenueForAllBranchEachMonth(),
         this.countBookingStatusForAllBranch(),
@@ -27,6 +29,7 @@ export class DashboardService {
       const [
         total_revune_by_week,
         total_revune_by_month,
+        total_revune_by_quarter,
         total_revune_by_year,
         total_revune_each_month,
         count_booking_status,
@@ -36,6 +39,7 @@ export class DashboardService {
         count_all_info,
         total_revune_by_week,
         total_revune_by_month,
+        total_revune_by_quarter,
         total_revune_by_year,
         total_revune_each_month,
         count_booking_status,
@@ -46,7 +50,8 @@ export class DashboardService {
       }
       console.log('Lỗi từ dashboardService -> getAllInfo: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -60,6 +65,7 @@ export class DashboardService {
         this.getTotalRevenueForEachBranch(branch_id),
         this.getTotalRevenueForEachBranchByWeek(branch_id),
         this.getTotalRevenueForEachBranchByMonth(branch_id),
+        this.getTotalRevenueForEachBranchByQuarter(branch_id),
         this.getTotalRevenueForEachBranchByYear(branch_id),
         this.getTotalRevenueForEachBranchEachMonth(branch_id),
         this.countBookingStatus(branch_id),
@@ -69,6 +75,7 @@ export class DashboardService {
         total_revune,
         total_revune_by_week,
         total_revune_by_month,
+        total_revune_by_quarter,
         total_revune_by_year,
         total_revune_each_month,
         count_booking_status,
@@ -79,6 +86,7 @@ export class DashboardService {
         total_revune,
         total_revune_by_week,
         total_revune_by_month,
+        total_revune_by_quarter,
         total_revune_by_year,
         total_revune_each_month,
         count_booking_status,
@@ -89,7 +97,8 @@ export class DashboardService {
       }
       console.log('Lỗi từ dashboardService -> getAllInfoByEachTime: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -97,19 +106,15 @@ export class DashboardService {
   // ! Tổng số lượng user, branch, product, category, tags, staff,menus,decors,party_type,furniture
   async countAll() {
     try {
-      console.log('countAll');
-
       const [
         totalUser,
         totalBranch,
         totalProduct,
         totalCategory,
         totalTags,
-        totalStaff,
         totalMenus,
         totalDecors,
         totalPartyType,
-        totalFurniture,
         totalFeedBack,
       ] = await Promise.all([
         this.prismaService.users.count(),
@@ -117,11 +122,9 @@ export class DashboardService {
         this.prismaService.products.count(),
         this.prismaService.categories.count(),
         this.prismaService.tags.count(),
-        this.prismaService.staffs.count(),
         this.prismaService.menus.count(),
         this.prismaService.decors.count(),
         this.prismaService.party_types.count(),
-        this.prismaService.funitures.count(),
         this.prismaService.feedbacks.count(),
       ]);
 
@@ -131,11 +134,9 @@ export class DashboardService {
         totalProduct,
         totalCategory,
         totalTags,
-        totalStaff,
         totalMenus,
         totalDecors,
         totalPartyType,
-        totalFurniture,
         totalFeedBack,
       };
     } catch (error) {
@@ -144,7 +145,8 @@ export class DashboardService {
       }
       console.log('Lỗi từ dashboardService -> countAll: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -184,7 +186,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -235,7 +238,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -286,7 +290,73 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
+
+  // ! Tổng doanh thu của tất cả các chi nhánh theo quý
+  async getTotalRevenueForAllBranchByQuarter() {
+    try {
+      // B1: Lấy ngày bắt đầu và kết thúc của năm
+      const now = new Date();
+      const startOfYear = dayjs(now).startOf('year').toDate();
+      const endOfYear = dayjs(now).endOf('year').toDate();
+
+      // B2: Lấy tất cả các booking
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          created_at: {
+            gte: startOfYear,
+            lte: endOfYear,
+          },
+        },
+        include: {
+          booking_details: {
+            select: {
+              total_amount: true,
+            },
+          },
+        },
+      });
+
+      const quarterlyRevenue = [0, 0, 0, 0];
+
+      // B4: Tính doanh thu cho từng booking
+      bookings.forEach((booking) => {
+        const bookingTotal = booking.booking_details.reduce(
+          (innerAcc, detail) => innerAcc + detail.total_amount,
+          0,
+        );
+
+        // Xác định quý của booking
+        const bookingDate = new Date(booking.created_at);
+        const month = bookingDate.getMonth(); // 0 - 11
+
+        if (month >= 0 && month <= 2) {
+          quarterlyRevenue[0] += bookingTotal; // Q1
+        } else if (month >= 3 && month <= 5) {
+          quarterlyRevenue[1] += bookingTotal; // Q2
+        } else if (month >= 6 && month <= 8) {
+          quarterlyRevenue[2] += bookingTotal; // Q3
+        } else if (month >= 9 && month <= 11) {
+          quarterlyRevenue[3] += bookingTotal; // Q4
+        }
+      });
+
+      return quarterlyRevenue;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log(
+        'Lỗi từ dashboardService -> getTotalRevenueForAllBranchByQuarter: ',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -337,7 +407,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -378,7 +449,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -417,7 +489,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -489,7 +562,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -569,7 +643,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -649,7 +724,107 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
+
+  // ! Tổng doanh thu của từng chi nhánh theo quý
+  async getTotalRevenueForEachBranchByQuarter(branch_id: number) {
+    try {
+      const data = {};
+      let branches;
+
+      // B1: Lấy tất cả các chi nhánh hoặc chi nhánh cụ thể
+      if (!branch_id) {
+        branches = await this.prismaService.branches.findMany();
+
+        // Nếu không có chi nhánh nào, trả về mảng rỗng
+        if (branches.length === 0) {
+          return [];
+        }
+      } else {
+        const branch = await this.prismaService.branches.findUnique({
+          where: {
+            id: Number(branch_id),
+          },
+        });
+        if (!branch || !branch.id) {
+          throw new NotFoundException('Không tìm thấy chi nhánh');
+        }
+        branches = [branch];
+      }
+
+      // Khởi tạo đối tượng doanh thu cho từng chi nhánh
+      branches.forEach((branch) => {
+        data[branch.name] = [0, 0, 0, 0];
+      });
+
+      // B2: Lấy ngày bắt đầu và kết thúc của năm
+      const now = new Date();
+      const startOfYear = dayjs(now).startOf('year').toDate();
+      const endOfYear = dayjs(now).endOf('year').toDate();
+
+      // B3: Lấy tất cả các booking cho từng chi nhánh trong một truy vấn
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          branch_id: {
+            in: branches.map((branch) => Number(branch.id)),
+          },
+          created_at: {
+            gte: startOfYear,
+            lte: endOfYear,
+          },
+        },
+        include: {
+          booking_details: {
+            select: {
+              total_amount: true,
+            },
+          },
+        },
+      });
+      // B4: Tính doanh thu cho từng booking
+      bookings.forEach((booking) => {
+        const bookingTotal = booking.booking_details.reduce(
+          (innerAcc, detail) => innerAcc + detail.total_amount,
+          0,
+        );
+
+        // Xác định quý của booking
+        const bookingDate = new Date(booking.created_at);
+        const month = bookingDate.getMonth(); // 0 - 11
+
+        // Cập nhật doanh thu cho từng chi nhánh theo quý
+        const branchName = branches.find(
+          (branch) => branch.id === booking.branch_id,
+        )?.name; // Lấy tên chi nhánh từ id
+        if (branchName) {
+          if (month >= 0 && month <= 2) {
+            data[branchName][0] += bookingTotal; // Q1
+          } else if (month >= 3 && month <= 5) {
+            data[branchName][1] += bookingTotal; // Q2
+          } else if (month >= 6 && month <= 8) {
+            data[branchName][2] += bookingTotal; // Q3
+          } else if (month >= 9 && month <= 11) {
+            data[branchName][3] += bookingTotal; // Q4
+          }
+        }
+      });
+
+      return data;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log(
+        'Lỗi từ dashboardService -> getTotalRevenueForEachBranchByQuarter: ',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -729,7 +904,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -873,7 +1049,8 @@ export class DashboardService {
         error,
       );
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -940,7 +1117,8 @@ export class DashboardService {
       }
       console.log('Lỗi từ dashboardService -> countBookingStatus: ', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

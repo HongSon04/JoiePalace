@@ -12,6 +12,7 @@ import { FeedbacksService } from './feedbacks.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiProperty,
@@ -19,8 +20,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+@ApiTags('Feedbacks - Quản lý đánh giá')
 @Controller('/api/feedbacks')
-@ApiTags('Feedbacks')
 export class FeedbacksController {
   constructor(private readonly feedbacksService: FeedbacksService) {}
 
@@ -30,9 +31,10 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Tạo feedback' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -73,9 +75,10 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy tất cả feedback đã được duyệt' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -109,9 +112,10 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy tất cả feedback bị ẩn' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -140,14 +144,15 @@ export class FeedbacksController {
   }
 
   // ! Lấy tất cả feedback theo id
-  @Get('get/:id')
+  @Get('get/:feedback_id')
   @ApiHeaders([
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy feedback theo id' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -175,7 +180,7 @@ export class FeedbacksController {
       message: 'Lỗi server',
     },
   })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('feedback_id') id: string) {
     return this.feedbacksService.findOne(+id);
   }
 
@@ -185,9 +190,10 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy feedback theo ID của đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -225,9 +231,10 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy feedback theo ID của chi nhánh' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -265,9 +272,10 @@ export class FeedbacksController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy feedback theo ID của người dùng' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -300,14 +308,15 @@ export class FeedbacksController {
   }
 
   // ! Cập nhật feedback
-  @Patch('update/:id')
+  @Patch('update/:feedback_id')
   @ApiHeaders([
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Cập nhật feedback' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -339,20 +348,21 @@ export class FeedbacksController {
     },
   })
   update(
-    @Param('id') id: string,
+    @Param('feedback_id') id: string,
     @Body() updateFeedbackDto: UpdateFeedbackDto,
   ) {
     return this.feedbacksService.update(+id, updateFeedbackDto);
   }
 
-  @Delete('destroy/:id')
+  @Delete('destroy/:feedback_id')
   @ApiHeaders([
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Xóa feedback' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -366,7 +376,7 @@ export class FeedbacksController {
       message: 'Không tìm thấy feedback',
     },
   })
-  remove(@Param('id') id: string) {
+  remove(@Param('feedback_id') id: string) {
     return this.feedbacksService.remove(+id);
   }
 }

@@ -12,11 +12,13 @@ import {
   UploadedFiles,
   Query,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -27,8 +29,8 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
+@ApiTags('Blogs - Quản lý bài viết')
 @Controller('/api/blogs')
-@ApiTags('blogs')
 export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
@@ -38,9 +40,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -73,27 +76,36 @@ export class BlogsController {
   })
   @ApiOperation({ summary: 'Tạo bài viết mới' })
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -152,9 +164,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -192,6 +205,204 @@ export class BlogsController {
   @ApiQuery({ name: 'search', required: false })
   findAllDeleted(@Query() query: FilterDto) {
     return this.blogsService.findAllDeleted(query);
+  }
+
+  // ! Get all blogs by category
+  @Get('get-all-by-category/:category_id')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy danh mục !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo danh mục' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllByCategory(
+    @Param('category_id') category_id: string,
+    @Query() query: FilterDto,
+  ) {
+    return this.blogsService.findAllByCategory(category_id, query);
+  }
+
+  // ! Get all blogs by slug category
+  @Get('get-all-by-slug-category/:category_slug')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy danh mục !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo slug danh mục' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllBySlugCategory(
+    @Param('category_slug') slug: string,
+    @Query() query: FilterDto,
+  ) {
+    return this.blogsService.findAllBySlugCategory(slug, query);
+  }
+
+  // ! Get all blogs by tag
+  @Get('get-all-by-tag/:tag_id')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy tag !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo tag' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllByTag(@Param('tag_id') tag_id: string, @Query() query: FilterDto) {
+    return this.blogsService.findAllByTag(tag_id, query);
+  }
+
+  // ! Get all blogs by slug tag
+  @Get('get-all-by-slug-tag/:tag_slug')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: [
+        {
+          id: 'number',
+          title: 'string',
+          slug: 'string',
+          content: 'string',
+          images: 'string',
+          deleted: 'boolean',
+          deleted_at: 'date',
+          deleted_by: 'number',
+          created_at: 'date',
+          updated_at: 'date',
+        },
+      ],
+      pagination: {
+        currentPage: 'number',
+        itemsPerPage: 'number',
+        totalItems: 'number',
+        totalPages: 'number',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    example: {
+      message: 'Không tìm thấy tag !',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra !',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách bài viết theo slug tag' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  findAllBySlugTag(@Param('tag_slug') slug: string, @Query() query: FilterDto) {
+    return this.blogsService.findAllBySlugTag(slug, query);
   }
 
   // ! Get a blog by id
@@ -232,7 +443,7 @@ export class BlogsController {
   }
 
   // ! Get a blog by slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:blog_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -264,34 +475,43 @@ export class BlogsController {
     },
   })
   @ApiOperation({ summary: 'Lấy bài viết theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
+  findOneBySlug(@Param('blog_slug') slug: string) {
     return this.blogsService.findOneBySlug(slug);
   }
 
   // ! Update a blog by id
   @Patch('update/:blog_id')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -299,9 +519,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -342,29 +563,38 @@ export class BlogsController {
   }
 
   // ! Update a blog by slug
-  @Patch('update-by-slug/:slug')
+  @Patch('update-by-slug/:blog_slug')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -372,9 +602,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -407,7 +638,7 @@ export class BlogsController {
   })
   @ApiOperation({ summary: 'Cập nhật bài viết theo slug' })
   updateBySlug(
-    @Param('slug') slug: string,
+    @Param('blog_slug') slug: string,
     @Body() updateBlogDto: UpdateBlogDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
@@ -420,9 +651,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -452,9 +684,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -478,9 +711,10 @@ export class BlogsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

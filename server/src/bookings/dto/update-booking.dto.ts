@@ -1,26 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
-
-interface Accessories {
-  table: [{ id: number; quantity: number; amount?: number }];
-  chair: { id: number; amount?: number };
-  extra_services: [{ id: number; quantity: number; amount?: number }];
-}
-
-interface ExtraServices {
-  id: number;
-  name?: string;
-  description?: string;
-  short_description?: string;
-  images?: string[];
-  quantity: number;
-  amount?: number;
-  total_price?: number;
-}
+import { BookingStatus } from 'helper/enum/booking_status.enum';
+import { PaymentMethod } from 'helper/enum/payment_method.enum';
 
 export class UpdateBookingDto {
   @ApiProperty({ required: false })
   user_id: number;
+
+  @ApiProperty({ required: true })
+  booking_id: number;
 
   @ApiProperty({ required: true })
   branch_id: number;
@@ -32,19 +20,10 @@ export class UpdateBookingDto {
   stage_id: number;
 
   @ApiProperty({ required: true })
-  space_id: number;
-
-  @ApiProperty({ required: true })
   decor_id: number;
 
   @ApiProperty({ required: true })
   menu_id: number;
-
-  @ApiProperty({ required: true })
-  @IsEnum(['cash', 'bank', 'momo', 'vnpay'], {
-    message: 'Phương thức thanh toán không hợp lệ (cash, bank, momo, vnpay)',
-  })
-  payment_method: string;
 
   @ApiProperty({ required: true })
   name: string;
@@ -64,25 +43,12 @@ export class UpdateBookingDto {
   @ApiProperty({ required: true })
   note: string;
 
-  @ApiProperty({
-    example: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    },
-  })
-  accessories: Accessories;
+  @ApiProperty({ required: true })
+  table_count: number;
+
   @ApiProperty({
     description:
-      'Tổng tiền của sự kiện: Tiền trang trí + Tiền không gian + tiền ghế(10 * tổng bàn) + tổng tiền bàn + tiền menu(menu * tổng bàn) + phí',
+      'Tổng tiền của sự kiện: Tiền trang trí + tiền ghế 100k/1 tiền ghế 50k/1 (1 bàn = 10 ghế) => (100k + (50k * 10)) + tiền menu(menu * tổng bàn) + phí',
   })
   amount: number;
 
@@ -102,7 +68,7 @@ export class UpdateBookingDto {
   is_deposit: boolean;
 
   @ApiProperty({ required: true })
-  @IsEnum(['pending', 'processing', 'success', 'cancel'], {
+  @IsEnum(BookingStatus, {
     message: 'Trạng thái không hợp lệ (pending, processing, success, cancel)',
   })
   status: string;

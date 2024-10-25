@@ -1,9 +1,11 @@
 import { User as UserEntity } from './entities/user.entity';
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -18,6 +20,8 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
+import { Role } from 'helper/enum/role.enum';
 
 @Injectable()
 export class UserService {
@@ -30,7 +34,8 @@ export class UserService {
 
   // ! Create User
   async create(createUserDto: CreateUserDto) {
-    const { username, email, password, phone, role, avatar } = createUserDto;
+    const { username, email, password, phone, role, avatar, branch_id } =
+      createUserDto;
 
     try {
       // ? Check email exist
@@ -40,7 +45,19 @@ export class UserService {
         },
       });
       if (findEmail) {
-        throw new HttpException('Email đã tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Email đã tồn tại');
+      }
+
+      if (branch_id) {
+        const checkBranch = await this.prismaService.branches.findUnique({
+          where: {
+            id: Number(branch_id),
+          },
+        });
+
+        if (!checkBranch) {
+          throw new NotFoundException('Chi nhánh không tồn tại');
+        }
       }
       // ? hashed password
       const hashedPassword = this.hashedPassword(password);
@@ -49,15 +66,25 @@ export class UserService {
         data: {
           username,
           email,
+          branch_id: branch_id ? Number(branch_id) : null,
           password: hashedPassword,
           phone,
-          role,
+          role: role as Role,
           avatar,
+        },
+        include: {
+          memberships: true,
         },
       });
 
       // ? Return token
-      throw new HttpException('Tạo mới thành công', HttpStatus.CREATED);
+      throw new HttpException(
+        {
+          message: 'Tạo tài khoản thành công',
+          data: FormatReturnData(user, ['password', 'refresh_token']),
+        },
+        HttpStatus.CREATED,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -65,6 +92,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> create: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -76,12 +104,20 @@ export class UserService {
         where: {
           id: Number(reqUser.id),
         },
+        include: {
+          memberships: true,
+        },
       });
       if (!findUser) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       const { password, refresh_token, ...user } = findUser;
-      throw new HttpException({ data: user }, HttpStatus.OK);
+      throw new HttpException(
+        {
+          data: FormatReturnData(user, ['password', 'refresh_token']),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -89,6 +125,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getProfile: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -104,13 +141,12 @@ export class UserService {
         },
       });
       if (!findUser) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       // ? Check new password !== old password
       if (oldPassword === newPassword) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Mật khẩu mới không được trùng với mật khẩu cũ',
-          HttpStatus.BAD_REQUEST,
         );
       }
       // ? Compare password
@@ -120,17 +156,11 @@ export class UserService {
       );
 
       if (!comparePassword) {
-        throw new HttpException(
-          'Mật khẩu cũ không chính xác',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Mật khẩu cũ không chính xác');
       }
       // ? Check new password
       if (newPassword !== confirmPassword) {
-        throw new HttpException(
-          'Mật khẩu xác nhận không khớp',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Mật khẩu xác nhận không khớp');
       }
       // ? Hashed password
       const hashedPassword = this.hashedPassword(newPassword);
@@ -150,6 +180,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changePassword: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -165,20 +196,29 @@ export class UserService {
         },
       });
       if (!findUser) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       // ? Update user
-      await this.prismaService.users.update({
+      const user = await this.prismaService.users.update({
         where: {
           id: Number(reqUser.id),
         },
         data: {
           username,
           phone,
-          role,
+          role: role as Role,
+        },
+        include: {
+          memberships: true,
         },
       });
-      throw new HttpException('Cập nhật thông tin thành công', HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Thay đổi thông tin cá nhân thành công',
+          data: FormatReturnData(user, ['password', 'refresh_token']),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -186,6 +226,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changeProfile: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -214,6 +255,7 @@ export class UserService {
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
+          { role: { contains: search, mode: 'insensitive' } },
         ],
         ...sortRangeDate,
       };
@@ -221,6 +263,9 @@ export class UserService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
+          include: {
+            memberships: true,
+          },
           skip,
           take: itemsPerPage,
           orderBy: { created_at: 'desc' },
@@ -239,7 +284,7 @@ export class UserService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -251,6 +296,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAll: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -280,6 +326,7 @@ export class UserService {
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
+          { role: { contains: search, mode: 'insensitive' } },
         ],
         ...sortRangeDate,
       };
@@ -287,6 +334,9 @@ export class UserService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
+          include: {
+            memberships: true,
+          },
           skip,
           take: itemsPerPage,
           orderBy: { created_at: 'desc' },
@@ -305,7 +355,7 @@ export class UserService {
       };
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -317,6 +367,78 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAllDeleted: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
+
+  // ! Get All User By Branch Id
+  async getAllByBranchId(query: FilterDto, branch_id: number) {
+    try {
+      const page = Number(query.page) || 1;
+      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      const search = query.search || '';
+      const skip = (page - 1) * itemsPerPage;
+
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? { created_at: { gte: new Date(startDate), lte: new Date(endDate) } }
+          : {};
+
+      const whereConditions: any = {
+        deleted: false,
+        branch_id: Number(branch_id),
+        OR: [
+          { username: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+          { role: { contains: search, mode: 'insensitive' } },
+        ],
+        ...sortRangeDate,
+      };
+
+      const [res, total] = await this.prismaService.$transaction([
+        this.prismaService.users.findMany({
+          where: whereConditions,
+          include: {
+            memberships: true,
+          },
+          skip,
+          take: itemsPerPage,
+          orderBy: { created_at: 'desc' },
+        }),
+        this.prismaService.users.count({ where: whereConditions }),
+      ]);
+
+      const lastPage = Math.ceil(total / itemsPerPage);
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
+      throw new HttpException(
+        {
+          data: FormatReturnData(res, ['password', 'refresh_token']),
+          pagination: paginationInfo,
+        },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ user.service.ts -> getAllByBranchId: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -328,19 +450,18 @@ export class UserService {
         where: {
           id: Number(id),
         },
+        include: {
+          memberships: true,
+        },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
-      const {
-        password,
-        refresh_token,
-        deleted,
-        deleted_at,
-        deleted_by,
-        ...userData
-      } = user;
-      throw new HttpException({ data: userData }, HttpStatus.OK);
+
+      throw new HttpException(
+        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -348,6 +469,38 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getById: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
+
+  // ! Get User By Email
+  async getByEmail(email: string) {
+    try {
+      const user = await this.prismaService.users.findUnique({
+        where: {
+          email,
+        },
+        include: {
+          memberships: true,
+        },
+      });
+      if (!user) {
+        throw new NotFoundException('User không tồn tại');
+      }
+
+      throw new HttpException(
+        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ user.service.ts -> getById: ', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -361,7 +514,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       await this.prismaService.users.update({
         where: {
@@ -373,7 +526,7 @@ export class UserService {
           deleted_by: Number(reqUser.id) as any,
         },
       });
-      throw new HttpException('Xóa thành công', HttpStatus.OK);
+      throw new HttpException('Xóa nguời dùng thành công', HttpStatus.OK);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -381,6 +534,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> softDelete: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -394,7 +548,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       await this.prismaService.users.update({
         where: {
@@ -414,6 +568,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> restore: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -427,7 +582,7 @@ export class UserService {
         },
       });
       if (!user) {
-        throw new HttpException('User không tồn tại', HttpStatus.BAD_REQUEST);
+        throw new NotFoundException('User không tồn tại');
       }
       // ? Delete Image
       if (user.avatar) {
@@ -446,6 +601,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> hardDelete: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -490,6 +646,4 @@ export class UserService {
     const hashedPassword = bcrypt.hashSync(password, 10);
     return hashedPassword;
   }
-
-  // ! Test Api
 }

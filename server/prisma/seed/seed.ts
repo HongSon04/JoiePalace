@@ -4,6 +4,10 @@ import { branchSeed } from './branch.seed';
 import { categoriesSeed } from './categories.seed';
 import { productSeed } from './product.seed';
 import { menuSeed } from './menu.seed';
+import { bookingSeed } from './booking.seed';
+import { partyTypesSeed } from './party_types';
+import { stageSeed } from './stage.seed';
+import { feedbackSeed } from './feedback.seed';
 
 const prisma = new PrismaClient();
 
@@ -13,12 +17,20 @@ const seedMap: { [key: string]: (number: number) => Promise<void> } = {
   category: categoriesSeed,
   product: productSeed,
   menu: menuSeed,
+  booking: bookingSeed,
+  party: partyTypesSeed,
+  stage: stageSeed,
+  feedback: feedbackSeed,
   all: async (number: number) => {
     await userSeed(number);
     await branchSeed();
     await categoriesSeed();
     await productSeed();
+    await stageSeed();
     await menuSeed();
+    await partyTypesSeed();
+    await bookingSeed();
+    await feedbackSeed();
   },
 };
 

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { DepositsService } from './deposits.service';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiResponse,
@@ -16,13 +17,13 @@ import {
 import { UpdateDepositDto } from './dto/update-status.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('deposits')
+@ApiTags('Deposits - Quản lý đặt cọc')
 @Controller('api/deposits')
 export class DepositsController {
   constructor(private readonly depositsService: DepositsService) {}
 
   // ? Find By ID
-  @Get('get/:id')
+  @Get('get/:deposit_id')
   @isPublic()
   @ApiOperation({ summary: 'Lấy chi tiết thông tin đặt cọc' })
   @ApiResponse({
@@ -50,7 +51,7 @@ export class DepositsController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Đã có lỗi xảy ra',
   })
-  findOneById(@Param('id') id: string) {
+  findOneById(@Param('deposit_id') id: string) {
     return this.depositsService.findOne(+id);
   }
 
@@ -88,14 +89,15 @@ export class DepositsController {
   }
 
   // ? Update
-  @Patch('update/:id')
+  @Patch('update/:deposit_id')
   @ApiHeaders([
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -122,7 +124,10 @@ export class DepositsController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Đã có lỗi xảy ra',
   })
-  update(@Param('id') id: string, @Body() updateDepositDto: UpdateDepositDto) {
+  update(
+    @Param('deposit_id') id: string,
+    @Body() updateDepositDto: UpdateDepositDto,
+  ) {
     return this.depositsService.update(+id, updateDepositDto);
   }
 
@@ -132,9 +137,10 @@ export class DepositsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Cập nhật trạng thái đặt cọc theo mã giao dịch' })
   @ApiResponse({
     status: HttpStatus.OK,

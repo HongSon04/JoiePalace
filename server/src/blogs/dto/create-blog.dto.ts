@@ -12,7 +12,7 @@ import {
 export class CreateBlogDto {
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Danh mục bài viết không được để trống' })
-  category_blog_id: number;
+  category_id: number;
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Tiêu đề không được để trống' })
   title: string;
@@ -29,7 +29,7 @@ export class CreateBlogDto {
   content: string;
 
   @ApiProperty({ required: true })
-  images: string;
+  images: string[];
 
   @ApiProperty({ example: [1, 2, 3], required: false })
   @IsArray({ message: 'Tags phải là một mảng' })

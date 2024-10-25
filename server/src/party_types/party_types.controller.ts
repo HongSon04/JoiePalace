@@ -13,6 +13,7 @@ import {
   Query,
   Request,
   Put,
+  BadRequestException,
 } from '@nestjs/common';
 import { PartyTypesService } from './party_types.service';
 import {
@@ -21,6 +22,7 @@ import {
 } from './dto/create-party_type.dto';
 import { UpdatePartyTypeDto } from './dto/update-party_type.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -31,7 +33,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('party-types')
+@ApiTags('Party Types - Quản lý loại tiệc')
 @Controller('api/party-types')
 export class PartyTypesController {
   constructor(private readonly partyTypesService: PartyTypesService) {}
@@ -42,9 +44,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -73,27 +76,36 @@ export class PartyTypesController {
   })
   @ApiOperation({ summary: 'Tạo loại tiệc' })
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -148,9 +160,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -211,47 +224,16 @@ export class PartyTypesController {
     return this.partyTypesService.findOne(id);
   }
 
-  // ! Get party type by slug
-  @Get('get-by-slug/:slug')
-  @isPublic()
-  @ApiResponse({
-    status: HttpStatus.OK,
-    example: {
-      data: {
-        id: 'number',
-        name: 'string',
-        slug: 'string',
-        description: 'string',
-        short_description: 'string',
-        images: 'array',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    example: {
-      message: 'Loại tiệc không tồn tại',
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    example: {
-      message: 'Lỗi server vui lòng thử lại sau',
-    },
-  })
-  @ApiOperation({ summary: 'Lấy loại tiệc theo slug' })
-  findBySlug(@Param('slug') slug: string) {
-    return this.partyTypesService.findBySlug(slug);
-  }
   // ! Update party type
   @Patch('update/:party_types_id')
   @ApiHeaders([
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -279,27 +261,36 @@ export class PartyTypesController {
   })
   @ApiOperation({ summary: 'Cập nhật loại tiệc' })
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -317,9 +308,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -349,9 +341,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -381,9 +374,10 @@ export class PartyTypesController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: { message: 'Xóa loại tiệc thành công' },
