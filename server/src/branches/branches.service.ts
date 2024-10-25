@@ -638,7 +638,6 @@ export class BranchesService {
           name: 'branch_details',
           imageFields: ['slogan_images', 'diagram_images', 'equipment_images'],
         },
-        { name: 'spaces', imageField: 'images' },
         { name: 'stages', imageField: 'images' },
       ];
 

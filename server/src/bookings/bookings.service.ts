@@ -700,7 +700,7 @@ export class BookingsService {
         }
       }
 
-      // Fetching user, branch, space, stage, decor, and menu in parallel
+      // Fetching user, branch,  stage, decor, and menu in parallel
       const [user, branch, stage, decor, menu, party_types] = await Promise.all(
         [
           this.prismaService.users.findUnique({
