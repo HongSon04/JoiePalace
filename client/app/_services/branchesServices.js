@@ -42,9 +42,8 @@ export const fetchBranchDataById = async (branchId) => {
   try {
     const response = await axios.get(API_CONFIG.DASHBOARD.GET_BOOKING_STATUS(branchId));
     
-    // Kiểm tra và trả về dữ liệu đúng
     if (Array.isArray(response.data) && response.data.length > 0) {
-      return response.data[0]; // Trả về đối tượng đầu tiên
+      return response.data[0];
     } else {
       throw new Error("Không có dữ liệu cho chi nhánh này");
     }
@@ -65,3 +64,15 @@ export const fetchBranchBookingById = async (branchId) => {
     throw error;
   }
 };
+
+export const fetchBranchTotalRevenueMonth = async (branchId) => {
+  try {
+    const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_EACH_MONTH(branchId));
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu chi nhánh");
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+

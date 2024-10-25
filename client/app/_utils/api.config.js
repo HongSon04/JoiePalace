@@ -7,7 +7,7 @@ const AUTH_API = `${HOST}/auth`;
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
-
+const DASHBOARD_API = `${HOST}/dashboard`;
 // API Endpoints
 export const API_CONFIG = {
   // AUTH API
@@ -60,7 +60,11 @@ export const API_CONFIG = {
   },
   // DASHBOARD API
   DASHBOARD: {
-    GET_BOOKING_STATUS: (id) => `${HOST}/dashboard/count-booking-status-for-each-branch/${id}`,
-    GET_BOOKING_BRANCH: (id) => `${HOST}/dashboard/get-all-info-by-each-time/${id}` 
+    GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
+    GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH: `${DASHBOARD_API}/total-revenue-for-all-branch-each-month`,
+    GET_BOOKING_STATUS: (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+    GET_BOOKING_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`
+
   }
 };

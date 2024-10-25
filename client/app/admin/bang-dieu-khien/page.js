@@ -1,8 +1,8 @@
-  
-export const metadata = {
-  title: "Bảng điều khiển",
-};
-import React from "react";
+"use client";
+// export const metadata = {
+//   title: "Bảng điều khiển",
+// };
+import React, { useEffect, useState } from "react";
 import { PiArrowSquareOutLight } from "react-icons/pi";
 import { FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
 import { BsThreeDots } from "react-icons/bs";
@@ -10,7 +10,32 @@ import { FaPlus } from "react-icons/fa6";
 import "../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
-const page = () => {
+import { fetchAllDashBoard, fetchAllTotalRevenueMonth } from "@/app/_services/apiServices";
+
+const Page = () => {
+  const [userId, setUserId] = useState(null);
+  const [dataAdmin, setDataAdmin] = useState(null);
+  const [totalRevenueData, setTotalRevenueData] = useState(null); // Thêm state cho dữ liệu doanh thu
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    const fetchAminData = async () => {
+      try {
+        const adminData = await fetchAllDashBoard();
+        const revenueData = await fetchAllTotalRevenueMonth(); 
+        console.log(revenueData);
+        
+        setDataAdmin(adminData);
+        setTotalRevenueData(revenueData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchAminData();
+  }, []);
+ 
     const data = {
       labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
       datasets: [
@@ -57,63 +82,72 @@ const page = () => {
 
       </AdminHeader>
       <div className="container px-2 flex gap-[10px] w-full overflow-x-auto max-w-[1200px] text-white">
-        <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col  gap-8  w-[251px]">
-            <div className="flex justify-between items-center">
-                <p className="text-red-400 text-2xl font-bold">111</p>
-                <p className="text-base font-normal  ">Xem</p>
-            </div>
-            <div className="flex justify-between items-center">
+        {dataAdmin ? (
+          <>
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
+              <div className="flex justify-between items-center">
+                <p className="text-red-400 text-2xl font-bold">{dataAdmin.count_all_info.totalFeedBack}</p>
+                {/* <p className="text-base font-normal">Xem</p> */}
+              </div>
+              <div className="flex justify-between items-center">
                 <p className="text-red-400 text-base font-normal">Yêu cầu xử lí</p>
-                <PiArrowSquareOutLight className="text-2xl " />
+                <PiArrowSquareOutLight className="text-2xl" />
+              </div>
             </div>
-        </div>  
-        <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
-            <div className="flex justify-between items-center">
-                <p className=" text-2xl font-bold">1111</p>
-                <p className="text-teal-300 text-base font-normal">+100</p>
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
+              <div className="flex justify-between items-center">
+                <p className="text-2xl font-bold">{dataAdmin.count_all_info.totalUser}</p>
+                {/* <p className="text-teal-300 text-base font-normal">+100</p> */}
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-white text-base font-normal">Khách hàng</p>
+                {/* <div className="flex justify-between items-center gap-1 text-teal-300">
+                  <FiArrowUpRight className="text-2xl" />
+                  <p className="text-base">2%</p>
+                </div> */}
+                <PiArrowSquareOutLight className="text-2xl" />
+              </div>
             </div>
-            <div className="flex justify-between items-center">
-                <p className="text-red-white text-base font-normal ">Yêu cầu xử lí</p>
-                <div className="flex justify-between items-center gap-1 text-teal-300">
-                    <FiArrowUpRight className="text-2xl" />
-                    <p className="text-base">2%</p>
-                </div>
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
+              <div className="flex justify-between items-center">
+                <p className="text-2xl font-bold">{dataAdmin.total_revune_by_month}</p>
+                {/* <p className="text-red-400 text-base font-normal">-100</p> */}
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-base font-normal">Tiệc trong tháng</p>
+                {/* <div className="flex justify-between items-center gap-1 text-red-400">
+                  <FiArrowDownRight className="text-2xl" />
+                  <p className="text-base">2%</p>
+                </div> */}
+                <PiArrowSquareOutLight className="text-2xl" />
+              </div>
             </div>
-        </div>
-        <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
-            <div className="flex justify-between items-center">
-                <p className=" text-2xl font-bold">1111</p>
-                <p className="text-red-400 text-base font-normal">-100</p>
-            </div>
-            <div className="flex justify-between items-center">
-                <p className=" text-base font-normal">Tiệc trong tháng</p>
-                <div className="flex justify-between items-center gap-1 text-red-400">
-                    <FiArrowDownRight className="text-2xl" />
-                    <p className="text-base">2%</p>
-                </div>
-            </div>
-        </div>
-        <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
-            <div className="flex justify-between items-center">
-                <p className=" text-2xl font-bold">111</p>
-                <p className="text-base font-normal ">Xem</p>
-            </div>
-            <div className="flex justify-between items-center">
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
+              <div className="flex justify-between items-center">
+                <p className="text-2xl font-bold">{dataAdmin.count_booking_status.pending}</p>
+                {/* <p className="text-base font-normal">Xem</p> */}
+              </div>
+              <div className="flex justify-between items-center">
                 <p className="text-red-400 text-base font-normal">Tiệc dự kiến</p>
-                <PiArrowSquareOutLight className="text-2xl " />
+                <PiArrowSquareOutLight className="text-2xl" />
+              </div>
             </div>
-        </div>
-        <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8 w-[251px]">
-            <div className="flex justify-between items-center">
-                <p className=" text-2xl font-bold">111</p>
-                <p className="text-base font-normal ">Xem</p>
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
+              <div className="flex justify-between items-center">
+                <p className="text-2xl font-bold">{dataAdmin.count_booking_status.processing}</p>
+                {/* <p className="text-base font-normal">Xem</p> */}
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-base font-normal">Tiệc đang diễn ra</p>
+                <PiArrowSquareOutLight className="text-2xl" />
+              </div>
             </div>
-            <div className="flex justify-between items-center">
-                <p className="  text-base font-normal">Tiệc đang diễn ra</p>
-                <PiArrowSquareOutLight className="text-2xl " />
-            </div>
-        </div>
+          </>
+        ) : (
+          <p>Đang tải dữ liệu...</p>
+        )}
       </div>
+
 
 
       <div className="container  flex gap-8 w-full h-full">
@@ -431,4 +465,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

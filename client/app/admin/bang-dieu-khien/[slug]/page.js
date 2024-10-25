@@ -10,43 +10,39 @@
   import "../../../_styles/globals.css";
   import Chart from "@/app/_components/Chart";
   import AdminHeader from "@/app/_components/AdminHeader";
-  import { fetchBranchDataById, fetchBranchBookingById } from "@/app/_services/branchesServices";
+  import { fetchBranchDataById, fetchBranchBookingById, fetchBranchTotalRevenueMonth } from "@/app/_services/branchesServices";
   const Page = ({ params }) => {
     const [userId, setUserId] = useState(null);
     const [dataBranch, setData] = useState(null);
     const [dataBooking, setDataBooking] = useState(null);
-    const [error, setError] = useState(null); 
+    const [revenueMonth, setDataRevenueMonth] = useState(null);
+  
     useEffect(() => {
       const storedUser = localStorage.getItem("user");
-      
+  
       if (storedUser) {
         try {
           const userObject = JSON.parse(storedUser);
           setUserId(userObject.id);
-          const branchId = userObject.id; 
-
-          const fetchBranchData = async () => {
+          const branchId = userObject.id;
+  
+          const fetchAminData = async () => {
             try {
-              const [fetchedDataBranch, fetchedDataBoocking] = await Promise.all([
-                fetchBranchDataById(branchId),
-                fetchBranchBookingById(branchId)
-              ]);
-              
-              setData(fetchedDataBranch);
-              // setDataBooking(fetchedDataBoocking);
-              // console.log(fetchedDataBoocking);
+              const dataRevenueMonth = await fetchBranchTotalRevenueMonth(branchId);
+              console.log("Dữ liệu doanh thu tháng:", dataRevenueMonth);
+              setDataRevenueMonth(dataRevenueMonth); 
             } catch (error) {
-              console.error("Error fetching branch data:", error);
-              setError(error);
+              console.error("Error fetching data:", error);
             }
           };
-    
-          fetchBranchData(); // Gọi hàm fetchBranchData
+  
+          fetchAminData();
         } catch (error) {
           console.error("Error parsing user data:", error);
         }
       }
-    }, []);    
+    }, []);
+     
     const data = {
       labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
       datasets: [
@@ -129,10 +125,9 @@
                   </div>
               </div>
           </div>
-          {dataBranch ? (
-            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
+          <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
               <div className="flex justify-between items-center">
-                  <p className=" text-2xl font-bold">{dataBranch.data.pending}</p>
+                  <p className=" text-2xl font-bold"></p>
                   <p className="text-base font-normal ">Xem</p>
               </div>
               <div className="flex justify-between items-center">
@@ -140,15 +135,11 @@
                   <PiArrowSquareOutLight className="text-2xl " />
               </div>
             </div>
-          ) : (
-            <p>Đang tải dữ liệu...</p>
-          )}
 
       
-          {dataBranch ? (
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-2xl font-bold">{dataBranch.data?.processing}</p> {/* Sử dụng optional chaining */}
+                <p className="text-2xl font-bold"></p> 
                 <p className="text-base font-normal">Xem</p>
               </div>
               <div className="flex justify-between items-center">
@@ -156,9 +147,6 @@
                 <PiArrowSquareOutLight className="text-2xl" />
               </div>
             </div>
-          ) : (
-            <p>Đang tải dữ liệu...</p>
-          )}
 
         
           
