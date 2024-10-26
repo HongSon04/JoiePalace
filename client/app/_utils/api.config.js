@@ -7,16 +7,14 @@ const AUTH_API = `${HOST}/auth`;
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
-<<<<<<< HEAD
 const DASHBOARD_API = `${HOST}/dashboard`;
-=======
 const PRODUCTS_API = `${HOST}/products`;
 const FEEDBACKS_API = `${HOST}/feedbacks`;
-const NOTIFICATIONS_API = `${HOST}/notifications`;
 
->>>>>>> 15b1bd28e0ca16f1fcad2ca4d4b52d4b2caa8928
 // API Endpoints
 export const API_CONFIG = {
+  GENERAL_BRANCH: "ho-chi-minh",
+
   // AUTH API
   AUTH: {
     LOGIN: `${AUTH_API}/login`,
@@ -65,7 +63,6 @@ export const API_CONFIG = {
     RESTORE: (id) => `${CATEGORIES_API}/restore/${id}`,
     DESTROY: (id) => `${CATEGORIES_API}/destroy/${id}`,
   },
-<<<<<<< HEAD
   // DASHBOARD API
   DASHBOARD: {
     GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
@@ -76,13 +73,13 @@ export const API_CONFIG = {
     GET_TOTAL_REVENUE_BRANCH_QUARTER: `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter`,
     GET_TOTAL_REVENUE_BRANCH_YEAR: `${DASHBOARD_API}/total-revenue-for-each-branch-by-year`,
     GET_ALL_BRANCH: `${HOST}/branches/get-all`,
-    GET_BOOKING_STATUS: (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_BOOKING_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`, 
-    
-
-  }
-=======
+    GET_BOOKING_STATUS: (id) =>
+      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+    GET_BOOKING_BRANCH: (id) =>
+      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+  },
 
   // PRODUCTS API
   PRODUCTS: {
@@ -114,5 +111,4 @@ export const API_CONFIG = {
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {},
->>>>>>> 15b1bd28e0ca16f1fcad2ca4d4b52d4b2caa8928
 };
