@@ -5,11 +5,11 @@ import { Image } from "@chakra-ui/react";
 import IconButton from "@/app/_components/IconButton";
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Carousel from "react-multi-carousel";
-import "@/app/_styles/client.css";
 import TextFade from "@/app/_components/TextFade";
+import "@/app/_styles/client.css";
 import { fetchBranchBySlug } from "@/app/_services/branchesServices";
 
 const section6 = [
@@ -47,18 +47,13 @@ const textContainerVariants = {
 };
 
 const PageLocation = () => {
+  const [branch, setBranch] = useState(null);
   const carouselRef = useRef();
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselMapRef1 = useRef(null);
   const carouselMapRef2 = useRef(null);
-
   const { slug } = useParams();
-
-  useEffect(() => {
-    console.log(fetchBranchBySlug(slug));
-  }, [slug]);
-
   useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
@@ -68,6 +63,14 @@ const PageLocation = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+  // call api
+  useEffect(() => {
+    const getBranch = async (slug) => {
+      const branchBySlug = await fetchBranchBySlug(slug);
+      setBranch(branchBySlug[0]);
+    };
+    getBranch(slug);
+  }, [slug]);
   const handlePrevious = () => {
     if (carouselMapRef1.current && carouselMapRef2.current) {
       carouselMapRef1.current.previous();
@@ -83,6 +86,21 @@ const PageLocation = () => {
   const handleSlideChange = (nextSlide) => {
     setCurrentSlide(nextSlide);
   };
+  if (!branch) return;
+  const splitIntoSpans = (str) => {
+    const words = str.split(" ");
+    const result = [];
+
+    for (let i = 0; i < words.length; i += 2) {
+      const span = words.slice(i, i + 2).join(" ");
+      result.push(span);
+    }
+
+    return result;
+  };
+
+  const spans = splitIntoSpans(branch.slogan);
+  console.log(branch);
 
   const JsxContent = (
     <>
@@ -90,7 +108,7 @@ const PageLocation = () => {
       <section className="section banner w-full h-screen relative top-0 left-0">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <Image
-            src="/images-client/banners/banner-2.png"
+            src={branch.images[0]}
             w={"100%"}
             h={"100%"}
             className="object-cover"
@@ -103,18 +121,18 @@ const PageLocation = () => {
           animate="visible"
           className="absolute h-auto flex flex-col gap-8 items-center w-full top-[50%] left-0 !translate-y-[-50%] lg:translate-y-0"
         >
-          <span className="text-[42px] sm:text-[64px] font-medium leading-[42px] sm:leading-[80px] text-center w-full px-8 lg:px-0 lg:w-4/6">
-            KHÔNG GIAN
-          </span>
-          <span className="text-[42px] sm:text-[84px] font-medium leading-[42px] sm:leading-[80px] text-center w-full px-8 lg:px-0 lg:w-4/6">
-            TINH TẾ
-          </span>
-          <span className="text-[42px] sm:text-[64px] font-medium leading-[42px] sm:leading-[80px] text-center w-full px-8 lg:px-0 lg:w-4/6">
-            GỢI MỞ
-          </span>
-          <span className="text-[42px] sm:text-[84px] font-medium leading-[42px] sm:leading-[80px] text-center w-full px-8 lg:px-0 lg:w-4/6">
-            SỰ SÁNG TẠO
-          </span>
+          {spans.map((span, index) => (
+            <span
+              key={index}
+              className={`text-[42px] ${
+                index % 2 === 1 ? "sm:text-[84px]" : "sm:text-[64px]"
+              } font-medium leading-[42px] ${
+                index % 2 === 1 ? "sm:leading-[80px]" : "sm:leading-[80px]"
+              } text-center w-full px-8 lg:px-0 lg:w-4/6`}
+            >
+              {span}
+            </span>
+          ))}
         </motion.div>
         <div className="w-full h-auto absolute bottom-[10%] hidden lg:flex justify-center items-center">
           <motion.div
@@ -135,16 +153,27 @@ const PageLocation = () => {
       </section>
       <section className="section">
         <div className="w-screen h-[60vh] lg:h-screen grid grid-cols-12 grid-rows-12 gap-y-5 lg:py-0">
-          <div className="grid col-start-2 col-end-6 row-start-5 xs:row-start-4 row-end-10 md:col-start-1 md:col-end-3 md:row-start-1 md:row-end-7 pt-5 overflow-hidden">
-            <Image
-              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/venue-1.png"
-              w={"100%"}
-              h={"100%"}
-              className="object-cover"
-              alt=""
-            />
-          </div>
-          <div className="grid col-start-3 col-end-7 row-start-8 xs:row-start-9 row-end-13 md:col-start-2 md:col-end-4 md:row-start-6 md:row-end-13 pb-5 overflow-hidden">
+          {branch.slogan_images.map((url, index) => {
+            <div
+              key={index}
+              className={`grid ${
+                index === 0
+                  ? "col-start-2 col-end-6 row-start-5 xs:row-start-4 row-end-10 md:col-start-1 md:col-end-3 md:row-start-1 md:row-end-7 pt-5"
+                  : index === 1
+                  ? "col-start-3 col-end-7 row-start-8 xs:row-start-9 row-end-13 md:col-start-2 md:col-end-4 md:row-start-6 md:row-end-13 pb-5"
+                  : "col-start-8 col-end-12 row-start-5 xs:row-start-4 row-end-13 md:col-start-10 md:col-end-13 md:row-start-1 md:row-end-13"
+              } overflow-hidden`}
+            >
+              <Image
+                src={url}
+                w={"100%"}
+                h={"100%"}
+                className="object-cover"
+                alt={url + "/" + index}
+              />
+            </div>;
+          })}
+          {/* <div className="grid col-start-3 col-end-7 row-start-8 xs:row-start-9 row-end-13 md:col-start-2 md:col-end-4 md:row-start-6 md:row-end-13 pb-5 overflow-hidden">
             <Image
               src="https://whitepalace.com.vn/wp-content/uploads/2024/01/venue-2.png"
               w={"100%"}
@@ -153,6 +182,15 @@ const PageLocation = () => {
               alt=""
             />
           </div>
+          <div className="grid col-start-8 col-end-12 row-start-5 xs:row-start-4 row-end-13 md:col-start-10 md:col-end-13 md:row-start-1 md:row-end-13 overflow-hidden">
+            <Image
+              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/venue-3.png"
+              w={"100%"}
+              h={"100%"}
+              className="object-cover"
+              alt=""
+            />
+          </div> */}
           <div className="grid col-start-2 col-end-12 row-start-1 row-end-4 md:col-start-4 md:col-end-10 md:px-10 md:row-start-1 md:row-end-13 z-30">
             <TextFade
               settings={{
@@ -171,27 +209,9 @@ const PageLocation = () => {
               replayEffect={true}
             >
               <span className="w-full h-full flex text-center justify-center items-center text-[10px] sxs:text-xs 2md:text-base font-normal leading-4 md:leading-7">
-                Tọa lạc tại số 194 Hoàng Văn Thụ – Quận Phú Nhuận, tuyến giao
-                thông huyết mạch kết nối sân bay Tân Sơn Nhất và trung tâm thành
-                phố, Trung tâm Sự kiện White Palace là một trong những địa điểm
-                tổ chức sự kiện có thẩm mỹ kiến trúc và chất lượng dịch vụ hàng
-                đầu tại Thành Phố Hồ Chí Minh. Trải qua hành trình hơn 17 năm
-                hình thành và phát triển, với mong muốn mang đến cho khách hàng
-                những trải nghiệm tối ưu nhất, Trung tâm Sự kiện White Palace đã
-                chuyển mình đầy ngoạn mục với diện mạo hoàn toàn mới, khẳng định
-                vị thế hàng đầu của một thương hiệu tiên phong trong lĩnh vực
-                công nghệ hiếu khách tại Việt Nam.
+                {branch.slogan_description}
               </span>
             </TextFade>
-          </div>
-          <div className="grid col-start-8 col-end-12 row-start-5 xs:row-start-4 row-end-13 md:col-start-10 md:col-end-13 md:row-start-1 md:row-end-13 overflow-hidden">
-            <Image
-              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/venue-3.png"
-              w={"100%"}
-              h={"100%"}
-              className="object-cover"
-              alt=""
-            />
           </div>
         </div>
       </section>
@@ -243,10 +263,7 @@ const PageLocation = () => {
           >
             <div className="w-full h-auto relative flex flex-col gap-4 px-[12%] lg:pl-9 pt-7">
               <span className="text-xs sm:text-sm lg:text-lg">
-                Trung tâm Sự kiện White Palace sở hữu 02 đại sảnh đa năng và 02
-                phòng họp cao cấp đáp ứng đa dạng các loại hình sự kiện. Hãy tìm
-                hiểu bảng Công Suất - Kích Thước và đừng quên để lại lời nhắn
-                cho chúng tôi nếu bạn cần hỗ trợ thêm thông tin.
+                {branch.diagram_description}
               </span>
             </div>
           </TextFade>
@@ -310,20 +327,15 @@ const PageLocation = () => {
                 customTransition={"1000ms ease-in-out"}
                 containerClass="w-full h-full"
               >
-                <div className="w-full h-full overflow-hidden">
-                  <Image
-                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-1.jpg"
-                    className="w-full h-full object-cover"
-                    alt=""
-                  />
-                </div>
-                <div className="w-full h-full overflow-hidden">
-                  <Image
-                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-2.jpg"
-                    className="w-full h-full object-cover"
-                    alt=""
-                  />
-                </div>
+                {branch.diagram_images.map((url, index) => {
+                  <div key={index} className="w-full h-full overflow-hidden">
+                    <Image
+                      src={url}
+                      className="w-full h-full object-cover"
+                      alt=""
+                    />
+                  </div>;
+                })}
               </Carousel>
             </div>
             <div className="w-[30%] h-[60%] carosel-right hidden lg:block">
@@ -358,20 +370,15 @@ const PageLocation = () => {
                 removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
                 containerClass="w-full h-full"
               >
-                <div className="w-full h-full overflow-hidden">
-                  <Image
-                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-1.jpg"
-                    className="w-full h-full object-cover"
-                    alt=""
-                  />
-                </div>
-                <div className="w-full h-full overflow-hidden">
-                  <Image
-                    src="https://whitepalace.com.vn/wp-content/uploads/2024/05/HVT-2.jpg"
-                    className="w-full h-full object-cover"
-                    alt=""
-                  />
-                </div>
+                {branch.diagram_images.map((url, index) => {
+                  <div key={index} className="w-full h-full overflow-hidden">
+                    <Image
+                      src={url}
+                      className="w-full h-full object-cover"
+                      alt=""
+                    />
+                  </div>;
+                })}
               </Carousel>
             </div>
           </div>
@@ -403,10 +410,8 @@ const PageLocation = () => {
               <span className="uppercase px-[12%] lg:ml-0 font-semibold text-gold inline-block lg:px-44 text-[24px] sm:text-[30px] lg:text-5xl">
                 trang thiết bị
               </span>
-              <span className="z-10 px-[12%] lg:w-[35%] lg:ml-44 text-xs sm:text-sm lg:text-base">
-                Toàn bộ sảnh tiệc đều sở hữu hệ thống trang thiết bị hiện đại,
-                đảm bảo mang đến cho khách tham dự sự kiện trải nghiệm tối ưu
-                nhất.
+              <span className="z-10 px-[12%] lg:w-[70%] lg:ml-0 lg:px-44 text-xs sm:text-sm lg:text-base">
+                {branch.equipment_description}
               </span>
               <span className="h-1 w-[10%] bg-gold flex absolute left-0 top-[25%]"></span>
             </div>
@@ -444,32 +449,25 @@ const PageLocation = () => {
             </div>
           </TextFade>
           {/* images start */}
-          <div className="overflow-hidden row-start-7 lg:row-start-5 row-end-13 col-start-3 col-end-7 pr-5 z-20">
-            <Image
-              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/meeting-4.png"
-              className="w-full h-full object-cover"
-              alt=""
-            />
-          </div>
-          <div className="overflow-hidden pt-6 lg:pt-0 col-start-4 lg:col-start-6 col-end-9 row-start-3 lg:row-start-1 row-end-9 lg:row-end-7 z-10">
-            <Image
-              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/meeting-5.png"
-              className="w-full h-full object-cover"
-              alt=""
-            />
-          </div>
-          <div className="overflow-hidden col-start-7 col-end-11 lg:col-end-13 row-start-4 lg:row-start-2 row-end-10">
-            <Image
-              src="https://whitepalace.com.vn/wp-content/uploads/2024/01/meeting-6.png"
-              className="w-full h-full object-cover"
-              alt=""
-            />
-          </div>
+          {branch.equipment_images.map((url, index) => {
+            <div
+              key={index}
+              className={`overflow-hidden ${
+                index === 0
+                  ? "row-start-7 lg:row-start-5 row-end-13 col-start-3 col-end-7 pr-5 z-20"
+                  : index === 1
+                  ? " pt-6 lg:pt-0 col-start-4 lg:col-start-6 col-end-9 row-start-3 lg:row-start-1 row-end-9 lg:row-end-7 z-10"
+                  : " col-start-7 col-end-11 lg:col-end-13 row-start-4 lg:row-start-2 row-end-10"
+              }`}
+            >
+              <Image src={url} className="w-full h-full object-cover" alt="" />
+            </div>;
+          })}
           {/* images end */}
         </div>
       </section>
       <section
-        className="section w-screen h-fit lg:h-screen flex flex-col gap-10 lg:gap-20 pt-20"
+        className="section w-screen h-fit lg:h-screen flex flex-col gap-10 lg:gap-20 py-20"
         id="location__section-5"
       >
         <TextFade
@@ -492,7 +490,7 @@ const PageLocation = () => {
             <span className="uppercase text-[24px] sm:text-[30px] lg:text-5xl font-semibold text-gold inline-block px-[12%] lg:px-44">
               không gian hội nghị
             </span>
-            <span className="h-1 w-[10%] bg-gold flex absolute left-0 bottom-2"></span>
+            <span className="h-1 w-[6%] bg-gold flex absolute left-0 bottom-2"></span>
           </div>
         </TextFade>
         <div className="w-full h-auto flex flex-col-reverse lg:flex-row lg:justify-between gap-8 lg:gap-16 px-[12%] lg:px-44">
@@ -515,13 +513,13 @@ const PageLocation = () => {
           >
             <div className="w-full flex flex-col gap-6 lg:gap-12">
               <div className="w-full flex justify-between lg:justify-normal lg:flex-col gap-12">
-                <span className="w-1/3 flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50 space-active">
+                <span className="w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50 space-active">
                   Kiểu lớp học
                 </span>
-                <span className="w-1/3 flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50">
+                <span className="w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50">
                   Kiểu bán nguyệt
                 </span>
-                <span className="w-1/3 flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50">
+                <span className="w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50">
                   Kiểu rạp hát
                 </span>
               </div>
