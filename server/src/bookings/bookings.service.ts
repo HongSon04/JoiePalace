@@ -194,16 +194,38 @@ export class BookingsService {
       // ? Where Conditions
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+          {
+            company_name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
       // ? Date Conditions
       if (startDate && endDate) {
         if (!whereConditions.AND) whereConditions.AND = [];
@@ -311,16 +333,38 @@ export class BookingsService {
       // ? Where Conditions
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+          {
+            company_name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
       // ? Date Conditions
       if (startDate && endDate) {
         if (!whereConditions.AND) whereConditions.AND = [];

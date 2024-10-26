@@ -251,14 +251,17 @@ export class UserService {
 
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
           { role: { contains: search, mode: 'insensitive' } },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
@@ -322,14 +325,17 @@ export class UserService {
 
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
           { role: { contains: search, mode: 'insensitive' } },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({

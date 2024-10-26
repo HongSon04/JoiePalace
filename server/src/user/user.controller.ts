@@ -161,7 +161,7 @@ export class UserController {
 
   // ! Get All User
   @Get('get-all')
-  @Roles(Role.ADMIN)
+  @isPublic()
   @ApiHeaders([
     {
       name: 'authorization',

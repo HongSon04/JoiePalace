@@ -16,6 +16,7 @@ import {
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { mode } from 'crypto-js';
 
 @Injectable()
 export class SubscribersService {
@@ -80,14 +81,20 @@ export class SubscribersService {
             }
           : {};
 
+      const whereConditions: any = {
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.email = {
+          contains: search,
+          mode: 'insensitive',
+        };
+      }
+
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.subscribers.findMany({
-          where: {
-            email: {
-              contains: search,
-            },
-            ...sortRangeDate,
-          },
+          where: whereConditions,
           skip,
           take: itemsPerPage,
           orderBy: {
@@ -95,12 +102,7 @@ export class SubscribersService {
           },
         }),
         this.prismaService.subscribers.count({
-          where: {
-            email: {
-              contains: search,
-            },
-            ...sortRangeDate,
-          },
+          where: whereConditions,
         }),
       ]);
 

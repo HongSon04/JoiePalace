@@ -130,7 +130,11 @@ export class MenusService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: false,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -153,10 +157,8 @@ export class MenusService {
             },
           },
         },
-      ],
-
-      ...sortRangeDate,
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [
@@ -269,7 +271,11 @@ export class MenusService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: true,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -292,12 +298,8 @@ export class MenusService {
             },
           },
         },
-      ],
-      created_at: {
-        gte: startDate,
-        lte: endDate,
-      },
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [

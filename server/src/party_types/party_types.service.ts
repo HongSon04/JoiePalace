@@ -117,31 +117,37 @@ export class PartyTypesService {
     const skip = (page - 1) * itemsPerPage;
 
     try {
+      // ? Where Conditions
+      const whereConditions: any = {
+        deleted: false,
+      };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.party_types.findMany({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           include: {
             products: {
               include: {
@@ -156,29 +162,7 @@ export class PartyTypesService {
           },
         }),
         this.prismaService.party_types.count({
-          where: {
-            deleted: false,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 
@@ -220,31 +204,37 @@ export class PartyTypesService {
     const skip = (page - 1) * itemsPerPage;
 
     try {
+      // ? Where Conditions
+      const whereConditions: any = {
+        deleted: true,
+      };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.party_types.findMany({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
           include: {
             products: {
               include: {
@@ -259,29 +249,7 @@ export class PartyTypesService {
           },
         }),
         this.prismaService.party_types.count({
-          where: {
-            deleted: true,
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                short_description: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
+          where: whereConditions,
         }),
       ]);
 
