@@ -7,14 +7,11 @@ const AUTH_API = `${HOST}/auth`;
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
-<<<<<<< HEAD
 const DASHBOARD_API = `${HOST}/dashboard`;
-=======
 const PRODUCTS_API = `${HOST}/products`;
 const FEEDBACKS_API = `${HOST}/feedbacks`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 
->>>>>>> 15b1bd28e0ca16f1fcad2ca4d4b52d4b2caa8928
 // API Endpoints
 export const API_CONFIG = {
   // AUTH API
@@ -65,7 +62,6 @@ export const API_CONFIG = {
     RESTORE: (id) => `${CATEGORIES_API}/restore/${id}`,
     DESTROY: (id) => `${CATEGORIES_API}/destroy/${id}`,
   },
-<<<<<<< HEAD
   // DASHBOARD API
   DASHBOARD: {
     GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
@@ -81,8 +77,7 @@ export const API_CONFIG = {
     GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`, 
     
 
-  }
-=======
+  },
 
   // PRODUCTS API
   PRODUCTS: {
@@ -114,5 +109,4 @@ export const API_CONFIG = {
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {},
->>>>>>> 15b1bd28e0ca16f1fcad2ca4d4b52d4b2caa8928
 };
