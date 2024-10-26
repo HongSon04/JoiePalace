@@ -1,8 +1,8 @@
-  
-export const metadata = {
-    title: "Bảng điều khiển",
-  };
-  import React from "react";
+"use client";
+// export const metadata = {
+//     title: "Bảng điều khiển",
+// };
+  import React, { useEffect, useState } from "react";
   import { PiArrowSquareOutLight } from "react-icons/pi";
   import { FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
   import { BsThreeDots } from "react-icons/bs";
@@ -10,43 +10,75 @@ export const metadata = {
   import "../../../_styles/globals.css";
   import Chart from "@/app/_components/Chart";
   import AdminHeader from "@/app/_components/AdminHeader";
-  const page = () => {
-      const data = {
-        labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
+  import { fetchBranchDataById, fetchBranchBookingById, fetchBranchTotalRevenueMonth } from "@/app/_services/branchesServices";
+  const Page = ({ params }) => {
+    const [userId, setUserId] = useState(null);
+    const [dataBranch, setData] = useState(null);
+    const [dataBooking, setDataBooking] = useState(null);
+    const [revenueMonth, setDataRevenueMonth] = useState(null);
+  
+    useEffect(() => {
+      const storedUser = localStorage.getItem("user");
+  
+      if (storedUser) {
+        try {
+          const userObject = JSON.parse(storedUser);
+          setUserId(userObject.id);
+          const branchId = userObject.id;
+  
+          const fetchAminData = async () => {
+            try {
+              const dataRevenueMonth = await fetchBranchTotalRevenueMonth(branchId);
+              console.log("Dữ liệu doanh thu tháng:", dataRevenueMonth);
+              setDataRevenueMonth(dataRevenueMonth); 
+            } catch (error) {
+              console.error("Error fetching data:", error);
+            }
+          };
+  
+          fetchAminData();
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+        }
+      }
+    }, []);
+     
+    const data = {
+      labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
+      datasets: [
+        {
+          label: 'Doanh thu',
+          data: [300000000, 500000000, 700000000]
+
+        },
+      ],
+    };
+    const data1 = {
+        labels: [
+          ' 1', ' 2', ' 3', ' 4', ' 5', ' 6',
+          ' 7', ' 8', ' 9', ' 10', ' 11', ' 12'
+        ],
         datasets: [
           {
-            label: 'Doanh thu',
-            data: [300000000, 500000000, 700000000]
-  
-          },
-        ],
-      };
-      const data1 = {
-          labels: [
-            ' 1', ' 2', ' 3', ' 4', ' 5', ' 6',
-            ' 7', ' 8', ' 9', ' 10', ' 11', ' 12'
-          ],
-          datasets: [
-            {
-              label: 'Doanh thu', // Nhãn cho dataset
-              data: [
-                50000000, // Doanh thu Tháng 1
-                60000000, // Doanh thu Tháng 2
-                55000000, // Doanh thu Tháng 3
-                70000000, // Doanh thu Tháng 4
-                80000000, // Doanh thu Tháng 5
-                65000000, // Doanh thu Tháng 6
-                75000000, // Doanh thu Tháng 7
-                85000000, // Doanh thu Tháng 8
-                90000000, // Doanh thu Tháng 9
-                95000000, // Doanh thu Tháng 10
-                100000000, // Doanh thu Tháng 11
-                105000000 // Doanh thu Tháng 12
-              ],
-           
-            }
-          ]
-        };
+            label: 'Doanh thu', // Nhãn cho dataset
+            data: [
+              50000000, // Doanh thu Tháng 1
+              60000000, // Doanh thu Tháng 2
+              55000000, // Doanh thu Tháng 3
+              70000000, // Doanh thu Tháng 4
+              80000000, // Doanh thu Tháng 5
+              65000000, // Doanh thu Tháng 6
+              75000000, // Doanh thu Tháng 7
+              85000000, // Doanh thu Tháng 8
+              90000000, // Doanh thu Tháng 9
+              95000000, // Doanh thu Tháng 10
+              100000000, // Doanh thu Tháng 11
+              105000000 // Doanh thu Tháng 12
+            ],
+          
+          }
+        ]
+    };
     return (
       <main className="grid gap-6  text-white ">
         <AdminHeader
@@ -95,24 +127,29 @@ export const metadata = {
           </div>
           <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8  w-[251px]">
               <div className="flex justify-between items-center">
-                  <p className=" text-2xl font-bold">111</p>
+                  <p className=" text-2xl font-bold"></p>
                   <p className="text-base font-normal ">Xem</p>
               </div>
               <div className="flex justify-between items-center">
                   <p className="text-red-400 text-base font-normal">Tiệc dự kiến</p>
                   <PiArrowSquareOutLight className="text-2xl " />
               </div>
-          </div>
-          <div className="box-item p-3 rounded-xl bg-whiteAlpha-100  inline-flex  flex-col gap-8 w-[251px]">
+            </div>
+
+      
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                  <p className=" text-2xl font-bold">111</p>
-                  <p className="text-base font-normal ">Xem</p>
+                <p className="text-2xl font-bold"></p> 
+                <p className="text-base font-normal">Xem</p>
               </div>
               <div className="flex justify-between items-center">
-                  <p className="  text-base font-normal">Tiệc đang diễn ra</p>
-                  <PiArrowSquareOutLight className="text-2xl " />
+                <p className="text-base font-normal">Tiệc đang diễn ra</p>
+                <PiArrowSquareOutLight className="text-2xl" />
               </div>
-          </div>
+            </div>
+
+        
+          
         </div>
   
   
@@ -431,4 +468,4 @@ export const metadata = {
     );
   };
   
-  export default page;
+  export default Page;

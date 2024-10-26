@@ -10,7 +10,7 @@ import CustomSelect from '@/app/_components/CustomSelect';
 import AdminHeader from '@/app/_components/AdminHeader';
 import Chart from '@/app/_components/Chart';
 import { MdOutlineHome, MdOutlineNotificationsNone } from 'react-icons/md';
-import "../../../../_styles/globals.css";
+import "../../../../../_styles/globals.css";
 import CustomPagination from '@/app/_components/CustomPagination';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
 import TableGrab from '@/app/_components/TableGrab';
