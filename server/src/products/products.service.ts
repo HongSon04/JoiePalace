@@ -149,7 +149,11 @@ export class ProductsService {
       // ? Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -157,9 +161,8 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {
@@ -258,7 +261,11 @@ export class ProductsService {
       // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -266,9 +273,8 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {
@@ -455,7 +461,10 @@ export class ProductsService {
       const whereConditions: any = {
         deleted: false,
         category_id: Number(category_id),
-        OR: [
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -463,8 +472,8 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {
@@ -566,7 +575,10 @@ export class ProductsService {
             id: tag_id,
           },
         },
-        OR: [
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -574,8 +586,8 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {

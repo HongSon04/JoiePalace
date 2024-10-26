@@ -14,6 +14,8 @@ const NOTIFICATIONS_API = `${HOST}/notifications`;
 
 // API Endpoints
 export const API_CONFIG = {
+  GENERAL_BRANCH: "ho-chi-minh",
+
   // AUTH API
   AUTH: {
     LOGIN: `${AUTH_API}/login`,
@@ -76,7 +78,12 @@ export const API_CONFIG = {
     GET_BOOKING_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
     GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`, 
     
-
+    GET_BOOKING_STATUS: (id) =>
+      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+    GET_BOOKING_BRANCH: (id) =>
+      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
   },
 
   // PRODUCTS API
