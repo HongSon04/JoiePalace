@@ -13,6 +13,8 @@ const NOTIFICATIONS_API = `${HOST}/notifications`;
 
 // API Endpoints
 export const API_CONFIG = {
+  GENERAL_BRANCH: "ho-chi-minh",
+
   // AUTH API
   AUTH: {
     LOGIN: `${AUTH_API}/login`,

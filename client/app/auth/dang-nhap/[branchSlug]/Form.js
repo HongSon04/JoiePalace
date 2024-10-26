@@ -109,6 +109,7 @@ function Form({}) {
       dispatch(loginSuccess());
       const user = decodeJwt(result.data.access_token);
       localStorage.setItem("user", JSON.stringify(user));
+      console.log(user);
 
       // LATER:
       // CHECK IF USER IS ADMIN
@@ -117,7 +118,7 @@ function Form({}) {
           title: "Đăng nhập thất bại",
           position: "top",
           description: "Bạn không có quyền truy cập",
-          status: "error",
+          type: "error",
           duration: 4000,
           isClosable: true,
         });
@@ -131,7 +132,23 @@ function Form({}) {
           title: "Đăng nhập thất bại",
           position: "top",
           description: "Tài khoản của bạn đã bị khóa",
-          status: "error",
+          type: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      if (!currentBranch) return;
+      console.log(currentBranch);
+
+      // CHECK IF USER BELONGS TO THE BRANCH
+      if (user?.branch_id !== currentBranch?.id) {
+        toast({
+          title: "Đăng nhập thất bại",
+          position: "top",
+          description: "Tài khoản của bạn không thuộc chi nhánh này",
+          type: "error",
           duration: 4000,
           isClosable: true,
         });
@@ -149,7 +166,9 @@ function Form({}) {
         closable: true,
       });
 
-      router.push(`/admin/bang-dieu-khien/${branchSlug}`);
+      if (currentBranch.slug === API_CONFIG.GENERAL_BRANCH)
+        router.push("/admin/bang-dieu-khien");
+      else router.push(`/admin/bang-dieu-khien/${branchSlug}`);
     }
   };
 
