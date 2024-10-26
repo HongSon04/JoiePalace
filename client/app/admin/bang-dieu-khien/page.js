@@ -10,13 +10,13 @@ import { FaPlus } from "react-icons/fa6";
 import "../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
-import { fetchAllDashBoard, fetchAllTotalRevenueMonth } from "@/app/_services/apiServices";
+import { fetchAllDashBoard, fetchAllTotalRevenueMonth,fetchAllEachTime} from "@/app/_services/apiServices";
 
 const Page = () => {
   const [userId, setUserId] = useState(null);
   const [dataAdmin, setDataAdmin] = useState(null);
-  const [totalRevenueData, setTotalRevenueData] = useState(null); // Thêm state cho dữ liệu doanh thu
-
+  const [totalRevenueData, setTotalRevenueData] = useState(null);
+  const [dataAllEachTime, setDataAllEachTime] = useState(null);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -24,8 +24,10 @@ const Page = () => {
       try {
         const adminData = await fetchAllDashBoard();
         const revenueData = await fetchAllTotalRevenueMonth(); 
-        console.log(revenueData);
+        const dataAllEachTime = await fetchAllEachTime ();
+        // console.log(dataAllEachTime);  
         
+        setDataAllEachTime(dataAllEachTime); 
         setDataAdmin(adminData);
         setTotalRevenueData(revenueData);
       } catch (error) {
@@ -35,43 +37,39 @@ const Page = () => {
 
     fetchAminData();
   }, []);
- 
-    const data = {
-      labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
+    const total_revune_each_month = dataAllEachTime?.total_revune_each_month || []; 
+    // console.log(total_revune_each_month);
+    const total_revune_by_month = dataAllEachTime?.total_revune_by_month || []; 
+    // console.log(total_revune_by_month);
+  
+    const dataByMonth = {
+      labels: Object.keys(total_revune_by_month), 
       datasets: [
-        {
-          label: 'Doanh thu',
-          data: [300000000, 500000000, 700000000]
-
-        },
-      ],
-    };
-    const data1 = {
-        labels: [
-          ' 1', ' 2', ' 3', ' 4', ' 5', ' 6',
-          ' 7', ' 8', ' 9', ' 10', ' 11', ' 12'
-        ],
-        datasets: [
           {
-            label: 'Doanh thu', // Nhãn cho dataset
-            data: [
-              50000000, // Doanh thu Tháng 1
-              60000000, // Doanh thu Tháng 2
-              55000000, // Doanh thu Tháng 3
-              70000000, // Doanh thu Tháng 4
-              80000000, // Doanh thu Tháng 5
-              65000000, // Doanh thu Tháng 6
-              75000000, // Doanh thu Tháng 7
-              85000000, // Doanh thu Tháng 8
-              90000000, // Doanh thu Tháng 9
-              95000000, // Doanh thu Tháng 10
-              100000000, // Doanh thu Tháng 11
-              105000000 // Doanh thu Tháng 12
-            ],
-         
+              label: 'Doanh thu',
+              data: Object.values(total_revune_by_month) 
           }
-        ]
-      };
+      ]
+    };
+    const dataEachMonth = {
+      labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+      datasets: total_revune_each_month.map(branch => ({
+        label: branch.name,
+        data: branch.data, 
+        
+      }))
+      
+    };
+    const branchCharts = total_revune_each_month.map((branch, index) => (
+      <div key={index} className="p-2 bg-blackAlpha-100 rounded-xl">
+        <Chart data={{
+          labels: dataEachMonth.labels,
+          datasets: [{ label: branch.name, data: branch.data }]
+        }} chartType="bar" />
+        <p className="text-center text-xs">{branch.name}</p>
+      </div>
+    ));
+    
   return (
     <main className="grid gap-6  text-white ">
       <AdminHeader
@@ -81,12 +79,12 @@ const Page = () => {
       >
 
       </AdminHeader>
-      <div className="container px-2 flex gap-[10px] w-full overflow-x-auto max-w-[1200px] text-white">
-        {dataAdmin ? (
+      <div className="container px-2 flex gap-[10px]  text-white">
+        {dataAllEachTime ? (
           <>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-red-400 text-2xl font-bold">{dataAdmin.count_all_info.totalFeedBack}</p>
+                <p className="text-red-400 text-2xl font-bold">{dataAllEachTime.count_all_info.totalFeedBack}</p>
                 {/* <p className="text-base font-normal">Xem</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -96,7 +94,7 @@ const Page = () => {
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-2xl font-bold">{dataAdmin.count_all_info.totalUser}</p>
+                <p className="text-2xl font-bold">{dataAllEachTime.count_all_info.totalUser}</p>
                 {/* <p className="text-teal-300 text-base font-normal">+100</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -110,7 +108,7 @@ const Page = () => {
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-2xl font-bold">{dataAdmin.total_revune_by_month}</p>
+                <p className="text-2xl font-bold">0</p>
                 {/* <p className="text-red-400 text-base font-normal">-100</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -150,212 +148,195 @@ const Page = () => {
 
 
 
-      <div className="container  flex gap-8 w-full h-full">
-      <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl" >
-            <div className="flex justify-between gap-[10px] items-center mb-[10px]">
-              <p className="text-base font-semibold ">Khách hàng</p>
-              <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
-            </div>
-            <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
-              <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                <div className="w-full flex justify-between items-center">
-                  <div>
-                    <p className="text-sm mb-[10px] font-semibold">
-                      Tên khách hàng
-                    </p>
-                    <div className="flex gap-3 items-center text-xs ">
-                      <img  src="/image/Group.svg" />
-                      <p>Đồng</p>
-                    </div>
-                  </div>
-                  <BsThreeDots className="text-xl" />
-                </div>
+      <div className="container  flex gap-8 w-full h-full  p-4">
+        <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl" >
+              <div className="flex justify-between gap-[10px] items-center mb-[10px]">
+                <p className="text-base font-semibold ">Khách hàng</p>
+                <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
               </div>
-              <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                <div className="w-full flex justify-between items-center">
-                  <div>
-                    <p className="text-sm mb-[10px] font-semibold">
-                      Tên khách hàng
-                    </p>
-                    <div className="flex gap-3 items-center text-xs ">
-                      <img  src="/image/Group.svg" />
-                      <p>Đồng</p>
+              <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
+                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
+                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                  <div className="w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-sm mb-[10px] font-semibold">
+                        Tên khách hàng
+                      </p>
+                      <div className="flex gap-3 items-center text-xs ">
+                        <img  src="/image/Group.svg" />
+                        <p>Đồng</p>
+                      </div>
                     </div>
+                    <BsThreeDots className="text-xl" />
                   </div>
-                  <BsThreeDots className="text-xl" />
                 </div>
-              </div>
-              <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                <div className="w-full flex justify-between items-center">
-                  <div>
-                    <p className="text-sm mb-[10px] font-semibold">
-                      Tên khách hàng
-                    </p>
-                    <div className="flex gap-3 items-center text-xs ">
-                      <img  src="/image/Group.svg" />
-                      <p>Đồng</p>
+                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
+                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                  <div className="w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-sm mb-[10px] font-semibold">
+                        Tên khách hàng
+                      </p>
+                      <div className="flex gap-3 items-center text-xs ">
+                        <img  src="/image/Group.svg" />
+                        <p>Đồng</p>
+                      </div>
                     </div>
+                    <BsThreeDots className="text-xl" />
                   </div>
-                  <BsThreeDots className="text-xl" />
                 </div>
-              </div>
-              <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                <div className="w-full flex justify-between items-center">
-                  <div>
-                    <p className="text-sm mb-[10px] font-semibold">
-                      Tên khách hàng
-                    </p>
-                    <div className="flex gap-3 items-center text-xs ">
-                      <img  src="/image/Group.svg" />
-                      <p>Đồng</p>
+                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
+                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                  <div className="w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-sm mb-[10px] font-semibold">
+                        Tên khách hàng
+                      </p>
+                      <div className="flex gap-3 items-center text-xs ">
+                        <img  src="/image/Group.svg" />
+                        <p>Đồng</p>
+                      </div>
                     </div>
+                    <BsThreeDots className="text-xl" />
                   </div>
-                  <BsThreeDots className="text-xl" />
                 </div>
-              </div>
-              <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                <div className="w-full flex justify-between items-center">
-                  <div>
-                    <p className="text-sm mb-[10px] font-semibold">
-                      Tên khách hàng
-                    </p>
-                    <div className="flex gap-3 items-center text-xs ">
-                      <img  src="/image/Group.svg" />
-                      <p>Đồng</p>
+                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
+                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                  <div className="w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-sm mb-[10px] font-semibold">
+                        Tên khách hàng
+                      </p>
+                      <div className="flex gap-3 items-center text-xs ">
+                        <img  src="/image/Group.svg" />
+                        <p>Đồng</p>
+                      </div>
                     </div>
+                    <BsThreeDots className="text-xl" />
                   </div>
-                  <BsThreeDots className="text-xl" />
                 </div>
-              </div>
-              <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                <div className="w-full flex justify-between items-center">
-                  <div>
-                    <p className="text-sm mb-[10px] font-semibold">
-                      Tên khách hàng
-                    </p>
-                    <div className="flex gap-3 items-center text-xs ">
-                      <img  src="/image/Group.svg" />
-                      <p>Đồng</p>
+                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
+                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                  <div className="w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-sm mb-[10px] font-semibold">
+                        Tên khách hàng
+                      </p>
+                      <div className="flex gap-3 items-center text-xs ">
+                        <img  src="/image/Group.svg" />
+                        <p>Đồng</p>
+                      </div>
                     </div>
+                    <BsThreeDots className="text-xl" />
                   </div>
-                  <BsThreeDots className="text-xl" />
                 </div>
+                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
+                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                  <div className="w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-sm mb-[10px] font-semibold">
+                        Tên khách hàng
+                      </p>
+                      <div className="flex gap-3 items-center text-xs ">
+                        <img  src="/image/Group.svg" />
+                        <p>Đồng</p>
+                      </div>
+                    </div>
+                    <BsThreeDots className="text-xl" />
+                  </div>
+                </div>
+              
+          
               </div>
-            
-         
-            </div>
-          </div>
+        </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
           <div className="flex justify-between items-center mb-[10px]">
             <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
             <p className="text-teal-400 font-semibold text-base">Xem thêm</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4  bg-blackAlpha-100  rounded-xl">
-                <Chart data={data1} chartType="bar"/>
-                <p className="text-center  text-xs">Võ Văn Kiệt</p>
-            </div>
-            <div className="p-4 bg-blackAlpha-100  rounded-xl">
-                <Chart data={data1} chartType="bar" />
-                <p className="text-center  text-xs">Phạm Văn Đồng</p>
-            </div>  
-            <div className="p-4 bg-blackAlpha-100  rounded-xl">
-                <Chart data={data1} chartType="bar" />
-                <p className="text-center  text-xs">Hoàng Văn Thụ</p>
-            </div>
-            <div className="p-4 rounded-xl bg-blackAlpha-100 relative flex justify-center items-center">
-              <div className="h-16 w-16 rounded-sm  bg-whiteAlpha-200  flex justify-center items-center">
-                <FaPlus className=""/>
-              </div>
-          </div>
-
-            
+          <div className="grid grid-cols-2 gap-4 max-h-[500px] overflow-y-auto hide-scrollbar">
+            {branchCharts}
           </div>
         </div>
       </div>
       <div className="flex justify-between gap-6 p-4">
-        <div className="w-1/2">
-          <div className="flex items-center justify-between mb-[10px]">
-            <p className="text-base  font-semibold">Yêu cầu mới nhất</p>
-            <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
+          <div className="w-1/2">
+            <div className="flex items-center justify-between mb-[10px]">
+              <p className="text-base  font-semibold">Yêu cầu mới nhất</p>
+              <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
+            </div>
+          <div className="overflow-y-auto max-h-[335px]">
+            <table className="table w-full">
+              <thead>
+                <tr>
+                  <th>Tên</th>
+                  <th>Chi Nhánh</th>
+                  <th>Số điện thoại</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+                <tr>
+                  <td>Võ Văn Kiệt</td>
+                  <td>Chi Nhánh 1</td>
+                  <td>0987654321</td>
+                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        <div className="overflow-y-auto max-h-[335px]">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>Tên</th>
-                <th>Chi Nhánh</th>
-                <th>Số điện thoại</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-              <tr>
-                <td>Võ Văn Kiệt</td>
-                <td>Chi Nhánh 1</td>
-                <td>0987654321</td>
-                <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
         </div>
-        <div className=" w-1/2">
+        <div className=" w-1/2" >
           <div className="flex items-center justify-between mb-[10px]">
             <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
             <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
           </div>
-          <div className="p-4  bg-blackAlpha-100  rounded-xl">
-            <Chart  data={data} chartType="line" />
+          
+          <div className="p-4 bg-blackAlpha-100 rounded-xl ">
+            <Chart data={dataByMonth} chartType="line" />
           </div>
        
          
