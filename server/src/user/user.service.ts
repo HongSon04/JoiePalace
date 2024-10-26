@@ -72,6 +72,9 @@ export class UserService {
           role: role as Role,
           avatar,
         },
+        include: {
+          memberships: true,
+        },
       });
 
       // ? Return token
@@ -100,6 +103,9 @@ export class UserService {
       const findUser = await this.prismaService.users.findUnique({
         where: {
           id: Number(reqUser.id),
+        },
+        include: {
+          memberships: true,
         },
       });
       if (!findUser) {
@@ -202,6 +208,9 @@ export class UserService {
           phone,
           role: role as Role,
         },
+        include: {
+          memberships: true,
+        },
       });
       throw new HttpException(
         {
@@ -254,6 +263,9 @@ export class UserService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
+          include: {
+            memberships: true,
+          },
           skip,
           take: itemsPerPage,
           orderBy: { created_at: 'desc' },
@@ -322,6 +334,9 @@ export class UserService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
+          include: {
+            memberships: true,
+          },
           skip,
           take: itemsPerPage,
           orderBy: { created_at: 'desc' },
@@ -390,6 +405,9 @@ export class UserService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
+          include: {
+            memberships: true,
+          },
           skip,
           take: itemsPerPage,
           orderBy: { created_at: 'desc' },
@@ -432,6 +450,9 @@ export class UserService {
         where: {
           id: Number(id),
         },
+        include: {
+          memberships: true,
+        },
       });
       if (!user) {
         throw new NotFoundException('User không tồn tại');
@@ -459,6 +480,9 @@ export class UserService {
       const user = await this.prismaService.users.findUnique({
         where: {
           email,
+        },
+        include: {
+          memberships: true,
         },
       });
       if (!user) {

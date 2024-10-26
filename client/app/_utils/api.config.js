@@ -7,7 +7,14 @@ const AUTH_API = `${HOST}/auth`;
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
+<<<<<<< HEAD
 const DASHBOARD_API = `${HOST}/dashboard`;
+=======
+const PRODUCTS_API = `${HOST}/products`;
+const FEEDBACKS_API = `${HOST}/feedbacks`;
+const NOTIFICATIONS_API = `${HOST}/notifications`;
+
+>>>>>>> 15b1bd28e0ca16f1fcad2ca4d4b52d4b2caa8928
 // API Endpoints
 export const API_CONFIG = {
   // AUTH API
@@ -58,6 +65,7 @@ export const API_CONFIG = {
     RESTORE: (id) => `${CATEGORIES_API}/restore/${id}`,
     DESTROY: (id) => `${CATEGORIES_API}/destroy/${id}`,
   },
+<<<<<<< HEAD
   // DASHBOARD API
   DASHBOARD: {
     GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
@@ -74,4 +82,37 @@ export const API_CONFIG = {
     
 
   }
+=======
+
+  // PRODUCTS API
+  PRODUCTS: {
+    CREATE: `${PRODUCTS_API}/create`,
+    GET_ALL: `${PRODUCTS_API}/get-all`,
+    GET_ALL_DELETED: `${PRODUCTS_API}/get-all-deleted`,
+    GET_BY_ID: (id) => `${PRODUCTS_API}/get/${id}`,
+    GET_BY_SLUG: (slug) => `${PRODUCTS_API}/get-by-slug/${slug}`,
+    GET_BY_CATEGORY: (categoryId) =>
+      `${PRODUCTS_API}/get-by-category/${categoryId}`,
+    UPDATE: (id) => `${PRODUCTS_API}/update/${id}`,
+    DELETE: (id) => `${PRODUCTS_API}/delete/${id}`,
+    RESTORE: (id) => `${PRODUCTS_API}/restore/${id}`,
+    DESTROY: (id) => `${PRODUCTS_API}/destroy/${id}`,
+  },
+
+  // FEEDBACKS API
+  FEEDBACKS: {
+    CREATE: `${FEEDBACKS_API}/create`,
+    GET_ALL_SHOW: `${FEEDBACKS_API}/get-all-show`,
+    GET_ALL_HIDE: `${FEEDBACKS_API}/get-all-hide`,
+    GET_BY_ID: (id) => `${FEEDBACKS_API}/get/${id}`,
+    GET_BY_BOOKING: (bookingId) =>
+      `${FEEDBACKS_API}/get-by-booking/${bookingId}`,
+    GET_BY_USER: (userId) => `${FEEDBACKS_API}/get-by-user/${userId}`,
+    UPDATE: (id) => `${FEEDBACKS_API}/update/${id}`,
+    DESTROY: (id) => `${FEEDBACKS_API}/destroy/${id}`,
+  },
+
+  // NOTIFICATIONS API
+  NOTIFICATIONS: {},
+>>>>>>> 15b1bd28e0ca16f1fcad2ca4d4b52d4b2caa8928
 };

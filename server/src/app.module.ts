@@ -29,6 +29,7 @@ import { BlogsModule } from './blogs/blogs.module';
 import { MembershipsModule } from './memberships/memberships.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
+import { PackagesModule } from './packages/packages.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { SubscribersModule } from './subscribers/subscribers.module';
     MembershipsModule,
     NotificationsModule,
     SubscribersModule,
+    PackagesModule,
   ],
   controllers: [AppController],
   providers: [

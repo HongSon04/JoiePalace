@@ -82,6 +82,13 @@ export class DecorsService {
             connect: products.map((product) => ({ id: Number(product) })),
           },
         },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
       });
 
       throw new HttpException(
@@ -202,8 +209,12 @@ export class DecorsService {
         this.prismaService.decors.findMany({
           where: whereConditions,
           include: {
-            products: true,
+          products: {
+            include: {
+              tags: true,
+            },
           },
+        },
           skip,
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
@@ -341,8 +352,12 @@ export class DecorsService {
         this.prismaService.decors.findMany({
           where: whereConditions,
           include: {
-            products: true,
+          products: {
+            include: {
+              tags: true,
+            },
           },
+        },
           skip,
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
@@ -387,7 +402,11 @@ export class DecorsService {
       const decor = await this.prismaService.decors.findUnique({
         where: { id: Number(id) },
         include: {
-          products: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
@@ -485,6 +504,13 @@ export class DecorsService {
       const updatedDecor = await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: dataToUpdate,
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
       });
 
       throw new HttpException(

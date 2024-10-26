@@ -205,18 +205,18 @@ const randomUnique = Math.floor(Math.random() * 90000000000000) + dateNow;
 const uid = uniqid();
 
 export const userSeed = async (count: number) => {
-  for (let i = 0; i < adminUser.length; i++) {
-    const user = await prisma.users.create({
-      data: {
-        username: adminUser[i].username,
-        email: adminUser[i].email,
-        password: hashedPassword,
-        role: adminUser[i].role as any,
-        phone: `0${Math.floor(Math.random() * 1000000000)}`,
-      },
-    });
-    console.log`Admin user created: ${user.username}`;
-  }
+  // for (let i = 0; i < adminUser.length; i++) {
+  //   const user = await prisma.users.create({
+  //     data: {
+  //       username: adminUser[i].username,
+  //       email: adminUser[i].email,
+  //       password: hashedPassword,
+  //       role: adminUser[i].role as any,
+  //       phone: `0${Math.floor(Math.random() * 1000000000)}`,
+  //     },
+  //   });
+  //   console.log`Admin user created: ${user.username}`;
+  // }
   for (let i = 0; i < count; i++) {
     const user = await prisma.users.create({
       data: {

@@ -37,6 +37,9 @@ export class AuthService {
         where: {
           email,
         },
+        include: {
+          memberships: true,
+        },
       });
       if (findEmail) {
         throw new BadRequestException('Email đã tồn tại');
@@ -51,7 +54,11 @@ export class AuthService {
           password: hashedPassword,
           phone,
         },
+        include: {
+          memberships: true,
+        },
       });
+
       // ? Generate token
       const token = await this.generateToken(user);
 
@@ -97,6 +104,9 @@ export class AuthService {
       const user = await this.prismaService.users.findFirst({
         where: {
           email,
+        },
+        include: {
+          memberships: true,
         },
       });
 
@@ -372,11 +382,13 @@ export class AuthService {
   async generateToken(user: UserEntity) {
     const payload = {
       id: Number(user.id),
+      branch_id: user.branch_id,
       username: user.username,
       email: user.email,
       role: user.role,
       phone: user.phone,
       platform: user.platform,
+      memberships: user.memberships,
       active: user.active,
       verify_at: user.verify_at,
     };

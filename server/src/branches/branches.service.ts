@@ -36,7 +36,6 @@ export class BranchesService {
       diagram_images: 'Hình ảnh sơ đồ không được để trống',
       slogan_images: 'Hình ảnh slogan không được để trống',
       equipment_images: 'Hình ảnh thiết bị không được để trống',
-      space_images: 'Hình ảnh không gian không được để trống',
     };
 
     Object.keys(requiredFiles).forEach((key) => {
@@ -72,7 +71,6 @@ export class BranchesService {
         uploadImages('diagram_images', 'joiepalace/diagram'),
         uploadImages('slogan_images', 'joiepalace/slogan'),
         uploadImages('equipment_images', 'joiepalace/equipment'),
-        uploadImages('space_images', 'joiepalace/space'),
       ]);
 
       const { name, address, phone, email } = branch;
@@ -97,16 +95,11 @@ export class BranchesService {
           diagram_images: branchImages.diagram_images,
           equipment_images: branchImages.equipment_images,
         },
+        include: {
+          stages: true,
+        },
       });
 
-      // Tạo Space mới
-      const bodySpace = {
-        branch_id: createbranch.id,
-        name: branch.spaces_name,
-        slug: MakeSlugger(branch.spaces_name),
-        description: branch.spaces_description,
-        images: branchImages.space_images,
-      };
       const result = {
         ...FormatReturnData(createbranch, []),
       };
@@ -183,6 +176,9 @@ export class BranchesService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.branches.findMany({
           where: whereConditions,
+          include: {
+            stages: true,
+          },
           skip: skip,
           take: itemsPerPage,
           orderBy: {
@@ -275,6 +271,9 @@ export class BranchesService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.branches.findMany({
           where: whereConditions,
+          include: {
+            stages: true,
+          },
           skip: skip,
           take: itemsPerPage,
           orderBy: {
@@ -321,6 +320,9 @@ export class BranchesService {
         where: {
           id: Number(id),
         },
+        include: {
+          stages: true,
+        },
       });
       if (!branch) {
         throw new NotFoundException('Địa điểm không tồn tại');
@@ -360,24 +362,16 @@ export class BranchesService {
         where: {
           slug,
         },
+        include: {
+          stages: true,
+        },
       });
       if (!branch) {
         throw new NotFoundException('Địa điểm không tồn tại');
       }
 
-      const stages = await this.prismaService.stages.findMany({
-        where: {
-          branch_id: Number(branch.id),
-        },
-      });
-      const { deleted, deleted_at, deleted_by, ...data } = branch;
-      let result = {
-        ...data,
-        stages,
-      };
-
       throw new HttpException(
-        { data: FormatReturnData(result, []) },
+        { data: FormatReturnData(branch, []) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -409,7 +403,6 @@ export class BranchesService {
           diagram_images: 'Hình ảnh sơ đồ không được để trống',
           slogan_images: 'Hình ảnh slogan không được để trống',
           equipment_images: 'Hình ảnh thiết bị không được để trống',
-          space_images: 'Hình ảnh không gian không được để trống',
         };
 
         Object.entries(requiredFiles).forEach(([key, message]) => {
@@ -455,8 +448,6 @@ export class BranchesService {
         slogan_description,
         diagram_description,
         equipment_description,
-        spaces_name,
-        spaces_description,
       } = branch;
 
       // Tạo slug mới nếu cần
@@ -488,19 +479,13 @@ export class BranchesService {
           diagram_images: branchImages.diagram_images,
           equipment_images: branchImages.equipment_images,
         },
+        include: {
+          stages: true,
+        },
       });
-
-      const stages = await this.prismaService.stages.findMany({
-        where: { branch_id: Number(id) },
-      });
-
-      const result = {
-        ...FormatReturnData(updatedbranch, []),
-        stages: FormatReturnData(stages, []),
-      };
 
       throw new HttpException(
-        { message: 'Cập nhật địa điểm thành công', data: result },
+        { message: 'Cập nhật địa điểm thành công', data: updatedbranch },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -653,7 +638,6 @@ export class BranchesService {
           name: 'branch_details',
           imageFields: ['slogan_images', 'diagram_images', 'equipment_images'],
         },
-        { name: 'spaces', imageField: 'images' },
         { name: 'stages', imageField: 'images' },
       ];
 
