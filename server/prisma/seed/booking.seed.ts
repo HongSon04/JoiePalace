@@ -8,6 +8,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 1,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty A',
     email: 'congtya@gmail.com',
@@ -22,6 +23,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 2,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty B',
     email: 'congtyb@gmail.com',
@@ -36,6 +38,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 3,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty C',
     email: 'congtyc@gmail.com',
@@ -50,6 +53,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 4,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty D',
     email: 'congtyd@gmail.com',
@@ -64,6 +68,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 5,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty E',
     email: 'congtye@gmail.com',
@@ -78,6 +83,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 6,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty F',
     email: 'congtyf@gmail.com',
@@ -92,6 +98,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 7,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty G',
     email: 'congtyg@gmail.com',
@@ -106,6 +113,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 8,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty H',
     email: 'congtyh@gmail.com',
@@ -120,6 +128,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 9,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty I',
     email: 'congtyi@gmail.com',
@@ -134,6 +143,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 9,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty I',
     email: 'congtyi@gmail.com',
@@ -148,6 +158,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 10,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty J',
     email: 'congtyj@gmail.com',
@@ -162,6 +173,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 11,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty K',
     email: 'congtyk@gmail.com',
@@ -176,6 +188,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 12,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty L',
     email: 'congtyl@gmail.com',
@@ -190,6 +203,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 13,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty M',
     email: 'congtym@gmail.com',
@@ -204,6 +218,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 14,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty N',
     email: 'congtyn@gmail.com',
@@ -218,6 +233,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 15,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty O',
     email: 'congtyo@gmail.com',
@@ -232,6 +248,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 16,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty P',
     email: 'congtyp@gmail.com',
@@ -246,6 +263,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 17,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty Q',
     email: 'congtyq@gmail.com',
@@ -260,6 +278,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 18,
     branch_id: 1,
+    budget: '',
     stage_id: 1,
     company_name: 'Công ty R',
     email: 'congtyr@gmail.com',

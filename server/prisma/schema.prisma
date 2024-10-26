@@ -282,6 +282,7 @@ model bookings {
   note              String?
   shift             String
   number_of_guests  Int?
+  budget            String?
   organization_date DateTime
   is_confirm        Boolean           @default(false)
   is_deposit        Boolean           @default(false)

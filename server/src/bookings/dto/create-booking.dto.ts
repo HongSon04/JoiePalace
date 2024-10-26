@@ -38,6 +38,9 @@ export class CreateBookingDto {
   @ApiProperty({ required: false })
   number_of_guests: number;
 
+  @ApiProperty({ required: false })
+  budget: string;
+
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Vui lòng chọn ca' })
   @IsEnum(['Sáng', 'Tối'], {

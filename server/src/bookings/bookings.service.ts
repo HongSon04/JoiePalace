@@ -6,7 +6,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { BookingStatus } from '@prisma/client';
 import dayjs from 'dayjs';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { FormatReturnData } from 'helper/FormatReturnData';
@@ -21,12 +20,16 @@ import {
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
+import { BookingStatus } from 'helper/enum/booking_status.enum';
 
 @Injectable()
 export class BookingsService {
   constructor(
     private prismaService: PrismaService,
     private mailService: MailService,
+    private notificationService: NotificationsService,
   ) {}
 
   // ! Create Booking
@@ -44,17 +47,17 @@ export class BookingsService {
         party_type_id,
         number_of_guests,
         phone,
+        budget,
+        organization_date,
       } = createBookingDto;
-      var { organization_date } = createBookingDto;
-      organization_date = FormatDateWithShift(organization_date, shift);
 
-      // ? Check Date And Shift is Exist
+      const formattedDate = FormatDateWithShift(organization_date, shift);
+
+      // Check Date And Shift is Exist
       const checkDateAndShift = await this.prismaService.bookings.findMany({
         where: {
           deleted: false,
-          organization_date: {
-            equals: organization_date,
-          },
+          organization_date: { equals: formattedDate },
           shift,
         },
       });
@@ -64,63 +67,51 @@ export class BookingsService {
         );
       }
 
-      if (user_id != null || user_id != undefined) {
-        const user = await this.prismaService.users.findUnique({
-          where: { id: Number(user_id) },
-        });
-        if (!user) {
-          throw new NotFoundException('Không tìm thấy người dùng');
-        }
-      }
-
-      if (stage_id) {
-        const findStage = await this.prismaService.stages.findUnique({
-          where: { id: Number(stage_id) },
-        });
-
-        if (!findStage) {
-          throw new NotFoundException('Không tìm thấy sảnh');
-        }
-      }
-
-      // Fetching user, branch in parallel
-      const [party_types, branch] = await Promise.all([
+      // Fetching user, branch, party type, and stage in parallel
+      const [user, partyType, branch, stage] = await Promise.all([
+        user_id
+          ? this.prismaService.users.findUnique({
+              where: { id: Number(user_id) },
+            })
+          : null,
         this.prismaService.party_types.findUnique({
           where: { id: Number(party_type_id) },
         }),
         this.prismaService.branches.findUnique({
           where: { id: Number(branch_id) },
         }),
+        stage_id
+          ? this.prismaService.stages.findUnique({
+              where: { id: Number(stage_id) },
+            })
+          : null,
       ]);
 
       // Validate fetched data
-      const validateExists = (entity: any, name: string) => {
-        if (!entity) throw new NotFoundException(`Không tìm thấy ${name}`);
-      };
-      validateExists(party_types, 'Loại tiệc');
-      validateExists(branch, 'Chi nhánh');
+      if (user_id && !user)
+        throw new NotFoundException('Không tìm thấy người dùng');
+      if (stage_id && !stage)
+        throw new NotFoundException('Không tìm thấy sảnh');
+      if (!partyType) throw new NotFoundException('Không tìm thấy loại tiệc');
+      if (!branch) throw new NotFoundException('Không tìm thấy chi nhánh');
 
       // Create Booking
       const booking = await this.prismaService.bookings.create({
         data: {
           user_id: Number(user_id),
           branch_id: Number(branch_id),
-          company_name: company_name ? company_name : null,
+          company_name: company_name || null,
           email,
           note,
           party_type_id: Number(party_type_id),
           stage_id: stage_id ? Number(stage_id) : null,
           phone,
           name,
-          organization_date,
+          organization_date: formattedDate,
           shift,
+          budget,
           number_of_guests: Number(number_of_guests),
         },
-      });
-
-      // Fetch booking with relations
-      const findBooking = await this.prismaService.bookings.findUnique({
-        where: { id: Number(booking.id) },
         include: {
           users: {
             select: {
@@ -138,10 +129,26 @@ export class BookingsService {
         },
       });
 
-      // ? Send Mail
+      // Prepare notification and email content
+      const contents = {
+        name: `Đơn đặt tiệc mới từ ${name}`,
+        contents: `Đơn đặt tiệc mới từ ${name}, vào ngày ${dayjs(formattedDate).format('DD/MM/YYYY')}, vào ca ${shift}, vui lòng kiểm tra và xác nhận!`,
+        branch_id,
+        type: TypeNotifyEnum.BOOKING_CREATED,
+      };
+
+      // Send Notification
+      await this.notificationService.sendNotifications(
+        contents.name,
+        contents.contents,
+        contents.branch_id,
+        contents.type,
+      );
+
+      // Send Mail
       const bodyMail = {
         shift,
-        organization_date: dayjs(organization_date).format('DD/MM/YYYY'),
+        organization_date: dayjs(formattedDate).format('DD/MM/YYYY'),
         branchName: branch.name,
         customerName: name,
         customerEmail: email,
@@ -149,10 +156,12 @@ export class BookingsService {
         branchAddress: branch.address,
       };
       await this.mailService.sendUserConfirmationBooking(bodyMail);
+
+      // Trả về thông báo thành công
       throw new HttpException(
         {
           message: 'Đặt tiệc thành công',
-          data: FormatReturnData(findBooking, []),
+          data: FormatReturnData(booking, []),
         },
         HttpStatus.OK,
       );
@@ -517,7 +526,13 @@ export class BookingsService {
           },
         },
         include: {
-          stages: true,
+          stages: {
+            select: {
+              id: true,
+              name: true,
+              // Chọn các trường cần thiết khác nếu cần
+            },
+          },
         },
       });
 
@@ -594,6 +609,40 @@ export class BookingsService {
           status: status as BookingStatus,
         },
       });
+
+      // ! Send Notification
+      const contents: any = {
+        name: `Đơn đặt tiệc của ${findBooking.name}`,
+        branch_id: findBooking.branch_id,
+      };
+
+      if (is_confirm === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được xác nhận!`;
+        contents.type = TypeNotifyEnum.BOOKING_CONFIRM;
+      } else if (is_deposit === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được đặt cọc!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'cancel') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã bị hủy!`;
+        contents.type = TypeNotifyEnum.BOOKING_CANCEL;
+      } else if (status === 'processing') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đang được tổ chức!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'success') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được tiến hành!`;
+        contents.type = TypeNotifyEnum.BOOKING_SUCCESS;
+      } else {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã cập nhật!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      }
+
+      await this.notificationService.sendNotifications(
+        contents.name,
+        contents.contents,
+        contents.branch_id,
+        contents.type,
+      );
+
       throw new HttpException(
         'Cập nhật trạng thái đơn đặt tiệc thành công',
         HttpStatus.OK,
@@ -634,22 +683,43 @@ export class BookingsService {
         status,
       } = updateBookingDto;
 
-      const findBooking = await this.prismaService.bookings.findUnique({
-        where: { id: Number(id) },
-      });
+      // Fetch the booking and related data in parallel to minimize database calls
+      const [findBooking, findStages] = await Promise.all([
+        this.prismaService.bookings.findUnique({
+          where: { id: Number(id) },
+        }),
+        this.prismaService.stages.findUnique({
+          where: { id: Number(stage_id) },
+        }),
+      ]);
+
       if (!findBooking) {
-        throw new HttpException(
-          'Không tìm thấy đơn đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
-
-      const findStages = await this.prismaService.stages.findUnique({
-        where: { id: Number(stage_id) },
-      });
-
       if (!findStages) {
         throw new NotFoundException('Không tìm thấy sảnh');
+      }
+
+      // ? Check date_organization and shift is exist or not with another booking in the same branch and shift time and stages
+      const formattedDate = FormatDateWithShift(
+        findBooking.organization_date as any,
+        findBooking.shift,
+      );
+
+      const checkDateAndShift = await this.prismaService.bookings.findMany({
+        where: {
+          deleted: false,
+          organization_date: { equals: formattedDate },
+          shift: findBooking.shift,
+          branch_id: findBooking.branch_id,
+          stage_id: Number(stage_id),
+        },
+      });
+
+      if (checkDateAndShift.length > 0) {
+        throw new BadRequestException(
+          'Đã có sự kiện tổ chức vào thời gian này',
+        );
       }
 
       // ! Update Booking
@@ -676,9 +746,9 @@ export class BookingsService {
         findBooking.shift,
       );
 
-      if (findBooking.is_confirm === false) {
+      if (!findBooking.is_confirm) {
         throw new BadRequestException(
-          'Không thể sửa thông tin đơn đặt tiệc chưa xác nhận',
+          'Không thể sửa thông tin đơn đặt tiệc khi chưa xác nhận',
         );
       }
 
@@ -699,9 +769,11 @@ export class BookingsService {
       // Fetching user, branch,  stage, decor, and menu in parallel
       const [user, branch, stage, decor, menu, party_types] = await Promise.all(
         [
-          this.prismaService.users.findUnique({
-            where: { id: Number(user_id) },
-          }),
+          user_id
+            ? this.prismaService.users.findUnique({
+                where: { id: Number(user_id) },
+              })
+            : null,
           this.prismaService.branches.findUnique({
             where: { id: Number(branch_id) },
           }),
@@ -868,6 +940,21 @@ export class BookingsService {
           },
         });
 
+        // ! Send Notification
+        const contents: any = {
+          name: `Đơn đặt tiệc của ${findBooking.name}`,
+          content: `Đơn đặt tiệc của ${findBooking.name} đã được cập nhật!`,
+          branch_id: findBooking.branch_id,
+          type: TypeNotifyEnum.BOOKING_UPDATED,
+        };
+
+        await this.notificationService.sendNotifications(
+          contents.name,
+          contents.content,
+          contents.branch_id,
+          contents.type,
+        );
+
         throw new HttpException(
           {
             message: 'Cập nhật tiệc thành công',
@@ -974,6 +1061,21 @@ export class BookingsService {
             booking_details: true,
           },
         });
+
+        // ! Send Notification
+        const contents: any = {
+          name: `Đơn đặt tiệc của ${findBooking.name}`,
+          content: `Đơn đặt tiệc của ${findBooking.name} đã được cập nhật!`,
+          branch_id: findBooking.branch_id,
+          type: TypeNotifyEnum.BOOKING_UPDATED,
+        };
+
+        await this.notificationService.sendNotifications(
+          contents.name,
+          contents.content,
+          contents.branch_id,
+          contents.type,
+        );
 
         throw new HttpException(
           {
@@ -1109,82 +1211,5 @@ export class BookingsService {
         error,
       );
     }
-  }
-
-  // ! Calculate accessory amounts
-  private async calculateAccessories(accessories) {
-    let accessoriesAmount = 0;
-    let totalTables = 0;
-
-    // // Fetch table prices in parallel
-    // const tablePromises = accessories.table.map(async (table) => {
-    //   const findTable = await this.prismaService.funitures.findUnique({
-    //     where: { id: Number(table.id) },
-    //   });
-    //   if (!findTable)
-    //     throw new HttpException(
-    //       'Không tìm thấy loại bàn',
-    //       HttpStatus.NOT_FOUND,
-    //     );
-    //   accessoriesAmount += findTable.price * table.quantity;
-    //   totalTables += table.quantity;
-    //   table.name = findTable.name;
-    //   table.amount = findTable.price;
-    //   table.total_price = findTable.price * table.quantity;
-    //   table.description = findTable.description;
-    //   table.short_description = findTable.short_description;
-    //   table.images = findTable.images;
-    //   table.type = findTable.type;
-    //   return findTable.price * table.quantity;
-    // });
-
-    // await Promise.all(tablePromises);
-
-    // // Fetch Extra Services
-    // const extraServicesPromise = accessories.extra_services.map(
-    //   async (extra) => {
-    //     const findExtra = await this.prismaService.products.findUnique({
-    //       where: { id: Number(extra.id) },
-    //     });
-    //     if (!findExtra)
-    //       throw new HttpException(
-    //         'Không tìm thấy dịch vụ thêm',
-    //         HttpStatus.NOT_FOUND,
-    //       );
-    //     accessoriesAmount += findExtra.price * extra.quantity;
-    //     extra.name = findExtra.name;
-    //     extra.amount = findExtra.price;
-    //     extra.total_price = findExtra.price * extra.quantity;
-    //     extra.quantity = extra.quantity;
-    //     extra.description = findExtra.description;
-    //     extra.short_description = findExtra.short_description;
-    //     extra.images = findExtra.images;
-    //     return findExtra.price * extra.quantity;
-    //   },
-    // );
-
-    // // Calculate chair price (1 table = 10 chairs)
-    // const findChair = await this.prismaService.funitures.findUnique({
-    //   where: { id: Number(accessories.chair.id) },
-    // });
-    // if (!findChair)
-    //   throw new HttpException('Không tìm thấy loại ghế', HttpStatus.NOT_FOUND);
-    // accessories.chair.name = findChair.name;
-    // accessories.chair.amount = findChair.price;
-    // accessories.chair.description = findChair.description;
-    // accessories.chair.short_description = findChair.short_description;
-    // accessories.chair.images = findChair.images;
-    // accessories.chair.type = findChair.type;
-    // accessories.chair.quantity = totalTables * 10;
-    // accessories.chair.total_price = findChair.price * totalTables * 10;
-
-    // accessoriesAmount += findChair.price * totalTables * 10;
-    accessoriesAmount = 0;
-    return {
-      totalAmount: accessoriesAmount,
-      tableAmount: accessoriesAmount,
-      totalTables,
-      NewAccessories: accessories,
-    };
   }
 }

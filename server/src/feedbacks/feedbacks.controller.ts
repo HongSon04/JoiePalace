@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { FeedbacksService } from './feedbacks.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -16,9 +17,11 @@ import {
   ApiHeaders,
   ApiOperation,
   ApiProperty,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { FilterDto } from 'helper/dto/Filter.dto';
 
 @ApiTags('Feedbacks - Quản lý đánh giá')
 @Controller('/api/feedbacks')
@@ -102,8 +105,13 @@ export class FeedbacksController {
       message: 'Lỗi server',
     },
   })
-  findAll() {
-    return this.feedbacksService.findAllShow();
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  findAll(@Query() query: FilterDto) {
+    return this.feedbacksService.findAllShow(query);
   }
 
   // ! Lấy tất cả feedback bị ẩn
@@ -139,8 +147,13 @@ export class FeedbacksController {
       message: 'Lỗi server',
     },
   })
-  findAllHide() {
-    return this.feedbacksService.findAllHide();
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  findAllHide(@Query() query: FilterDto) {
+    return this.feedbacksService.findAllHide(query);
   }
 
   // ! Lấy tất cả feedback theo id
