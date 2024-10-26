@@ -105,7 +105,7 @@ export class BookingsService {
         data: {
           user_id: Number(user_id),
           branch_id: Number(branch_id),
-          company_name,
+          company_name: company_name ? company_name : null,
           email,
           note,
           party_type_id: Number(party_type_id),
@@ -180,8 +180,6 @@ export class BookingsService {
         ? FormatDateToStartOfDay(query.startDate)
         : '';
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
-      const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -196,7 +194,11 @@ export class BookingsService {
       // ? Where Conditions
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -204,34 +206,26 @@ export class BookingsService {
             },
           },
           {
-            branchs: {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
+            company_name: {
+              contains: search,
+              mode: 'insensitive',
             },
           },
           {
-            menus: {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
+            email: {
+              contains: search,
+              mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
-      // ? Price Conditions
-      if (minPrice >= 0) {
-        if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ amount: { gte: minPrice } });
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
       }
 
-      if (maxPrice > 0) {
-        if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { lte: maxPrice } });
-      }
       // ? Date Conditions
       if (startDate && endDate) {
         if (!whereConditions.AND) whereConditions.AND = [];
@@ -266,7 +260,11 @@ export class BookingsService {
                 decors: true,
                 menus: {
                   include: {
-                    products: true,
+                    products: {
+                      include: {
+                        tags: true,
+                      },
+                    },
                   },
                 },
                 deposits: true,
@@ -321,8 +319,6 @@ export class BookingsService {
         ? FormatDateToStartOfDay(query.startDate)
         : '';
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
-      const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -337,7 +333,11 @@ export class BookingsService {
       // ? Where Conditions
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -345,34 +345,26 @@ export class BookingsService {
             },
           },
           {
-            branchs: {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
+            company_name: {
+              contains: search,
+              mode: 'insensitive',
             },
           },
           {
-            menus: {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
+            email: {
+              contains: search,
+              mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
-      // ? Price Conditions
-      if (minPrice >= 0) {
-        if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ amount: { gte: minPrice } });
+          {
+            phone: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
       }
 
-      if (maxPrice > 0) {
-        if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { lte: maxPrice } });
-      }
       // ? Date Conditions
       if (startDate && endDate) {
         if (!whereConditions.AND) whereConditions.AND = [];
@@ -408,7 +400,11 @@ export class BookingsService {
                 decors: true,
                 menus: {
                   include: {
-                    products: true,
+                    products: {
+                      include: {
+                        tags: true,
+                      },
+                    },
                   },
                 },
                 deposits: true,
@@ -663,7 +659,7 @@ export class BookingsService {
           user_id: Number(user_id),
           branch_id: Number(branch_id),
           name,
-          company_name,
+          company_name: company_name ? company_name : null,
           email,
           note,
           number_of_guests: Number(number_of_guests),
@@ -700,7 +696,7 @@ export class BookingsService {
         }
       }
 
-      // Fetching user, branch, space, stage, decor, and menu in parallel
+      // Fetching user, branch,  stage, decor, and menu in parallel
       const [user, branch, stage, decor, menu, party_types] = await Promise.all(
         [
           this.prismaService.users.findUnique({

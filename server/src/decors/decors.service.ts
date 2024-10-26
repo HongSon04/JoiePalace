@@ -141,7 +141,11 @@ export class DecorsService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: false,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -164,9 +168,8 @@ export class DecorsService {
             },
           },
         },
-      ],
-      ...sortRangeDate,
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [
@@ -209,12 +212,12 @@ export class DecorsService {
         this.prismaService.decors.findMany({
           where: whereConditions,
           include: {
-          products: {
-            include: {
-              tags: true,
+            products: {
+              include: {
+                tags: true,
+              },
             },
           },
-        },
           skip,
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
@@ -284,7 +287,11 @@ export class DecorsService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: true,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -307,9 +314,8 @@ export class DecorsService {
             },
           },
         },
-      ],
-      ...sortRangeDate,
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [
@@ -352,12 +358,12 @@ export class DecorsService {
         this.prismaService.decors.findMany({
           where: whereConditions,
           include: {
-          products: {
-            include: {
-              tags: true,
+            products: {
+              include: {
+                tags: true,
+              },
             },
           },
-        },
           skip,
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },

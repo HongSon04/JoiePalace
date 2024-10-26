@@ -161,7 +161,7 @@ export class UserController {
 
   // ! Get All User
   @Get('get-all')
-  @Roles(Role.ADMIN)
+  @isPublic()
   @ApiHeaders([
     {
       name: 'authorization',
@@ -599,5 +599,12 @@ export class UserController {
   @ApiOperation({ summary: 'Xóa vĩnh viễn tài khoản' })
   hardDelete(@Query('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);
+  }
+
+  // ! Test
+  @Get('/xoa-du-an-nay')
+  @isPublic()
+  xoaDuAnNay() {
+    return `https://youtu.be/dQw4w9WgXcQ?si=9TAokZhkWrZZwfay`;
   }
 }

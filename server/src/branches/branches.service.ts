@@ -150,7 +150,11 @@ export class BranchesService {
 
       const whereConditions = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -169,9 +173,8 @@ export class BranchesService {
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.branches.findMany({
@@ -245,7 +248,11 @@ export class BranchesService {
 
       const whereConditions = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -264,9 +271,8 @@ export class BranchesService {
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.branches.findMany({
@@ -638,7 +644,6 @@ export class BranchesService {
           name: 'branch_details',
           imageFields: ['slogan_images', 'diagram_images', 'equipment_images'],
         },
-        { name: 'spaces', imageField: 'images' },
         { name: 'stages', imageField: 'images' },
       ];
 

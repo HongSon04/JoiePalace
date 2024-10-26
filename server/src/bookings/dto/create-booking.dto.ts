@@ -28,7 +28,7 @@ export class CreateBookingDto {
   @IsNotEmpty({ message: 'Email không được để trống' })
   email: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   @IsNotEmpty({ message: 'Tên công ty không được để trống' })
   company_name: string;
 

@@ -131,7 +131,11 @@ export class CategoriesService {
 
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -150,9 +154,8 @@ export class CategoriesService {
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.categories.findMany({
@@ -228,7 +231,11 @@ export class CategoriesService {
 
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -247,9 +254,8 @@ export class CategoriesService {
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.categories.findMany({

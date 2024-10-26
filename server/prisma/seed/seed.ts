@@ -8,6 +8,7 @@ import { bookingSeed } from './booking.seed';
 import { partyTypesSeed } from './party_types';
 import { stageSeed } from './stage.seed';
 import { feedbackSeed } from './feedback.seed';
+import { decorSeed } from './decor.seed';
 
 const prisma = new PrismaClient();
 
@@ -21,12 +22,14 @@ const seedMap: { [key: string]: (number: number) => Promise<void> } = {
   party: partyTypesSeed,
   stage: stageSeed,
   feedback: feedbackSeed,
+  decor: decorSeed,
   all: async (number: number) => {
     await userSeed(number);
     await branchSeed();
     await categoriesSeed();
     await productSeed();
     await stageSeed();
+    await decorSeed();
     await menuSeed();
     await partyTypesSeed();
     await bookingSeed();

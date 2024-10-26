@@ -147,7 +147,6 @@ export class BranchesController {
       slogan_images?: Express.Multer.File[];
       diagram_images?: Express.Multer.File[];
       equipment_images?: Express.Multer.File[];
-      space_images?: Express.Multer.File[];
     },
   ): Promise<CreateBranchDto | any> {
     return this.branchesService.createBranch(
@@ -180,18 +179,6 @@ export class BranchesController {
           equipment_images: ['string', 'string'],
           created_at: 'date',
           updated_at: 'date',
-          space: [
-            {
-              id: 'number',
-              branch_id: 'number',
-              name: 'string',
-              slug: 'string',
-              description: 'string',
-              images: ['string', 'string'],
-              created_at: 'date',
-              updated_at: 'date',
-            },
-          ],
           stages: [
             {
               id: 'number',
@@ -249,18 +236,6 @@ export class BranchesController {
           equipment_images: ['string', 'string'],
           created_at: 'date',
           updated_at: 'date',
-          space: [
-            {
-              id: 'number',
-              branch_id: 'number',
-              name: 'string',
-              slug: 'string',
-              description: 'string',
-              images: ['string', 'string'],
-              created_at: 'date',
-              updated_at: 'date',
-            },
-          ],
           stages: [
             {
               id: 'number',
@@ -318,18 +293,6 @@ export class BranchesController {
         equipment_images: ['string', 'string'],
         created_at: 'date',
         updated_at: 'date',
-        space: [
-          {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
-        ],
         stages: [
           {
             id: 'number',
@@ -385,18 +348,6 @@ export class BranchesController {
         equipment_images: ['string', 'string'],
         created_at: 'date',
         updated_at: 'date',
-        space: [
-          {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
-        ],
         stages: [
           {
             id: 'number',
@@ -455,18 +406,6 @@ export class BranchesController {
         created_at: 'date',
         updated_at: 'date',
 
-        space: [
-          {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
-        ],
         stages: [
           {
             id: 'number',
@@ -550,7 +489,6 @@ export class BranchesController {
       slogan_images?: Express.Multer.File[];
       diagram_images?: Express.Multer.File[];
       equipment_images?: Express.Multer.File[];
-      space_images?: Express.Multer.File[];
     },
   ): Promise<UpdateBranchDto | any> {
     return this.branchesService.updateBranch(
