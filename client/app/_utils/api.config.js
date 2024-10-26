@@ -8,6 +8,9 @@ const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
 const DASHBOARD_API = `${HOST}/dashboard`;
+const PRODUCTS_API = `${HOST}/products`;
+const FEEDBACKS_API = `${HOST}/feedbacks`;
+
 // API Endpoints
 export const API_CONFIG = {
   GENERAL_BRANCH: "ho-chi-minh",
