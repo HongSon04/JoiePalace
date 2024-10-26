@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsArray, IsString, ArrayNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsArray,
+  IsString,
+  ArrayNotEmpty,
+  ArrayMinSize,
+  ArrayMaxSize,
+  IsInt,
+} from 'class-validator';
 
 export class CreateDecorDto {
   @ApiProperty({ required: true })
@@ -17,9 +26,20 @@ export class CreateDecorDto {
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Giá không được để trống' })
   price: number;
-  
+
   @ApiProperty({ required: true })
   images: string[];
+
+  @ApiProperty({ example: [1, 2, 3] })
+  @ArrayNotEmpty({ message: 'Danh sách sản phẩm không được để trống' })
+  @ArrayMinSize(1, { message: 'Cần ít nhất 1 món ăn' })
+  @ArrayMaxSize(10, { message: 'Chỉ cho phép tối đa 10 món ăn' })
+  @Type(() => Number)
+  @IsInt({
+    each: true,
+    message: 'Mỗi phần tử trong Danh sách sản phẩm phải là số nguyên',
+  })
+  products: number[];
 }
 
 export class ImageDecorDto {

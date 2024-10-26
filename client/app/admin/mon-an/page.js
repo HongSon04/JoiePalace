@@ -1,18 +1,13 @@
 import AdminHeader from "@/app/_components/AdminHeader";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import AddDishCategory from "./AddDishCategory";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-} from "@chakra-ui/react";
 import DishesMain from "./DishesMain";
 
 export const metadata = {
   title: "Quản lý món ăn",
 };
 
-function page() {
+function Page() {
   return (
     <div>
       {/* Header */}
@@ -37,10 +32,9 @@ function page() {
         </BreadcrumbItem>
       </Breadcrumb>
 
-      {/* Main content */}
       <DishesMain />
     </div>
   );
 }
 
-export default page;
+export default Page;

@@ -41,19 +41,34 @@ function FormInput({
   name,
   id,
   type = "text",
-  className,
-  errorMessage,
+  className = "",
+  errorMessage = "",
   isPasswordVisible,
   setIsPasswordVisible,
-  labelClassName,
-  placeholder,
-  wrapperClassName,
-  startContent,
-  endContent,
+  labelClassName = "",
+  placeholder = "",
+  wrapperClassName = "",
+  startContent = null,
+  endContent = null,
+  // for textarea
   cols = 12,
   rows = 8,
+
+  // react ref
   inputRef = null,
+
+  // for select input
+  options = [],
+  required = false,
+  value,
+  theme = "light",
+  optionClassName = "",
 }) {
+  const themeClassName = {
+    light: "",
+    dark: "",
+  }[theme];
+
   return (
     <div
       className={`flex flex-col gap-2 w-full mt-5 text-white ${wrapperClassName}`}
@@ -113,19 +128,41 @@ function FormInput({
             className={`px-3 py-2 outline-none border-none text-white placeholder:text-gray-400 w-full flex-1 ${className}`}
           />
         )}
-        {type !== "password" && type !== "textarea" && type !== "text" && (
-          <input
-            ref={inputRef}
-            placeholder={placeholder}
-            role="input"
-            type={type}
-            {...register(name)}
-            id={id || name}
+        {type === "select" && (
+          <select
             name={name}
-            aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className}`}
-          />
+            id={id}
+            value={value}
+            className={`select !bg-blackAlpha-100 text-gray-600 hover:text-gray-400 ${className}`}
+            required={required}
+          >
+            {options.map((option) => (
+              <option
+                value={option.id}
+                key={option.key}
+                className={`option text-gray-600 ${optionClassName}`}
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
         )}
+        {type !== "password" &&
+          type !== "textarea" &&
+          type !== "text" &&
+          type !== "select" && (
+            <input
+              ref={inputRef}
+              placeholder={placeholder}
+              role="input"
+              type={type}
+              {...register(name)}
+              id={id || name}
+              name={name}
+              aria-label={ariaLabel}
+              className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className}`}
+            />
+          )}
         {type === "password" && (
           <Button
             role="toggle-button"

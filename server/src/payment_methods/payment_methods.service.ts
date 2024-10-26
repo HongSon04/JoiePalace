@@ -1,18 +1,21 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
-import dayjs from 'dayjs';
-import { OnePayInternational, VNPay } from 'vn-payments';
-import { MomoCallbackDto } from './dto/momo-callback.dto';
-import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
-import { OnepayCallbackDto } from './dto/onepay-calback.dto';
-import * as CryptoJS from 'crypto-js';
-import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
+import * as CryptoJS from 'crypto-js';
+import dayjs from 'dayjs';
+import { PaymentMethod } from 'helper/enum/payment_method.enum';
+import { PrismaService } from 'src/prisma.service';
+import { OnePayInternational } from 'vn-payments';
+import { MomoCallbackDto } from './dto/momo-callback.dto';
+import { OnepayCallbackDto } from './dto/onepay-calback.dto';
+import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
 @Injectable()
 export class PaymentMethodsService {
   constructor(
@@ -54,27 +57,19 @@ export class PaymentMethodsService {
         },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          { message: 'Không tìm thấy giao dịch' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy giao dịch' });
       }
 
       if (findDeposit.status === 'success') {
-        throw new HttpException(
-          { message: 'Giao dịch đã được thanh toán' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException({
+          message: 'Giao dịch đã được thanh toán',
+        });
       }
 
       // If amount > 50000000 => error
       if (findDeposit.amount > 50000000) {
-        throw new HttpException(
-          {
-            message:
-              'Số tiền cọc không được lớn hơn 50.000.000 do Momo giới hạn',
-          },
-          HttpStatus.BAD_REQUEST,
+        throw new BadRequestException(
+          'Số tiền cọc không được lớn hơn 50.000.000 do Momo giới hạn',
         );
       }
 
@@ -166,16 +161,15 @@ export class PaymentMethodsService {
         ress.on('data', (body) => {
           const response = JSON.parse(body);
           if (ress.statusCode === HttpStatus.CREATED && response.payUrl) {
-            return res.status(HttpStatus.CREATED).json({
-              message: 'Tạo đơn đặt cọc thành công',
-              status: HttpStatus.OK,
-              payUrl: response.payUrl,
-            });
+            throw new HttpException(
+              {
+                message: 'Tạo đơn đặt cọc thành công',
+                payUrl: response.payUrl,
+              },
+              HttpStatus.CREATED,
+            );
           } else {
-            return res.status(400).json({
-              message: 'Tạo đơn đặt cọc thất bại',
-              status: HttpStatus.BAD_REQUEST,
-            });
+            throw new BadRequestException('Tạo đơn đặt cọc thất bại');
           }
         });
         ress.on('end', () => {
@@ -195,7 +189,8 @@ export class PaymentMethodsService {
       }
       console.log('Lỗi từ payment_method.service.ts -> momo', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -260,17 +255,13 @@ export class PaymentMethodsService {
         },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          { message: 'Không tìm thấy giao dịch' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy giao dịch' });
       }
 
       if (findDeposit.status === 'success') {
-        throw new HttpException(
-          { message: 'Giao dịch đã được thanh toán' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException({
+          message: 'Giao dịch đã được thanh toán',
+        });
       }
 
       let date = new Date();
@@ -340,7 +331,8 @@ export class PaymentMethodsService {
       }
       console.log('Lỗi từ payment_method.service.ts -> vnpay', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -393,17 +385,13 @@ export class PaymentMethodsService {
         },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          { message: 'Không tìm thấy giao dịch' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy giao dịch' });
       }
 
       if (findDeposit.status === 'success') {
-        throw new HttpException(
-          { message: 'Giao dịch đã được thanh toán' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException({
+          message: 'Giao dịch đã được thanh toán',
+        });
       }
 
       const checkoutData = {
@@ -446,7 +434,8 @@ export class PaymentMethodsService {
       }
       console.log('Lỗi từ payment_method.service.ts -> onepay', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -495,18 +484,12 @@ export class PaymentMethodsService {
         },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          { message: 'Không tìm thấy giao dịch' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException({ message: 'Không tìm thấy giao dịch' });
       }
 
-      // if (findDeposit.status === 'success') {
-      //   throw new HttpException(
-      //     { message: 'Giao dịch đã được thanh toán' },
-      //     HttpStatus.BAD_REQUEST,
-      //   );
-      // }
+      if (findDeposit.status === 'success') {
+        throw new BadRequestException('Giao dịch đã được thanh toán');
+      }
       const config = {
         app_id: this.configService.get<string>('ZALO_APP_ID'),
         key1: this.configService.get<string>('ZALO_KEY_1'),
@@ -574,7 +557,8 @@ export class PaymentMethodsService {
       }
       console.log('Lỗi từ payment_method.service.ts -> zaloPay', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -613,7 +597,7 @@ export class PaymentMethodsService {
           },
           data: {
             status: 'success',
-            payment_method: 'zalopay',
+            payment_method: PaymentMethod.ZALO,
           },
         });
 

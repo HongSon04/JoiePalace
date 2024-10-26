@@ -1,7 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { DepositStatusEnum } from './../../helper/enum/deposit.enum';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateDepositDto } from './dto/update-status.dto';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { PaymentMethod } from 'helper/enum/payment_method.enum';
 
 @Injectable()
 export class DepositsService {
@@ -14,10 +22,7 @@ export class DepositsService {
         where: { id: Number(id) },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          'Không tìm thấy giao dịch đặt cọc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy giao dịch đặt cọc');
       }
 
       throw new HttpException(
@@ -32,9 +37,9 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->findOne: ', error);
-      throw new HttpException(
-        'Có lỗi xảy ra khi tìm kiếm giao dịch đặt cọc',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -46,10 +51,7 @@ export class DepositsService {
         where: { transactionID },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          'Không tìm thấy giao dịch đặt cọc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy giao dịch đặt cọc');
       }
 
       throw new HttpException(
@@ -64,9 +66,9 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->findOneByTransactionId: ', error);
-      throw new HttpException(
-        'Có lỗi xảy ra khi tìm kiếm giao dịch đặt cọc',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -79,14 +81,14 @@ export class DepositsService {
         where: { id: Number(id) },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          'Không tìm thấy giao dịch đặt cọc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy giao dịch đặt cọc');
       }
       const updateDeposit = await this.prismaService.deposits.update({
         where: { id: Number(id) },
-        data: { status, payment_method },
+        data: {
+          status: status as DepositStatusEnum,
+          payment_method: payment_method as PaymentMethod,
+        },
       });
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =
@@ -95,10 +97,7 @@ export class DepositsService {
         });
 
       if (!findBookingDetail) {
-        throw new HttpException(
-          'Không tìm thấy thông tin đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy thông tin đặt tiệc');
       }
 
       await this.prismaService.bookings.update({
@@ -118,9 +117,9 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->update: ', error);
-      throw new HttpException(
-        'Có lỗi xảy ra khi cập nhật giao dịch đặt cọc',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -136,14 +135,14 @@ export class DepositsService {
         where: { transactionID },
       });
       if (!findDeposit) {
-        throw new HttpException(
-          'Không tìm thấy giao dịch đặt cọc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy giao dịch đặt cọc');
       }
       const updateDeposit = await this.prismaService.deposits.update({
         where: { transactionID },
-        data: { status, payment_method },
+        data: {
+          status: status as DepositStatusEnum,
+          payment_method: payment_method as PaymentMethod,
+        },
       });
       // ? Find Booking Detail & booking to update status
       const findBookingDetail =
@@ -152,10 +151,7 @@ export class DepositsService {
         });
 
       if (!findBookingDetail) {
-        throw new HttpException(
-          'Không tìm thấy thông tin đặt tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy thông tin đặt tiệc');
       }
 
       await this.prismaService.bookings.update({
@@ -175,9 +171,9 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->updateByTransactionID: ', error);
-      throw new HttpException(
-        'Có lỗi xảy ra khi cập nhật giao dịch đặt cọc',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

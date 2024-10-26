@@ -12,6 +12,7 @@ import {
   UploadedFiles,
   Query,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
@@ -75,27 +76,36 @@ export class BlogsController {
   })
   @ApiOperation({ summary: 'Tạo bài viết mới' })
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -249,7 +259,7 @@ export class BlogsController {
   }
 
   // ! Get all blogs by slug category
-  @Get('get-all-by-slug-category/:slug')
+  @Get('get-all-by-slug-category/:category_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -293,7 +303,7 @@ export class BlogsController {
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
   findAllBySlugCategory(
-    @Param('slug') slug: string,
+    @Param('category_slug') slug: string,
     @Query() query: FilterDto,
   ) {
     return this.blogsService.findAllBySlugCategory(slug, query);
@@ -348,7 +358,7 @@ export class BlogsController {
   }
 
   // ! Get all blogs by slug tag
-  @Get('get-all-by-slug-tag/:slug')
+  @Get('get-all-by-slug-tag/:tag_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -391,7 +401,7 @@ export class BlogsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
-  findAllBySlugTag(@Param('slug') slug: string, @Query() query: FilterDto) {
+  findAllBySlugTag(@Param('tag_slug') slug: string, @Query() query: FilterDto) {
     return this.blogsService.findAllBySlugTag(slug, query);
   }
 
@@ -433,7 +443,7 @@ export class BlogsController {
   }
 
   // ! Get a blog by slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:blog_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -465,34 +475,43 @@ export class BlogsController {
     },
   })
   @ApiOperation({ summary: 'Lấy bài viết theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
+  findOneBySlug(@Param('blog_slug') slug: string) {
     return this.blogsService.findOneBySlug(slug);
   }
 
   // ! Update a blog by id
   @Patch('update/:blog_id')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -544,29 +563,38 @@ export class BlogsController {
   }
 
   // ! Update a blog by slug
-  @Patch('update-by-slug/:slug')
+  @Patch('update-by-slug/:blog_slug')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -610,7 +638,7 @@ export class BlogsController {
   })
   @ApiOperation({ summary: 'Cập nhật bài viết theo slug' })
   updateBySlug(
-    @Param('slug') slug: string,
+    @Param('blog_slug') slug: string,
     @Body() updateBlogDto: UpdateBlogDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {

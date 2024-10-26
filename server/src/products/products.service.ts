@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -34,10 +36,7 @@ export class ProductsService {
 
       // Validate inputs
       if (!files.images || files.images.length === 0) {
-        throw new HttpException(
-          'Ảnh không được để trống',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Ảnh không được để trống');
       }
 
       // Check product existence
@@ -46,19 +45,17 @@ export class ProductsService {
       });
 
       if (existingproduct) {
-        throw new HttpException('Sản phẩm đã tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Sản phẩm đã tồn tại');
       }
 
       // Check tags existence
+      const tagsArray = JSON.parse(tags as any);
       const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tags } }, // Assuming tags is already an array of numbers
+        where: { id: { in: tagsArray } },
       });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (existingTags.length !== tagsArray.length) {
+        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
       }
 
       // Check category existence
@@ -67,10 +64,7 @@ export class ProductsService {
       });
 
       if (!existingCategory) {
-        throw new HttpException(
-          'Danh mục không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Danh mục không tồn tại');
       }
 
       // Upload images
@@ -81,7 +75,7 @@ export class ProductsService {
         );
 
       if (!uploadImages) {
-        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Upload ảnh thất bại');
       }
 
       // Create product entry
@@ -101,19 +95,24 @@ export class ProductsService {
             connect: tagsConnect,
           },
         },
+        include: { categories: true, tags: true },
       });
 
-      return {
-        message: 'Tạo Sản phẩm thành công',
-        data: FormatReturnData(createproduct, []),
-      };
+      throw new HttpException(
+        {
+          message: 'Tạo Sản phẩm thành công',
+          data: FormatReturnData(createproduct, []),
+        },
+        HttpStatus.CREATED,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       console.log('Lỗi từ products.service.ts -> create', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -221,7 +220,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findAll', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -329,7 +329,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -344,6 +345,9 @@ export class ProductsService {
           tags: true,
         },
       });
+      if (!product) {
+        throw new NotFoundException('Sản phẩm không tồn tại');
+      }
       throw new HttpException(
         {
           data: FormatReturnData(product, []),
@@ -356,7 +360,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findOne', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -371,6 +376,9 @@ export class ProductsService {
             where: { deleted: false },
             take: 10,
             orderBy: { created_at: 'desc' },
+            include: {
+              tags: true,
+            },
           },
         },
       });
@@ -387,7 +395,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> get10PerCategory', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -402,6 +411,10 @@ export class ProductsService {
         },
       });
 
+      if (!product) {
+        throw new NotFoundException('Sản phẩm không tồn tại');
+      }
+
       throw new HttpException(
         {
           data: FormatReturnData(product, []),
@@ -414,7 +427,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findBySlug', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -477,6 +491,15 @@ export class ProductsService {
         orderByConditions.price = priceSort;
       }
 
+      // ? Check category existence
+      const existingCategory = await this.prismaService.categories.findUnique({
+        where: { id: Number(category_id) },
+      });
+
+      if (!existingCategory) {
+        throw new NotFoundException('Danh mục không tồn tại');
+      }
+
       // Lấy danh sách Sản phẩm và tổng số
       const [products, totalCount] = await Promise.all([
         this.prismaService.products.findMany({
@@ -511,7 +534,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findByCategoryId', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -578,6 +602,15 @@ export class ProductsService {
         orderByConditions.price = priceSort;
       }
 
+      // ? Check tag existence
+      const existingTag = await this.prismaService.tags.findUnique({
+        where: { id: tag_id },
+      });
+
+      if (!existingTag) {
+        throw new NotFoundException('Tag không tồn tại');
+      }
+
       // Lấy danh sách Sản phẩm và tổng số
       const [products, totalCount] = await Promise.all([
         this.prismaService.products.findMany({
@@ -612,7 +645,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findByTagId', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -632,7 +666,7 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Check product existence by name
@@ -640,22 +674,16 @@ export class ProductsService {
         where: { name, id: { not: id } },
       });
       if (findproductByName) {
-        throw new HttpException(
-          'Tên Sản phẩm đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên Sản phẩm đã tồn tại');
       }
-
       // Handle tags
+      const tagsArray = JSON.parse(tags as any);
       const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tags } },
+        where: { id: { in: tagsArray } },
       });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (existingTags.length !== tagsArray.length) {
+        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
       }
 
       // Check category existence
@@ -663,10 +691,7 @@ export class ProductsService {
         where: { id: Number(category_id) },
       });
       if (!findCategory) {
-        throw new HttpException(
-          'Danh mục không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Danh mục không tồn tại');
       }
 
       // Ready data for update
@@ -691,10 +716,7 @@ export class ProductsService {
             'joiepalace/products',
           );
         if (!uploadImages) {
-          throw new HttpException(
-            'Upload ảnh thất bại',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new BadRequestException('Upload ảnh thất bại');
         }
         // Delete old images
         await this.cloudinaryService.deleteMultipleImagesByUrl(
@@ -707,6 +729,7 @@ export class ProductsService {
       const updatedproduct = await this.prismaService.products.update({
         where: { id: Number(id) },
         data: updateData,
+        include: { categories: true, tags: true },
       });
 
       throw new HttpException(
@@ -722,7 +745,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> update', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -734,11 +758,11 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       if (findproduct.deleted) {
-        throw new HttpException('Sản phẩm đã bị xóa', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Sản phẩm đã bị xóa');
       }
 
       const deleteProduct = await this.prismaService.products.update({
@@ -760,7 +784,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> deleteProduct', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -772,11 +797,11 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       if (!findproduct.deleted) {
-        throw new HttpException('Sản phẩm chưa bị xóa', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Sản phẩm chưa bị xóa');
       }
 
       const restoreproduct = await this.prismaService.products.update({
@@ -789,7 +814,7 @@ export class ProductsService {
       });
 
       throw new HttpException(
-        { message: 'Khôi phục Sản phẩm thành công', data: restoreproduct },
+        { message: 'Khôi phục Sản phẩm thành công' },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -798,7 +823,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> restoreproduct', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -810,7 +836,7 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Delete images
@@ -828,7 +854,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> destroy', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

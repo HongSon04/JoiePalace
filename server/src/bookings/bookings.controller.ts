@@ -14,7 +14,14 @@ import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { isPublic } from 'decorator/auth.decorator';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
 
@@ -35,7 +42,6 @@ export class BookingsController {
         id: 1,
         user_id: 1,
         branch_id: 1,
-        space_id: 1,
         stage_id: 1,
         decor_id: 1,
         menu_id: 1,
@@ -78,6 +84,13 @@ export class BookingsController {
 
   // ! Get All Booking
   @Get('get-all')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy danh sách đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -87,7 +100,6 @@ export class BookingsController {
           id: 'number',
           user_id: 'number',
           branch_id: 'number',
-          space_id: 'number',
           stage_id: 'number',
           deposit_id: 'number',
           decor_id: 'number',
@@ -166,16 +178,6 @@ export class BookingsController {
             deleted_by: null,
             created_at: '2024-09-18T15:32:12.458Z',
             updated_at: '2024-09-18T15:32:12.458Z',
-          },
-          spaces: {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: '2024-09-08T04:25:08.544Z',
-            updated_at: '2024-09-08T04:25:08.544Z',
           },
           stages: {
             id: 'number',
@@ -256,6 +258,13 @@ export class BookingsController {
 
   // ! Get All Deleted Booking
   @Get('get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy danh sách đơn tiệc' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
@@ -271,6 +280,7 @@ export class BookingsController {
 
   // ! Get One Booking
   @Get('get/:booking_id')
+  @isPublic()
   @ApiOperation({ summary: 'Lấy thông tin chi tiết một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -279,7 +289,6 @@ export class BookingsController {
         id: 'number',
         user_id: 'number',
         branch_id: 'number',
-        space_id: 'number',
         stage_id: 'number',
         decor_id: 'number',
         menu_id: 'number',
@@ -600,7 +609,6 @@ export class BookingsController {
         id: 1,
         user_id: 1,
         branch_id: 1,
-        space_id: 1,
         stage_id: 1,
         decor_id: 1,
         menu_id: 1,
@@ -687,7 +695,6 @@ export class BookingsController {
         id: 1,
         user_id: 1,
         branch_id: 1,
-        space_id: 1,
         stage_id: 1,
         decor_id: 1,
         menu_id: 1,
@@ -733,6 +740,13 @@ export class BookingsController {
 
   // ! Soft Delete Booking
   @Delete('delete/:booking_id')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Xóa tạm thời một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -758,6 +772,13 @@ export class BookingsController {
 
   // ! Restore Booking
   @Patch('restore/:booking_id')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Khôi phục một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -783,6 +804,13 @@ export class BookingsController {
 
   // ! Hard Delete Booking
   @Delete('hard-delete/:booking_id')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Xóa vĩnh viễn một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,

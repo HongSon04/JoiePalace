@@ -2,11 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import slugify from 'slugify';
 import { CreateBookingDto } from 'src/bookings/dto/create-booking.dto';
 const prisma = new PrismaClient();
+import uniqid from 'uniqid';
 
 const booking: CreateBookingDto[] = [
   {
     user_id: 1,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty A',
     email: 'congtya@gmail.com',
     phone: '123456789',
@@ -20,6 +22,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 2,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty B',
     email: 'congtyb@gmail.com',
     phone: '123456789',
@@ -33,6 +36,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 3,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty C',
     email: 'congtyc@gmail.com',
     phone: '123456789',
@@ -46,6 +50,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 4,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty D',
     email: 'congtyd@gmail.com',
     phone: '123456789',
@@ -59,6 +64,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 5,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty E',
     email: 'congtye@gmail.com',
     phone: '123456789',
@@ -72,6 +78,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 6,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty F',
     email: 'congtyf@gmail.com',
     phone: '123456789',
@@ -85,6 +92,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 7,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty G',
     email: 'congtyg@gmail.com',
     phone: '123456789',
@@ -98,6 +106,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 8,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty H',
     email: 'congtyh@gmail.com',
     phone: '123456789',
@@ -111,6 +120,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 9,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty I',
     email: 'congtyi@gmail.com',
     phone: '123456789',
@@ -124,6 +134,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 9,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty I',
     email: 'congtyi@gmail.com',
     phone: '123456789',
@@ -137,6 +148,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 10,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty J',
     email: 'congtyj@gmail.com',
     phone: '123456789',
@@ -150,6 +162,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 11,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty K',
     email: 'congtyk@gmail.com',
     phone: '123456789',
@@ -163,6 +176,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 12,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty L',
     email: 'congtyl@gmail.com',
     phone: '123456789',
@@ -176,6 +190,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 13,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty M',
     email: 'congtym@gmail.com',
     phone: '123456789',
@@ -189,6 +204,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 14,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty N',
     email: 'congtyn@gmail.com',
     phone: '123456789',
@@ -202,6 +218,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 15,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty O',
     email: 'congtyo@gmail.com',
     phone: '123456789',
@@ -215,6 +232,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 16,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty P',
     email: 'congtyp@gmail.com',
     phone: '123456789',
@@ -228,6 +246,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 17,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty Q',
     email: 'congtyq@gmail.com',
     phone: '123456789',
@@ -241,6 +260,7 @@ const booking: CreateBookingDto[] = [
   {
     user_id: 18,
     branch_id: 1,
+    stage_id: 1,
     company_name: 'Công ty R',
     email: 'congtyr@gmail.com',
     phone: '123456789',
@@ -253,33 +273,142 @@ const booking: CreateBookingDto[] = [
   },
 ];
 
+const deposit = [
+  {
+    name: 'Tiền cọc 1',
+    email: 'test@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 10000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 2',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 20000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 3',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 30000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 4',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 40000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 5',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 50000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 6',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 60000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 7',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 70000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 8',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 80000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 9',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 90000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 10',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 100000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 11',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 110000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 12',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 120000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 13',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 130000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 14',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 140000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+  {
+    name: 'Tiền cọc 15',
+    email: 'test2@gmail.com',
+    transactionID: uniqid().toLocaleUpperCase(),
+    amount: 150000000,
+    payment_method: 'momo',
+    status: 'pending',
+  },
+];
+
 const booking_details = [
   {
     booking_id: 1,
     stage_id: 1,
-    space_id: 1,
     decor_id: 1,
     menu_id: 1,
+    deposit_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -287,29 +416,15 @@ const booking_details = [
   {
     booking_id: 2,
     stage_id: 1,
-    space_id: 1,
     decor_id: 1,
+    deposit_id: 2,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -317,29 +432,15 @@ const booking_details = [
   {
     booking_id: 3,
     stage_id: 1,
-    space_id: 1,
     decor_id: 1,
+    deposit_id: 3,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -347,29 +448,15 @@ const booking_details = [
   {
     booking_id: 4,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 4,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -377,29 +464,15 @@ const booking_details = [
   {
     booking_id: 5,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 5,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -407,29 +480,15 @@ const booking_details = [
   {
     booking_id: 6,
     stage_id: 1,
-    space_id: 1,
     decor_id: 1,
+    deposit_id: 6,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -437,29 +496,15 @@ const booking_details = [
   {
     booking_id: 7,
     stage_id: 1,
-    space_id: 1,
     decor_id: 1,
+    deposit_id: 7,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -467,29 +512,15 @@ const booking_details = [
   {
     booking_id: 8,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 8,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -497,29 +528,15 @@ const booking_details = [
   {
     booking_id: 9,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 9,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -527,29 +544,15 @@ const booking_details = [
   {
     booking_id: 10,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 10,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -557,29 +560,15 @@ const booking_details = [
   {
     booking_id: 11,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 11,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -587,29 +576,16 @@ const booking_details = [
   {
     booking_id: 12,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 12,
     decor_id: 1,
+
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -617,29 +593,15 @@ const booking_details = [
   {
     booking_id: 13,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 13,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -647,29 +609,15 @@ const booking_details = [
   {
     booking_id: 14,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 14,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -677,29 +625,15 @@ const booking_details = [
   {
     booking_id: 15,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 15,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -707,29 +641,15 @@ const booking_details = [
   {
     booking_id: 16,
     stage_id: 1,
-    space_id: 1,
+    deposit_id: 16,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -737,29 +657,14 @@ const booking_details = [
   {
     booking_id: 17,
     stage_id: 1,
-    space_id: 1,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -767,29 +672,14 @@ const booking_details = [
   {
     booking_id: 18,
     stage_id: 1,
-    space_id: 1,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
-    space: ['ABC'],
     decor: ['ABC'],
     menu: ['ABC'],
     extra_service: ['ABC'],
     images: ['ABC'],
-    accessories: {
-      table: [
-        { id: 1, quantity: 2 },
-        { id: 2, quantity: 1 },
-      ],
-      chair: {
-        id: 3,
-      },
-      extra_services: [
-        { id: 4, quantity: 1 },
-        { id: 5, quantity: 1 },
-      ],
-    } as any,
     amount_booking: 10000000,
     fee: 10,
     total_amount: 110000000,
@@ -797,32 +687,37 @@ const booking_details = [
 ];
 
 export const bookingSeed = async () => {
-  // for (let i = 0; i < booking.length; i++) {
-  //   await prisma.bookings.create({
-  //     data: booking[i],
+  // for (let i = 1; i <= booking.length; i++) {
+  //   const created_booking = await prisma.bookings.create({
+  //     data: {
+  //       ...booking[i],
+  //       party_type_id: 1,
+  //     },
   //   });
+  //   console.log('Created booking:', created_booking.id);
   // }
 
-  for (let i = 6; i < booking_details.length; i++) {
-    await prisma.booking_details.create({
+  // for (let i = 1; i <= deposit.length; i++) {
+  //   const created_deposit = await prisma.deposits.create({
+  //     data: {
+  //       ...(deposit[i] as any),
+  //     },
+  //   });
+  //   console.log('Created deposit:', created_deposit.id);
+  // }
+
+  for (let i = 1; i <= booking_details.length; i++) {
+    const created_booking_details = await prisma.booking_details.create({
       data: {
-        booking_id: i,
-        stage_id: booking_details[i].stage_id,
-        space_id: booking_details[i].space_id,
-        decor_id: booking_details[i].decor_id,
+        booking_id: Number(booking_details[i].booking_id),
+        decor_id: Number(booking_details[i].decor_id),
         menu_id: booking_details[i].menu_id,
-        payment_method: 'momo',
-        stage: booking_details[i].stage,
-        accessories: booking_details[i].accessories,
         amount_booking: booking_details[i].amount_booking,
         deposit_id: 1,
         fee: booking_details[i].fee,
         total_amount: booking_details[i].total_amount,
-        menu: booking_details[i].menu,
-        space: booking_details[i].space,
-        decor: booking_details[i].decor,
-        extra_service: booking_details[i].extra_service,
       } as any,
     });
+    console.log('Created booking details:', created_booking_details.id);
   }
 };

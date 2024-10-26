@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -20,10 +26,7 @@ export class FeedbacksService {
         },
       });
       if (!findBooking) {
-        throw new HttpException(
-          'Không tìm thấy đơn tiệc',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('Không tìm thấy đơn tiệc');
       }
       let user;
       if (user_id) {
@@ -33,7 +36,7 @@ export class FeedbacksService {
           },
         });
         if (!user) {
-          throw new HttpException('Không tìm thấy user', HttpStatus.NOT_FOUND);
+          throw new NotFoundException('Không tìm thấy user');
         }
       }
       const feedback = await this.prismaService.feedbacks.create({
@@ -59,7 +62,10 @@ export class FeedbacksService {
         throw error;
       }
       console.log('Lỗi từ feedbacks.service.ts->create', error);
-      throw new HttpException('Lỗi server', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -87,7 +93,10 @@ export class FeedbacksService {
         throw error;
       }
       console.log('Lỗi từ feedbacks.service.ts->findAllShow', error);
-      throw new HttpException('Lỗi server', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -115,7 +124,10 @@ export class FeedbacksService {
         throw error;
       }
       console.log('Lỗi từ feedbacks.service.ts->findAllHide', error);
-      throw new HttpException('Lỗi server', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -131,7 +143,7 @@ export class FeedbacksService {
       },
     });
     if (!feedback) {
-      throw new HttpException('Không tìm thấy feedback', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Không tìm thấy feedback');
     }
     throw new HttpException(
       {
@@ -154,7 +166,7 @@ export class FeedbacksService {
       },
     });
     if (!feedback) {
-      throw new HttpException('Không tìm thấy feedback', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Không tìm thấy feedback');
     }
     throw new HttpException(
       {
@@ -177,7 +189,7 @@ export class FeedbacksService {
       },
     });
     if (!feedback) {
-      throw new HttpException('Không tìm thấy feedback', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Không tìm thấy feedback');
     }
     throw new HttpException(
       {
@@ -200,7 +212,7 @@ export class FeedbacksService {
       },
     });
     if (!feedback) {
-      throw new HttpException('Không tìm thấy feedback', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Không tìm thấy feedback');
     }
     throw new HttpException(
       {
@@ -214,6 +226,15 @@ export class FeedbacksService {
   // ! Cập nhật feedback
   async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
     const { name, comments, rate, is_show } = updateFeedbackDto;
+
+    const findFeedback = await this.prismaService.feedbacks.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (!findFeedback) {
+      throw new NotFoundException('Không tìm thấy feedback');
+    }
     const feedback = await this.prismaService.feedbacks.update({
       where: {
         id: Number(id),

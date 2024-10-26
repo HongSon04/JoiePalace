@@ -69,15 +69,18 @@ export class BlogsService {
       }
 
       // Check tags existence
-      const existingTags = (await this.prismaService.tags.findMany({
-        where: { id: { in: tags } },
-      })) as any;
+      const tagsArray = JSON.parse(tags as any);
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tagsArray } },
+      });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException('Tag không tồn tại', HttpStatus.BAD_REQUEST);
+      if (existingTags.length !== tagsArray.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
-      // Upload images
       // Upload images
       const uploadImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
@@ -107,6 +110,10 @@ export class BlogsService {
           },
           images: uploadImages as any,
         },
+        include: {
+          tags: true,
+          categories: true,
+        },
       });
 
       throw new HttpException(
@@ -121,7 +128,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> create', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -190,7 +200,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAll', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -259,7 +272,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -329,7 +345,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllByCategory', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -410,7 +429,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugCategory', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -492,7 +514,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllByTag', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -574,7 +599,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugTag', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -648,7 +676,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findOneBySlug', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -715,12 +746,16 @@ export class BlogsService {
       }
 
       // Check tags existence
-      const existingTags = (await this.prismaService.tags.findMany({
-        where: { id: { in: tags } },
-      })) as any;
+      const tagsArray = JSON.parse(tags as any);
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tagsArray } },
+      });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException('Tag không tồn tại', HttpStatus.BAD_REQUEST);
+      if (existingTags.length !== tagsArray.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // Upload images
@@ -753,6 +788,10 @@ export class BlogsService {
           },
           images: uploadImages as any,
         },
+        include: {
+          tags: true,
+          categories: true,
+        },
       });
 
       throw new HttpException(
@@ -767,7 +806,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> update', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -834,12 +876,16 @@ export class BlogsService {
       }
 
       // Check tags existence
-      const existingTags = (await this.prismaService.tags.findMany({
-        where: { id: { in: tags } },
-      })) as any;
+      const tagsArray = JSON.parse(tags as any);
+      const existingTags = await this.prismaService.tags.findMany({
+        where: { id: { in: tagsArray } },
+      });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException('Tag không tồn tại', HttpStatus.BAD_REQUEST);
+      if (existingTags.length !== tagsArray.length) {
+        throw new HttpException(
+          'Một hoặc nhiều tag không tồn tại',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // Upload images
@@ -872,6 +918,10 @@ export class BlogsService {
           },
           images: uploadImages as any,
         },
+        include: {
+          tags: true,
+          categories: true,
+        },
       });
 
       throw new HttpException(
@@ -886,7 +936,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> updateBySlug', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -916,7 +969,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> delete', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -946,7 +1002,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> restore', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 
@@ -981,7 +1040,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> hardDelete', error);
-      throw new InternalServerErrorException('Lỗi server, vui lòng thử lại!');
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
     }
   }
 }

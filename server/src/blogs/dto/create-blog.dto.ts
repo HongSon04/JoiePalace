@@ -29,7 +29,7 @@ export class CreateBlogDto {
   content: string;
 
   @ApiProperty({ required: true })
-  images: string;
+  images: string[];
 
   @ApiProperty({ example: [1, 2, 3], required: false })
   @IsArray({ message: 'Tags phải là một mảng' })

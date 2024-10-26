@@ -144,7 +144,7 @@ export class FeedbacksController {
   }
 
   // ! Lấy tất cả feedback theo id
-  @Get('get/:id')
+  @Get('get/:feedback_id')
   @ApiHeaders([
     {
       name: 'authorization',
@@ -180,7 +180,7 @@ export class FeedbacksController {
       message: 'Lỗi server',
     },
   })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('feedback_id') id: string) {
     return this.feedbacksService.findOne(+id);
   }
 
@@ -308,7 +308,7 @@ export class FeedbacksController {
   }
 
   // ! Cập nhật feedback
-  @Patch('update/:id')
+  @Patch('update/:feedback_id')
   @ApiHeaders([
     {
       name: 'authorization',
@@ -348,13 +348,13 @@ export class FeedbacksController {
     },
   })
   update(
-    @Param('id') id: string,
+    @Param('feedback_id') id: string,
     @Body() updateFeedbackDto: UpdateFeedbackDto,
   ) {
     return this.feedbacksService.update(+id, updateFeedbackDto);
   }
 
-  @Delete('destroy/:id')
+  @Delete('destroy/:feedback_id')
   @ApiHeaders([
     {
       name: 'authorization',
@@ -376,7 +376,7 @@ export class FeedbacksController {
       message: 'Không tìm thấy feedback',
     },
   })
-  remove(@Param('id') id: string) {
+  remove(@Param('feedback_id') id: string) {
     return this.feedbacksService.remove(+id);
   }
 }
