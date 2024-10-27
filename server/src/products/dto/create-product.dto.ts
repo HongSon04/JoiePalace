@@ -27,7 +27,6 @@ export class CreateProductDto {
   short_description: string;
 
   @ApiProperty({ example: [1, 2, 3] })
- 
   tags: number[];
 
   @ApiProperty({ required: true })
