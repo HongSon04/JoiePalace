@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpException,
@@ -13,6 +14,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
 import {
+  ApiBearerAuth,
   ApiCookieAuth,
   ApiHeaders,
   ApiOperation,
@@ -26,7 +28,7 @@ import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyTokenDto } from './dto/verify-token.dto';
 
-@ApiTags('auth')
+@ApiTags('Auth - Xác thực')
 @Controller('api/auth')
 export class AuthController {
   constructor(
@@ -95,9 +97,10 @@ export class AuthController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -208,29 +211,33 @@ export class AuthController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Người dùng tải ảnh đại diện' })
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(`Chỉ chấp nhận ảnh jpg, jpeg, png`, 400),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else {
-          const fileSize = parseInt(req.headers['content-length']);
-          if (fileSize > 1024 * 1024 * 5) {
-            return cb(
-              new HttpException('Kích thước ảnh tối đa 5MB', 400),
-              false,
-            );
-          } else {
-            cb(null, true);
-          }
         }
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+            false,
+          );
+        }
+        if (file.size > 1024 * 1024 * 5) {
+          return cb(
+            new BadRequestException('Kích thước ảnh tối đa 5MB'),
+            false,
+          );
+        }
+        cb(null, true);
       },
     }),
   )
@@ -259,7 +266,7 @@ export class AuthController {
   ) {
     const avatar = await this.cloudinaryService.uploadFileToFolder(
       file,
-      'joieplace/avatar',
+      'joiepalace/avatar',
     );
     return this.authService.changeAvatar(req.user, avatar);
   }

@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -14,6 +16,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
 
 @Injectable()
 export class ProductsService {
@@ -33,17 +36,7 @@ export class ProductsService {
 
       // Validate inputs
       if (!files.images || files.images.length === 0) {
-        throw new HttpException(
-          'Ảnh không được để trống',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      if (!category_id || !name || !price) {
-        throw new HttpException(
-          'Thông tin không đầy đủ',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Ảnh không được để trống');
       }
 
       // Check product existence
@@ -52,19 +45,17 @@ export class ProductsService {
       });
 
       if (existingproduct) {
-        throw new HttpException('Sản phẩm đã tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Sản phẩm đã tồn tại');
       }
 
       // Check tags existence
+      const tagsArray = JSON.parse(tags as any);
       const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tags } }, // Assuming tags is already an array of numbers
+        where: { id: { in: tagsArray } },
       });
 
-      if (existingTags.length !== tags.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (existingTags.length !== tagsArray.length) {
+        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
       }
 
       // Check category existence
@@ -73,26 +64,23 @@ export class ProductsService {
       });
 
       if (!existingCategory) {
-        throw new HttpException(
-          'Danh mục không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Danh mục không tồn tại');
       }
 
       // Upload images
       const uploadImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/products',
+          'joiepalace/products',
         );
 
       if (!uploadImages) {
-        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Upload ảnh thất bại');
       }
 
       // Create product entry
       const slug = MakeSlugger(name);
-      const tagsConnect = existingTags.map((tag) => ({ id: tag.id }));
+      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       const createproduct = await this.prismaService.products.create({
         data: {
@@ -107,19 +95,24 @@ export class ProductsService {
             connect: tagsConnect,
           },
         },
+        include: { categories: true, tags: true },
       });
 
-      return {
-        message: 'Tạo Sản phẩm thành công',
-        data: createproduct,
-      };
+      throw new HttpException(
+        {
+          message: 'Tạo Sản phẩm thành công',
+          data: FormatReturnData(createproduct, []),
+        },
+        HttpStatus.CREATED,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       console.log('Lỗi từ products.service.ts -> create', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -140,10 +133,7 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -159,7 +149,11 @@ export class ProductsService {
       // ? Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -167,14 +161,18 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo
@@ -216,7 +214,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -225,7 +223,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findAll', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -246,10 +245,7 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -265,7 +261,11 @@ export class ProductsService {
       // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -273,14 +273,18 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo
@@ -322,7 +326,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -331,7 +335,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -346,11 +351,12 @@ export class ProductsService {
           tags: true,
         },
       });
+      if (!product) {
+        throw new NotFoundException('Sản phẩm không tồn tại');
+      }
       throw new HttpException(
         {
-          data: {
-            ...product,
-          },
+          data: FormatReturnData(product, []),
         },
         HttpStatus.OK,
       );
@@ -360,11 +366,46 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findOne', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
 
+  // ! Get 10 products per category
+  async get10PerCategory() {
+    try {
+      const categoriesProducts = await this.prismaService.categories.findMany({
+        where: { deleted: false },
+        include: {
+          products: {
+            where: { deleted: false },
+            take: 10,
+            orderBy: { created_at: 'desc' },
+            include: {
+              tags: true,
+            },
+          },
+        },
+      });
+
+      throw new HttpException(
+        {
+          data: FormatReturnData(categoriesProducts, []),
+        },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ products.service.ts -> get10PerCategory', error);
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
   // ! Get all products by slug
   async findBySlug(slug: string) {
     try {
@@ -376,9 +417,13 @@ export class ProductsService {
         },
       });
 
+      if (!product) {
+        throw new NotFoundException('Sản phẩm không tồn tại');
+      }
+
       throw new HttpException(
         {
-          data: product,
+          data: FormatReturnData(product, []),
         },
         HttpStatus.OK,
       );
@@ -388,7 +433,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findBySlug', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -409,16 +455,16 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
         deleted: false,
-        category_id,
-        OR: [
+        category_id: Number(category_id),
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -426,13 +472,18 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo
@@ -447,6 +498,15 @@ export class ProductsService {
       let orderByConditions: any = {};
       if (priceSort === 'asc' || priceSort === 'desc') {
         orderByConditions.price = priceSort;
+      }
+
+      // ? Check category existence
+      const existingCategory = await this.prismaService.categories.findUnique({
+        where: { id: Number(category_id) },
+      });
+
+      if (!existingCategory) {
+        throw new NotFoundException('Danh mục không tồn tại');
       }
 
       // Lấy danh sách Sản phẩm và tổng số
@@ -474,7 +534,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -483,7 +543,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findByCategoryId', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -504,10 +565,7 @@ export class ProductsService {
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
 
       const minPrice = Math.max(0, Number(query.minPrice) || 0);
-      const maxPrice = Math.max(
-        minPrice,
-        Number(query.maxPrice) || 999999999999,
-      );
+      const maxPrice = Math.max(minPrice, Number(query.maxPrice) || 0);
 
       // Tạo điều kiện tìm kiếm
       const whereConditions: any = {
@@ -517,7 +575,10 @@ export class ProductsService {
             id: tag_id,
           },
         },
-        OR: [
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { name: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
           { short_description: { contains: search, mode: 'insensitive' } },
@@ -525,13 +586,18 @@ export class ProductsService {
           {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
-        ],
-      };
+        ];
+      }
 
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice, lte: maxPrice } });
+        whereConditions.AND.push({ price: { gte: minPrice } });
+      }
+
+      if (maxPrice > 0) {
+        if (!whereConditions.AND) whereConditions.AND = [];
+        whereConditions.AND.push({ price: { lte: maxPrice } });
       }
 
       // Điều kiện ngày tạo
@@ -546,6 +612,15 @@ export class ProductsService {
       let orderByConditions: any = {};
       if (priceSort === 'asc' || priceSort === 'desc') {
         orderByConditions.price = priceSort;
+      }
+
+      // ? Check tag existence
+      const existingTag = await this.prismaService.tags.findUnique({
+        where: { id: tag_id },
+      });
+
+      if (!existingTag) {
+        throw new NotFoundException('Tag không tồn tại');
       }
 
       // Lấy danh sách Sản phẩm và tổng số
@@ -573,7 +648,7 @@ export class ProductsService {
 
       // Trả về kết quả
       throw new HttpException(
-        { data: products, pagination: paginationInfo },
+        { data: FormatReturnData(products, []), pagination: paginationInfo },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -582,7 +657,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> findByTagId', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -602,7 +678,7 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Check product existence by name
@@ -610,23 +686,16 @@ export class ProductsService {
         where: { name, id: { not: id } },
       });
       if (findproductByName) {
-        throw new HttpException(
-          'Tên Sản phẩm đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên Sản phẩm đã tồn tại');
       }
-
       // Handle tags
-      const tagsArray = JSON.parse(tags as any) || [];
+      const tagsArray = JSON.parse(tags as any);
       const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray.map((tagId: number) => Number(tagId)) } },
+        where: { id: { in: tagsArray } },
       });
 
       if (existingTags.length !== tagsArray.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
       }
 
       // Check category existence
@@ -634,15 +703,12 @@ export class ProductsService {
         where: { id: Number(category_id) },
       });
       if (!findCategory) {
-        throw new HttpException(
-          'Danh mục không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Danh mục không tồn tại');
       }
 
       // Ready data for update
       const slug = MakeSlugger(name);
-      const tagsSet = existingTags.map((tag) => ({ id: tag.id }));
+      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       const updateData: any = {
         category_id,
@@ -659,13 +725,10 @@ export class ProductsService {
         const uploadImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/products',
+            'joiepalace/products',
           );
         if (!uploadImages) {
-          throw new HttpException(
-            'Upload ảnh thất bại',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new BadRequestException('Upload ảnh thất bại');
         }
         // Delete old images
         await this.cloudinaryService.deleteMultipleImagesByUrl(
@@ -678,10 +741,14 @@ export class ProductsService {
       const updatedproduct = await this.prismaService.products.update({
         where: { id: Number(id) },
         data: updateData,
+        include: { categories: true, tags: true },
       });
 
       throw new HttpException(
-        { message: 'Cập nhật Sản phẩm thành công', data: updatedproduct },
+        {
+          message: 'Cập nhật Sản phẩm thành công',
+          data: FormatReturnData(updatedproduct, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -690,7 +757,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> update', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -702,11 +770,11 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       if (findproduct.deleted) {
-        throw new HttpException('Sản phẩm đã bị xóa', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Sản phẩm đã bị xóa');
       }
 
       const deleteProduct = await this.prismaService.products.update({
@@ -719,7 +787,7 @@ export class ProductsService {
       });
 
       throw new HttpException(
-        { message: 'Xóa Sản phẩm thành công', data: deleteProduct },
+        { message: 'Xóa Sản phẩm thành công' },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -728,7 +796,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> deleteProduct', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -740,11 +809,11 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       if (!findproduct.deleted) {
-        throw new HttpException('Sản phẩm chưa bị xóa', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Sản phẩm chưa bị xóa');
       }
 
       const restoreproduct = await this.prismaService.products.update({
@@ -757,7 +826,7 @@ export class ProductsService {
       });
 
       throw new HttpException(
-        { message: 'Khôi phục Sản phẩm thành công', data: restoreproduct },
+        { message: 'Khôi phục Sản phẩm thành công' },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -766,7 +835,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> restoreproduct', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -778,7 +848,7 @@ export class ProductsService {
         where: { id: Number(id) },
       });
       if (!findproduct) {
-        throw new HttpException('Sản phẩm không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Delete images
@@ -796,7 +866,8 @@ export class ProductsService {
       }
       console.log('Lỗi từ products.service.ts -> destroy', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

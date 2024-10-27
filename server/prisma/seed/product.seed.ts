@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 const MakeSlugger = (str: string): string => {
   return slugify(str, {
-    replacement: '',
+    replacement: '-',
     remove: undefined,
     lower: true,
     strict: false,
@@ -1102,7 +1102,6 @@ const products = [
       'https://res.cloudinary.com/dlpvcsewd/image/upload/v1725472645/joieplace/products/y0c7tfqz3sxjocxuxtee.jpg,https://res.cloudinary.com/dlpvcsewd/image/upload/v1725472646/joieplace/products/cbe7ecs5kzugthltxdb1.jpg',
     ],
   },
- 
 ];
 
 export const productSeed = async () => {
@@ -1112,7 +1111,7 @@ export const productSeed = async () => {
     categoriesIDs.push(category.id);
   }
   for (const product of products) {
-    await prisma.products.create({
+    const Cproduct = await prisma.products.create({
       data: {
         name: product.name,
         slug: product.slug,
@@ -1124,5 +1123,7 @@ export const productSeed = async () => {
         images: product.images,
       },
     });
+
+    console.log`Product ${Cproduct.name} created`;
   }
 };

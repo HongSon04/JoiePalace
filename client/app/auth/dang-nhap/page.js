@@ -1,9 +1,6 @@
-"use client";
-
 import authBg from "@/public/auth-bg.png";
 import {
   ChatBubbleLeftRightIcon,
-  ExclamationCircleIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Button, Tooltip } from "@nextui-org/react";
@@ -11,15 +8,14 @@ import Image from "next/image";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 
-import { useRouter } from "next/navigation";
+import Notification from "./Notification";
+
+export const metadata = {
+  title: "Chưa chọn chi nhánh",
+  description: "Chọn chi nhánh trước khi đăng nhập",
+};
 
 function Page() {
-  const router = useRouter();
-
-  const onRedirect = () => {
-    router.push("/auth/chon-chi-nhanh");
-  };
-
   return (
     <div className="relative w-full h-screen p-8">
       <Image
@@ -54,20 +50,8 @@ function Page() {
         </Tooltip>
       </div>
 
-      {/* FORM */}
-      <div className="flex-center bg-whiteAlpha-200 flex-col p-5 rounded-md text-gray-800 gap-5 absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
-        <ExclamationCircleIcon className="w-24 h-w-24" />
-        <h1 className="text-xl font-bold">Chưa chọn chi nhánh</h1>
-        <p className="text-base">Vui lòng chọn chi nhánh trước khi đăng nhập</p>
-
-        <Button
-          onClick={onRedirect}
-          radius="full"
-          className="bg-gold text-white font-semibold"
-        >
-          Chọn chi nhánh
-        </Button>
-      </div>
+      {/* NOTIFICATION */}
+      <Notification />
     </div>
   );
 }

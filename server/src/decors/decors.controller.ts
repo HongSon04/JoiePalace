@@ -12,11 +12,13 @@ import {
   UploadedFiles,
   Query,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { DecorsService } from './decors.service';
 import { CreateDecorDto, ImageDecorDto } from './dto/create-decor.dto';
 import { UpdateDecorDto } from './dto/update-decor.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -27,7 +29,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('decors')
+@ApiTags('Decors - Quản lý trang trí')
 @Controller('api/decors')
 export class DecorsController {
   constructor(private readonly decorsService: DecorsService) {}
@@ -38,9 +40,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -49,7 +52,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -70,27 +72,36 @@ export class DecorsController {
   })
   @ApiOperation({ summary: 'Tạo trang trí' })
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -111,7 +122,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -151,9 +161,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -161,7 +172,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -205,7 +215,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -229,49 +238,16 @@ export class DecorsController {
     return this.decorsService.findOne(id);
   }
 
-  // ! Get Decor By Slug
-  @Get('get-by-slug/:slug')
-  @isPublic()
-  @ApiResponse({
-    status: HttpStatus.OK,
-    example: {
-      data: {
-        id: 'number',
-        name: 'string',
-        price: 'number',
-        slug: 'string',
-        description: 'string',
-        short_description: 'string',
-        images: 'array',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    example: {
-      message: 'Không tìm thấy trang trí',
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    example: {
-      message: 'Lỗi server vui lòng thử lại sau',
-    },
-  })
-  @ApiOperation({ summary: 'Lấy thông tin trang trí theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
-    return this.decorsService.findOneBySlug(slug);
-  }
-
   // ! Update Decor
   @Patch('update/:decor_id')
   @ApiHeaders([
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -280,7 +256,6 @@ export class DecorsController {
         id: 'number',
         name: 'string',
         price: 'number',
-        slug: 'string',
         description: 'string',
         short_description: 'string',
         images: 'array',
@@ -301,27 +276,36 @@ export class DecorsController {
   })
   @ApiOperation({ summary: 'Cập nhật trang trí' })
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file) {
           return cb(
-            new HttpException(
-              'Chỉ chấp nhận ảnh jpg, jpeg, png',
-              HttpStatus.BAD_REQUEST,
-            ),
+            new BadRequestException('Không có tệp nào được tải lên'),
             false,
           );
-        } else if (file.size > 1024 * 1024 * 5) {
-          return cb(
-            new HttpException(
-              'Kích thước ảnh tối đa 5MB',
-              HttpStatus.BAD_REQUEST,
-            ),
-            false,
-          );
-        } else {
-          cb(null, true);
         }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
       },
     }),
   )
@@ -339,9 +323,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -371,9 +356,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -403,9 +389,10 @@ export class DecorsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

@@ -14,11 +14,18 @@ import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { isPublic } from 'decorator/auth.decorator';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeaders,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
 
-@ApiTags('bookings')
+@ApiTags('Bookings - Quản lý đơn tiệc')
 @Controller('api/bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
@@ -35,7 +42,6 @@ export class BookingsController {
         id: 1,
         user_id: 1,
         branch_id: 1,
-        space_id: 1,
         stage_id: 1,
         decor_id: 1,
         menu_id: 1,
@@ -45,6 +51,7 @@ export class BookingsController {
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 1,
         fee: 1,
+        budget: 'Trên 500 triệu',
         total_amount: 1,
         status: 'pending',
         deleted: false,
@@ -78,6 +85,13 @@ export class BookingsController {
 
   // ! Get All Booking
   @Get('get-all')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy danh sách đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -87,51 +101,12 @@ export class BookingsController {
           id: 'number',
           user_id: 'number',
           branch_id: 'number',
-          space_id: 'number',
           stage_id: 'number',
           deposit_id: 'number',
           decor_id: 'number',
           menu_id: 'number',
           name: 'string',
           images: [],
-          accessories: {
-            chair: {
-              id: 'number',
-              name: 'string',
-              type: 'string',
-              amount: 500,
-              images: ['string', 'string'],
-              quantity: 30,
-              description: 'string',
-              total_price: 15000,
-              short_description: 'string',
-            },
-            table: [
-              {
-                id: 'number',
-                name: 'string',
-                type: 'string',
-                amount: 500,
-                images: ['string', 'string'],
-                quantity: 2,
-                description: 'string',
-                total_price: 1000,
-                short_description: 'string',
-              },
-              {
-                id: 'number',
-                name: 'string',
-                type: 'table',
-                amount: 500,
-                images: ['string', 'string'],
-                quantity: 1,
-                description: 'string',
-                total_price: 500,
-                short_description: 'string',
-              },
-            ],
-            total_price: 16500,
-          },
           shift: 'Sáng',
           organization_date: '2024-09-20T08:00:00.000Z',
           amount: 'number',
@@ -166,16 +141,6 @@ export class BookingsController {
             deleted_by: null,
             created_at: '2024-09-18T15:32:12.458Z',
             updated_at: '2024-09-18T15:32:12.458Z',
-          },
-          spaces: {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: '2024-09-08T04:25:08.544Z',
-            updated_at: '2024-09-08T04:25:08.544Z',
           },
           stages: {
             id: 'number',
@@ -256,6 +221,13 @@ export class BookingsController {
 
   // ! Get All Deleted Booking
   @Get('get-all-deleted')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Lấy danh sách đơn tiệc' })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
@@ -271,6 +243,7 @@ export class BookingsController {
 
   // ! Get One Booking
   @Get('get/:booking_id')
+  @isPublic()
   @ApiOperation({ summary: 'Lấy thông tin chi tiết một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -279,50 +252,11 @@ export class BookingsController {
         id: 'number',
         user_id: 'number',
         branch_id: 'number',
-        space_id: 'number',
         stage_id: 'number',
         decor_id: 'number',
         menu_id: 'number',
         name: 'string',
         images: [],
-        accessories: {
-          chair: {
-            id: 'number',
-            name: 'string',
-            type: 'string',
-            amount: 500,
-            images: ['string', 'string'],
-            quantity: 30,
-            description: 'string',
-            total_price: 15000,
-            short_description: 'string',
-          },
-          table: [
-            {
-              id: 'number',
-              name: 'string',
-              type: 'string',
-              amount: 500,
-              images: ['string', 'string'],
-              quantity: 2,
-              description: 'string',
-              total_price: 1000,
-              short_description: 'string',
-            },
-            {
-              id: 'number',
-              name: 'string',
-              type: 'table',
-              amount: 500,
-              images: ['string', 'string'],
-              quantity: 1,
-              description: 'string',
-              total_price: 500,
-              short_description: 'string',
-            },
-          ],
-          total_price: 16500,
-        },
         shift: 'Sáng',
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 'number',
@@ -600,53 +534,16 @@ export class BookingsController {
         id: 1,
         user_id: 1,
         branch_id: 1,
-        space_id: 1,
         stage_id: 1,
         decor_id: 1,
         menu_id: 1,
         name: 'string',
-        accessories: {
-          chair: {
-            id: 1,
-            name: 'string',
-            type: 'string',
-            amount: 1,
-            images: ['string', 'string'],
-            quantity: 1,
-            description: 'string',
-            total_price: 1,
-            short_description: 'string',
-          },
-          table: [
-            {
-              id: 1,
-              name: 'string',
-              type: 'string',
-              amount: 1,
-              images: ['string', 'string'],
-              quantity: 1,
-              description: 'string',
-              total_price: 1,
-              short_description: 'string',
-            },
-          ],
-          extra_service: {
-            id: 1,
-            name: 'string',
-            type: 'string',
-            amount: 1,
-            images: ['string', 'string'],
-            description: 'string',
-            total_price: 1,
-            short_description: 'string',
-          },
-          total_price: 1,
-        },
         images: ['string', 'string'],
         shift: 'Sáng',
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 1,
         fee: 1,
+        budget: 'Trên 500 triệu',
         total_amount: 1,
         status: 'pending',
         deleted: false,
@@ -687,7 +584,6 @@ export class BookingsController {
         id: 1,
         user_id: 1,
         branch_id: 1,
-        space_id: 1,
         stage_id: 1,
         decor_id: 1,
         menu_id: 1,
@@ -697,6 +593,7 @@ export class BookingsController {
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 1,
         fee: 1,
+        budget: 'Trên 500 triệu',
         total_amount: 1,
         status: 'pending',
         deleted: false,
@@ -733,6 +630,13 @@ export class BookingsController {
 
   // ! Soft Delete Booking
   @Delete('delete/:booking_id')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Xóa tạm thời một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -758,6 +662,13 @@ export class BookingsController {
 
   // ! Restore Booking
   @Patch('restore/:booking_id')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Khôi phục một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -783,6 +694,13 @@ export class BookingsController {
 
   // ! Hard Delete Booking
   @Delete('hard-delete/:booking_id')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Xóa vĩnh viễn một đơn tiệc' })
   @ApiResponse({
     status: HttpStatus.OK,

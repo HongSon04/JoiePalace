@@ -1,6 +1,13 @@
 "use client";
 
 import CustomPagination from "@/app/_components/CustomPagination";
+import useApiServices from "@/app/_hooks/useApiServices";
+import {
+  fetchFeedbacksFailure,
+  fetchFeedbacksRequest,
+  fetchFeedbacksSuccess,
+} from "@/app/_lib/features/feedbacks/feedbacksSlice";
+import { API_CONFIG } from "@/app/_utils/api.config";
 import { formatDateTime } from "@/app/_utils/formaters";
 import { capitalize } from "@/app/_utils/helpers";
 import {
@@ -32,6 +39,7 @@ import {
 import { Col, Row } from "antd";
 import { format } from "date-fns";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 function FeedbackTabs() {
   const [selectedFeedback, setSelectedFeedback] = React.useState({
@@ -58,122 +66,149 @@ function FeedbackTabs() {
 
   const status = ["received", "approved"];
 
-  const feedbacks = [
-    {
-      id: 1,
-      name: "Nguyễn Văn A",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "received",
-      dateTime: "2024-10-12T11:34:55.082Z",
-      bookingId: "FDK-ED2-291",
-      satisLevel: "good",
-    },
-    {
-      id: 2,
-      name: "Nguyễn Văn B",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "approved",
-      dateTime: "2024-10-10T11:34:55.082Z",
-      bookingId: "FDK-ED2-292",
-      satisLevel: "good",
-    },
-    {
-      id: 3,
-      name: "Nguyễn Văn C",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "received",
-      dateTime: "2024-10-10T11:34:55.082Z",
-      bookingId: "FDK-ED2-293",
-      satisLevel: "good",
-    },
-    {
-      id: 4,
-      name: "Nguyễn Văn D",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "approved",
-      dateTime: "2024-10-10T11:34:55.082Z",
-      bookingId: "FDK-ED2-294",
-      satisLevel: "bad",
-    },
-    {
-      id: 5,
-      name: "Nguyễn Văn E",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "received",
-      dateTime: "2024-10-10T11:34:55.082Z",
-      bookingId: "FDK-ED2-295",
-      satisLevel: "good",
-    },
-    {
-      id: 6,
-      name: "Nguyễn Văn F",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "approved",
-      dateTime: "2024-10-10T11:34:55.082Z",
-      bookingId: "FDK-ED2-296",
-      satisLevel: "normal",
-    },
-    {
-      id: 7,
-      name: "Nguyễn Văn G",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "received",
-      dateTime: "2024-10-12T11:34:55.082Z",
-      bookingId: "FDK-ED2-297",
-      satisLevel: "bad",
-    },
-    {
-      id: 8,
-      name: "Nguyễn Văn H",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "approved",
-      dateTime: "2024-10-12T11:34:55.082Z",
-      bookingId: "FDK-ED2-298",
-      satisLevel: "good",
-    },
-    {
-      id: 9,
-      name: "Nguyễn Văn I",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "received",
-      dateTime: "2024-10-22T11:34:55.082Z",
-      bookingId: "FDK-ED2-299",
-      satisLevel: "normal",
-    },
-    {
-      id: 10,
-      name: "Nguyễn Văn J",
-      feedback:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
-      status: "approved",
-      dateTime: "2024-10-22T11:34:55.082Z",
-      bookingId: "FDK-ED2-300",
-      satisLevel: "great",
-    },
-  ].filter((f) => f.dateTime >= date.start && f.dateTime <= date.end);
+  // const feedbacks = [
+  //   {
+  //     id: 1,
+  //     name: "Nguyễn Văn A",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "received",
+  //     dateTime: "2024-10-12T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-291",
+  //     satisLevel: "good",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Nguyễn Văn B",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "approved",
+  //     dateTime: "2024-10-10T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-292",
+  //     satisLevel: "good",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Nguyễn Văn C",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "received",
+  //     dateTime: "2024-10-10T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-293",
+  //     satisLevel: "good",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Nguyễn Văn D",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "approved",
+  //     dateTime: "2024-10-10T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-294",
+  //     satisLevel: "bad",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Nguyễn Văn E",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "received",
+  //     dateTime: "2024-10-10T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-295",
+  //     satisLevel: "good",
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Nguyễn Văn F",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "approved",
+  //     dateTime: "2024-10-10T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-296",
+  //     satisLevel: "normal",
+  //   },
+  //   {
+  //     id: 7,
+  //     name: "Nguyễn Văn G",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "received",
+  //     dateTime: "2024-10-12T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-297",
+  //     satisLevel: "bad",
+  //   },
+  //   {
+  //     id: 8,
+  //     name: "Nguyễn Văn H",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "approved",
+  //     dateTime: "2024-10-12T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-298",
+  //     satisLevel: "good",
+  //   },
+  //   {
+  //     id: 9,
+  //     name: "Nguyễn Văn I",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "received",
+  //     dateTime: "2024-10-22T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-299",
+  //     satisLevel: "normal",
+  //   },
+  //   {
+  //     id: 10,
+  //     name: "Nguyễn Văn J",
+  //     feedback:
+  //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec odio vitae nunc. Donec nec odio vitae nunc. Donec nec odio vitae nunc.",
+  //     status: "approved",
+  //     dateTime: "2024-10-22T11:34:55.082Z",
+  //     bookingId: "FDK-ED2-300",
+  //     satisLevel: "great",
+  //   },
+  // ].filter((f) => f.dateTime >= date.start && f.dateTime <= date.end);
 
-  const categories = [
-    {
-      key: "requested",
-      name: "Đã nhận",
-    },
-    {
-      key: "approved",
-      name: "Đã duyệt",
-    },
-  ];
+  // const categories = [
+  //   {
+  //     key: "requested",
+  //     name: "Đã nhận",
+  //   },
+  //   {
+  //     key: "approved",
+  //     name: "Đã duyệt",
+  //   },
+  // ];
+
+  const dispatch = useDispatch();
+  const { makeAuthorizedRequest } = useApiServices();
+  const { feedbacks, categories } = useSelector((state) => state.feedbacks);
+
+  const getFeedbacks = async () => {
+    dispatch(fetchFeedbacksRequest());
+
+    const data = await makeAuthorizedRequest(
+      API_CONFIG.FEEDBACKS.GET_ALL_SHOW,
+      "GET",
+      null
+    );
+
+    console.log(data);
+
+    if (data.success) {
+      dispatch(fetchFeedbacksSuccess(data.data));
+    }
+
+    dispatch(fetchFeedbacksFailure());
+  };
+
+  React.useEffect(() => {
+    getFeedbacks();
+  }, []);
 
   return (
     <>
+      {/*  TABS */}
       <Tabs className="mt-8" variant={"unstyled"}>
         <TabList width={"fit-content"} className="!w-full flex">
           {categories.map((c) => (
@@ -182,7 +217,7 @@ function FeedbackTabs() {
               color={"white"}
               className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
             >
-              Đã nhận
+              {c.name}
               <Chip
                 color="default"
                 classNames={{
@@ -216,7 +251,7 @@ function FeedbackTabs() {
         <TabIndicator mt="1.5px" height="2px" bg="white" borderRadius="2px" />
         <TabPanels>
           {status.map((item, index) => (
-            <TabPanel className="mt-3 rounded-md bg-whiteAlpha-100" key={index}>
+            <TabPanel className="mt-3 rounded-md" key={index}>
               {/* HEADER */}
               <Row className="mb-3">
                 <Col className="font-semibold text-base text-white" span={12}>
@@ -240,7 +275,7 @@ function FeedbackTabs() {
                 .map((feedback) => (
                   <Row
                     key={feedback.id}
-                    className={`p-2 rounded-md bg-whiteAlpha-100 text-white hover:bg-whiteAlpha-200 mb-2`}
+                    className={`p-2 rounded-md text-white hover:bg-whiteAlpha-200 mb-2 border-top-whiteAlpha-100`}
                   >
                     <Col span={12}>
                       <div className="flex items-center gap-3">
@@ -351,6 +386,7 @@ function FeedbackTabs() {
         </TabPanels>
         <CustomPagination total={status.length} />
       </Tabs>
+      {/* MODAL */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (

@@ -70,6 +70,8 @@ const ScrollFullPage = ({ children }) => {
     window.addEventListener("resize", handleResize);
 
     return () => {
+      if (typeof window === "undefined") return;
+      
       if (window.fullpage_api) {
         window.fullpage_api.destroy("all");
       }

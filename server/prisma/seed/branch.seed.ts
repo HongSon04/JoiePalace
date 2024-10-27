@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 const MakeSlugger = (str: string): string => {
   return slugify(str, {
-    replacement: '',
+    replacement: '-',
     remove: undefined,
     lower: true,
     strict: false,
@@ -98,7 +98,7 @@ const branches = [
     name: 'Hà Tây',
     address: 'Đường 9, Quận 9, Hà Tây',
     slug: MakeSlugger('Hà Tây'),
-    phone: '999999999',
+    phone: '09',
     email: 'chinhanh9@joieplace.com',
     images: [
       'https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/xhnquxrdecjxbbialilg.jpg,https://res.cloudinary.com/dlpvcsewd/image/upload/v1726673256/joieplace/branch/pakoi5ihxkxbnqlnjgl1.jpg',
@@ -118,7 +118,6 @@ const branches = [
 let branchIDS: number[] = [];
 export const branchSeed = async () => {
   for (const branch of branches) {
-    console.log('Creating branch:', branch.name);
     const branches = await prisma.branches.create({
       data: {
         name: branch.name,
@@ -143,5 +142,6 @@ export const branchSeed = async () => {
       },
     });
     branchIDS.push(branches.id);
+    console.log('Creating branch:', branch.name);
   }
 };

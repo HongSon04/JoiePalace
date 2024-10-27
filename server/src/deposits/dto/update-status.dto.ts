@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { PaymentMethod } from 'helper/enum/payment_method.enum';
 
 export class UpdateDepositDto {
   @ApiProperty({ required: true, example: 'cancelled|pending|completed' })
@@ -10,10 +11,10 @@ export class UpdateDepositDto {
   })
   status: string;
 
-  @ApiProperty({ example: 'momo|vnpay|onepay|zalopay|banking' })
-  @IsString()
-  @IsEnum(['momo', 'vnpay', 'onepay', 'zalopay', 'banking'], {
-    message: 'Phương thức thanh toán không hợp lệ',
+  @ApiProperty({ required: true })
+  @IsEnum(PaymentMethod, {
+    message:
+      'Phương thức thanh toán không hợp lệ (cash, bank, momo, vnpay, zalo, onepay)',
   })
   payment_method: string;
 }

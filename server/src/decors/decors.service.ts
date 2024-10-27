@@ -1,19 +1,21 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-import { CreateDecorDto, ImageDecorDto } from './dto/create-decor.dto';
-import { UpdateDecorDto } from './dto/update-decor.dto';
-import { PrismaService } from 'src/prisma.service';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { MakeSlugger } from 'helper/slug';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FormatReturnData } from 'helper/FormatReturnData';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { CreateDecorDto, ImageDecorDto } from './dto/create-decor.dto';
+import { UpdateDecorDto } from './dto/update-decor.dto';
 
 @Injectable()
 export class DecorsService {
@@ -23,53 +25,77 @@ export class DecorsService {
   ) {}
   // ! Create Decor
   async create(createDecorDto: CreateDecorDto, files: ImageDecorDto | any) {
-    const { name, price, description, short_description } = createDecorDto;
-    const slug = MakeSlugger(name);
+    const { name, price, description, short_description, products } =
+      createDecorDto;
+
     try {
+      // Kiểm tra hình ảnh
       if (!files.images) {
-        throw new HttpException(
-          'Hình ảnh không được để trống',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Hình ảnh không được để trống');
       }
 
-      const findDecorByName = await this.prismaService.decors.findFirst({
+      // Kiểm tra tên trang trí
+      const existingDecor = await this.prismaService.decors.findFirst({
         where: { name },
       });
-
-      if (findDecorByName) {
-        throw new HttpException(
-          'Tên trang trí đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (existingDecor) {
+        throw new BadRequestException('Tên trang trí đã tồn tại');
       }
 
+      // Kiểm tra sản phẩm
+      const foundProducts = await this.prismaService.products.findMany({
+        where: { id: { in: products } },
+      });
+
+      if (foundProducts.length !== products.length) {
+        throw new NotFoundException('Sản phẩm không tồn tại');
+      }
+
+      // Tính toán tổng giá
+      const totalPrice = foundProducts.reduce(
+        (total, product) => total + product.price,
+        0,
+      );
+      if (totalPrice < Number(price)) {
+        throw new BadRequestException('Giá trang trí không hợp lệ');
+      }
+
+      // Tải hình ảnh lên Cloudinary
       const imagesDecor =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joieplace/decors',
+          'joiepalace/decors',
         );
-
       if (imagesDecor.length === 0) {
-        throw new HttpException(
-          'Upload hình ảnh thất bại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Upload hình ảnh thất bại');
       }
 
+      // Tạo trang trí
       const createDecor = await this.prismaService.decors.create({
         data: {
           name,
-          slug,
-          price: Number(price),
+          price: Number(totalPrice),
           description,
           short_description,
           images: imagesDecor as any,
+          products: {
+            connect: products.map((product) => ({ id: Number(product) })),
+          },
+        },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
       throw new HttpException(
-        { message: 'Tạo trang trí thành công', data: createDecor },
+        {
+          message: 'Tạo trang trí thành công',
+          data: FormatReturnData(createDecor, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -78,7 +104,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> create', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -91,7 +118,7 @@ export class DecorsService {
     const skip = (page - 1) * itemsPerPage;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     const priceSort = query?.priceSort?.toLowerCase();
 
@@ -114,7 +141,11 @@ export class DecorsService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: false,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -137,9 +168,8 @@ export class DecorsService {
             },
           },
         },
-      ],
-      ...sortRangeDate,
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [
@@ -147,6 +177,16 @@ export class DecorsService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -171,7 +211,13 @@ export class DecorsService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.decors.findMany({
           where: whereConditions,
-
+          include: {
+            products: {
+              include: {
+                tags: true,
+              },
+            },
+          },
           skip,
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
@@ -194,7 +240,7 @@ export class DecorsService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -205,7 +251,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> findAll', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -218,7 +265,7 @@ export class DecorsService {
     const skip = (page - 1) * itemsPerPage;
 
     const minPrice = Number(query.minPrice) || 0;
-    const maxPrice = Number(query.maxPrice) || 999999999999;
+    const maxPrice = Number(query.maxPrice) || 0;
 
     const priceSort = query?.priceSort?.toLowerCase();
 
@@ -240,7 +287,11 @@ export class DecorsService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: true,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -263,9 +314,8 @@ export class DecorsService {
             },
           },
         },
-      ],
-      ...sortRangeDate,
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [
@@ -273,6 +323,16 @@ export class DecorsService {
         {
           price: {
             gte: minPrice,
+          },
+        },
+      ];
+    }
+
+    if (maxPrice > 0) {
+      whereConditions.AND = [
+        ...(whereConditions.AND || []),
+        {
+          price: {
             lte: maxPrice,
           },
         },
@@ -297,7 +357,13 @@ export class DecorsService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.decors.findMany({
           where: whereConditions,
-
+          include: {
+            products: {
+              include: {
+                tags: true,
+              },
+            },
+          },
           skip,
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
@@ -320,7 +386,7 @@ export class DecorsService {
 
       throw new HttpException(
         {
-          data: res,
+          data: FormatReturnData(res, []),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -330,10 +396,9 @@ export class DecorsService {
         throw error;
       }
       console.log('Lỗi từ decors.service.ts -> findAllDeleted', error);
-      throw new HttpException(
-        { message: error.message || 'Lấy danh sách trang trí thất bại' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException({
+        message: error.message || 'Lấy danh sách trang trí thất bại',
+      });
     }
   }
 
@@ -342,49 +407,34 @@ export class DecorsService {
     try {
       const decor = await this.prismaService.decors.findUnique({
         where: { id: Number(id) },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
-      throw new HttpException(decor, HttpStatus.OK);
+      throw new HttpException(
+        {
+          message: 'Lấy thông tin trang trí thành công',
+          data: FormatReturnData(decor, []),
+        },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       console.log('Lỗi từ decors.service.ts -> findOne', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      );
-    }
-  }
-
-  // ! Get One Decor By Slug
-  async findOneBySlug(slug: string) {
-    try {
-      const decor = await this.prismaService.decors.findUnique({
-        where: { slug },
-      });
-
-      if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      throw new HttpException(decor, HttpStatus.OK);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ decors.service.ts -> findOneBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -396,49 +446,61 @@ export class DecorsService {
     files: { images?: Express.Multer.File[] },
   ) {
     try {
-      const { name, price, description, short_description } = updateDecorDto;
+      const { name, price, description, short_description, products } =
+        updateDecorDto;
 
       const decor = await this.prismaService.decors.findUnique({
         where: { id: Number(id) },
       });
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
-      const slug = MakeSlugger(name);
       const findDecorByName = await this.prismaService.decors.findFirst({
         where: { name, NOT: { id: Number(id) } },
       });
 
       if (findDecorByName) {
-        throw new HttpException(
-          'Tên trang trí đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Tên trang trí đã tồn tại');
+      }
+
+      // ? Kiểm tra sản phẩm
+      const foundProducts = await this.prismaService.products.findMany({
+        where: { id: { in: products } },
+      });
+
+      if (foundProducts.length !== products.length) {
+        throw new NotFoundException('Sản phẩm không tồn tại');
+      }
+
+      // ? Tính toán tổng giá
+      const totalPrice = foundProducts.reduce(
+        (total, product) => total + product.price,
+        0,
+      );
+
+      if (totalPrice < Number(price)) {
+        throw new BadRequestException('Giá trang trí không hợp lệ');
       }
       const dataToUpdate: any = {
         name,
-        slug,
         price: Number(price),
         description,
         short_description,
+        products: {
+          set: products.map((product) => ({ id: product })),
+        },
       };
 
       if (files.images) {
         const imagesDecor =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
-            'joieplace/decors',
+            'joiepalace/decors',
           );
 
         if (!imagesDecor.length) {
-          throw new HttpException(
-            'Upload hình ảnh thất bại',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new BadRequestException('Upload hình ảnh thất bại');
         }
         // Delete old images
         await this.cloudinaryService.deleteMultipleImagesByUrl(decor.images);
@@ -448,10 +510,20 @@ export class DecorsService {
       const updatedDecor = await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: dataToUpdate,
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
       });
 
       throw new HttpException(
-        { message: 'Cập nhật trang trí thành công', data: updatedDecor },
+        {
+          message: 'Cập nhật trang trí thành công',
+          data: FormatReturnData(updatedDecor, []),
+        },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -460,7 +532,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> update', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -473,17 +546,14 @@ export class DecorsService {
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       if (decor.deleted) {
-        throw new HttpException('Trang trí đã bị xóa', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Trang trí đã bị xóa');
       }
 
-      const updatedDecor = await this.prismaService.decors.update({
+      await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: { deleted: true, deleted_by: reqUser.id, deleted_at: new Date() },
       });
@@ -498,7 +568,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> delete', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -511,20 +582,14 @@ export class DecorsService {
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       if (!decor.deleted) {
-        throw new HttpException(
-          'Trang trí chưa bị xóa',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Trang trí chưa bị xóa');
       }
 
-      const updatedDecor = await this.prismaService.decors.update({
+      await this.prismaService.decors.update({
         where: { id: Number(id) },
         data: { deleted: false, deleted_by: null, deleted_at: null },
       });
@@ -539,7 +604,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> restore', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -552,17 +618,11 @@ export class DecorsService {
       });
 
       if (!decor) {
-        throw new HttpException(
-          'Không tìm thấy trang trí',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Không tìm thấy trang trí');
       }
 
       if (!decor.deleted) {
-        throw new HttpException(
-          'Trang trí chưa bị xóa',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Trang trí chưa bị xóa');
       }
 
       // Delete images
@@ -582,7 +642,8 @@ export class DecorsService {
       }
       console.log('Lỗi từ decors.service.ts -> destroy', error);
       throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

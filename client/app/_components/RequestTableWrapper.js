@@ -1,19 +1,8 @@
 "use client";
 
 import RequestTable from "@/app/_components/RequestTable";
-import { useDispatch, useSelector } from "react-redux";
-import { setFilter } from "../_lib/features/requests/requestsSlice";
 
 function RequestTableWrapper() {
-  const { filter } = useSelector((store) => store.requests);
-
-  const dispatch = useDispatch();
-
-  // filter requests
-  function handleChange(e) {
-    dispatch(setFilter(parseInt(e.target.value)));
-  }
-
   return (
     <div>
       {/* Header */}

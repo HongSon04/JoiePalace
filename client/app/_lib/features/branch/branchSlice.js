@@ -1,10 +1,15 @@
-import { API_CONFIG } from "@/app/_utils/api.config";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createSlice } from "@reduxjs/toolkit";
+
+const getCurrentBranchFromLocalStorage = () => {
+  if (typeof window !== "undefined" && window.localStorage) {
+    return JSON.parse(localStorage.getItem("currentBranch")) || {};
+  }
+  return {};
+};
 
 const initialState = {
   branches: [],
-  currentBranch: null,
+  currentBranch: getCurrentBranchFromLocalStorage(),
   isLoading: false,
   isError: false,
   errorMessage: null,

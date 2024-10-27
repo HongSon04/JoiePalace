@@ -15,7 +15,8 @@ import { useEffect } from "react";
 import { Divider } from "@chakra-ui/react";
 
 // import images
-import logo from "@/public/logo-dark.png";
+import blogIcon from "@/public/admin-sidebar/bai-viet.svg";
+import tableAndChair from "@/public/admin-sidebar/ban-ghe.svg";
 import dashboardIcon from "@/public/admin-sidebar/bang-dieu-khien.svg";
 import settingIcon from "@/public/admin-sidebar/cai-dat.svg";
 import branchIcon from "@/public/admin-sidebar/chi-nhanh.svg";
@@ -24,22 +25,20 @@ import customerIcon from "@/public/admin-sidebar/khach-hang.svg";
 import contactIcon from "@/public/admin-sidebar/lien-he-ho-tro.svg";
 import menuIcon from "@/public/admin-sidebar/menu.svg";
 import foodIcon from "@/public/admin-sidebar/mon-an.svg";
+import feedbackIcon from "@/public/admin-sidebar/phan-hoi-danh-gia.svg";
 import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
 import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
-import feedbackIcon from "@/public/admin-sidebar/phan-hoi-danh-gia.svg";
-import blogIcon from "@/public/admin-sidebar/bai-viet.svg";
-import tableAndChair from "@/public/admin-sidebar/ban-ghe.svg";
+import logo from "@/public/logo-dark.png";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
+import { API_CONFIG } from "../_utils/api.config";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   const [scope, animate] = useAnimate();
-
-  // const liRef = useRef(null);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -117,58 +116,71 @@ function AdminSidebarHeader() {
 }
 
 function AdminSidebarNav() {
+  const { currentBranch } = useSelector((state) => state.branch);
+
   const mainOptions = [
     {
       title: "Bảng điều khiển",
-      path: "/admin/bang-dieu-khien",
+      path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
       icon: dashboardIcon,
     },
-    { title: "Chi nhánh", path: "/admin/chi-nhanh", icon: branchIcon },
-    { title: "Thống kê", path: "/admin/thong-ke", icon: statisticIcon },
+    {
+      title: "Chi nhánh",
+      path: `/admin/chi-nhanh/${currentBranch?.slug}`,
+      icon: branchIcon,
+    },
+    {
+      title: "Thống kê",
+      path:
+        currentBranch.slug === API_CONFIG.GENERAL_BRANCH
+          ? "/admin/thong-ke/"
+          : `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+      icon: statisticIcon,
+    },
     {
       title: "Khách hàng",
-      path: "/admin/khach-hang",
+      path: `/admin/khach-hang/${currentBranch?.slug}`,
       icon: customerIcon,
     },
     {
       title: "Yêu cầu",
-      path: "/admin/yeu-cau",
+      path: `/admin/yeu-cau/${currentBranch?.slug}`,
       icon: requestIcon,
       qty: 5,
     },
     {
       title: "Quản lý tiệc",
-      path: "/admin/quan-ly-tiec",
+      path: `/admin/quan-li-tiec/${currentBranch?.slug}`,
       icon: eventIcon,
     },
     {
       title: "Quản lý bàn ghế",
-      path: "/admin/quan-ly-ban-ghe",
+      path: `/admin/quan-li-ban-ghe/${currentBranch?.slug}`,
       icon: tableAndChair,
     },
     {
       title: "Thực đơn",
-      path: "/admin/thuc-don",
+      path: `/admin/thuc-don/`,
       icon: menuIcon,
     },
     {
       title: "Món ăn",
-      path: "/admin/mon-an",
+      path: `/admin/mon-an/`,
       icon: foodIcon,
     },
     {
       title: "Đồ uống",
-      path: "/admin/do-uong",
+      path: `/admin/do-uong/`,
       icon: drinkIcon,
     },
     {
       title: "Phản hồi & đánh giá",
-      path: "/admin/phan-hoi-danh-gia",
+      path: `/admin/phan-hoi-danh-gia/`,
       icon: feedbackIcon,
     },
     {
       title: "Bài viết",
-      path: "/admin/bai-viet",
+      path: `/admin/bai-viet/`,
       icon: blogIcon,
     },
   ];
@@ -176,13 +188,13 @@ function AdminSidebarNav() {
   const subOptions = [
     {
       title: "Thông báo",
-      path: "/admin/thong-bao",
+      path: `/admin/thong-bao/${currentBranch?.slug}`,
       icon: notificationIcon,
       qty: 5,
     },
     {
       title: "Liên hệ & hỗ trợ",
-      path: "/admin/lien-he-ho-tro",
+      path: `/admin/lien-he-ho-tro/${currentBranch?.slug}`,
       icon: contactIcon,
     },
     {

@@ -5,6 +5,9 @@ const initialState = {
   selectedDish: {},
   dishes: [],
   categoryDishes: [],
+  error: "",
+  isLoading: false,
+  isError: false,
 };
 
 const dishesSlice = createSlice({
@@ -14,51 +17,95 @@ const dishesSlice = createSlice({
     setSelectedDish: (state, action) => {
       state.selectedDish = action.payload;
     },
+    addingDishCategory: (state, action) => {
+      state.isLoading = true;
+    },
+    addingDishCategorySuccess: (state, action) => {
+      state.isLoading = false;
+    },
+    addingDishCategoryFailure: (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+    },
+    fetchingSelectedDish: (state, action) => {
+      state.isLoading = true;
+    },
+    fetchingSelectedDishSuccess: (state, action) => {
+      state.isLoading = false;
+    },
+    fetchingSelectedDishFailure: (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+    },
+    fetchingCategoryDishes: (state, action) => {
+      state.isLoading = true;
+    },
+    fetchingCategoryDishesSuccess: (state, action) => {
+      state.isLoading = false;
+    },
+    fetchingCategoryDishesFailure: (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+    },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(getDishes.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(getDishes.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.dishes = action.payload;
-      })
-      .addCase(getDishes.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      .addCase(getDishesByCategory.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(getDishesByCategory.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.categoryDishes = action.payload;
-      })
-      .addCase(getDishesByCategory.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      });
-  },
+  // extraReducers: (builder) => {
+  //   builder
+  //     .addCase(getDishes.pending, (state) => {
+  //       state.status = "loading";
+  //     })
+  //     .addCase(getDishes.fulfilled, (state, action) => {
+  //       state.status = "succeeded";
+  //       state.dishes = action.payload;
+  //     })
+  //     .addCase(getDishes.rejected, (state, action) => {
+  //       state.status = "failed";
+  //       state.error = action.error.message;
+  //     })
+  //     .addCase(getDishesByCategory.pending, (state) => {
+  //       state.status = "loading";
+  //     })
+  //     .addCase(getDishesByCategory.fulfilled, (state, action) => {
+  //       state.status = "succeeded";
+  //       state.categoryDishes = action.payload;
+  //     })
+  //     .addCase(getDishesByCategory.rejected, (state, action) => {
+  //       state.status = "failed";
+  //       state.error = action.error.message;
+  //     });
+  // },
 });
 
-export const getDishes = createAsyncThunk("dishes/getDishes", async () => {
-  // const response = await fetch("/api/dishes");
-  // const data = await response.json();
+// export const getDishes = createAsyncThunk("dishes/getDishes", async () => {
+//   // const response = await fetch("/api/dishes");
+//   // const data = await response.json();
 
-  return dishes;
-});
+//   return dishes;
+// });
 
-export const getDishesByCategory = createAsyncThunk(
-  "dishes/getDishesByCategory",
-  async (category) => {
-    // const response = await fetch(`/api/dishes?category=${category}`);
-    // const data = await response.json();
-    return dishes.filter((dish) => dish.category === category);
-  }
-);
+// export const getDishesByCategory = createAsyncThunk(
+//   "dishes/getDishesByCategory",
+//   async (category) => {
+//     // const response = await fetch(`/api/dishes?category=${category}`);
+//     // const data = await response.json();
 
-export const { setSelectedDish } = dishesSlice.actions;
+//     // return data;
+
+//     return dishes.filter((dish) => dish.category === category);
+//   }
+// );
+
+export const {
+  setSelectedDish,
+  addingDishCategory,
+  addingDishCategorySuccess,
+  addingDishCategoryFailure,
+  fetchingSelectedDish,
+  fetchingSelectedDishSuccess,
+  fetchingSelectedDishFailure,
+  fetchingCategoryDishes,
+  fetchingCategoryDishesSuccess,
+  fetchingCategoryDishesFailure,
+} = dishesSlice.actions;
 
 export default dishesSlice;
 

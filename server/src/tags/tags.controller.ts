@@ -13,6 +13,7 @@ import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import {
+  ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -22,7 +23,7 @@ import {
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@ApiTags('tags')
+@ApiTags('Tags - Quản lý tag')
 @Controller('api/tags')
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
@@ -33,9 +34,10 @@ export class TagsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -142,7 +144,7 @@ export class TagsController {
     return this.tagsService.findOne(id);
   }
 
-  @Get('/get-by-slug/:slug')
+  @Get('/get-by-slug/:tag_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -169,7 +171,7 @@ export class TagsController {
     },
   })
   @ApiOperation({ summary: 'Lấy tag theo slug' })
-  findBySlug(@Param('slug') slug: string) {
+  findBySlug(@Param('tag_slug') slug: string) {
     return this.tagsService.findBySlug(slug);
   }
 
@@ -178,9 +180,10 @@ export class TagsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
@@ -216,9 +219,10 @@ export class TagsController {
     {
       name: 'authorization',
       description: 'Bearer token',
-      required: true,
+      required: false,
     },
   ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

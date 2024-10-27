@@ -28,7 +28,7 @@ const Chart = ({ data, chartType }) => {
                     color: '#ffff',
                     padding: 5,
                     callback: function(value) {
-                        return value / 1000000 + 'M'; // Hiển thị giá trị theo triệu
+                        return value / 1000000 + 'M'; 
                     }
                 },
                 suggestedMax: 800000000,
@@ -37,20 +37,20 @@ const Chart = ({ data, chartType }) => {
         },
         elements: {
             point: {
-                radius: 7,                                      // Kích thước của các điểm tròn
-               backgroundColor: 'rgba(75, 192, 192, 0.6)',   // Màu sáng cho điểm tròn (nền sáng hơn)
-                borderColor: 'rgba(200, 200, 200, 1)',          // Màu viền sáng hơn cho điểm tròn
+                radius: 5,                                      
+               backgroundColor: 'rgba(75, 192, 192, 0.6)',  
+                borderColor: 'rgba(200, 200, 200, 1)',        
                 borderWidth: 1,               
             }
         },
        barThickness: 15,
-       backgroundColor: 'rgba(75, 192, 192, 0.6)',       // Màu nền sáng hơn cho các cột
-        borderColor: 'rgba(255, 255, 255, 0.6)',            // Màu viền sáng hơn cho các cột
+       backgroundColor: 'rgba(75, 192, 192, 0.6)',      
+        borderColor: 'rgba(255, 255, 255, 0.6)',           
         borderWidth: 1,            
         
     };
 
-    // Lựa chọn loại biểu đồ dựa trên prop chartType
+    
     const renderChart = () => {
         switch (chartType) {
             case 'bar':

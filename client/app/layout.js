@@ -3,6 +3,7 @@ import "@/app/_styles/globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import StoreProvider from "./admin/StoreProvider";
 import { Providers } from "./providers";
+import Toast from "./_components/Toast";
 
 // metadata for the layout
 export const metadata = {
