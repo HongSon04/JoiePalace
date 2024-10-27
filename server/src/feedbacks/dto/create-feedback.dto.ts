@@ -28,6 +28,8 @@ export class CreateFeedbackDto {
   comments: string;
 
   @ApiProperty({ required: false })
-  @IsEnum([true, false], { message: 'Trạng thái hiển thị không hợp lệ' })
   is_show: boolean;
+
+  @ApiProperty({ required: false })
+  is_approved: boolean;
 }

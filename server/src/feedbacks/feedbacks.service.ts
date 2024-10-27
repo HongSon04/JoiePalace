@@ -14,6 +14,7 @@ import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
+import { FilterFeedBackDto } from './dto/FilterFeedBackDto';
 
 @Injectable()
 export class FeedbacksService {
@@ -325,24 +326,98 @@ export class FeedbacksService {
   }
 
   // ! Lấy tất cả feedback theo id của branch
-  async findByBranch(branch_id: number) {
+  async findByBranch(branch_id: number, query: FilterFeedBackDto) {
     try {
-      const feedback = await this.prismaService.feedbacks.findMany({
-        where: {
-          branch_id: Number(branch_id),
-        },
-        include: {
-          bookings: true,
-          branches: true,
-        },
-      });
-      if (!feedback) {
-        throw new NotFoundException('Không tìm thấy feedback');
+      const page = Number(query.page) || 1;
+      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      const search = query.search || '';
+      const skip = (page - 1) * itemsPerPage;
+      const is_show = query.is_show;
+      const is_approved = query.is_approved;
+
+      const startDate = query.startDate
+        ? FormatDateToStartOfDay(query.startDate)
+        : '';
+      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
+
+      const sortRangeDate: any =
+        startDate && endDate
+          ? {
+              created_at: {
+                gte: new Date(startDate),
+                lte: new Date(endDate),
+              },
+            }
+          : {};
+
+      const whereConditions: any = {
+        is_show: true,
+        ...sortRangeDate,
+      };
+
+      if (is_show !== undefined) {
+        whereConditions.is_show = Boolean(!is_show);
       }
+
+      if (is_approved !== undefined) {
+        whereConditions.is_approved = Boolean(!is_approved);
+      }
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            comments: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
+
+      const [feedbacks, total] = await this.prismaService.$transaction([
+        this.prismaService.feedbacks.findMany({
+          where: {
+            branch_id: Number(branch_id),
+            ...whereConditions,
+          },
+          include: {
+            bookings: true,
+            branches: true,
+          },
+          skip,
+          take: itemsPerPage,
+          orderBy: {
+            created_at: 'desc',
+          },
+        }),
+        this.prismaService.feedbacks.count({
+          where: {
+            branch_id: Number(branch_id),
+            ...whereConditions,
+          },
+        }),
+      ]);
+
+      const lastPage = Math.ceil(total / itemsPerPage);
+      const paginationInfo = {
+        lastPage,
+        nextPage: page < lastPage ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null,
+        currentPage: page,
+        itemsPerPage,
+        total,
+      };
+
       throw new HttpException(
         {
-          message: 'Lấy feedback thành công',
-          data: FormatReturnData(feedback, []),
+          data: FormatReturnData(feedbacks, []),
+          pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -395,7 +470,7 @@ export class FeedbacksService {
   // ! Cập nhật feedback
   async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
     try {
-      const { name, comments, rate, is_show } = updateFeedbackDto;
+      const { name, comments, rate, is_show, is_approved } = updateFeedbackDto;
 
       const findFeedback = await this.prismaService.feedbacks.findUnique({
         where: {
@@ -405,6 +480,7 @@ export class FeedbacksService {
       if (!findFeedback) {
         throw new NotFoundException('Không tìm thấy feedback');
       }
+
       const feedback = await this.prismaService.feedbacks.update({
         where: {
           id: Number(id),
@@ -414,6 +490,7 @@ export class FeedbacksService {
           comments,
           rate: Number(rate),
           is_show,
+          is_approved,
         },
       });
       await this.updateRateBranch(Number(feedback.branch_id));

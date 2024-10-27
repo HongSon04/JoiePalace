@@ -22,6 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { FilterFeedBackDto } from './dto/FilterFeedBackDto';
 
 @ApiTags('Feedbacks - Quản lý đánh giá')
 @Controller('/api/feedbacks')
@@ -152,7 +153,7 @@ export class FeedbacksController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAllHide(@Query() query: FilterDto) {
+  findAllHide(@Query() query: FilterFeedBackDto) {
     return this.feedbacksService.findAllHide(query);
   }
 
@@ -248,6 +249,13 @@ export class FeedbacksController {
     },
   ])
   @ApiBearerAuth('authorization')
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'itemsPerPage', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'is_show', required: false })
+  @ApiQuery({ name: 'is_approved', required: false })
   @ApiOperation({ summary: 'Lấy feedback theo ID của chi nhánh' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -275,8 +283,11 @@ export class FeedbacksController {
       message: 'Lỗi server',
     },
   })
-  findByBranch(@Param('branch_id') id: string) {
-    return this.feedbacksService.findByBranch(+id);
+  findByBranch(
+    @Param('branch_id') id: string,
+    @Query() query: FilterFeedBackDto,
+  ) {
+    return this.feedbacksService.findByBranch(+id, query);
   }
 
   // ! Lấy tất cả feedback theo id của user
