@@ -7,7 +7,7 @@ import "../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import CustomSelect from '@/app/_components/CustomSelect';
 import AdminHeader from '@/app/_components/AdminHeader';
-import { fetchAllEachTime, fetchRevenueBranchByWeek, fetchRevenueBranchByMonth, fetchRevenueBranchByQuarter, fetchRevenueBranchByYear, fetchAllBranch} from "@/app/_services/apiServices";
+import { fetchAllEachTime,fetchBranchUserById, fetchRevenueBranchByWeek, fetchRevenueBranchByMonth, fetchRevenueBranchByQuarter, fetchRevenueBranchByYear, fetchAllBranch} from "@/app/_services/apiServices";
 const Page = () => {
     const [userId, setUserId] = useState(null);
     const [dataAllEachTime, setDataAllEachTime] = useState(null);
@@ -16,6 +16,8 @@ const Page = () => {
     const [totalQuarter, setTotalQuarter] = useState(null);
     const [totalYear, setTotalYear] = useState(null);
     const [allBranch, setAllBranch] = useState(null);
+    const  [dataUser, setdataUser] = useState(null);
+    
     useEffect(() => {
   
       const fetchData = async () => {
@@ -25,8 +27,8 @@ const Page = () => {
             const totalQuarter = await  fetchRevenueBranchByQuarter();
             const totalYear = await  fetchRevenueBranchByYear();
             const allBranch = await fetchAllBranch();
-            // console.log(allBranch.data);
-
+            
+            
             setTotalWeek(totalWeek);
             setTotalMonth(totalMonth);
             setTotalQuarter(totalQuarter);

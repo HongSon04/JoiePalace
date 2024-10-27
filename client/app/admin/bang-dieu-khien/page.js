@@ -10,13 +10,15 @@ import { FaPlus } from "react-icons/fa6";
 import "../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
-import { fetchAllDashBoard, fetchAllTotalRevenueMonth,fetchAllEachTime} from "@/app/_services/apiServices";
+import {fetchAllDashBoard,fetchUserById, fetchAllTotalRevenueMonth,fetchAllEachTime,fetchAllBooking } from "@/app/_services/apiServices";
 
 const Page = () => {
   const [userId, setUserId] = useState(null);
   const [dataAdmin, setDataAdmin] = useState(null);
   const [totalRevenueData, setTotalRevenueData] = useState(null);
   const [dataAllEachTime, setDataAllEachTime] = useState(null);
+  const [allBooking, setAllBooking] = useState(null);
+  const [branchNames, setBranchNames] = useState({});
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -25,8 +27,21 @@ const Page = () => {
         const adminData = await fetchAllDashBoard();
         const revenueData = await fetchAllTotalRevenueMonth(); 
         const dataAllEachTime = await fetchAllEachTime ();
-        // console.log(dataAllEachTime);  
+        const allBooking = await fetchAllBooking ();
+        // const dataUser = await fetchBranchById();
+        // const bookings = allBooking.data || [];
+        // console.log(bookings.branch_id);
         
+        //  // Lấy tên nhánh cho từng booking
+        // const branches = {};
+        // for (const booking of  bookings) {
+        //   if (!branches[booking.branch_id]) {
+        //     const branchData = await fetchBranchById(booking.branch_id);
+        //     branches[booking.branch_id] = branchData.name; 
+        //   }
+        // }
+        // setBranchNames(branches); 
+        setAllBooking(allBooking);
         setDataAllEachTime(dataAllEachTime); 
         setDataAdmin(adminData);
         setTotalRevenueData(revenueData);
@@ -69,6 +84,8 @@ const Page = () => {
         <p className="text-center text-xs">{branch.name}</p>
       </div>
     ));
+    
+    const dataBooking = allBooking?.data || [];
     
   return (
     <main className="grid gap-6  text-white ">
@@ -276,54 +293,16 @@ const Page = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
+              {dataBooking.map((item, index) => (
+                <tr key={index}> 
+                  <td>{item.user_id}</td>
+                  <td>{item.branch_id}</td> 
+                  <td>{item.phone}</td>
                   <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
                 </tr>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-                </tr>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-                </tr>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-                </tr>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-                </tr>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-                </tr>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-                </tr>
-                <tr>
-                  <td>Võ Văn Kiệt</td>
-                  <td>Chi Nhánh 1</td>
-                  <td>0987654321</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
-                </tr>
+                
+              ))}
+                
               </tbody>
             </table>
           </div>
