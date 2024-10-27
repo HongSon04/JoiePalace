@@ -33,7 +33,7 @@ const HeaderClient = () => {
     isShowMenu ? setIsShowMenu(false) : setIsShowMenu(true);
   };
   return (
-    <header className={`fixed top-0 left-0 w-full z-10 text-white`}>
+    <header className={`fixed top-0 left-0 w-full z-40 text-white`}>
       <div className="py-4 px-5 w-full h-[90px] flex justify-between items-center bg-transparent">
         <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
           <svg
@@ -88,7 +88,7 @@ const HeaderClient = () => {
       </div>
       {/* popup menu */}
       <div
-        className={`menu px-5 w-full h-screen bg-primary z-20 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${
+        className={`menu px-5 w-full h-screen bg-primary z-50 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${
           isShowMenu ? "showMenu" : ""
         }`}
       >

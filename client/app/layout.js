@@ -14,6 +14,8 @@ export const metadata = {
     "Luxurious and modern hotel located in the heart of the city. We offer the best services and amenities for our guests.",
 };
 
+
+
 export default function RootLayout({ children }) {
   return (
     <html lang="vn">

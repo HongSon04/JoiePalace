@@ -44,10 +44,9 @@ const CustomSliderMenu = ({ dataSlider }) => {
       }
     },
   };
-  console.log(dataSlider);
 
   return (
-    <section className="h-screen max-sm:h-fit">
+    <section className="h-screen max-sm:h-fit max-md:mt-0">
       <Slider ref={sliderRef} {...menuSliderSettings}>
         {dataSlider.map((i, index) => {
           return (
@@ -129,7 +128,7 @@ const CustomSliderMenu = ({ dataSlider }) => {
                     </div>
                   </div>
                 </div>
-                <div className="max-w-[450px] p-5 bg-white max-lg:max-w-[300px] max-sm:p-2 max-sm:w-[135px]">
+                <div className="max-w-[450px] p-5 bg-white max-lg:max-w-[300px] max-sm:p-2 max-sm:w-[135px] ">
                   <Image src={`/${i.img}`} alt="My Image" />
                 </div>
               </div>

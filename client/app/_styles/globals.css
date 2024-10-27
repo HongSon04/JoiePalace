@@ -121,6 +121,53 @@
   font-style: italic;
 }
 
+@font-face {
+  font-family: 'Beautique Display';
+  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Beautique Display';
+  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Beautique Display';
+  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Italic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Beautique Display';
+  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-BoldItalic.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Beautique Display';
+  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Beautique Display';
+  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Add more font weights and styles as needed */
+
+
+
+
 *,
 *:before,
 *:after {
@@ -505,5 +552,15 @@ select {
 }
 .tag-vip{
   background-color: rgba(0, 0, 0, 0.92);
-  color: #FFAE00;
+  color: #FFAE00; 
+}
+.bgfeedbackYellow::after {
+  content: "";
+  position: absolute;
+  top: 140px;
+  right: 40%;
+  height: 50%;
+  width: 150px;
+  background-image: url(/line-group.svg);
+  z-index: 1; 
 }
