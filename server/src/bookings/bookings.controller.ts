@@ -22,8 +22,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
+import { FilterBookingDto } from './dto/FilterBookingDto';
 
 @ApiTags('Bookings - Quản lý đơn tiệc')
 @Controller('api/bookings')
@@ -85,6 +85,7 @@ export class BookingsController {
 
   // ! Get All Booking
   @Get('get-all')
+  @isPublic()
   @ApiHeaders([
     {
       name: 'Authorization',
@@ -215,7 +216,22 @@ export class BookingsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAll(@Query() query: FilterPriceDto) {
+  @ApiQuery({
+    name: 'is_confirm',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'is_deposit',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'pending | processing | success | cancel',
+  })
+  findAll(@Query() query: FilterBookingDto) {
     return this.bookingsService.findAll(query);
   }
 
@@ -237,7 +253,22 @@ export class BookingsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAllDeleted(@Query() query: FilterPriceDto) {
+  @ApiQuery({
+    name: 'is_confirm',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'is_deposit',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'pending | processing | success | cancel',
+  })
+  findAllDeleted(@Query() query: FilterBookingDto) {
     return this.bookingsService.findAllDeleted(query);
   }
 

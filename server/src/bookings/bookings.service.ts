@@ -7,9 +7,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import dayjs from 'dayjs';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { FilterBookingDto } from './dto/FilterBookingDto';
+import { BookingStatus } from 'helper/enum/booking_status.enum';
+import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
 import { FormatReturnData } from 'helper/FormatReturnData';
 import { MailService } from 'src/mail/mail.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { PrismaService } from 'src/prisma.service';
 import uniqid from 'uniqid';
 import {
@@ -20,9 +23,6 @@ import {
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
-import { NotificationsService } from 'src/notifications/notifications.service';
-import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
-import { BookingStatus } from 'helper/enum/booking_status.enum';
 
 @Injectable()
 export class BookingsService {
@@ -178,7 +178,7 @@ export class BookingsService {
   }
 
   // ! Find All Booking
-  async findAll(query: FilterPriceDto) {
+  async findAll(query: FilterBookingDto) {
     try {
       const page = Number(query.page) || 1;
       const itemsPerPage = Number(query.itemsPerPage) || 10;
@@ -189,6 +189,9 @@ export class BookingsService {
         ? FormatDateToStartOfDay(query.startDate)
         : '';
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
+      const is_confirm = query.is_confirm;
+      const is_deposit = query.is_deposit;
+      const status = query.status;
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -235,6 +238,18 @@ export class BookingsService {
         ];
       }
 
+      if (is_confirm !== undefined) {
+        whereConditions.is_confirm = Boolean(!is_confirm);
+      }
+
+      if (is_deposit !== undefined) {
+        whereConditions.is_deposit = Boolean(!is_deposit);
+      }
+
+      if (status) {
+        whereConditions.status = status;
+      }
+
       // ? Date Conditions
       if (startDate && endDate) {
         if (!whereConditions.AND) whereConditions.AND = [];
@@ -247,6 +262,10 @@ export class BookingsService {
       if (priceSort === 'asc' || priceSort === 'desc') {
         orderByConditions.price = priceSort;
       }
+      orderByConditions.created_at = 'desc';
+
+      console.log('whereConditions: ', whereConditions);
+
       // ? Fetch Data
       const [result, total] = await this.prismaService.$transaction([
         this.prismaService.bookings.findMany({
@@ -317,7 +336,7 @@ export class BookingsService {
   }
 
   // ! Find All Deleted Booking
-  async findAllDeleted(query: FilterPriceDto) {
+  async findAllDeleted(query: FilterBookingDto) {
     try {
       const page = Number(query.page) || 1;
       const itemsPerPage = Number(query.itemsPerPage) || 10;
@@ -328,6 +347,9 @@ export class BookingsService {
         ? FormatDateToStartOfDay(query.startDate)
         : '';
       const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
+      const is_confirm = query.is_confirm;
+      const is_deposit = query.is_deposit;
+      const status = query.status;
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -344,6 +366,18 @@ export class BookingsService {
         deleted: true,
         ...sortRangeDate,
       };
+
+      if (is_confirm !== undefined) {
+        whereConditions.is_confirm = Boolean(!is_confirm);
+      }
+
+      if (is_deposit !== undefined) {
+        whereConditions.is_deposit = Boolean(!is_deposit);
+      }
+
+      if (status) {
+        whereConditions.status = status;
+      }
 
       if (search) {
         whereConditions.OR = [
@@ -386,6 +420,8 @@ export class BookingsService {
       if (priceSort === 'asc' || priceSort === 'desc') {
         orderByConditions.price = priceSort;
       }
+      orderByConditions.created_at = 'desc';
+
       // ? Fetch Data
       const [result, total] = await this.prismaService.$transaction([
         this.prismaService.bookings.findMany({
