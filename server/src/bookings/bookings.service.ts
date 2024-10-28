@@ -319,7 +319,7 @@ export class BookingsService {
           return priceSort === 'asc' ? totalA - totalB : totalB - totalA;
         });
       }
-      
+
       // ? Pagination
       const lastPage = Math.ceil(total / itemsPerPage);
       const paginationInfo = {
@@ -1074,7 +1074,8 @@ export class BookingsService {
               menu: menuFormat,
               extra_service: null,
               gift: null,
-
+              table_count,
+              chair_count,
               fee,
               total_amount: totalAmount,
               deposit_id: deposit.id,
@@ -1093,6 +1094,8 @@ export class BookingsService {
               extra_service: null,
               gift: null,
               fee,
+              table_count,
+              chair_count,
               total_amount: totalAmount,
               deposit_id: deposit.id,
               amount_booking: Number(bookingAmount),
