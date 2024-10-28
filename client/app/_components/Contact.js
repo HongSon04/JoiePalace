@@ -6,6 +6,7 @@ import ButtonDiscover from "./ButtonDiscover";
 import InputIndex from "./InputIndexClient";
 import { fetchBranchesFromApi } from "../_services/branchesServices";
 import { fecthAllPartyTypes } from "../_services/partyTypesServices";
+import { createNewBooking } from "../_services/bookingServices";
 
 const formSchema = z.object({
   name: z.string().min(2, "Vui lòng nhập Họ và tên!"),
@@ -26,7 +27,11 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [listBranches, setListBranches] = useState([]);
   const [listPartyTypes, setListPartyTypes] = useState([]);
+  const [userInfo, setUserInfo] = useState(
+    JSON.parse(localStorage.getItem("user"))
+  );
   const [formData, setFormData] = useState({
+    user_id: userInfo?.id,
     name: "",
     email: "",
     phone: "",
@@ -44,48 +49,70 @@ const Contact = () => {
       const partyTypes = await fecthAllPartyTypes();
       setListBranches(branches);
       setListPartyTypes(partyTypes);
+
+      // Thiết lập giá trị mặc định cho formData
+      if (branches.length > 0 && partyTypes.length > 0) {
+        setFormData((prevData) => ({
+          ...prevData,
+          branch: branches[0]?.id || "",
+          partyType: partyTypes[0]?.id || "",
+        }));
+      }
     };
     fetchData();
-    setFormData({
-      ...formData,
-      branch: listBranches[0].name,
-      partyType: listPartyTypes[0].name,
-    });
-  }, [formData]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: type === "number" ? Number(value) : value,
-    });
+    }));
   };
 
   const handleSelectChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = {};
     try {
       formSchema.parse(formData);
-      console.log("Form submitted successfully:", formData);
       setErrors({});
       // Thực hiện hành động gửi form ở đây
+      const dataToSend = {
+        user_id: formData.user_id,
+        branch_id: formData.branch,
+        party_type_id: formData.partyType,
+        stage_id: "",
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        company_name: "",
+        note: formData.note,
+        number_of_guests: formData.guestCount,
+        budget: formData.budget,
+        shift: formData.shift,
+        organization_date: formData.date,
+      };
+      console.log("Form submitted successfully:", formData);
+      console.log("Form submitted to send:", dataToSend);
+      const response = await createNewBooking(dataToSend);
+      console.log("response", response);
     } catch (error) {
-      error.errors.forEach((err) => {
+      error?.errors?.forEach((err) => {
         validationErrors[err.path[0]] = err.message;
       });
       setErrors(validationErrors);
     }
   };
 
-  if (!listBranches || !listPartyTypes) return null;
+  if (!listBranches.length || !listPartyTypes.length) return null;
 
   return (
     <form
@@ -166,7 +193,7 @@ const Contact = () => {
             <option
               className="bg-darkGreen-800"
               key={branch.id}
-              value={branch.name}
+              value={branch.id}
             >
               {branch.name}
             </option>
@@ -214,14 +241,21 @@ const Contact = () => {
             <option
               className="bg-darkGreen-800"
               key={partyType.id}
-              value={partyType.name}
+              value={partyType.id}
             >
               {partyType.name}
             </option>
           ))}
         </select>
       </div>
-      <InputIndex type="text" placeholder="Ghi chú*" styles="overflow-hidden" />
+      <InputIndex
+        value={formData.note}
+        onChange={handleChange}
+        name="note"
+        type="text"
+        placeholder="Ghi chú*"
+        styles="overflow-hidden"
+      />
       <div className="w-full flex justify-end">
         <ButtonDiscover type="submit" name="Gửi" className="w-auto px-6" />
       </div>
