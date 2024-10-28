@@ -9,6 +9,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     CacheModule.register({
       ttl: 60, // thời gian sống của cache (tính bằng giây)
       max: 100, // số lượng tối đa của cache
+      
     }),
   ],
   controllers: [DashboardController],
