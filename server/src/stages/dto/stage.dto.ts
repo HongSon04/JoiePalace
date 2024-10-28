@@ -13,12 +13,14 @@ export class StageDto {
   @IsNotEmpty({ message: 'Mô tả sảnh không được để trống' })
   description: string;
 
-  @ApiProperty({ type: Number, example: 'Số lượng bàn VD: 50' })
-  @IsNotEmpty({ message: 'Số lượng bàn không được để trống' })
-  capacity: number;
+  @ApiProperty({ type: Number, example: 'Số lượng bàn tối thiểu' })
+  @IsNotEmpty({ message: 'Số lượng bàn tối thiểu không được để trống' })
+  capacity_min: number;
+
+  @ApiProperty({ type: Number, example: 'Số lượng bàn tối đa' })
+  @IsNotEmpty({ message: 'Số lượng bàn tối đa không được để trống' })
+  capacity_max: number;
 
   @ApiProperty({ type: [String] })
   images: string[] | any;
-
-  
 }

@@ -29,14 +29,8 @@ export class CreateBlogDto {
   content: string;
 
   @ApiProperty({ required: true })
-  images: string;
+  images: string[];
 
   @ApiProperty({ example: [1, 2, 3], required: false })
-  @IsArray({ message: 'Tags phải là một mảng' })
-  @ArrayNotEmpty({ message: 'Tags không được để trống' })
-  @ArrayMinSize(1, { message: 'Cần ít nhất 1 tag' })
-  @ArrayMaxSize(10, { message: 'Chỉ cho phép tối đa 10 tags' })
-  @Type(() => Number)
-  @IsInt({ each: true, message: 'Mỗi tag phải là số nguyên' })
   tags: number[];
 }

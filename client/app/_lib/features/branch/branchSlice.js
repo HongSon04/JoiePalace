@@ -1,8 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const getCurrentBranchFromLocalStorage = () => {
+  if (typeof window !== "undefined" && window.localStorage) {
+    return JSON.parse(localStorage.getItem("currentBranch")) || {};
+  }
+  return {};
+};
+
 const initialState = {
   branches: [],
-  currentBranch: JSON.parse(localStorage.getItem("currentBranch")) || null,
+  currentBranch: getCurrentBranchFromLocalStorage(),
   isLoading: false,
   isError: false,
   errorMessage: null,

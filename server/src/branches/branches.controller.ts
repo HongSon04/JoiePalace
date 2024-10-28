@@ -96,31 +96,44 @@ export class BranchesController {
   @UseInterceptors(
     FileFieldsInterceptor(
       [
-        { name: 'images', maxCount: 5 },
-        { name: 'slogan_images', maxCount: 5 },
-        { name: 'diagram_images', maxCount: 5 },
-        { name: 'equipment_images', maxCount: 5 },
-        { name: 'space_images', maxCount: 5 },
+        { name: 'images', maxCount: 6 },
+        { name: 'slogan_images', maxCount: 6 },
+        { name: 'diagram_images', maxCount: 6 },
+        { name: 'equipment_images', maxCount: 6 },
       ],
       {
         fileFilter: (req, file, cb) => {
-          if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(
-              new HttpException(
-                'Chỉ chấp nhận ảnh jpg, jpeg, png',
-                HttpStatus.BAD_REQUEST,
-              ),
-              false,
-            );
-          } else if (file.size > 1024 * 1024 * 5) {
-            return cb(
-              new HttpException(
-                'Kích thước ảnh tối đa 5MB',
-                HttpStatus.BAD_REQUEST,
-              ),
-              false,
-            );
+          const allowedExtensions = /\.(jpg|jpeg|png)$/;
+          const maxSize = 1024 * 1024 * 5; // 5MB
+
+          // Kiểm tra nếu file là mảng
+          const files = Array.isArray(file) ? file : [file];
+
+          for (const f of files) {
+            // Kiểm tra định dạng tệp
+            if (!f.originalname.match(allowedExtensions)) {
+              return cb(
+                new HttpException(
+                  `Chỉ chấp nhận ảnh jpg, jpeg, png cho trường "${f.fieldname}"`,
+                  HttpStatus.BAD_REQUEST,
+                ),
+                false,
+              );
+            }
+
+            // Kiểm tra kích thước tệp
+            if (f.size > maxSize) {
+              return cb(
+                new HttpException(
+                  `Kích thước ảnh tối đa 5MB cho trường "${f.fieldname}"`,
+                  HttpStatus.BAD_REQUEST,
+                ),
+                false,
+              );
+            }
           }
+
+          // Nếu tất cả đều hợp lệ
           cb(null, true);
         },
       },
@@ -134,7 +147,6 @@ export class BranchesController {
       slogan_images?: Express.Multer.File[];
       diagram_images?: Express.Multer.File[];
       equipment_images?: Express.Multer.File[];
-      space_images?: Express.Multer.File[];
     },
   ): Promise<CreateBranchDto | any> {
     return this.branchesService.createBranch(
@@ -167,18 +179,6 @@ export class BranchesController {
           equipment_images: ['string', 'string'],
           created_at: 'date',
           updated_at: 'date',
-          space: [
-            {
-              id: 'number',
-              branch_id: 'number',
-              name: 'string',
-              slug: 'string',
-              description: 'string',
-              images: ['string', 'string'],
-              created_at: 'date',
-              updated_at: 'date',
-            },
-          ],
           stages: [
             {
               id: 'number',
@@ -236,18 +236,6 @@ export class BranchesController {
           equipment_images: ['string', 'string'],
           created_at: 'date',
           updated_at: 'date',
-          space: [
-            {
-              id: 'number',
-              branch_id: 'number',
-              name: 'string',
-              slug: 'string',
-              description: 'string',
-              images: ['string', 'string'],
-              created_at: 'date',
-              updated_at: 'date',
-            },
-          ],
           stages: [
             {
               id: 'number',
@@ -305,18 +293,6 @@ export class BranchesController {
         equipment_images: ['string', 'string'],
         created_at: 'date',
         updated_at: 'date',
-        space: [
-          {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
-        ],
         stages: [
           {
             id: 'number',
@@ -372,18 +348,6 @@ export class BranchesController {
         equipment_images: ['string', 'string'],
         created_at: 'date',
         updated_at: 'date',
-        space: [
-          {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
-        ],
         stages: [
           {
             id: 'number',
@@ -442,18 +406,6 @@ export class BranchesController {
         created_at: 'date',
         updated_at: 'date',
 
-        space: [
-          {
-            id: 'number',
-            branch_id: 'number',
-            name: 'string',
-            slug: 'string',
-            description: 'string',
-            images: ['string', 'string'],
-            created_at: 'date',
-            updated_at: 'date',
-          },
-        ],
         stages: [
           {
             id: 'number',
@@ -485,31 +437,44 @@ export class BranchesController {
   @UseInterceptors(
     FileFieldsInterceptor(
       [
-        { name: 'images', maxCount: 5 },
-        { name: 'slogan_images', maxCount: 5 },
-        { name: 'diagram_images', maxCount: 5 },
-        { name: 'equipment_images', maxCount: 5 },
-        { name: 'space_images', maxCount: 5 },
+        { name: 'images', maxCount: 6 },
+        { name: 'slogan_images', maxCount: 6 },
+        { name: 'diagram_images', maxCount: 6 },
+        { name: 'equipment_images', maxCount: 6 },
       ],
       {
         fileFilter: (req, file, cb) => {
-          if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-            return cb(
-              new HttpException(
-                'Chỉ chấp nhận ảnh jpg, jpeg, png',
-                HttpStatus.BAD_REQUEST,
-              ),
-              false,
-            );
-          } else if (file.size > 1024 * 1024 * 5) {
-            return cb(
-              new HttpException(
-                'Kích thước ảnh tối đa 5MB',
-                HttpStatus.BAD_REQUEST,
-              ),
-              false,
-            );
+          const allowedExtensions = /\.(jpg|jpeg|png)$/;
+          const maxSize = 1024 * 1024 * 5; // 5MB
+
+          // Kiểm tra nếu file là mảng
+          const files = Array.isArray(file) ? file : [file];
+
+          for (const f of files) {
+            // Kiểm tra định dạng tệp
+            if (!f.originalname.match(allowedExtensions)) {
+              return cb(
+                new HttpException(
+                  `Chỉ chấp nhận ảnh jpg, jpeg, png cho trường "${f.fieldname}"`,
+                  HttpStatus.BAD_REQUEST,
+                ),
+                false,
+              );
+            }
+
+            // Kiểm tra kích thước tệp
+            if (f.size > maxSize) {
+              return cb(
+                new HttpException(
+                  `Kích thước ảnh tối đa 5MB cho trường "${f.fieldname}"`,
+                  HttpStatus.BAD_REQUEST,
+                ),
+                false,
+              );
+            }
           }
+
+          // Nếu tất cả đều hợp lệ
           cb(null, true);
         },
       },
@@ -524,7 +489,6 @@ export class BranchesController {
       slogan_images?: Express.Multer.File[];
       diagram_images?: Express.Multer.File[];
       equipment_images?: Express.Multer.File[];
-      space_images?: Express.Multer.File[];
     },
   ): Promise<UpdateBranchDto | any> {
     return this.branchesService.updateBranch(

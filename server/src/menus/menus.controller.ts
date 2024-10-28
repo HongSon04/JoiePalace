@@ -195,7 +195,7 @@ export class MenusController {
   }
 
   // ! Get Menu By Slug
-  @Get('get-by-slug/:slug')
+  @Get('get-by-slug/:menu_slug')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -224,7 +224,7 @@ export class MenusController {
     },
   })
   @ApiOperation({ summary: 'Lấy menu theo slug' })
-  findOneBySlug(@Param('slug') slug: string) {
+  findOneBySlug(@Param('menu_slug') slug: string) {
     return this.menusService.findBySlug(slug);
   }
 

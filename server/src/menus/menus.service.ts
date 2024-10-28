@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -32,7 +34,7 @@ export class MenusService {
       });
 
       if (findName) {
-        throw new HttpException('Tên menu đã tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Tên menu đã tồn tại');
       }
 
       const findProducts = await this.prismaService.products.findMany({
@@ -44,10 +46,7 @@ export class MenusService {
       });
 
       if (findProducts.length !== products.length) {
-        throw new HttpException(
-          'Có món ăn không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Có món ăn không tồn tại');
       }
 
       const connectproducts = products.map((foodId) => ({
@@ -60,9 +59,8 @@ export class MenusService {
         0,
       );
       if (totalAmount !== Number(price)) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Giá của menu không trùng với tổng giá của các món ăn',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -75,6 +73,13 @@ export class MenusService {
           is_show,
           products: {
             connect: connectproducts,
+          },
+        },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
           },
         },
       });
@@ -90,6 +95,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> create', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -124,7 +130,11 @@ export class MenusService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: false,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -147,10 +157,8 @@ export class MenusService {
             },
           },
         },
-      ],
-
-      ...sortRangeDate,
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [
@@ -228,6 +236,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findAll', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -262,7 +271,11 @@ export class MenusService {
     // ? Where Conditions
     const whereConditions: any = {
       deleted: true,
-      OR: [
+      ...sortRangeDate,
+    };
+
+    if (search) {
+      whereConditions.OR = [
         {
           name: {
             contains: search,
@@ -285,12 +298,8 @@ export class MenusService {
             },
           },
         },
-      ],
-      created_at: {
-        gte: startDate,
-        lte: endDate,
-      },
-    };
+      ];
+    }
 
     if (minPrice >= 0) {
       whereConditions.AND = [
@@ -368,6 +377,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -387,7 +397,7 @@ export class MenusService {
       });
 
       if (!menu) {
-        throw new HttpException('Menu không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Menu không tồn tại');
       }
 
       throw new HttpException(
@@ -401,6 +411,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findOne', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -422,7 +433,7 @@ export class MenusService {
       });
 
       if (!menu) {
-        throw new HttpException('Menu không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Menu không tồn tại');
       }
 
       throw new HttpException(
@@ -436,6 +447,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findBySlug', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -455,7 +467,7 @@ export class MenusService {
       });
 
       if (findMenuByname) {
-        throw new HttpException('Tên menu đã tồn tại', HttpStatus.BAD_REQUEST);
+        throw new BadRequestException('Tên menu đã tồn tại');
       }
 
       const findProducts = await this.prismaService.products.findMany({
@@ -467,10 +479,7 @@ export class MenusService {
       });
 
       if (findProducts.length !== products.length) {
-        throw new HttpException(
-          'Có món ăn không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new NotFoundException('Có món ăn không tồn tại');
       }
 
       const connectproducts = products.map((foodId) => ({
@@ -483,9 +492,8 @@ export class MenusService {
         0,
       );
       if (totalAmount !== Number(price)) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Giá của menu không trùng với tổng giá của các món ăn',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -498,6 +506,13 @@ export class MenusService {
           slug,
           products: {
             set: connectproducts,
+          },
+        },
+        include: {
+          products: {
+            include: {
+              tags: true,
+            },
           },
         },
       });
@@ -516,6 +531,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> update', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -527,7 +543,7 @@ export class MenusService {
         where: { id: Number(id) },
       });
       if (!findMenu) {
-        throw new HttpException('Menu không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Menu không tồn tại');
       }
 
       await this.prismaService.menus.update({
@@ -547,6 +563,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> remove', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -558,7 +575,7 @@ export class MenusService {
         where: { id: Number(id) },
       });
       if (!findMenu) {
-        throw new HttpException('Menu không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Menu không tồn tại');
       }
 
       await this.prismaService.menus.update({
@@ -578,6 +595,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> restore', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }
@@ -589,7 +607,7 @@ export class MenusService {
         where: { id: Number(id) },
       });
       if (!findMenu) {
-        throw new HttpException('Menu không tồn tại', HttpStatus.NOT_FOUND);
+        throw new NotFoundException('Menu không tồn tại');
       }
 
       await this.prismaService.menus.delete({
@@ -604,6 +622,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> destroy', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
       );
     }
   }

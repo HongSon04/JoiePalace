@@ -7,43 +7,90 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ? Tạo Role cho User
+enum Role {
+  user
+  admin
+  manager
+}
+
+// ? Tạo PaymentMethod cho Deposit
+enum PaymentMethod {
+  cash
+  momo
+  zalo
+  vnpay
+  onepay
+  bank
+}
+
+// ? Tạo status cho Booking
+enum BookingStatus {
+  pending
+  cancel
+  success
+  processing
+}
+
+// ? Tạo status cho Deposit
+enum DepositStatus {
+  pending
+  cancel
+  success
+}
+
+// ? TypeNotification 
+enum TypeNotification {
+  booking_created
+  booking_confirm
+  booking_success
+  booking_cancel
+  booking_updated
+  deposit_success
+  deposit_cancel
+  feedback
+}
+
 model users {
-  id             Int          @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
+  branch_id      Int?
+  branches       branches?       @relation(fields: [branch_id], references: [id])
   username       String?
-  email          String       @unique
+  email          String          @unique
   password       String
   platform       String?
   phone          String?
   avatar         String?
-  role           String       @default("user")
-  active         Boolean      @default(true)
+  role           Role            @default(user)
+  active         Boolean         @default(true)
   refresh_token  String?
   verify_at      DateTime?
-  deleted        Boolean      @default(false)
+  deleted        Boolean         @default(false)
   deleted_at     DateTime?
   deleted_by     Int?
-  created_at     DateTime     @default(now())
-  updated_at     DateTime     @updatedAt
-  memberships_id Int?         @unique
-  memberships    memberships? @relation(fields: [memberships_id], references: [id])
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  memberships_id Int?            @unique
+  memberships    memberships?    @relation(fields: [memberships_id], references: [id])
   bookings       bookings[]
   feedbacks      feedbacks[]
+  notifications  notifications[]
 }
 
 model memberships {
-  id                  Int       @id @default(autoincrement())
-  name                String
-  decsription         String
-  booking_total       Int
-  booking_totalAmount Int
-  gifts               Json[]
-  images              String[]
-  deleted             Boolean   @default(false)
-  deleted_at          DateTime?
-  deleted_by          Int?
-  created_at          DateTime  @default(now())
-  updated_at          DateTime  @updatedAt
-  users               users[]
+  id                   Int        @id @default(autoincrement())
+  name                 String
+  slug                 String     @unique
+  description          String
+  booking_total_amount Int
+  gifts                products[] @relation("MembershipGifts")
+  images               String[]
+  deleted              Boolean    @default(false)
+  deleted_at           DateTime?
+  deleted_by           Int?
+  created_at           DateTime   @default(now())
+  updated_at           DateTime   @updatedAt
+  users                users[]
 }
 
 model verify_tokens {
@@ -76,55 +123,25 @@ model branches {
   deleted_by            Int?
   created_at            DateTime    @default(now())
   updated_at            DateTime    @updatedAt
-  staffs                staffs[]
   stages                stages[]
-  spaces                spaces[]
   bookings              bookings[]
   feedbacks             feedbacks[]
+  users                 users[]
 }
 
 model stages {
-  id              Int               @id @default(autoincrement())
-  branch          branches          @relation(fields: [branch_id], references: [id])
-  branch_id       Int               @unique
-  name            String
-  description     String
-  images          String[]
-  capacity        Int               @default(0)
-  price           Int               @default(0)
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
-  booking_details booking_details[]
-}
-
-model spaces {
-  id              Int               @id @default(autoincrement())
-  branch          branches          @relation(fields: [branch_id], references: [id])
-  branch_id       Int               @unique
-  name            String
-  slug            String            @unique
-  description     String
-  images          String[]
-  price           Int               @default(0)
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
-  booking_details booking_details[]
-}
-
-model staffs {
-  id           Int       @id @default(autoincrement())
-  branches     branches  @relation(fields: [branch_id], references: [id])
-  branch_id    Int       @unique
+  id           Int        @id @default(autoincrement())
+  branch       branches   @relation(fields: [branch_id], references: [id])
+  branch_id    Int        @unique
   name         String
-  phone        String
-  avatar       String?
-  payment_info String
-  shift        String
-  deleted      Boolean   @default(false)
-  deleted_at   DateTime?
-  deleted_by   Int?
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
+  description  String
+  images       String[]
+  capacity_min Int        @default(0)
+  capacity_max Int        @default(0)
+  price        Int        @default(0)
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  bookings     bookings[]
 }
 
 model categories {
@@ -159,22 +176,25 @@ model tags {
 }
 
 model products {
-  id                Int        @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
   category_id       Int
-  categories        categories @relation(fields: [category_id], references: [id])
+  categories        categories    @relation(fields: [category_id], references: [id])
   name              String
-  slug              String     @unique
+  slug              String        @unique
   description       String
   short_description String?
   price             Int
   images            String[]
-  tags              tags[]     @relation("ProductTags")
-  menus             menus[]    @relation("ProductMenus")
-  deleted           Boolean    @default(false)
+  tags              tags[]        @relation("ProductTags")
+  menus             menus[]       @relation("ProductMenus")
+  memberships       memberships[] @relation("MembershipGifts")
+  decors            decors[]      @relation("DecorProducts")
+  party_types       party_types[] @relation("PartyTypeProducts")
+  deleted           Boolean       @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
-  created_at        DateTime   @default(now())
-  updated_at        DateTime   @updatedAt
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
 }
 
 model menus {
@@ -183,61 +203,51 @@ model menus {
   slug            String            @unique
   description     String
   price           Int
+  is_show         Boolean           @default(false)
   products        products[]        @relation("ProductMenus")
-  is_show         Boolean           @default(true)
   deleted         Boolean           @default(false)
   deleted_at      DateTime?
   deleted_by      Int?
   created_at      DateTime          @default(now())
   updated_at      DateTime          @updatedAt
   booking_details booking_details[]
+  packages        packages[]
 }
 
 model decors {
   id                Int               @id @default(autoincrement())
   name              String
-  slug              String            @unique
   description       String
   short_description String?
   images            String[]
   price             Int
+  is_show           Boolean           @default(false)
+  products          products[]        @relation("DecorProducts")
+  booking_details   booking_details[]
   deleted           Boolean           @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
   created_at        DateTime          @default(now())
   updated_at        DateTime          @updatedAt
-  booking_details   booking_details[]
+  packages          packages[]
 }
 
 model party_types {
   id                Int        @id @default(autoincrement())
   name              String
-  slug              String     @unique
   description       String
   short_description String?
   images            String[]
+  price             Int
+  is_show           Boolean    @default(false)
+  products          products[] @relation("PartyTypeProducts")
   deleted           Boolean    @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
   created_at        DateTime   @default(now())
   updated_at        DateTime   @updatedAt
   bookings          bookings[]
-}
-
-model funitures {
-  id                Int       @id @default(autoincrement())
-  name              String
-  slug              String    @unique
-  description       String
-  short_description String?
-  images            String[]
-  price             Int
-  type              String
-  deleted           Boolean   @default(false)
-  deleted_at        DateTime?
-  deleted_by        Int?
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  packages          packages[]
 }
 
 model deposits {
@@ -247,12 +257,12 @@ model deposits {
   phone           String?
   email           String?
   amount          Int
-  payment_method  String?
-  status          String            @default("pending")
+  status          DepositStatus     @default(pending)
+  payment_method  PaymentMethod?
+  booking_details booking_details[]
   expired_at      DateTime          @default(dbgenerated("now() + interval '3 day'"))
   created_at      DateTime          @default(now())
   updated_at      DateTime          @updatedAt
-  booking_details booking_details[]
 }
 
 model bookings {
@@ -261,6 +271,8 @@ model bookings {
   users             users?            @relation(fields: [user_id], references: [id])
   branch_id         Int
   branches          branches          @relation(fields: [branch_id], references: [id])
+  stage_id          Int?
+  stages            stages?           @relation(fields: [stage_id], references: [id])
   party_type_id     Int
   party_types       party_types       @relation(fields: [party_type_id], references: [id])
   name              String
@@ -270,10 +282,11 @@ model bookings {
   note              String?
   shift             String
   number_of_guests  Int?
+  budget            String?
   organization_date DateTime
   is_confirm        Boolean           @default(false)
   is_deposit        Boolean           @default(false)
-  status            String            @default("pending")
+  status            BookingStatus     @default(pending)
   expired_at        DateTime          @default(dbgenerated("now() + interval '3 day'"))
   deleted           Boolean           @default(false)
   deleted_at        DateTime?
@@ -284,56 +297,44 @@ model bookings {
   feedbacks         feedbacks[]
 }
 
-enum PaymentMethod {
-  cash
-  momo
-  vnpay
-  bank
-}
-
 model booking_details {
-  id             Int           @id @default(autoincrement())
-  booking_id     Int           @unique
-  bookings       bookings      @relation(fields: [booking_id], references: [id])
-  stage_id       Int
-  stages         stages        @relation(fields: [stage_id], references: [id])
-  space_id       Int
-  spaces         spaces        @relation(fields: [space_id], references: [id])
+  id             Int      @id @default(autoincrement())
+  booking_id     Int      @unique
+  bookings       bookings @relation(fields: [booking_id], references: [id])
   decor_id       Int
-  decors         decors        @relation(fields: [decor_id], references: [id])
+  decors         decors   @relation(fields: [decor_id], references: [id])
   menu_id        Int
-  menus          menus         @relation(fields: [menu_id], references: [id])
+  menus          menus    @relation(fields: [menu_id], references: [id])
   deposit_id     Int
-  deposits       deposits      @relation(fields: [deposit_id], references: [id])
-  payment_method PaymentMethod
-  stage          Json
-  space          Json
-  decor          Json
-  menu           Json
-  extra_service  Json
+  deposits       deposits @relation(fields: [deposit_id], references: [id])
+  party_types    Json?
+  decor          Json?
+  menu           Json?
+  extra_service  Json?
+  gift           Json?
   images         String[]
-  accessories    Json
-  amount_booking Int           @default(0)
-  fee            Int           @default(0)
-  total_amount   Int           @default(0)
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
+  amount_booking Int      @default(0)
+  fee            Int      @default(0)
+  total_amount   Int      @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 }
 
 model feedbacks {
-  id         Int      @id @default(autoincrement())
-  branch_id  Int
-  branches   branches @relation(fields: [branch_id], references: [id])
-  booking_id Int
-  bookings   bookings @relation(fields: [booking_id], references: [id])
-  user_id    Int?
-  users      users?   @relation(fields: [user_id], references: [id])
-  name       String
-  comments   String
-  rate       Float    @default(5)
-  is_show    Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  branch_id   Int
+  branches    branches @relation(fields: [branch_id], references: [id])
+  booking_id  Int
+  bookings    bookings @relation(fields: [booking_id], references: [id])
+  user_id     Int?
+  users       users?   @relation(fields: [user_id], references: [id])
+  name        String
+  comments    String
+  rate        Float    @default(5)
+  is_show     Boolean  @default(true)
+  is_approved Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
 
 model blogs {
@@ -355,4 +356,49 @@ model blogs {
   updated_by        Int?
   created_at        DateTime   @default(now())
   updated_at        DateTime   @updatedAt
+}
+
+model notifications {
+  id         Int              @id @default(autoincrement())
+  user_id    Int
+  users      users            @relation(fields: [user_id], references: [id])
+  type       TypeNotification
+  title      String
+  content    String
+  is_read    Boolean          @default(false)
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+}
+
+model subscribers {
+  id                Int      @id @default(autoincrement())
+  email             String   @unique
+  is_receive        Boolean  @default(true)
+  is_receive_sales  Boolean  @default(true)
+  is_receive_notify Boolean  @default(true)
+  is_receive_blog   Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+}
+
+model packages {
+  id                Int         @id @default(autoincrement())
+  party_type_id     Int
+  party_types       party_types @relation(fields: [party_type_id], references: [id])
+  menu_id           Int
+  menus             menus       @relation(fields: [menu_id], references: [id])
+  decor_id          Int
+  decors            decors      @relation(fields: [decor_id], references: [id])
+  name              String
+  slug              String      @unique
+  description       String
+  short_description String?
+  price             Int
+  images            String[]
+  extra_service     Json?
+  deleted           Boolean     @default(false)
+  deleted_at        DateTime?
+  deleted_by        Int?
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
 }

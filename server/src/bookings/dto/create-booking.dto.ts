@@ -13,6 +13,9 @@ export class CreateBookingDto {
   @IsNotEmpty({ message: 'Vui lòng chọn loại sự kiện' })
   party_type_id: number;
 
+  @ApiProperty({ required: false })
+  stage_id: number;
+
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Họ và tên không được để trống' })
   name: string;
@@ -25,7 +28,7 @@ export class CreateBookingDto {
   @IsNotEmpty({ message: 'Email không được để trống' })
   email: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   @IsNotEmpty({ message: 'Tên công ty không được để trống' })
   company_name: string;
 
@@ -34,6 +37,9 @@ export class CreateBookingDto {
 
   @ApiProperty({ required: false })
   number_of_guests: number;
+
+  @ApiProperty({ required: false })
+  budget: string;
 
   @ApiProperty({ required: true })
   @IsNotEmpty({ message: 'Vui lòng chọn ca' })

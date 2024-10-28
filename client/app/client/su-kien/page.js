@@ -14,16 +14,16 @@ import CustomSliderMenu from '@/app/_components/CustomSliderMenu';
 
 const dataslider = [
     {
-        id:1,
+        id: 1,
         name: 'set menu',
-        img:'Alacarte-Menu-Thumbnail.png',
-        descriptions:'Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!'
+        img: 'Alacarte-Menu-Thumbnail.png',
+        descriptions: 'Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!'
     },
     {
-        id:2,
+        id: 2,
         name: 'set menu 2',
-        img:'Alacarte-Menu-Thumbnail.png',
-        descriptions:'Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!'
+        img: 'Alacarte-Menu-Thumbnail.png',
+        descriptions: 'Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!'
     }
 ];
 
@@ -34,7 +34,7 @@ function Event() {
             <ScrollFullPage>
                 <div className="section ">
                     <section className='select-none flex max-h-screen justify-between items-start max-lg:pt-20 lg:px-[25px] xl:max-w-screen-xl m-auto'>
-                        <div className="flex flex-col justify-center lg:h-screen z-10">
+                        <div className="flex flex-col justify-center lg:h-screen z-10 ">
                             <img className="w-full h-full object-cover" src="/event-1.png" alt="" />
                         </div>
                         <div className="flex flex-col mx-5 z-30 w-[400px] md:h-screen lg:justify-center max-sm:mx-2 ">
@@ -72,14 +72,14 @@ function Event() {
                     </div>
                 </div>
                 <div className="section">
-                    <section className="select-none max-h-[89vh] mt-[80px] overflow-y-scroll sectionEvent affterSS2 max-sm:after:w-[48px] max-sm:after:h-[20%] ">
+                    <section className="select-none max-h-[89vh] mt-[80px] max-md:mt-0 overflow-y-scroll sectionEvent affterSS2 max-sm:after:w-[48px] max-sm:after:h-[20%] ">
                         <div className="ml-[180px] mt-[100px] max-lg:mt-0 max-lg:ml-10">
                             <h1 className="uppercase text-5xl wrap text-gold font-bold font-gilroy text-fade-in max-lg:text-5xl max-sm:text-xl">Dịch vụ <br /> Sự kiện</h1>
                         </div>
                         <div className="w-full relative bottom-[140px] max-xl:bottom-[-150px]  ">
                             <div className="flex justify-center relative top-[100px] xl:max-w-screen-xl m-auto">
                                 <div className="relative left-[190px] max-xl:left-[135px] max-xl:top-[60px]  z-10 top-[100px] max-lg:top-[-20px] max-sm:top-[-130px] max-sm:left-[50px]">
-                                    <div className="max-w-[371px] max-h-[464px]  ">
+                                    <div className="max-w-[371px] max-h-[464px] -z-10">
                                         <Image src="/meeting-4.png" alt="" />
                                     </div>
                                 </div>
@@ -88,7 +88,7 @@ function Event() {
                                         <Image src="/meeting-5.png" alt="" />
                                     </div>
                                 </div>
-                                <div className="relative right-[135px] z-[-1]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
+                                <div className="relative right-[135px]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
                                     <div className="max-w-[641px] max-h-[430px] ">
                                         <Image src="/meeting-6.png" alt="" />
                                     </div>
@@ -101,7 +101,7 @@ function Event() {
                     </section>
                 </div>
                 <div className="section">
-                   <CustomSliderMenu dataSlider={dataslider}/>
+                    <CustomSliderMenu dataSlider={dataslider} />
                 </div>
                 <section className="section">
                     <Footer />

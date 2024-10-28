@@ -30,17 +30,17 @@ function Conference() {
             <ScrollFullPage>
                 <div className="section ">
                     <section className='select-none flex max-h-screen justify-between items-start max-lg:pt-20 lg:px-[25px] xl:max-w-screen-xl m-auto'>
-                        <div className="flex flex-col justify-center max-sm:w-full lg:h-screen z-10">
+                        <div className="flex flex-col justify-center max-sm:w-full lg:h-screen z-10 max-lg:w-[65%]">
                             <img className="w-full h-full object-cover" src="/Meeting-1-1.jpg" alt="" />
                         </div>
                         <div className="flex flex-col mx-5 z-30 w-[400px] md:h-screen lg:justify-center max-sm:mx-2 ">
                             <h1 className="text-gold mb-10 font-bold text-fade-in font-gilroy text-7xl max-lg:text-5xl max-sm:text-xl max-sm:mb-2 ">Hội nghị</h1>
                             <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[10px] max-sm:leading-3">
-                                Trung tâm Sự kiện White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.                            
+                                Trung tâm Sự kiện White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.
                             </p>
                         </div>
                         <div className="bgYellow md:before:h-screen w-[350px] mb:w-[250px] relative flex flex-col md:justify-center lg:h-full max-lg:bottom-[100px] max-lg:pb-[80px] max-sm:pb-[50px]">
-                            <div className="max-lg:mt-[80px] max-sm:pb-[50px]">
+                            <div className="max-lg:mt-[150px] max-sm:pb-[50px]">
                                 <div className="bg-gray-500 max-w-[60%] relative top-[20px] left-[20px] z-10">
                                     <img className="w-full h-full object-cover" src="/Meeting-2-scaled-e1719419350353.jpg" alt="" />
                                 </div>
@@ -68,7 +68,7 @@ function Conference() {
                     </div>
                 </div>
                 <div className="section">
-                    <section className="select-none max-h-[89vh] mt-[80px] overflow-y-scroll sectionEvent affterSS2 max-sm:after:w-[48px] max-sm:after:h-[20%] ">
+                    <section className="select-none max-h-[89vh] mt-[80px] max-md:mt-0 overflow-y-scroll sectionEvent affterSS2 max-sm:after:w-[48px] max-sm:after:h-[20%] ">
                         <div className="ml-[180px] mt-[100px] max-lg:mt-0 max-lg:ml-10">
                             <h1 className="uppercase text-5xl wrap text-gold font-bold font-gilroy text-fade-in max-lg:text-5xl max-sm:text-xl">Dịch vụ <br /> Hội nghị</h1>
                         </div>
@@ -84,7 +84,7 @@ function Conference() {
                                         <Image src="/meeting-5.png" alt="" />
                                     </div>
                                 </div>
-                                <div className="relative right-[135px] z-[-1]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
+                                <div className="relative right-[135px] max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
                                     <div className="max-w-[641px] max-h-[430px] ">
                                         <Image src="/meeting-6.png" alt="" />
                                     </div>
