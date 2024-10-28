@@ -34,7 +34,7 @@ export class PackagesService {
         description,
         price,
         short_description,
-        extra_sevice,
+        extra_service,
       } = createPackageDto;
       let checkPrice = 0;
 
@@ -84,7 +84,7 @@ export class PackagesService {
       checkPrice += findPartyType.price;
 
       // ? Check Extra Service
-      extra_sevice.forEach(async (service) => {
+      extra_service.forEach(async (service) => {
         const findService = await this.prismaService.products.findUnique({
           where: { id: Number(service.id) },
         });
@@ -123,7 +123,7 @@ export class PackagesService {
           price: Number(price),
           short_description,
           images: uploadImages as any,
-          extra_service: extra_sevice,
+          extra_service,
         },
         include: {
           menus: true,
@@ -302,7 +302,7 @@ export class PackagesService {
         description,
         price,
         short_description,
-        extra_sevice,
+        extra_service,
       } = updatePackageDto;
       let checkPrice = 0;
 
@@ -356,7 +356,7 @@ export class PackagesService {
       checkPrice += findPartyType.price;
 
       // ? Check Extra Service
-      extra_sevice.forEach(async (service) => {
+      extra_service.forEach(async (service) => {
         const findService = await this.prismaService.products.findUnique({
           where: { id: Number(service.id) },
         });
@@ -397,7 +397,7 @@ export class PackagesService {
           price: Number(price),
           short_description,
           images: uploadImages ? uploadImages : findPackage.images,
-          extra_service: extra_sevice,
+          extra_service,
         },
         include: {
           menus: true,

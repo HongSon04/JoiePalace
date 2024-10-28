@@ -23,6 +23,7 @@ import {
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class BookingsService {
@@ -715,7 +716,7 @@ export class BookingsService {
         party_type_id,
         table_count,
         phone,
-        extra_sevice,
+        extra_service,
         status,
       } = updateBookingDto;
 
@@ -888,7 +889,7 @@ export class BookingsService {
       if (findBooking.is_deposit === true) {
         let extraServiceAmount = 0;
         // ! Fetch booking with relations
-        extra_sevice.map(async (extra) => {
+        extra_service.map(async (extra) => {
           const findExtra = await this.prismaService.products.findUnique({
             where: { id: Number(extra.id) },
           });
@@ -948,7 +949,7 @@ export class BookingsService {
             menu_id: Number(menu_id),
             decor: decorFormat,
             menu: menuFormat,
-            extra_service: extra_sevice,
+            extra_service: extra_service,
             fee,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
@@ -1244,6 +1245,113 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> destroy: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
+
+  // ! Cron Job check booking expired_at and delete it
+  @Cron('0 */2 * * *')
+  async handleBookingExpiredCron() {
+    try {
+      const currentDate = new Date();
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          deleted: false,
+          expired_at: {
+            gte: currentDate,
+          },
+        },
+      });
+
+      // Xóa booking nếu hết hạn
+      bookings.map(async (booking) => {
+        // ? Xóa booking
+        await this.prismaService.bookings.update({
+          where: { id: Number(booking.id) },
+          data: {
+            deleted: true,
+            deleted_at: new Date(),
+            deleted_by: 1,
+            status: 'cancel',
+          },
+        });
+      });
+    } catch (error) {
+      console.log('Lỗi từ booking.service.ts -> handleCron: ', error);
+    }
+  }
+
+  // ! Send Email Booking if is_deposit is false
+  // ! Cron Job Run Every Day at 8:00 AM
+  @Cron('0 8 * * *')
+  async handleBookingEmailCron() {
+    try {
+      const currentDate = new Date();
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          deleted: false,
+          is_deposit: false,
+          organization_date: {
+            gte: currentDate,
+          },
+        },
+        include: {
+          users: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              memberships_id: true,
+              phone: true,
+              avatar: true,
+              role: true,
+            },
+          },
+          branches: true,
+          booking_details: {
+            include: {
+              decors: true,
+              menus: {
+                include: {
+                  products: {
+                    include: {
+                      tags: true,
+                    },
+                  },
+                },
+              },
+              deposits: true,
+            },
+          },
+          stages: true,
+        },
+      });
+
+      // Prepare notification and email content
+      bookings.map(async (booking) => {
+        const { name, email, phone, organization_date, shift, branches } =
+          booking;
+        const formattedDate = FormatDateWithShift(
+          organization_date as any,
+          shift,
+        );
+
+        // Send Mail
+        const bodyMail = {
+          shift,
+          organization_date: dayjs(formattedDate).format('DD/MM/YYYY'),
+          branchName: branches.name,
+          customerName: name,
+          customerEmail: email,
+          customerPhone: phone,
+          branchAddress: branches.address,
+        };
+        await this.mailService.sendUserConfirmationBooking(bodyMail);
+      });
+    } catch (error) {
+      console.log(
+        'Lỗi từ booking.service.ts -> handleBookingEmailCron: ',
         error,
       );
     }

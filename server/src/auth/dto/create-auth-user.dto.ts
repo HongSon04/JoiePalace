@@ -1,24 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class CreateAuthUserDto {
+  @ApiProperty({
+    required: true,
+    description: 'Họ và tên của người dùng',
+    example: 'Nguyễn Văn A',
+  })
   @IsNotEmpty({ message: 'Vui lòng nhập họ và tên' })
-  @ApiProperty({ required: true })
   username: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    required: true,
+    description: 'Địa chỉ email của người dùng',
+    example: 'example@example.com',
+  })
   @IsNotEmpty({ message: 'Vui lòng nhập Email' })
   @IsEmail({}, { message: 'Email không đúng định dạng' })
   email: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    required: true,
+    description: 'Mật khẩu của người dùng',
+    example: 'M@tp@ssw0rd',
+  })
   @IsNotEmpty({ message: 'Vui lòng nhập mật khẩu' })
   password: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    required: true,
+    description: 'Số điện thoại liên hệ của người dùng',
+    example: '0123456789',
+  })
   @IsNotEmpty({ message: 'Vui lòng nhập số điện thoại' })
   phone: string;
 }

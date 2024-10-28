@@ -1,43 +1,57 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  ArrayNotEmpty,
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreatePartyTypeDto {
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Tên loại tiệc, không được để trống',
+    example: 'Tiệc Cưới',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Tên loại tiệc không được để trống' })
   name: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Mô tả chi tiết về loại tiệc, không được để trống',
+    example: 'Tiệc cưới với các dịch vụ hoàn hảo.',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   description: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Mô tả ngắn gọn về loại tiệc, không được để trống',
+    example: 'Tiệc cưới sang trọng',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
   short_description: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Ảnh của loại tiệc, không được để trống',
+    required: true,
+  })
   images: string[];
 
-  @ApiProperty({ example: [1, 2, 3] })
+  @ApiProperty({
+    description: 'Danh sách các ID sản phẩm liên quan đến loại tiệc',
+    example: [1, 2, 3],
+    required: false,
+  })
   products: number[];
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Giá của loại tiệc, không được để trống',
+    example: 2000000,
+    required: true,
+  })
   @IsNotEmpty({ message: 'Giá không được để trống' })
   price: number;
 }
 
 export class ImagePartyTypesDto {
-  @ApiProperty({ type: [String] })
-  @IsArray({ message: 'Hình ảnh phải là một mảng' })
-  @ArrayNotEmpty({ message: 'Hình ảnh không được để trống' })
-  @IsString({ each: true, message: 'Các mục trong hình ảnh phải là chuỗi' })
+  @ApiProperty({
+    description: 'Ảnh của loại tiệc, không được để trống',
+    type: [String],
+  })
   images: string[];
 }
