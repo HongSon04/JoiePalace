@@ -33,6 +33,8 @@ export const fetchCurrentBranch = async (slug) => {
     throw new Error("Có lỗi khi lấy dữ liệu chi nhánh");
   }
 
+  localStorage.setItem("currentBranch", JSON.stringify(response.data.data));
+  return response.data.data;
   console.log(response.data.data);
 
   localStorage.setItem(
@@ -43,6 +45,13 @@ export const fetchCurrentBranch = async (slug) => {
   return response.data.data.at(0);
 };
 
+export const postBranchAPI = async (branch) => {
+  const response = await axios.post(API_CONFIG.BRANCHES.CREATE, branch);
+  if (response.status!== 201) {
+    throw new Error("Có lỗi khi tạo chi nhánh mới");
+  }
+  return response.data.data;
+}
 export const fetchBranchDataById = async (branchId) => {
   try {
     const response = await axios.get(API_CONFIG.DASHBOARD.GET_BOOKING_STATUS(branchId));
