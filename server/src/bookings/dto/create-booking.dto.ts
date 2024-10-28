@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
-import { ShiftEnum } from 'helper/enum/Shift.enum';
+import { ShiftEnum } from 'helper/enum/shift.enum';
 
 export class CreateBookingDto {
   @ApiProperty({
