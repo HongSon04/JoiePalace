@@ -20,7 +20,7 @@ const listLocation = [
 ];
 const HeaderClient = () => {
   const [isShowMenu, setIsShowMenu] = useState(false);
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [screenWidth, setScreenWidth] = useState(window?.innerWidth);
   const [listBranches, setListBranches] = useState([]);
 
   useEffect(() => {
@@ -120,8 +120,8 @@ const HeaderClient = () => {
               liên hệ
             </span>
           </div>
-          <div>
-            <span className="font-normal text-4xl max-sm:hidden">
+          <div className="">
+            <span className="font-normal text-4xl max-sm:hidden cursor-pointer">
               JOIE PALACE
             </span>
           </div>
