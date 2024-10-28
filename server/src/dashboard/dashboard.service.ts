@@ -143,7 +143,6 @@ export class DashboardService {
       let totalSuccessBooking = 0;
       let totalCancelBooking = 0;
       let totalBooking = 0;
-      console.log('branch_id', branch_id);
       // Lấy thời gian đầu và cuối tháng
       const now = dayjs();
       const startOfMonth = now.startOf('month').toDate();

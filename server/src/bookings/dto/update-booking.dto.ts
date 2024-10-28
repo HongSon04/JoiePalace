@@ -1,57 +1,117 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
 import { BookingStatus } from 'helper/enum/booking_status.enum';
 
 export class UpdateBookingDto {
-  @ApiProperty({ required: false })
-  user_id: number;
-
-  @ApiProperty({ required: true })
-  booking_id: number;
-
-  @ApiProperty({ required: true })
-  branch_id: number;
-
-  @ApiProperty({ required: true })
-  party_type_id: number;
-
-  @ApiProperty({ required: true })
-  stage_id: number;
-
-  @ApiProperty({ required: true })
-  decor_id: number;
-
-  @ApiProperty({ required: true })
-  menu_id: number;
-
-  @ApiProperty({ required: true })
-  name: string;
-
-  @ApiProperty({ required: true })
-  phone: string;
-
-  @ApiProperty({ required: true })
-  email: string;
-
-  @ApiProperty({ required: true })
-  company_name: string;
-
-  @ApiProperty({ required: false })
-  number_of_guests: number;
-
-  @ApiProperty({ required: false })
-  budget: string;
-
-  @ApiProperty({ required: true })
-  note: string;
-
-  @ApiProperty({ required: true })
-  table_count: number;
+  @ApiProperty({
+    required: false,
+    description: 'ID của người dùng (nếu có)',
+  })
+  user_id?: number;
 
   @ApiProperty({
-    description:
-      'Tổng tiền của sự kiện: Tiền trang trí + tiền ghế 100k/1 tiền ghế 50k/1 (1 bàn = 10 ghế) => (100k + (50k * 10)) + tiền menu(menu * tổng bàn) + phí',
+    required: true,
+    description: 'ID của đặt chỗ cần cập nhật',
   })
+  @IsNotEmpty({ message: 'ID đặt chỗ không được để trống' })
+  booking_id: number;
+
+  @ApiProperty({
+    required: true,
+    description: 'ID của chi nhánh nơi tổ chức sự kiện',
+  })
+  @IsNotEmpty({ message: 'ID chi nhánh không được để trống' })
+  branch_id: number;
+
+  @ApiProperty({
+    required: true,
+    description: 'ID của loại sự kiện',
+  })
+  @IsNotEmpty({ message: 'ID loại sự kiện không được để trống' })
+  party_type_id: number;
+
+  @ApiProperty({
+    required: true,
+    description: 'ID của sảnh tổ chức sự kiện',
+  })
+  @IsNotEmpty({ message: 'ID sảnh không được để trống' })
+  stage_id: number;
+
+  @ApiProperty({
+    required: true,
+    description: 'ID của trang trí sự kiện',
+  })
+  @IsNotEmpty({ message: 'ID trang trí không được để trống' })
+  decor_id: number;
+
+  @ApiProperty({
+    required: true,
+    description: 'ID của menu sự kiện',
+  })
+  @IsNotEmpty({ message: 'ID menu không được để trống' })
+  menu_id: number;
+
+  @ApiProperty({
+    required: true,
+    description: 'Họ và tên của người đặt',
+  })
+  @IsNotEmpty({ message: 'Họ và tên không được để trống' })
+  name: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Số điện thoại liên hệ',
+  })
+  @IsNotEmpty({ message: 'Số điện thoại không được để trống' })
+  phone: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Địa chỉ email liên hệ',
+  })
+  @IsNotEmpty({ message: 'Email không được để trống' })
+  @IsEmail({}, { message: 'Email không hợp lệ' })
+  email: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Tên công ty (nếu có)',
+  })
+  @IsNotEmpty({ message: 'Tên công ty không được để trống' })
+  company_name: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Số lượng khách dự kiến',
+  })
+  @IsOptional()
+  number_of_guests?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Ngân sách dự kiến cho sự kiện',
+  })
+  @IsOptional()
+  budget?: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Ghi chú thêm về sự kiện',
+  })
+  @IsNotEmpty({ message: 'Ghi chú không được để trống' })
+  note: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Số lượng bàn cần đặt',
+  })
+  @IsNotEmpty({ message: 'Số lượng bàn không được để trống' })
+  table_count: number;
+  @ApiProperty({
+    description:
+      'Tổng tiền của sự kiện: Tiền trang trí + tiền ghế 100k/1 ghế 50k/1 (1 bàn = 10 ghế) => (100k + (50k * 10)) + tiền menu (menu * tổng bàn) + phí',
+  })
+  @IsNotEmpty({ message: 'Tổng tiền không được để trống' })
   amount: number;
 
   @ApiProperty({
@@ -62,19 +122,39 @@ export class UpdateBookingDto {
     description:
       'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
   })
-  extra_sevice: [{ id: number; quantity: number }] | any;
-  @ApiProperty({ required: true })
+  extra_service: [{ id: number; quantity: number }] | any;
+
+  @ApiProperty({
+    required: true,
+    description: 'Trạng thái xác nhận của đặt chỗ',
+    enum: [true, false],
+  })
+  @IsNotEmpty({ message: 'Trạng thái xác nhận không được để trống' })
   is_confirm: boolean;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    required: true,
+    description: 'Trạng thái đặt cọc của đặt chỗ',
+    enum: [true, false],
+  })
+  @IsNotEmpty({ message: 'Trạng thái đặt cọc không được để trống' })
   is_deposit: boolean;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    required: true,
+    description: 'Trạng thái của đặt chỗ',
+    enum: ['pending', 'processing', 'success', 'cancel'],
+  })
   @IsEnum(BookingStatus, {
     message: 'Trạng thái không hợp lệ (pending, processing, success, cancel)',
   })
   status: string;
 
-  @ApiProperty({ type: [String] })
-  images: string[] | any;
+  @ApiProperty({
+    type: [String],
+    description: 'Danh sách các hình ảnh liên quan đến sự kiện',
+    required: false,
+  })
+  @IsOptional()
+  images?: string[];
 }

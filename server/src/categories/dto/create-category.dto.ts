@@ -1,32 +1,47 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  ArrayNotEmpty,
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateCategoryDto {
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Tên danh mục, không được để trống',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Tên danh mục không được để trống' })
   name: string;
 
-  @ApiProperty({ required: false })
-  category_id: number;
+  @ApiProperty({
+    description: 'ID danh mục cha, nếu có',
+    required: false,
+  })
+  @IsOptional()
+  @IsInt({ message: 'ID danh mục phải là một số nguyên' })
+  category_id?: number;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Mô tả chi tiết về danh mục, không được để trống',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Mô tả danh mục không được để trống' })
   description: string;
 
-  @ApiProperty({ required: false })
-  short_description: string;
+  @ApiProperty({
+    description: 'Mô tả ngắn gọn về danh mục',
+    required: false,
+  })
+  @IsOptional()
+  short_description?: string;
 
-  @ApiProperty({ required: false })
-  images: string[];
+  @ApiProperty({
+    description: 'Ảnh danh mục, không được để trống',
+    required: false,
+  })
+  @IsOptional()
+  images?: string[];
 
-  @ApiProperty({ example: [1, 2, 3] })
-  tags: number[];
+  @ApiProperty({
+    description: 'Danh sách các ID thẻ liên quan đến danh mục',
+    required: false,
+  })
+  @IsOptional()
+  tags?: number[];
 }
