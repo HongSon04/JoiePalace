@@ -64,24 +64,23 @@ export class TagsService {
       const search = query.search || '';
       const skip = (page - 1) * itemsPerPage;
 
+      const whereConditions: any = {};
+
+      if (search) {
+        whereConditions.name = {
+          contains: search,
+          mode: 'insensitive',
+        };
+      }
+
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.tags.findMany({
-          where: {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
+          where: whereConditions,
           skip,
           take: itemsPerPage,
         }),
         this.prismaService.tags.count({
-          where: {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
+          where: whereConditions,
         }),
       ]);
 
@@ -120,7 +119,7 @@ export class TagsService {
     try {
       const tag = await this.prismaService.tags.findUnique({
         where: {
-          id,
+          id: Number(id),
         },
       });
       if (!tag) {

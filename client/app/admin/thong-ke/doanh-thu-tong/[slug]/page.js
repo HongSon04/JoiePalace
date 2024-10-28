@@ -6,12 +6,9 @@ import { DateRangePicker } from '@nextui-org/date-picker';
 import { Input } from '@nextui-org/react';
 import { RiMoneyDollarCircleLine } from 'react-icons/ri';
 import { HiArrowDown, HiArrowUp } from 'react-icons/hi';
-import CustomSelect from '@/app/_components/CustomSelect';
 import AdminHeader from '@/app/_components/AdminHeader';
 import Chart from '@/app/_components/Chart';
-import { MdOutlineHome, MdOutlineNotificationsNone } from 'react-icons/md';
-import "../../../_styles/globals.css";
-import CustomPagination from '@/app/_components/CustomPagination';
+import "../../../../_styles/globals.css";
 import TableGrab from '@/app/_components/TableGrab';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
 const Page = () => {
@@ -47,7 +44,10 @@ const Page = () => {
       <div className="flex justify-start items-center gap-2 text-base text-gray-500 ">
         <p>Thống kê</p>
         <p>/</p>
+        <p>Doanh thu tổng</p>
+        <p>/</p>
         <p>Doanh thu chi nhánh</p>
+
        
       </div>
       <div>
@@ -101,14 +101,14 @@ const Page = () => {
           </div>
         </div>
         {isFilterVisible && (
-          <div className="absolute mt-2 w-[300px]  rounded-xl right-0 top-[40px]  0 z-10 bg-[#27272A]">
-            <DateRangePicker className="max-w-xs w-full dark" />
+          <div className="absolute mt-2 w-[300px]  rounded-xl right-0 top-[40px]  0 z-10 text-gray-500 bg-white">
+            <DateRangePicker className="max-w-xs w-full " />
             <div className="flex justify-center items-center gap-2 ">
               <Input
                 type="number"
                 placeholder="0"
                 labelPlacement="outside"
-                className=' dark'
+                
                 startContent={
                   <div className="pointer-events-none flex items-center ">
                     <RiMoneyDollarCircleLine className="text-default-400 w-[24px] h-[24px]" />
@@ -120,7 +120,7 @@ const Page = () => {
                 type="number"
                 placeholder="0"
                 labelPlacement="outside"
-                className=' dark'
+                
                 startContent={
                   <div className="pointer-events-none flex items-center">
                     <RiMoneyDollarCircleLine className="text-default-400 w-[24px] h-[24px]" />

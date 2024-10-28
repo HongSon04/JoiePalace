@@ -22,8 +22,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
+import { FilterBookingDto } from './dto/FilterBookingDto';
 
 @ApiTags('Bookings - Quản lý đơn tiệc')
 @Controller('api/bookings')
@@ -51,6 +51,7 @@ export class BookingsController {
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 1,
         fee: 1,
+        budget: 'Trên 500 triệu',
         total_amount: 1,
         status: 'pending',
         deleted: false,
@@ -84,6 +85,7 @@ export class BookingsController {
 
   // ! Get All Booking
   @Get('get-all')
+  @isPublic()
   @ApiHeaders([
     {
       name: 'Authorization',
@@ -106,44 +108,6 @@ export class BookingsController {
           menu_id: 'number',
           name: 'string',
           images: [],
-          accessories: {
-            chair: {
-              id: 'number',
-              name: 'string',
-              type: 'string',
-              amount: 500,
-              images: ['string', 'string'],
-              quantity: 30,
-              description: 'string',
-              total_price: 15000,
-              short_description: 'string',
-            },
-            table: [
-              {
-                id: 'number',
-                name: 'string',
-                type: 'string',
-                amount: 500,
-                images: ['string', 'string'],
-                quantity: 2,
-                description: 'string',
-                total_price: 1000,
-                short_description: 'string',
-              },
-              {
-                id: 'number',
-                name: 'string',
-                type: 'table',
-                amount: 500,
-                images: ['string', 'string'],
-                quantity: 1,
-                description: 'string',
-                total_price: 500,
-                short_description: 'string',
-              },
-            ],
-            total_price: 16500,
-          },
           shift: 'Sáng',
           organization_date: '2024-09-20T08:00:00.000Z',
           amount: 'number',
@@ -252,7 +216,22 @@ export class BookingsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAll(@Query() query: FilterPriceDto) {
+  @ApiQuery({
+    name: 'is_confirm',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'is_deposit',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'pending | processing | success | cancel',
+  })
+  findAll(@Query() query: FilterBookingDto) {
     return this.bookingsService.findAll(query);
   }
 
@@ -274,7 +253,22 @@ export class BookingsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAllDeleted(@Query() query: FilterPriceDto) {
+  @ApiQuery({
+    name: 'is_confirm',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'is_deposit',
+    required: false,
+    description: 'true | false',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'pending | processing | success | cancel',
+  })
+  findAllDeleted(@Query() query: FilterBookingDto) {
     return this.bookingsService.findAllDeleted(query);
   }
 
@@ -294,44 +288,6 @@ export class BookingsController {
         menu_id: 'number',
         name: 'string',
         images: [],
-        accessories: {
-          chair: {
-            id: 'number',
-            name: 'string',
-            type: 'string',
-            amount: 500,
-            images: ['string', 'string'],
-            quantity: 30,
-            description: 'string',
-            total_price: 15000,
-            short_description: 'string',
-          },
-          table: [
-            {
-              id: 'number',
-              name: 'string',
-              type: 'string',
-              amount: 500,
-              images: ['string', 'string'],
-              quantity: 2,
-              description: 'string',
-              total_price: 1000,
-              short_description: 'string',
-            },
-            {
-              id: 'number',
-              name: 'string',
-              type: 'table',
-              amount: 500,
-              images: ['string', 'string'],
-              quantity: 1,
-              description: 'string',
-              total_price: 500,
-              short_description: 'string',
-            },
-          ],
-          total_price: 16500,
-        },
         shift: 'Sáng',
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 'number',
@@ -613,48 +569,12 @@ export class BookingsController {
         decor_id: 1,
         menu_id: 1,
         name: 'string',
-        accessories: {
-          chair: {
-            id: 1,
-            name: 'string',
-            type: 'string',
-            amount: 1,
-            images: ['string', 'string'],
-            quantity: 1,
-            description: 'string',
-            total_price: 1,
-            short_description: 'string',
-          },
-          table: [
-            {
-              id: 1,
-              name: 'string',
-              type: 'string',
-              amount: 1,
-              images: ['string', 'string'],
-              quantity: 1,
-              description: 'string',
-              total_price: 1,
-              short_description: 'string',
-            },
-          ],
-          extra_service: {
-            id: 1,
-            name: 'string',
-            type: 'string',
-            amount: 1,
-            images: ['string', 'string'],
-            description: 'string',
-            total_price: 1,
-            short_description: 'string',
-          },
-          total_price: 1,
-        },
         images: ['string', 'string'],
         shift: 'Sáng',
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 1,
         fee: 1,
+        budget: 'Trên 500 triệu',
         total_amount: 1,
         status: 'pending',
         deleted: false,
@@ -704,6 +624,7 @@ export class BookingsController {
         organization_date: '2024-09-20T08:00:00.000Z',
         amount: 1,
         fee: 1,
+        budget: 'Trên 500 triệu',
         total_amount: 1,
         status: 'pending',
         deleted: false,

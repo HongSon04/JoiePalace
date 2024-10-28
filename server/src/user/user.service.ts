@@ -251,14 +251,17 @@ export class UserService {
 
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
           { role: { contains: search, mode: 'insensitive' } },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
@@ -268,7 +271,10 @@ export class UserService {
           },
           skip,
           take: itemsPerPage,
-          orderBy: { created_at: 'desc' },
+          orderBy: {
+            created_at: 'desc',
+            memberships: { booking_total_amount: 'desc' },
+          },
         }),
         this.prismaService.users.count({ where: whereConditions }),
       ]);
@@ -318,18 +324,20 @@ export class UserService {
         startDate && endDate
           ? { created_at: { gte: new Date(startDate), lte: new Date(endDate) } }
           : {};
-      console.log(sortRangeDate);
 
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
           { role: { contains: search, mode: 'insensitive' } },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
@@ -339,7 +347,10 @@ export class UserService {
           },
           skip,
           take: itemsPerPage,
-          orderBy: { created_at: 'desc' },
+          orderBy: {
+            created_at: 'desc',
+            memberships: { booking_total_amount: 'desc' },
+          },
         }),
         this.prismaService.users.count({ where: whereConditions }),
       ]);

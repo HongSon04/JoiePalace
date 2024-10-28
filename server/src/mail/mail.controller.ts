@@ -1,18 +1,10 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  Request,
-  Response,
-  Query,
+  Controller
 } from '@nestjs/common';
-import { MailService } from './mail.service';
 import { isPublic } from 'decorator/auth.decorator';
 import { ConfirmBookingMailDto } from './dto/ConfirmBookingMail.dto';
+import { MailService } from './mail.service';
 
 @Controller('api/mail')
 export class MailController {

@@ -1,11 +1,9 @@
-import { CreateUserDto } from './dto/create-user.dto';
 import {
   BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  HttpException,
   HttpStatus,
   Param,
   Patch,
@@ -16,7 +14,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -25,14 +23,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { isPublic } from 'decorator/auth.decorator';
+import { FilterDto } from 'helper/dto/Filter.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
-import { FilterDto } from 'helper/dto/Filter.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { Roles } from 'decorator/roles.decorator';
-import { Role } from 'helper/enum/role.enum';
-import { isPublic } from 'decorator/auth.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserService } from './user.service';
 
 @ApiTags('User - Quản lý người dùng')
 @Controller('api/user')
@@ -161,7 +158,6 @@ export class UserController {
 
   // ! Get All User
   @Get('get-all')
-  @Roles(Role.ADMIN)
   @ApiHeaders([
     {
       name: 'authorization',
@@ -383,7 +379,7 @@ export class UserController {
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo id' })
-  getById(@Query('user_id') id: number): Promise<any> {
+  getById(@Param('user_id') id: number): Promise<any> {
     return this.userService.getById(id);
   }
 
@@ -428,7 +424,7 @@ export class UserController {
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo email' })
-  getByEmail(@Query('email') email: string): Promise<any> {
+  getByEmail(@Param('email') email: string): Promise<any> {
     return this.userService.getByEmail(email);
   }
 
@@ -531,7 +527,7 @@ export class UserController {
     },
   })
   @ApiOperation({ summary: 'Xóa tài khoản tạm thời' })
-  softDelete(@Request() req, @Query('user_id') id: number): Promise<any> {
+  softDelete(@Request() req, @Param('user_id') id: number): Promise<any> {
     return this.userService.softDelete(req.user, id);
   }
 
@@ -564,7 +560,7 @@ export class UserController {
     },
   })
   @ApiOperation({ summary: 'Khôi phục tài khoản đã xóa tạm' })
-  restore(@Query('user_id') id: number): Promise<any> {
+  restore(@Param('user_id') id: number): Promise<any> {
     return this.userService.restore(id);
   }
 
@@ -597,7 +593,7 @@ export class UserController {
     },
   })
   @ApiOperation({ summary: 'Xóa vĩnh viễn tài khoản' })
-  hardDelete(@Query('user_id') id: number): Promise<any> {
+  hardDelete(@Param('user_id') id: number): Promise<any> {
     return this.userService.hardDelete(id);
   }
 

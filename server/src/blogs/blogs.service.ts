@@ -104,7 +104,7 @@ export class BlogsService {
           content,
           description,
           short_description,
-          category_id,
+          category_id: Number(category_id),
           tags: {
             connect: tagsConnect,
           },
@@ -145,23 +145,36 @@ export class BlogsService {
 
       const whereConditions: any = {
         deleted: false,
-        title: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        description: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        slug: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        short_description: {
-          contains: search,
-          mode: 'insensitive',
-        },
       };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            slug: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
 
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
@@ -217,23 +230,36 @@ export class BlogsService {
 
       const whereConditions: any = {
         deleted: true,
-        title: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        description: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        slug: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        short_description: {
-          contains: search,
-          mode: 'insensitive',
-        },
       };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            slug: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
 
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
@@ -290,23 +316,36 @@ export class BlogsService {
       const whereConditions: any = {
         deleted: false,
         category_id: Number(category_id),
-        title: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        description: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        slug: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        short_description: {
-          contains: search,
-          mode: 'insensitive',
-        },
       };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            slug: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
 
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
@@ -374,23 +413,36 @@ export class BlogsService {
       const whereConditions: any = {
         deleted: false,
         category_id: Number(category.id),
-        title: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        description: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        slug: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        short_description: {
-          contains: search,
-          mode: 'insensitive',
-        },
       };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            slug: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
 
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
@@ -459,23 +511,36 @@ export class BlogsService {
             id: Number(tag.id),
           },
         },
-        title: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        description: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        slug: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        short_description: {
-          contains: search,
-          mode: 'insensitive',
-        },
       };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            slug: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
 
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
@@ -544,23 +609,36 @@ export class BlogsService {
             id: Number(tag.id),
           },
         },
-        title: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        description: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        slug: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        short_description: {
-          contains: search,
-          mode: 'insensitive',
-        },
       };
+
+      if (search) {
+        whereConditions.OR = [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            slug: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            short_description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ];
+      }
 
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({

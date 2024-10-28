@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
 import { BookingStatus } from 'helper/enum/booking_status.enum';
-import { PaymentMethod } from 'helper/enum/payment_method.enum';
 
 export class UpdateBookingDto {
   @ApiProperty({ required: false })
@@ -37,8 +36,11 @@ export class UpdateBookingDto {
   @ApiProperty({ required: true })
   company_name: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   number_of_guests: number;
+
+  @ApiProperty({ required: false })
+  budget: string;
 
   @ApiProperty({ required: true })
   note: string;

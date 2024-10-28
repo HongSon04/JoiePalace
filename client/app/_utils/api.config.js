@@ -7,6 +7,7 @@ const AUTH_API = `${HOST}/auth`;
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
+const DASHBOARD_API = `${HOST}/dashboard`;
 const PRODUCTS_API = `${HOST}/products`;
 const FEEDBACKS_API = `${HOST}/feedbacks`;
 const PARTYTYPES_API = `${HOST}/party-types`;
@@ -15,6 +16,8 @@ const NOTIFICATIONS_API = `${HOST}/notifications`;
 
 // API Endpoints
 export const API_CONFIG = {
+  GENERAL_BRANCH: "ho-chi-minh",
+
   // AUTH API
   AUTH: {
     LOGIN: `${AUTH_API}/login`,
@@ -62,6 +65,23 @@ export const API_CONFIG = {
     DELETE: (id) => `${CATEGORIES_API}/delete/${id}`,
     RESTORE: (id) => `${CATEGORIES_API}/restore/${id}`,
     DESTROY: (id) => `${CATEGORIES_API}/destroy/${id}`,
+  },
+  // DASHBOARD API
+  DASHBOARD: {
+    GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
+    GET_ALL_INFO_EACH_TIME: `${DASHBOARD_API}/get-all-info-by-each-time`,
+    GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH: `${DASHBOARD_API}/total-revenue-for-all-branch-each-month`,
+    GET_TOTAL_REVENUE_BRANCH_WEEK: `${DASHBOARD_API}/total-revenue-for-each-branch-by-week`,
+    GET_TOTAL_REVENUE_BRANCH_MONTH: `${DASHBOARD_API}/total-revenue-for-each-branch-by-month`,
+    GET_TOTAL_REVENUE_BRANCH_QUARTER: `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter`,
+    GET_TOTAL_REVENUE_BRANCH_YEAR: `${DASHBOARD_API}/total-revenue-for-each-branch-by-year`,
+    GET_ALL_BRANCH: `${HOST}/branches/get-all`,
+    GET_BOOKING_STATUS: (id) =>
+      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+    GET_BOOKING_BRANCH: (id) =>
+      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
   },
 
   // PRODUCTS API

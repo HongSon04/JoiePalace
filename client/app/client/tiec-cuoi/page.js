@@ -30,7 +30,7 @@ function Event() {
             <ScrollFullPage>
                 <div className="section ">
                     <section className='select-none flex max-h-screen justify-between items-start max-lg:pt-20 lg:px-[25px] xl:max-w-screen-xl m-auto'>
-                        <div className="flex flex-col justify-center lg:h-screen z-10">
+                        <div className="flex flex-col justify-center lg:h-screen z-10 max-lg:w-[75%]">
                             <img className="w-full h-full object-cover" src="/Wedding-1.jpg" alt="" />
                         </div>
                         <div className="flex flex-col mx-5 z-30 w-[400px] md:h-screen lg:justify-center max-sm:mx-2 ">
@@ -84,7 +84,7 @@ function Event() {
                                         <Image src="/Wedding-5-scaled-e1719420448461.jpg" alt="" />
                                     </div>
                                 </div>
-                                <div className="relative right-[135px] z-[-1]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
+                                <div className="relative right-[135px]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
                                     <div className="max-w-[641px] max-h-[430px] ">
                                         <Image src="/Wedding-6-e1719420516884.jpg" alt="" />
                                     </div>

@@ -12,16 +12,17 @@ module.exports = {
     extend: {
       scrollbar: {
         thin: {
-            'scrollbar-width': 'thin',
-            'scrollbar-color': 'white transparent',
+          'scrollbar-width': 'thin',
+          'scrollbar-color': 'white transparent',
         },
         DEFAULT: {
-            'scrollbar-width': 'thin',
-            'scrollbar-color': 'white transparent',
+          'scrollbar-width': 'thin',
+          'scrollbar-color': 'white transparent',
         },
-    },
+      },
       fontFamily: {
         gilroy: ["Gilroy", "sans-serif"],
+        beautique: ['"Beautique Display"', 'sans-serif'],
       },
       screens: {
         sxs: "420px",
@@ -257,7 +258,7 @@ module.exports = {
       },
     },
   },
-  
+
   darkMode: "class",
   plugins: [nextui()],
 };

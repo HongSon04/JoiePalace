@@ -84,6 +84,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
@@ -131,7 +136,11 @@ export class CategoriesService {
 
       const whereConditions: any = {
         deleted: false,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -150,15 +159,19 @@ export class CategoriesService {
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.categories.findMany({
           where: whereConditions,
           include: {
             tags: true,
+            products: {
+              include: {
+                tags: true,
+              },
+            },
           },
           skip,
           take: itemsPerPage,
@@ -228,7 +241,11 @@ export class CategoriesService {
 
       const whereConditions: any = {
         deleted: true,
-        OR: [
+        ...sortRangeDate,
+      };
+
+      if (search) {
+        whereConditions.OR = [
           {
             name: {
               contains: search,
@@ -247,15 +264,19 @@ export class CategoriesService {
               mode: 'insensitive',
             },
           },
-        ],
-        ...sortRangeDate,
-      };
+        ];
+      }
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.categories.findMany({
           where: whereConditions,
           include: {
             tags: true,
+            products: {
+              include: {
+                tags: true,
+              },
+            },
           },
           skip,
           take: itemsPerPage,
@@ -307,6 +328,11 @@ export class CategoriesService {
         where: { id: Number(id) },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
       if (!category) {
@@ -337,6 +363,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       })) as any;
       // ? Find Children Categories
@@ -346,6 +377,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
       if (childrenCategories.length > 0) {
@@ -391,6 +427,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
@@ -483,6 +524,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
