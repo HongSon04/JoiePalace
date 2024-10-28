@@ -33,6 +33,7 @@ import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import logo from "@/public/logo-dark.png";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
+import { API_CONFIG } from "../_utils/api.config";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -130,7 +131,10 @@ function AdminSidebarNav() {
     },
     {
       title: "Thống kê",
-      path: `/admin/thong-ke/${currentBranch?.slug}`,
+      path:
+        currentBranch.slug === API_CONFIG.GENERAL_BRANCH
+          ? "/admin/thong-ke/"
+          : `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
       icon: statisticIcon,
     },
     {

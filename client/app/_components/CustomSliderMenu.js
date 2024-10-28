@@ -5,6 +5,7 @@ import { Image } from "@chakra-ui/react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import ButtonDiscover from "./ButtonDiscover";
 // import "@/app/_styles/index.css";
 
 const CustomSliderMenu = ({ dataSlider }) => {
@@ -44,10 +45,9 @@ const CustomSliderMenu = ({ dataSlider }) => {
       }
     },
   };
-  console.log(dataSlider);
 
   return (
-    <section className="h-screen max-sm:h-fit">
+    <section className="h-screen max-sm:h-fit max-md:mt-0">
       <Slider ref={sliderRef} {...menuSliderSettings}>
         {dataSlider.map((i, index) => {
           return (
@@ -74,12 +74,12 @@ const CustomSliderMenu = ({ dataSlider }) => {
                       {i.descriptions}
                     </p>
                     <div className="flex items-center justify-between">
-                      <div
+                        <ButtonDiscover className="w-fit px-3"/>
+                      {/* <div
                         className="flex justify-center items-center rounded-full h-10 w-[130px] bg-yellow-400 hover:bg-gold text-right-to-left max-sm:text-[10px] "
                         style={{ animationDelay: "0.6s" }}
                       >
                         {" "}
-                        <p>Khám phá</p>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="16"
@@ -125,11 +125,11 @@ const CustomSliderMenu = ({ dataSlider }) => {
                             />
                           </svg>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
-                <div className="max-w-[450px] p-5 bg-white max-lg:max-w-[300px] max-sm:p-2 max-sm:w-[135px]">
+                <div className="max-w-[450px] p-5 bg-white max-lg:max-w-[300px] max-sm:p-2 max-sm:w-[135px] ">
                   <Image src={`/${i.img}`} alt="My Image" />
                 </div>
               </div>

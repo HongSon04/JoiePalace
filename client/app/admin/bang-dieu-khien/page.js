@@ -12,6 +12,9 @@ import "../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
 import {fetchInfoByMonth,fetchAllDashBoard,fetchUserById, fetchAllTotalRevenueMonth,fetchAllEachTime,fetchAllBooking } from "@/app/_services/apiServices";
+import Link from 'next/link';
+import { useSelector } from 'react-redux';
+import { log } from 'util';
 
 const Page = () => {
   const [userId, setUserId] = useState(null);
@@ -20,20 +23,24 @@ const Page = () => {
   const [dataAllEachTime, setDataAllEachTime] = useState(null);
   const [allBooking, setAllBooking] = useState([]);
   const [dataInfo, setDataInfo] = useState(null);
+  const [slug, setSlug] = useState('');
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
+    const storedUser = localStorage.getItem("currentBranch");
+    
     const fetchAminData = async () => {
       try {
+        const branchObject = JSON.parse(storedUser);
+        const branchSlug = branchObject ? branchObject.slug : ''; 
+        setSlug(branchSlug); 
+
         const adminData = await fetchAllDashBoard();
         const revenueData = await fetchAllTotalRevenueMonth(); 
         const dataAllEachTime = await fetchAllEachTime();
         const allBooking = await fetchAllBooking();
         const dataInfo = await fetchInfoByMonth();
-        // console.log(dataInfo);
         
-        setDataInfo(dataInfo)
+        setDataInfo(dataInfo);
         setAllBooking(allBooking); 
         setDataAllEachTime(dataAllEachTime); 
         setDataAdmin(adminData);
@@ -46,6 +53,8 @@ const Page = () => {
     fetchAminData();
   }, []); 
 
+    console.log(`allBooking` );
+    
     const total_revune_each_month = dataAllEachTime?.total_revune_each_month || []; 
     // console.log(total_revune_each_month);
     const total_revune_by_month = dataAllEachTime?.total_revune_by_month || []; 
@@ -78,9 +87,8 @@ const Page = () => {
         <p className="text-center text-xs">{branch.name}</p>
       </div>
     ));
-   
     
-    
+  
     
   return (
     <main className="grid gap-6  text-white ">
@@ -101,7 +109,11 @@ const Page = () => {
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-red-400 text-base font-normal">Yêu cầu xử lí</p>
-                <PiArrowSquareOutLight className="text-2xl" />
+                <Link href={`/admin/yeu-cau/${slug}`}>
+                  <PiArrowSquareOutLight className="text-2xl" />
+                </Link>
+
+                
               </div>
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
@@ -115,7 +127,10 @@ const Page = () => {
                   <FiArrowUpRight className="text-2xl" />
                   <p className="text-base">2%</p>
                 </div> */}
-                <PiArrowSquareOutLight className="text-2xl" />
+                <Link href={`/admin/khach-hang/${slug}`}>
+                  <PiArrowSquareOutLight className="text-2xl" />
+                </Link>
+                
               </div>
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
@@ -129,7 +144,9 @@ const Page = () => {
                   <FiArrowDownRight className="text-2xl" />
                   <p className="text-base">2%</p>
                 </div> */}
-                <PiArrowSquareOutLight className="text-2xl" />
+                <Link href={`/admin/quan-ly-tiec/${slug}`}>
+                  <PiArrowSquareOutLight className="text-2xl" />
+                </Link>
               </div>
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
@@ -139,7 +156,9 @@ const Page = () => {
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-red-400 text-base font-normal">Tiệc dự kiến</p>
-                <PiArrowSquareOutLight className="text-2xl" />
+                <Link href={`/admin/quan-ly-tiec/${slug}`}>
+                  <PiArrowSquareOutLight className="text-2xl" />
+                </Link>
               </div>
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
@@ -149,7 +168,9 @@ const Page = () => {
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-base font-normal">Tiệc đang diễn ra</p>
-                <PiArrowSquareOutLight className="text-2xl" />
+                <Link href={`/admin/quan-ly-tiec/${slug}`}>
+                  <PiArrowSquareOutLight className="text-2xl" />
+                </Link>
               </div>
             </div>
           </>
@@ -164,9 +185,11 @@ const Page = () => {
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl" >
               <div className="flex justify-between gap-[10px] items-center mb-[10px]">
                 <p className="text-base font-semibold ">Khách hàng</p>
-                <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
+                <Link href={`/admin/khach-hang/`}>
+                  <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
+                </Link>
               </div>
-              <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
+              <div className="flex flex-col gap-3 h-[500px] overflow-y-auto hide-scrollbar">
               <div className="booking-list">
                 {allBooking.length > 0 ? (
                   allBooking.map((item, index) => (
@@ -202,9 +225,12 @@ const Page = () => {
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
           <div className="flex justify-between items-center mb-[10px]">
             <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
-            <p className="text-teal-400 font-semibold text-base">Xem thêm</p>
+            <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
+              <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
+            </Link>
+            
           </div>
-          <div className="grid grid-cols-2 gap-4 max-h-[500px] overflow-y-auto hide-scrollbar">
+          <div className="grid grid-cols-2 gap-4 h-[500px] overflow-y-auto hide-scrollbar">
             {branchCharts}
           </div>
         </div>
@@ -213,9 +239,12 @@ const Page = () => {
           <div className="w-1/2">
             <div className="flex items-center justify-between mb-[10px]">
               <p className="text-base  font-semibold">Yêu cầu mới nhất</p>
-              <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
+              <Link href={`/admin/yeu-cau/${slug}`}>
+                <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
+              </Link>
+             
             </div>
-          <div className="overflow-y-auto max-h-[335px]">
+          <div className="overflow-y-auto h-[335px]">
             <table className="table w-full">
               <thead>
                 <tr>
@@ -251,7 +280,9 @@ const Page = () => {
         <div className=" w-1/2" >
           <div className="flex items-center justify-between mb-[10px]">
             <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
-            <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
+            <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
+              <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
+            </Link>
           </div>
           
           <div className="p-4 bg-blackAlpha-100 rounded-xl ">
@@ -267,7 +298,9 @@ const Page = () => {
       <div className="w-full p-4">
           <div className="flex items-center justify-between mb-[10px]">
             <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
-            <p className="text-teal-400 text-xs font-bold">Xem thêm</p>
+            <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
+              <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
+            </Link>
           </div>
         <div className="overflow-y-auto max-h-72">
           <table className="table w-full table-auto rounded-lg">

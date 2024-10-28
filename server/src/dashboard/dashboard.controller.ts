@@ -216,6 +216,33 @@ export class DashboardController {
     return this.dashboardService.getAllInfoByEachTime(+branch_id);
   }
 
+  // ! Get Dashboard General Info By Month
+  @Get('get-dashboard-general-info-by-month')
+  @isPublic()
+  @ApiOperation({
+    summary: 'Lấy thông tin tổng quát của dashboard theo tháng',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Lấy thông tin tổng quát của dashboard theo tháng',
+    example: {
+      totalUser: 8708,
+      totalPendingBooking: 0,
+      totalFutureBooking: 0,
+      totalSuccessBooking: 0,
+      totalCancelBooking: 0,
+      totalBooking: 0,
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+  })
+  @ApiQuery({ name: 'branch_id', required: false })
+  async getDashboardGeneralInfoByMonth(@Query('branch_id') branch_id: string) {
+    return this.dashboardService.getDashboardGeneralInfoByMonth(+branch_id);
+  }
+
   // ! Tổng số lượng user, branch, product, category, tags, staff,menus,decors,party_type,furniture
   @Get('count-all')
   @isPublic()

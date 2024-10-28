@@ -130,3 +130,6 @@ background-color: #022C25;
 * {
     color: white;
 }
+body {
+    overflow-x: hidden;
+}

@@ -27,7 +27,7 @@ const Footer = () => {
           lòng hiếu khách và tinh thần duy mỹ
         </span>
       </div>
-      <div className="flex justify-center gap-20 max-lg:w-5/6 max-lg:gap-10 max-sm:gap-1">
+      <div className="flex justify-center gap-20 max-lg:w-5/6 max-lg:gap-10 max-sm:gap-1 max-md:hidden">
         <div className="flex flex-col gap-8 text-sm font-normal leading-5 max-sm:gap-4 max-sm:text-xs">
           <span>Copyright: 2023 White Palace All rights reserved</span>
           <span>
@@ -75,6 +75,61 @@ const Footer = () => {
                 <Image src={`/${image}`} alt="" />
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+      <div className="hidden justify-between gap-20 max-lg:w-5/6 max-lg:gap-10 max-sm:gap-1 max-md:flex">
+        <div>
+          <div className="flex flex-col gap-8 text-sm font-normal leading-5 max-sm:gap-4 max-sm:text-xs">
+            <span>Copyright: 2023 White Palace All rights reserved</span>
+            <span>
+              Managed by <span className="font-bold">@NangTamFixBug Co. Ltd</span>
+            </span>
+          </div>
+          <div className="flex flex-col gap-8 max-lg:gap-4">
+            <span className="uppercase text-2xl font-normal text-[#B5905B] text-nowrap max-lg:text-xl max-sm:text-xs">
+              địa điểm
+            </span>
+            {locations.map((location) => (
+              <div
+                key={location.id}
+                className="flex flex-col gap-7 text-base font-normal leading-6 uppercase max-lg:text-base text-nowrap max-sm:text-xs"
+              >
+                {location.name}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="flex flex-col gap-8 max-lg:gap-4">
+            <span className="uppercase text-2xl font-normal text-[#B5905B] text-nowrap max-lg:text-xl max-sm:text-xs">
+              Dịch vụ
+            </span>
+            {services.map((service) => (
+              <div
+                key={service.id}
+                className="flex flex-col gap-7 text-base font-normal leading-6 uppercase max-lg:text-base text-nowrap max-sm:text-xs"
+              >
+                {service.name}
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col gap-8 max-lg:gap-4 ">
+            {other.map((item) => (
+              <span
+                key={item.id}
+                className="uppercase text-2xl font-normal text-[#B5905B] text-nowrap max-lg:text-xl max-sm:text-xs"
+              >
+                {item.name}
+              </span>
+            ))}
+            <div className="flex items-center justify-between">
+              {images.map((image, index) => (
+                <div key={index} className="h-[24px] w-[24px]">
+                  <Image src={`/${image}`} alt="" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

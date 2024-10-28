@@ -2,24 +2,34 @@
 import "@/app/_styles/header.css";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
+import axios from "axios";
+import { fetchBranchesFromApi } from "../_services/branchesServices";
+const listMenu = [
+  { id: 1, name: "Địa điểm", categories: "dia-diem", href: "/#" },
+  { id: 2, name: "Sự kiện", categories: "su-kien", href: "su-kien" },
+  { id: 3, name: "Hội nghị", categories: "hoi-nghi", href: "hoi-nghi" },
+  { id: 4, name: "Tiệc cưới", categories: "tiec-cuoi", href: "tiec-cuoi" },
+  { id: 5, name: "Tin tức", categories: "tin-tuc", href: "tin-tuc" },
+  { id: 6, name: "Ưu đãi", categories: "uu-dai", href: "uu-dai" },
+  { id: 7, name: "Liên hệ", categories: "lien-he", href: "lien-he" },
+];
+const listLocation = [
+  { id: 1, name: "Joice Palace Hoàng Văn Thụ" },
+  { id: 2, name: "Joice Palace Phạm Văn Đồng" },
+  { id: 3, name: "Joice Palace Võ Văn Kiệt" },
+];
 const HeaderClient = () => {
-  const listMenu = [
-    { id: 1, name: "Địa điểm", categories: "dia-diem", href: "/#" },
-    { id: 2, name: "Sự kiện", categories: "su-kien", href: "su-kien" },
-    { id: 3, name: "Hội nghị", categories: "hoi-nghi", href: "hoi-nghi" },
-    { id: 4, name: "Tiệc cưới", categories: "tiec-cuoi", href: "tiec-cuoi" },
-    { id: 5, name: "Tin tức", categories: "tin-tuc", href: "tin-tuc" },
-    { id: 6, name: "Ưu đãi", categories: "uu-dai", href: "uu-dai" },
-    { id: 7, name: "Liên hệ", categories: "lien-he", href: "lien-he" },
-  ];
-  const listLocation = [
-    { id: 1, name: "Joice Palace Hoàng Văn Thụ" },
-    { id: 2, name: "Joice Palace Phạm Văn Đồng" },
-    { id: 3, name: "Joice Palace Võ Văn Kiệt" },
-  ];
   const [isShowMenu, setIsShowMenu] = useState(false);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [listBranches, setListBranches] = useState([]);
+
+  useEffect(() => {
+    const fecthData = async () => {
+      const branches = await fetchBranchesFromApi();
+      setListBranches(branches);
+    };
+    fecthData();
+  }, []);
   useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
@@ -32,8 +42,10 @@ const HeaderClient = () => {
   const handleShowMenu = () => {
     isShowMenu ? setIsShowMenu(false) : setIsShowMenu(true);
   };
+
+  if (!listBranches) return;
   return (
-    <header className={`fixed top-0 left-0 w-full z-10 text-white`}>
+    <header className={`fixed top-0 left-0 w-full z-40 text-white`}>
       <div className="py-4 px-5 w-full h-[90px] flex justify-between items-center bg-transparent">
         <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
           <svg
@@ -88,7 +100,7 @@ const HeaderClient = () => {
       </div>
       {/* popup menu */}
       <div
-        className={`menu px-5 w-full h-screen bg-primary z-20 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${
+        className={`menu px-5 w-full h-screen bg-primary z-50 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${
           isShowMenu ? "showMenu" : ""
         }`}
       >
@@ -153,6 +165,7 @@ const HeaderClient = () => {
                 <div key={menu.id}>
                   <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
+                      onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
                       href={`/client/${menu.href}`}
                     >
@@ -162,7 +175,11 @@ const HeaderClient = () => {
                   {menu.categories === "dia-diem" && (
                     <ul className="lg:hidden mt-[16px]">
                       {listLocation.map((i) => (
-                        <li key={i.id} className="text-xl my-[16px] font-light">
+                        <li
+                          onClick={handleShowMenu}
+                          key={i.id}
+                          className="text-xl my-[16px] font-light"
+                        >
                           {i.name}
                         </li>
                       ))}
@@ -173,14 +190,18 @@ const HeaderClient = () => {
             </ul>
           </div>
           <span className="w-[1px] h-full bg-white"></span>
-          <div className="max-lg:hidden">
-            <ul className="flex flex-col gap-4 ">
-              {listLocation.map((location) => (
+          <div className="max-lg:hidden w-[40%]">
+            <ul className="flex flex-wrap gap-4">
+              {listBranches.map((location) => (
                 <li
                   key={location.id}
-                  className="font-normal h-16 text-3xl flex items-center "
+                  className="font-normal w-[48%] h-16 text-3xl flex items-center "
                 >
-                  <Link className="hover:text-[#C0995A]" href={"/"}>
+                  <Link
+                    onClick={handleShowMenu}
+                    className="hover:text-[#C0995A]"
+                    href={`/client/chi-nhanh/${location.slug}`}
+                  >
                     {location.name}
                   </Link>
                 </li>
