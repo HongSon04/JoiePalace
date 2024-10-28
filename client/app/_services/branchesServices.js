@@ -33,6 +33,8 @@ export const fetchCurrentBranch = async (slug) => {
     throw new Error("Có lỗi khi lấy dữ liệu chi nhánh");
   }
 
+  localStorage.setItem("currentBranch", JSON.stringify(response.data.data));
+  return response.data.data;
   console.log(response.data.data);
 
   localStorage.setItem(

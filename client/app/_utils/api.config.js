@@ -10,6 +10,9 @@ const CATEGORIES_API = `${HOST}/categories`;
 const DASHBOARD_API = `${HOST}/dashboard`;
 const PRODUCTS_API = `${HOST}/products`;
 const FEEDBACKS_API = `${HOST}/feedbacks`;
+const PARTYTYPES_API = `${HOST}/party-types`;
+const BOOKING_API = `${HOST}/bookings`;
+const NOTIFICATIONS_API = `${HOST}/notifications`;
 
 // API Endpoints
 export const API_CONFIG = {
@@ -107,6 +110,18 @@ export const API_CONFIG = {
     GET_BY_USER: (userId) => `${FEEDBACKS_API}/get-by-user/${userId}`,
     UPDATE: (id) => `${FEEDBACKS_API}/update/${id}`,
     DESTROY: (id) => `${FEEDBACKS_API}/destroy/${id}`,
+  },
+
+  // PARTY TYPES API
+  PARTYTYPES: {
+    CREATE: `${PARTYTYPES_API}/create`,
+    GET_ALL: `${PARTYTYPES_API}/get-all`,
+  },
+
+  // PARTY TYPES API
+  BOOKINGS: {
+    CREATE: `${BOOKING_API}/create`,
+    GET_ALL: `${BOOKING_API}/get-all`,
   },
 
   // NOTIFICATIONS API
