@@ -6,7 +6,6 @@ export class ChangeProfileUserDto {
   @ApiProperty({
     required: true,
     description: 'Tên người dùng',
-    example: 'user123',
   })
   @IsNotEmpty({ message: 'Tên người dùng không được để trống' })
   username: string;
@@ -14,7 +13,6 @@ export class ChangeProfileUserDto {
   @ApiProperty({
     required: true,
     description: 'Số điện thoại của người dùng',
-    example: '+84123456789',
   })
   @IsNotEmpty({ message: 'Số điện thoại không được để trống' })
   phone: string;
@@ -23,7 +21,6 @@ export class ChangeProfileUserDto {
     required: true,
     enum: Role,
     description: 'Vai trò của người dùng',
-    example: Role.USER,
   })
   @IsEnum(Role, { message: 'Vai trò không hợp lệ' })
   role: Role;

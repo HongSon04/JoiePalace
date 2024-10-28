@@ -4,7 +4,6 @@ import { IsOptional } from 'class-validator';
 export class FilterFeedBackDto {
   @ApiProperty({
     description: 'Số trang hiện tại, mặc định là 1',
-    example: '1',
     required: false,
   })
   @IsOptional()
@@ -12,7 +11,6 @@ export class FilterFeedBackDto {
 
   @ApiProperty({
     description: 'Số lượng phản hồi trên mỗi trang, mặc định là 10',
-    example: '10',
     required: false,
   })
   @IsOptional()
@@ -20,7 +18,6 @@ export class FilterFeedBackDto {
 
   @ApiProperty({
     description: 'Từ khóa tìm kiếm để lọc phản hồi',
-    example: 'dịch vụ tốt',
     required: false,
   })
   @IsOptional()
@@ -28,7 +25,6 @@ export class FilterFeedBackDto {
 
   @ApiProperty({
     description: 'Ngày bắt đầu để lọc phản hồi (định dạng: YYYY-MM-DD)',
-    example: '2023-01-01',
     required: false,
   })
   @IsOptional()
@@ -36,7 +32,6 @@ export class FilterFeedBackDto {
 
   @ApiProperty({
     description: 'Ngày kết thúc để lọc phản hồi (định dạng: YYYY-MM-DD)',
-    example: '2023-12-31',
     required: false,
   })
   @IsOptional()
@@ -44,7 +39,6 @@ export class FilterFeedBackDto {
 
   @ApiProperty({
     description: 'ID của chi nhánh để lọc phản hồi',
-    example: 'branch_123',
     required: false,
   })
   @IsOptional()
@@ -53,7 +47,6 @@ export class FilterFeedBackDto {
   @ApiProperty({
     description:
       'Cho biết liệu phản hồi có được hiển thị hay không (true/false)',
-    example: 'true',
     required: false,
   })
   @IsOptional()
@@ -62,7 +55,6 @@ export class FilterFeedBackDto {
   @ApiProperty({
     description:
       'Cho biết liệu phản hồi có được phê duyệt hay không (true/false)',
-    example: 'false',
     required: false,
   })
   @IsOptional()

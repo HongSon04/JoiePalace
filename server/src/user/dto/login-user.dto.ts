@@ -5,7 +5,6 @@ export class LoginUserDto {
   @ApiProperty({
     required: true,
     description: 'Địa chỉ email của người dùng',
-    example: 'email@example.com',
   })
   @IsNotEmpty({ message: 'Email không được để trống' })
   email: string;
