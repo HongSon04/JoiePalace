@@ -37,3 +37,11 @@ export const fetchCurrentBranch = async (slug) => {
 
   return response.data.data;
 };
+
+export const postBranchAPI = async (branch) => {
+  const response = await axios.post(API_CONFIG.BRANCHES.CREATE, branch);
+  if (response.status!== 201) {
+    throw new Error("Có lỗi khi tạo chi nhánh mới");
+  }
+  return response.data.data;
+}

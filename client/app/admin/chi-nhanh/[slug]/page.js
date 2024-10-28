@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import AdminHeader from "@/app/_components/AdminHeader";
 import AdminThemChiNhanhImg from "@/app/_components/AdminThemChiNhanhImg";
 import AdminThemChiNhanhInput from "@/app/_components/AdminThemChiNhanhInput";
@@ -10,6 +10,9 @@ import IconButtonSave from "@/app/_components/IconButtonSave";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Stack } from "@chakra-ui/react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const fieldsConfig = {
   contact: [
@@ -29,15 +32,49 @@ const fieldsConfig = {
     { type: 'textarea', placeholder: 'Mô tả không gian', name: 'space_description' },
   ],
 };
+const createSlug = (str) => {
+  const fromVietnamese = str
+    .toLowerCase()
+    .normalize('NFD') 
+    .replace(/[\u0300-\u036f]/g, '');
 
-function Page() {
-  const { handleSubmit, control } = useForm();
+  return fromVietnamese
+    .replace(/[^a-z0-9\s]/g, '')
+    .trim() 
+    .replace(/\s+/g, '-'); 
+};
+
+const branchSchema = z.object({
+  name: z.string().min(1, { message: "Tên chi nhánh là bắt buộc" }),
+  address: z.string().min(1, { message: "Địa chỉ là bắt buộc" }),
+  email: z.string().email({ message: "Email không hợp lệ" }),
+  phone: z
+    .string()
+    .regex(/^\d+$/, { message: "Số điện thoại phải là số" })
+    .min(10, { message: "Số điện thoại phải có ít nhất 10 ký tự" }),
+  slogan: z.string().optional(),
+  slogan_description: z.string().optional(),
+  diagram_description: z.string().optional(),
+  equipment_description: z.string().optional(),
+  space_name: z.string().min(1, { message: "Tên không gian là bắt buộc" }).optional(),
+  space_description: z.string().optional(),
+});
+function ChiNhanhAddPage() {
+  const dispatch = useDispatch();
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(branchSchema),
+  });
+
   const [imagesData, setImagesData] = useState({
-    images: [],  // Carousel images
-    slogan_images: [], // Slogan images
-    diagram_images: [], // Diagram images
-    equipment_images: [], // Equipment images
-    space_images: [], // Space images
+    images: [], 
+    slogan_images: [],
+    diagram_images: [], 
+    equipment_images: [], 
+    space_images: [],
   });
 
   const onImagesChange = (name, images) => {
@@ -49,9 +86,15 @@ function Page() {
 
   const onSubmit = (data) => {
     const formData = {
-      ...data,
-      "rate": 0,
-      images: imagesData.images,
+      data: {
+        name: data.name,
+        slug: createSlug(data.name),
+        address: data.address,
+        phone: data.phone,
+        email: data.email,
+        rate: 5,
+        images: imagesData.images,
+      },
       location_detail: {
         slogan: data.slogan,
         slogan_description: data.slogan_description,
@@ -66,12 +109,10 @@ function Page() {
           name: data.space_name,
           description: data.space_description,
           images: imagesData.space_images,
-          
-        } 
+        },
       ],
     };
     console.log("Form Data: ", formData);
-    // Submit formData to backend
   };
 
   return (
@@ -179,8 +220,9 @@ const renderSection = (
       inputId={inputId}
       onImagesChange={onImagesChange}
       name={imageName}
+      
     />
   </div>
 );
 
-export default Page;
+export default ChiNhanhAddPage;
