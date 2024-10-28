@@ -111,17 +111,24 @@ export const fetchAllBranch = async () => {
 };
 // export const fetchUserById = async (userId) => {
 //   try {
-//     const response = await axios.get(API_CONFIG.USER.GET_BY_ID(userId));
+//     const token = getCookie('accessToken');
+//     const response = await axios.get(API_CONFIG.USER.GET_BY_ID(userId), {
+//       headers: {
+//         'Authorization': `Bearer ${token}`,
+//       }
+//     });
     
 //     if (response.status !== 200) {
 //       throw new Error("Có lỗi khi lấy dữ liệu !");
-//       }
-//       return response.data;
+//     }
+//     return response.data;
 //   } catch (error) {
 //     console.error("Lỗi:", error);
 //     throw error;
 //   }
 // };
+
+
 // export const fetchBranchById = async (branchId) => {
 //   try {
 //     const response = await axios.get(API_CONFIG.BRANCHES.GET_BY_ID(branchId));
@@ -152,5 +159,17 @@ export const fetchAllBooking = async () => {
   } catch (error) {
       console.error("Lỗi:", error);
       throw error; 
+  }
+};
+export const fetchInfoByMonth = async () => {
+  try {
+    const response = await axios.get(API_CONFIG.DASHBOARD.GET_INFO_BY_MONTH);
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu !");
+    }
+    return response.data; 
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error; 
   }
 };

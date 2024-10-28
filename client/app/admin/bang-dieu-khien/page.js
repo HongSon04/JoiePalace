@@ -2,6 +2,7 @@
 // export const metadata = {
 //   title: "Bảng điều khiển",
 // };
+import Image from 'next/image';
 import React, { useEffect, useState } from "react";
 import { PiArrowSquareOutLight } from "react-icons/pi";
 import { FiArrowUpRight, FiArrowDownRight } from "react-icons/fi";
@@ -10,15 +11,16 @@ import { FaPlus } from "react-icons/fa6";
 import "../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
-import {fetchAllDashBoard,fetchUserById, fetchAllTotalRevenueMonth,fetchAllEachTime,fetchAllBooking } from "@/app/_services/apiServices";
+import {fetchInfoByMonth,fetchAllDashBoard,fetchUserById, fetchAllTotalRevenueMonth,fetchAllEachTime,fetchAllBooking } from "@/app/_services/apiServices";
 
 const Page = () => {
   const [userId, setUserId] = useState(null);
   const [dataAdmin, setDataAdmin] = useState(null);
   const [totalRevenueData, setTotalRevenueData] = useState(null);
   const [dataAllEachTime, setDataAllEachTime] = useState(null);
-  const [allBooking, setAllBooking] = useState(null);
-  const [branchNames, setBranchNames] = useState({});
+  const [allBooking, setAllBooking] = useState([]);
+  const [dataInfo, setDataInfo] = useState(null);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -26,32 +28,24 @@ const Page = () => {
       try {
         const adminData = await fetchAllDashBoard();
         const revenueData = await fetchAllTotalRevenueMonth(); 
-        const dataAllEachTime = await fetchAllEachTime ();
-        const allBooking = await fetchAllBooking ();
-        // const dataUser = await fetchBranchById();
-        // const bookings = allBooking.data || [];
-        // console.log(bookings.branch_id);
+        const dataAllEachTime = await fetchAllEachTime();
+        const allBooking = await fetchAllBooking();
+        const dataInfo = await fetchInfoByMonth();
+        // console.log(dataInfo);
         
-        //  // Lấy tên nhánh cho từng booking
-        // const branches = {};
-        // for (const booking of  bookings) {
-        //   if (!branches[booking.branch_id]) {
-        //     const branchData = await fetchBranchById(booking.branch_id);
-        //     branches[booking.branch_id] = branchData.name; 
-        //   }
-        // }
-        // setBranchNames(branches); 
-        setAllBooking(allBooking);
+        setDataInfo(dataInfo)
+        setAllBooking(allBooking); 
         setDataAllEachTime(dataAllEachTime); 
         setDataAdmin(adminData);
-        setTotalRevenueData(revenueData);
+        setTotalRevenueData(revenueData); 
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Lỗi:", error);
       }
     };
 
     fetchAminData();
-  }, []);
+  }, []); 
+
     const total_revune_each_month = dataAllEachTime?.total_revune_each_month || []; 
     // console.log(total_revune_each_month);
     const total_revune_by_month = dataAllEachTime?.total_revune_by_month || []; 
@@ -84,8 +78,9 @@ const Page = () => {
         <p className="text-center text-xs">{branch.name}</p>
       </div>
     ));
+   
     
-    const dataBooking = allBooking?.data || [];
+    
     
   return (
     <main className="grid gap-6  text-white ">
@@ -101,7 +96,7 @@ const Page = () => {
           <>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-red-400 text-2xl font-bold">{dataAllEachTime.count_all_info.totalFeedBack}</p>
+                <p className="text-red-400 text-2xl font-bold">{dataInfo.totalBooking}</p>
                 {/* <p className="text-base font-normal">Xem</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -111,7 +106,7 @@ const Page = () => {
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-2xl font-bold">{dataAllEachTime.count_all_info.totalUser}</p>
+                <p className="text-2xl font-bold">{dataInfo.totalUser}</p>
                 {/* <p className="text-teal-300 text-base font-normal">+100</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -125,7 +120,7 @@ const Page = () => {
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-2xl font-bold">0</p>
+                <p className="text-2xl font-bold">{dataInfo.totalBooking}</p>
                 {/* <p className="text-red-400 text-base font-normal">-100</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -139,7 +134,7 @@ const Page = () => {
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-2xl font-bold">{dataAdmin.count_booking_status.pending}</p>
+                <p className="text-2xl font-bold">{dataInfo.totalFutureBooking}</p>
                 {/* <p className="text-base font-normal">Xem</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -149,7 +144,7 @@ const Page = () => {
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
-                <p className="text-2xl font-bold">{dataAdmin.count_booking_status.processing}</p>
+                <p className="text-2xl font-bold">{dataInfo.totalPendingBooking}</p>
                 {/* <p className="text-base font-normal">Xem</p> */}
               </div>
               <div className="flex justify-between items-center">
@@ -172,96 +167,34 @@ const Page = () => {
                 <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
               </div>
               <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
-                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                  <div className="w-full flex justify-between items-center">
-                    <div>
-                      <p className="text-sm mb-[10px] font-semibold">
-                        Tên khách hàng
-                      </p>
-                      <div className="flex gap-3 items-center text-xs ">
-                        <img  src="/image/Group.svg" />
-                        <p>Đồng</p>
+              <div className="booking-list">
+                {allBooking.length > 0 ? (
+                  allBooking.map((item, index) => (
+                    <div key={index} className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
+                      <img className="rounded-full w-[48px]" src="/image/user.jpg" alt="User profile" />
+                      <div className="w-full flex justify-between items-center">
+                        <div>
+                          <p className="text-sm mb-[10px] font-semibold">
+                            {item.users ? item.users.username : "N/A"}
+                          </p>
+                          <div className="flex gap-3 items-center text-xs">
+                            <img src="/image/Group.svg" alt="Membership Icon" />
+                            <p>{item.users ? item.users.memberships_id : "N/A"}</p>
+                          </div>
+                        </div>
+                        <BsThreeDots className="text-xl" />
                       </div>
                     </div>
-                    <BsThreeDots className="text-xl" />
+                  ))
+                ) : (
+                  <div className="loading-message">
+                    <p className="text-center">Đang tải dữ liệu.</p>
                   </div>
-                </div>
-                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                  <div className="w-full flex justify-between items-center">
-                    <div>
-                      <p className="text-sm mb-[10px] font-semibold">
-                        Tên khách hàng
-                      </p>
-                      <div className="flex gap-3 items-center text-xs ">
-                        <img  src="/image/Group.svg" />
-                        <p>Đồng</p>
-                      </div>
-                    </div>
-                    <BsThreeDots className="text-xl" />
-                  </div>
-                </div>
-                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                  <div className="w-full flex justify-between items-center">
-                    <div>
-                      <p className="text-sm mb-[10px] font-semibold">
-                        Tên khách hàng
-                      </p>
-                      <div className="flex gap-3 items-center text-xs ">
-                        <img  src="/image/Group.svg" />
-                        <p>Đồng</p>
-                      </div>
-                    </div>
-                    <BsThreeDots className="text-xl" />
-                  </div>
-                </div>
-                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                  <div className="w-full flex justify-between items-center">
-                    <div>
-                      <p className="text-sm mb-[10px] font-semibold">
-                        Tên khách hàng
-                      </p>
-                      <div className="flex gap-3 items-center text-xs ">
-                        <img  src="/image/Group.svg" />
-                        <p>Đồng</p>
-                      </div>
-                    </div>
-                    <BsThreeDots className="text-xl" />
-                  </div>
-                </div>
-                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                  <div className="w-full flex justify-between items-center">
-                    <div>
-                      <p className="text-sm mb-[10px] font-semibold">
-                        Tên khách hàng
-                      </p>
-                      <div className="flex gap-3 items-center text-xs ">
-                        <img  src="/image/Group.svg" />
-                        <p>Đồng</p>
-                      </div>
-                    </div>
-                    <BsThreeDots className="text-xl" />
-                  </div>
-                </div>
-                <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50  bg-cover bg-center">
-                  <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                  <div className="w-full flex justify-between items-center">
-                    <div>
-                      <p className="text-sm mb-[10px] font-semibold">
-                        Tên khách hàng
-                      </p>
-                      <div className="flex gap-3 items-center text-xs ">
-                        <img  src="/image/Group.svg" />
-                        <p>Đồng</p>
-                      </div>
-                    </div>
-                    <BsThreeDots className="text-xl" />
-                  </div>
-                </div>
+                )}
+              </div>
+
+               
+                
               
           
               </div>
@@ -293,15 +226,22 @@ const Page = () => {
                 </tr>
               </thead>
               <tbody>
-              {dataBooking.map((item, index) => (
-                <tr key={index}> 
-                  <td>{item.user_id}</td>
-                  <td>{item.branch_id}</td> 
-                  <td>{item.phone}</td>
-                  <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+              {allBooking.length > 0 ? (
+                allBooking.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.users ? item.users.username : "N/A"}</td>
+                    <td>{item.branches ? item.branches.name : "N/A"}</td> 
+                    <td>{item.phone || "N/A"}</td> 
+                    <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="text-center">Đang tải dữ liệu.</td>
                 </tr>
-                
-              ))}
+              )}
+
+
                 
               </tbody>
             </table>
