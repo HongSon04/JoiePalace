@@ -6,7 +6,7 @@ import {
   Post,
   Request,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -14,7 +14,7 @@ import {
   ApiHeaders,
   ApiOperation,
   ApiResponse,
-  ApiTags
+  ApiTags,
 } from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
@@ -24,6 +24,8 @@ import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
 import { VerifyTokenDto } from './dto/verify-token.dto';
+import { CreateUserSocialDto } from './dto/create-user-social.dto';
+import { LoginUserSocialDto } from './dto/login-user-social.dto';
 
 @ApiTags('Auth - Xác thực')
 @Controller('api/auth')
@@ -61,6 +63,34 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
+  // ! Register Social User
+  @Post('register-social')
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    example: {
+      message: 'Đăng ký thành công',
+      data: { access_token: 'string', refresh_token: 'string' },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Email đã tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
+    },
+  })
+  @ApiOperation({ summary: 'Người dùng tạo tài khoản qua mạng xã hội' })
+  @isPublic()
+  createSocialUser(@Body() createUserSocialDto: CreateUserSocialDto) {
+    return this.authService.registerSocialUser(createUserSocialDto);
+  }
+
   // ! Login
   @Post('login')
   @isPublic()
@@ -87,6 +117,34 @@ export class AuthController {
   @ApiOperation({ summary: 'Người dùng đăng nhập' })
   login(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
+  }
+
+  // ! Login Social
+  @Post('login-social')
+  @isPublic()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Đăng nhập thành công',
+      data: { access_token: 'string', refresh_token: 'string' },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Tài khoản không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
+    },
+  })
+  @ApiOperation({ summary: 'Người dùng đăng nhập qua mạng xã hội' })
+  loginSocial(@Body() loginUserDto: LoginUserSocialDto) {
+    return this.authService.loginSocial(loginUserDto);
   }
 
   // ! Logout

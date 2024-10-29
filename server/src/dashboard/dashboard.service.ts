@@ -633,7 +633,9 @@ export class DashboardService {
         {} as Record<string, number>,
       );
 
-      return result;
+      return Number(branch_id) === 0 && branch_id
+        ? this.transformBranchData(result)
+        : result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -714,7 +716,9 @@ export class DashboardService {
         data[branch.name] = revenueMap[branch.id] || 0; // Nếu không có booking, gán 0
       });
 
-      return data;
+      return Number(branch_id) === 0 && branch_id
+        ? this.transformBranchData(data)
+        : data;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -796,7 +800,9 @@ export class DashboardService {
         {} as Record<string, number>,
       );
 
-      return result;
+      return Number(branch_id) === 0 && branch_id
+        ? this.transformBranchData(result)
+        : result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -880,7 +886,11 @@ export class DashboardService {
         result[branchName][quarterIndex] += totalAmount;
       });
 
-      return result;
+      if (branch_id) {
+        return result;
+      } else {
+        return this.transformQuarterlyData(result);
+      }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -957,7 +967,9 @@ export class DashboardService {
         return acc;
       }, {});
 
-      return result;
+      return Number(branch_id) === 0 && branch_id
+        ? this.transformBranchData(result)
+        : result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -1055,7 +1067,13 @@ export class DashboardService {
       }
 
       // B7: Sắp xếp theo tổng doanh thu giảm dần
-      return results.sort((a, b) => b.total - a.total);
+      const sort = results.sort((a, b) => b.total - a.total);
+
+      if (branch_id) {
+        return sort;
+      } else {
+        return this.transformDataByYear(sort);
+      }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -1118,7 +1136,11 @@ export class DashboardService {
       });
 
       // B5: Trả về kết quả sau khi cập nhật dữ liệu
-      return statusCounts;
+      if (branch_id) {
+        return statusCounts;
+      } else {
+        return this.transformDataStatusWithBranches(statusCounts);
+      }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -1129,5 +1151,105 @@ export class DashboardService {
         error: error,
       });
     }
+  }
+
+  transformBranchData(data) {
+    // Create a new object to hold the transformed data
+    const result = {};
+
+    // Iterate through each key in the original data
+    for (const branch in data) {
+      if (branch === 'Hồ Chí Minh') {
+        // Set up "Hồ Chí Minh" with value and other branches in nested structure
+        result[branch] = {
+          value: data[branch],
+          branches: { ...data, [branch]: undefined },
+        };
+      } else {
+        // Keep other branches as they are
+        result[branch] = data[branch];
+      }
+    }
+
+    // Remove "Hồ Chí Minh" from nested branches inside the "Hồ Chí Minh" object
+    delete result['Hồ Chí Minh'].branches['Hồ Chí Minh'];
+
+    return result;
+  }
+
+  transformQuarterlyData(data) {
+    // Initialize the result object
+    const result = {};
+
+    // Iterate over each branch
+    for (const branch in data) {
+      if (branch === 'Hồ Chí Minh') {
+        // Set up "Hồ Chí Minh" with quarterly values and other branches in a nested structure
+        result[branch] = {
+          value: data[branch],
+          branches: { ...data, [branch]: undefined }, // Copy all data except "Hồ Chí Minh"
+        };
+      } else {
+        // Keep other branches as they are
+        result[branch] = data[branch];
+      }
+    }
+
+    // Remove self-reference to "Hồ Chí Minh" in its own nested branches
+    delete result['Hồ Chí Minh'].branches['Hồ Chí Minh'];
+
+    return result;
+  }
+
+  transformDataByYear(data) {
+    // Separate "Hồ Chí Minh" data and other branches
+    const hoChiMinhBranch = data.find(
+      (branch) => branch.name === 'Hồ Chí Minh',
+    );
+    const otherBranches = data.filter(
+      (branch) => branch.name !== 'Hồ Chí Minh',
+    );
+
+    // Transform data as required
+    return {
+      ...Object.fromEntries(
+        otherBranches.map((branch) => [
+          branch.name,
+          { data: branch.data, total: branch.total },
+        ]),
+      ),
+      'Hồ Chí Minh': {
+        value: hoChiMinhBranch.total,
+        branches: Object.fromEntries(
+          otherBranches.map((branch) => [
+            branch.name,
+            { data: branch.data, total: branch.total },
+          ]),
+        ),
+      },
+    };
+  }
+
+  transformDataStatusWithBranches(data) {
+    // Extract "Hồ Chí Minh" entry and other branches
+    const hoChiMinhBranch = data.find(
+      (branch) => branch.name === 'Hồ Chí Minh',
+    );
+    const otherBranches = data.filter(
+      (branch) => branch.name !== 'Hồ Chí Minh',
+    );
+
+    // Format result with "Hồ Chí Minh" including other branches under `branches`
+    return {
+      ...Object.fromEntries(
+        otherBranches.map((branch) => [branch.name, branch.data]),
+      ),
+      'Hồ Chí Minh': {
+        ...hoChiMinhBranch.data,
+        branches: Object.fromEntries(
+          otherBranches.map((branch) => [branch.name, branch.data]),
+        ),
+      },
+    };
   }
 }
