@@ -26,5 +26,5 @@ export const loginAccountUser = async (dataToSend) => {
     throw new Error("Có lỗi khi đăng nhập");
   }
 
-  return response.data.data;
+  return response;
 };

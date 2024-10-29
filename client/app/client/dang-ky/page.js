@@ -8,6 +8,7 @@ import { z } from "zod";
 import React, { useState } from "react";
 import { createAccountUser } from "@/app/_services/accountServices";
 
+
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
   username: z.string().min(2, "Vui lòng nhập Họ và tên!"),
@@ -49,6 +50,7 @@ const Page = () => {
         password: formData.password,
         phone: "null",
       });
+      
       toast({
         position: "top",
         type: "success",
@@ -121,7 +123,7 @@ const Page = () => {
             <span className="text-gold text-base font-normal">
               Bạn đã có tài khoản?{" "}
               <span
-                className="cursor-pointer"
+                className="cursor-pointer text-gold"
                 onClick={() => router.push("/client/dang-nhap")}
               >
                 Đăng nhập ngay
@@ -156,7 +158,7 @@ const Page = () => {
             <span className="flex w-full justify-center font-light">Hoặc</span>
             <button className="w-fit rounded-full bg-white text-black flex items-center gap-2 py-3 px-5 m-auto">
               <Image w={"auto"} h={"auto"} src="/googeIcon.svg" alt="" />
-              <span className="font-medium">Đăng ký bằng Google</span>
+              <span className="font-medium text-black">Đăng ký bằng Google</span>
             </button>
           </form>
         </div>
