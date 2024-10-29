@@ -1,14 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const getUserFromLocalStorage = () => {
-  if (typeof window !== "undefined" && window.localStorage) {
-    return JSON.parse(localStorage.getItem("user")) || {};
-  }
-  return {};
-};
-
 const initialState = {
-  user: getUserFromLocalStorage(),
+  user: {},
   accessToken: "",
   refreshToken: "",
   isLoading: false,
@@ -19,6 +12,9 @@ const accountSlice = createSlice({
   name: "account",
   initialState,
   reducers: {
+    getUserFromLocalStorage(state, action) {
+      state.user = action.payload;
+    },
     loading(state) {
       state.isLoading = true;
       state.isError = false;
@@ -71,6 +67,7 @@ export const {
   loginFailed,
   error,
   fetchUserProfileSuccess,
+  getUserFromLocalStorage,
 } = accountSlice.actions;
 
 export default accountSlice;

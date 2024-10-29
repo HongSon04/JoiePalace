@@ -12,6 +12,7 @@ import {
 import {
   error,
   fetchBranchSuccess,
+  getCurrentBranch,
   loading,
 } from "@/app/_lib/features/branch/branchSlice";
 import { fetchCurrentBranch } from "@/app/_services/branchesServices";
@@ -109,7 +110,7 @@ function Form({}) {
       dispatch(loginSuccess());
       const user = decodeJwt(result.data.access_token);
       localStorage.setItem("user", JSON.stringify(user));
-      console.log(user);
+      // console.log(user);
 
       // LATER:
       // CHECK IF USER IS ADMIN
@@ -162,13 +163,11 @@ function Form({}) {
         position: "top",
         type: "success",
         title: result.message,
-        description: "Chào mừng bạn quay trở lại",
+        description: `Chào mừng bạn quay trở lại. Chúng tôi đang chuyển bạn đến trang quản trị`,
         closable: true,
       });
 
-      if (currentBranch.slug === API_CONFIG.GENERAL_BRANCH)
-        router.push("/admin/bang-dieu-khien");
-      else router.push(`/admin/bang-dieu-khien/${branchSlug}`);
+      router.push(`/admin/bang-dieu-khien/${branchSlug}`);
     }
   };
 
@@ -190,6 +189,13 @@ function Form({}) {
   React.useEffect(() => {
     getBranchBySlug(branchSlug);
   }, [getBranchBySlug, branchSlug]);
+
+  React.useEffect(() => {
+    const storedBranch = JSON.parse(localStorage.getItem("currentBranch"));
+    if (storedBranch) {
+      dispatch(getCurrentBranch(storedBranch));
+    }
+  }, [getBranchBySlug]);
 
   return (
     <>

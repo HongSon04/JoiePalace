@@ -1,12 +1,15 @@
-import {
-  DocumentArrowUpIcon,
-  PhotoIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import imagePlaceholder from "@/public/image-placeholder.jpg";
 import { Button } from "@nextui-org/react";
 import Image from "next/image";
 import { useRef } from "react";
-import imagePlaceholder from "@/public/image-placeholder.jpg";
+
+/**
+ * @param {string} image - The image url
+ * @returns - A file uploader component
+ *
+ * // USAGE:
+ *
+ */
 
 function FileUploader({ image }) {
   const hiddenFileInput = useRef(null);

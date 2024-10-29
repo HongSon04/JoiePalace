@@ -13,7 +13,7 @@ const UserRankAndImageClient = ({userImage, rankImage, title}) => {
                 />
             </div>
             <div className="flex gap-2 items-center">
-                <div className="relative w-6 h-3 sm:w-8 sm:h-4 lg:w-10 lg:h-5">
+                <div className="relative w-6 h-3 sm:w-8 sm:h-4 lg:w-10 lg:h-8">
                     <Image
                         src={rankImage}
                         alt="rank-img"

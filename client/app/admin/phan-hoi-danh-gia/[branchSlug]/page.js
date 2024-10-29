@@ -1,6 +1,6 @@
 import AdminHeader from "@/app/_components/AdminHeader";
-import FeedbackBreadcrumbs from "./FeedbackBreadcrumbs";
-import FeedbackTabs from "./FeedbackTabs";
+import FeedbackBreadcrumbs from "../FeedbackBreadcrumbs";
+import FeedbackTabs from "../FeedbackTabs";
 
 export const metadata = {
   title: "Quản lý phản hồi & đánh giá",
@@ -10,7 +10,7 @@ export const metadata = {
 
 function Page() {
   return (
-    <div className="relative">
+    <div>
       <AdminHeader title="Phản hồi & đánh giá" />
       <FeedbackBreadcrumbs />
       <FeedbackTabs />

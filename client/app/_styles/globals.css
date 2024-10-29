@@ -213,8 +213,16 @@ body {
   line-height: 1;
 }
 
+.hidden-input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
 
 @layer components {
+
   .example {
     @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
   }
@@ -487,9 +495,10 @@ body {
   background-image: url('/Diwa-background_page-0001.jpg');
   background-size: cover;
   opacity: 0.2;
-  z-index:-1;
+  z-index: -1;
 }
-.activeConference{
+
+.activeConference {
   opacity: 1;
 }
 
@@ -500,61 +509,73 @@ select {
   border-radius: 10px;
   color: gray
 }
+
 /* tag*/
 
 
-.status{
+.status {
   padding: 6px;
   border-radius: 4px;
 }
-.da-dat-coc{
+
+.da-dat-coc {
   background-color: #FEEBCB;
   color: #ED8936;
 }
-.da-thanh-toan{
+
+.da-thanh-toan {
   background-color: #C6F6D5;
   color: #48BB78;
 }
-.chua-thanh-toan{
+
+.chua-thanh-toan {
   background-color: #FEFCBF;
   color: #B7791F;
 }
-.da-hoan-tien{
+
+.da-hoan-tien {
   background-color: #38B2AC;
   color: #B2F5EA;
 }
-.da-huy{
-  background-color: #FED7D7;  
-  color:  #F56565;
+
+.da-huy {
+  background-color: #FED7D7;
+  color: #F56565;
 }
 
-.tag{
+.tag {
   padding: 10px;
   display: flex;
   gap: 10px;
   align-items: center;
   border-radius: 8px;
 }
-.tag p{
+
+.tag p {
   font-size: 14px;
   font-style: medium;
 }
-.tag-copper{
+
+.tag-copper {
   background-color: rgba(0, 0, 0, 0.24);
   color: #A25915;
 }
-.tag-silver{
+
+.tag-silver {
   background-color: #333333;
   color: #C0C0C0;
 }
-.tag-gold{
+
+.tag-gold {
   background-color: #FFAE00;
   color: white;
 }
-.tag-vip{
+
+.tag-vip {
   background-color: rgba(0, 0, 0, 0.92);
-  color: #FFAE00; 
+  color: #FFAE00;
 }
+
 .bgfeedbackYellow::after {
   content: "";
   position: absolute;
@@ -563,5 +584,5 @@ select {
   height: 50%;
   width: 150px;
   background-image: url(/line-group.svg);
-  z-index: 1; 
+  z-index: 1;
 }

@@ -110,6 +110,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${FEEDBACKS_API}/get/${id}`,
     GET_BY_BOOKING: (bookingId) =>
       `${FEEDBACKS_API}/get-by-booking/${bookingId}`,
+    GET_BY_BRANCH: (branchId) => `${FEEDBACKS_API}/get-by-branch/${branchId}`,
     GET_BY_USER: (userId) => `${FEEDBACKS_API}/get-by-user/${userId}`,
     UPDATE: (id) => `${FEEDBACKS_API}/update/${id}`,
     DESTROY: (id) => `${FEEDBACKS_API}/destroy/${id}`,

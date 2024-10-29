@@ -9,7 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 // import react hooks
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 // import custom components
 import { Divider } from "@chakra-ui/react";
@@ -31,9 +31,10 @@ import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import logo from "@/public/logo-dark.png";
-import { useSelector } from "react-redux";
-import AdminUser from "./AdminUser";
+import { useDispatch, useSelector } from "react-redux";
 import { API_CONFIG } from "../_utils/api.config";
+import AdminUser from "./AdminUser";
+import { getCurrentBranch } from "../_lib/features/branch/branchSlice";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -117,10 +118,23 @@ function AdminSidebarHeader() {
 
 function AdminSidebarNav() {
   const { currentBranch } = useSelector((state) => state.branch);
+  const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
+
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    const storedBranch = JSON.parse(localStorage.getItem("currentBranch"));
+    if (storedBranch) {
+      dispatch(getCurrentBranch(storedBranch));
+    }
+  }, []);
 
   const mainOptions = [
     {
       title: "Bảng điều khiển",
+      // path: isGeneralBranch
+      //   ? "/admin/bang-dieu-khien"
+      //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
       path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
       icon: dashboardIcon,
     },
@@ -131,10 +145,8 @@ function AdminSidebarNav() {
     },
     {
       title: "Thống kê",
-      path:
-        currentBranch.slug === API_CONFIG.GENERAL_BRANCH
-          ? "/admin/thong-ke/"
-          : `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+      path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+      // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
       icon: statisticIcon,
     },
     {
@@ -154,11 +166,6 @@ function AdminSidebarNav() {
       icon: eventIcon,
     },
     {
-      title: "Quản lý bàn ghế",
-      path: `/admin/quan-li-ban-ghe/${currentBranch?.slug}`,
-      icon: tableAndChair,
-    },
-    {
       title: "Thực đơn",
       path: `/admin/thuc-don/`,
       icon: menuIcon,
@@ -175,7 +182,9 @@ function AdminSidebarNav() {
     },
     {
       title: "Phản hồi & đánh giá",
-      path: `/admin/phan-hoi-danh-gia/`,
+      path: isGeneralBranch
+        ? `/admin/phan-hoi-danh-gia`
+        : `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
       icon: feedbackIcon,
     },
     {
@@ -194,7 +203,10 @@ function AdminSidebarNav() {
     },
     {
       title: "Liên hệ & hỗ trợ",
-      path: `/admin/lien-he-ho-tro/${currentBranch?.slug}`,
+      // path: isGeneralBranch
+      //   ? `/admin/lien-he-ho-tro`
+      //   : `/admin/lien-he-ho-tro/${currentBranch.slug}`,
+      path: `/admin/lien-he-ho-tro/${currentBranch.slug}`,
       icon: contactIcon,
     },
     {

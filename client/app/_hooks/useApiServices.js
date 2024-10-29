@@ -1,4 +1,3 @@
-
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -96,7 +95,7 @@ const useApiServices = () => {
       localStorage.removeItem("refreshToken");
     }
 
-    console.log("result from refreshAccessToken function -> ", result);
+    // console.log("result from refreshAccessToken function -> ", result);
     return result; // Return the result (new access token or error)
   };
 

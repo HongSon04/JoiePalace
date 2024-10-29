@@ -10,11 +10,20 @@ import { Link } from "@nextui-org/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Avatar, Button } from "@nextui-org/react";
 import { motion } from "framer-motion";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { getUserFromLocalStorage } from "../_lib/features/authentication/accountSlice";
 
 function AdminUser() {
   const dispatch = useDispatch();
   const { user } = useSelector((store) => store.account);
+
+  React.useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      dispatch(getUserFromLocalStorage(storedUser));
+    }
+  }, []);
 
   const { isSidebarOpen } = useSelector((store) => store.sidebar);
 
