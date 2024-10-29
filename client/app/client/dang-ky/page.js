@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import React, { useState } from "react";
 import { createAccountUser } from "@/app/_services/accountServices";
-import { check } from "@/app/_lib/auth";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -18,8 +17,6 @@ const formSchema = z.object({
   password: z.string().min(8, "Tối thiểu 8 kí tự!").max(36, "Tối đa 36 kí tự!"),
 });
 const Page = () => {
-  check();
-
   const router = useRouter();
   const toast = useCustomToast();
   const [errors, setErrors] = useState({});
