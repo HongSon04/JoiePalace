@@ -307,6 +307,8 @@ model booking_details {
   menus          menus    @relation(fields: [menu_id], references: [id])
   deposit_id     Int
   deposits       deposits @relation(fields: [deposit_id], references: [id])
+  table_count    Int      @default(0)
+  chair_count    Int      @default(0)
   party_types    Json?
   decor          Json?
   menu           Json?

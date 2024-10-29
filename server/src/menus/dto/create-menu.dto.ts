@@ -1,29 +1,39 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  ArrayNotEmpty,
-  IsInt,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty } from 'class-validator';
 
 export class CreateMenuDto {
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Tên menu, không được để trống',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Tên menu không được để trống' })
   name: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Mô tả chi tiết về menu, không được để trống',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
   description: string;
 
-  @ApiProperty({ example: [1, 2, 3] })
+  @ApiProperty({
+    description: 'Danh sách các ID sản phẩm có trong menu',
+    required: false,
+  })
   products: number[];
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    description: 'Giá của menu, không được để trống',
+    required: true,
+  })
   @IsNotEmpty({ message: 'Giá không được để trống' })
   price: number;
 
-  @ApiProperty({ example: ['true', 'false'] })
+  @ApiProperty({
+    description: 'Menu có hiển thị cho khách hàng hay không',
+    required: false,
+  })
+  @IsBoolean({ message: 'Hiện thị phải là một giá trị boolean' })
+  @IsEnum([true, false], { message: 'Hiện thị phải là một giá trị boolean' })
   is_show: boolean;
 }

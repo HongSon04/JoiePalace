@@ -1,3 +1,4 @@
+import { booking_details } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
   HttpException,
@@ -6,8 +7,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import dayjs from 'dayjs';
-import { FilterBookingDto } from './dto/FilterBookingDto';
 import { BookingStatus } from 'helper/enum/booking_status.enum';
 import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
 import { FormatReturnData } from 'helper/FormatReturnData';
@@ -21,6 +22,7 @@ import {
   FormatDateWithShift,
 } from './../../helper/formatDate';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { FilterBookingDto } from './dto/FilterBookingDto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
 
@@ -258,13 +260,6 @@ export class BookingsService {
         });
       }
       // ? Sort Conditions
-      let orderByConditions: any = {};
-      if (priceSort === 'asc' || priceSort === 'desc') {
-        orderByConditions.price = priceSort;
-      }
-      orderByConditions.created_at = 'desc';
-
-      console.log('whereConditions: ', whereConditions);
 
       // ? Fetch Data
       const [result, total] = await this.prismaService.$transaction([
@@ -300,7 +295,9 @@ export class BookingsService {
             },
             stages: true,
           },
-          orderBy: orderByConditions,
+          orderBy: {
+            created_at: 'desc',
+          },
           skip,
           take: itemsPerPage,
         }),
@@ -308,6 +305,21 @@ export class BookingsService {
           where: whereConditions,
         }),
       ]);
+
+      if (priceSort === 'asc' || priceSort === 'desc') {
+        result.sort((a, b) => {
+          const totalA = a.booking_details.reduce(
+            (sum, detail) => sum + detail.total_amount,
+            0,
+          );
+          const totalB = b.booking_details.reduce(
+            (sum, detail) => sum + detail.total_amount,
+            0,
+          );
+          return priceSort === 'asc' ? totalA - totalB : totalB - totalA;
+        });
+      }
+
       // ? Pagination
       const lastPage = Math.ceil(total / itemsPerPage);
       const paginationInfo = {
@@ -415,13 +427,6 @@ export class BookingsService {
           created_at: { gte: startDate, lte: endDate },
         });
       }
-      // ? Sort Conditions
-      let orderByConditions: any = {};
-      if (priceSort === 'asc' || priceSort === 'desc') {
-        orderByConditions.price = priceSort;
-      }
-      orderByConditions.created_at = 'desc';
-
       // ? Fetch Data
       const [result, total] = await this.prismaService.$transaction([
         this.prismaService.bookings.findMany({
@@ -456,7 +461,9 @@ export class BookingsService {
               },
             },
           },
-          orderBy: orderByConditions,
+          orderBy: {
+            created_at: 'desc',
+          },
           skip,
           take: itemsPerPage,
         }),
@@ -464,6 +471,19 @@ export class BookingsService {
           where: whereConditions,
         }),
       ]);
+      if (priceSort === 'asc' || priceSort === 'desc') {
+        result.sort((a, b) => {
+          const totalA = a.booking_details.reduce(
+            (sum, detail) => sum + detail.total_amount,
+            0,
+          );
+          const totalB = b.booking_details.reduce(
+            (sum, detail) => sum + detail.total_amount,
+            0,
+          );
+          return priceSort === 'asc' ? totalA - totalB : totalB - totalA;
+        });
+      }
       // ? Pagination
       const lastPage = Math.ceil(total / itemsPerPage);
       const paginationInfo = {
@@ -715,7 +735,7 @@ export class BookingsService {
         party_type_id,
         table_count,
         phone,
-        extra_sevice,
+        extra_service,
         status,
       } = updateBookingDto;
 
@@ -888,7 +908,7 @@ export class BookingsService {
       if (findBooking.is_deposit === true) {
         let extraServiceAmount = 0;
         // ! Fetch booking with relations
-        extra_sevice.map(async (extra) => {
+        extra_service.map(async (extra) => {
           const findExtra = await this.prismaService.products.findUnique({
             where: { id: Number(extra.id) },
           });
@@ -948,7 +968,9 @@ export class BookingsService {
             menu_id: Number(menu_id),
             decor: decorFormat,
             menu: menuFormat,
-            extra_service: extra_sevice,
+            table_count,
+            chair_count,
+            extra_service: extra_service,
             fee,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
@@ -1052,7 +1074,8 @@ export class BookingsService {
               menu: menuFormat,
               extra_service: null,
               gift: null,
-
+              table_count,
+              chair_count,
               fee,
               total_amount: totalAmount,
               deposit_id: deposit.id,
@@ -1071,6 +1094,8 @@ export class BookingsService {
               extra_service: null,
               gift: null,
               fee,
+              table_count,
+              chair_count,
               total_amount: totalAmount,
               deposit_id: deposit.id,
               amount_booking: Number(bookingAmount),
@@ -1244,6 +1269,113 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> destroy: ', error);
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
+
+  // ! Cron Job check booking expired_at and delete it
+  @Cron('0 */2 * * *')
+  async handleBookingExpiredCron() {
+    try {
+      const currentDate = new Date();
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          deleted: false,
+          expired_at: {
+            gte: currentDate,
+          },
+        },
+      });
+
+      // Xóa booking nếu hết hạn
+      bookings.map(async (booking) => {
+        // ? Xóa booking
+        await this.prismaService.bookings.update({
+          where: { id: Number(booking.id) },
+          data: {
+            deleted: true,
+            deleted_at: new Date(),
+            deleted_by: 1,
+            status: 'cancel',
+          },
+        });
+      });
+    } catch (error) {
+      console.log('Lỗi từ booking.service.ts -> handleCron: ', error);
+    }
+  }
+
+  // ! Send Email Booking if is_deposit is false
+  // ! Cron Job Run Every Day at 8:00 AM
+  @Cron('0 8 * * *')
+  async handleBookingEmailCron() {
+    try {
+      const currentDate = new Date();
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          deleted: false,
+          is_deposit: false,
+          organization_date: {
+            gte: currentDate,
+          },
+        },
+        include: {
+          users: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              memberships_id: true,
+              phone: true,
+              avatar: true,
+              role: true,
+            },
+          },
+          branches: true,
+          booking_details: {
+            include: {
+              decors: true,
+              menus: {
+                include: {
+                  products: {
+                    include: {
+                      tags: true,
+                    },
+                  },
+                },
+              },
+              deposits: true,
+            },
+          },
+          stages: true,
+        },
+      });
+
+      // Prepare notification and email content
+      bookings.map(async (booking) => {
+        const { name, email, phone, organization_date, shift, branches } =
+          booking;
+        const formattedDate = FormatDateWithShift(
+          organization_date as any,
+          shift,
+        );
+
+        // Send Mail
+        const bodyMail = {
+          shift,
+          organization_date: dayjs(formattedDate).format('DD/MM/YYYY'),
+          branchName: branches.name,
+          customerName: name,
+          customerEmail: email,
+          customerPhone: phone,
+          branchAddress: branches.address,
+        };
+        await this.mailService.sendUserConfirmationBooking(bodyMail);
+      });
+    } catch (error) {
+      console.log(
+        'Lỗi từ booking.service.ts -> handleBookingEmailCron: ',
         error,
       );
     }

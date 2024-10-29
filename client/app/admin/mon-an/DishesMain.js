@@ -42,6 +42,8 @@ function DishesMain() {
 
   const dispatch = useDispatch();
 
+  const [activeTabIndex, setActiveTabIndex] = React.useState(0); // State to track the active tab
+
   const getCategories = async () => {
     dispatch(fetchingCategories());
 
@@ -51,7 +53,7 @@ function DishesMain() {
     );
 
     if (data.success) {
-      dispatch(fetchingCategoriesSuccess(data.data));
+      dispatch(fetchingCategoriesSuccess(data.data.at(0).children));
       return;
     }
 
@@ -78,6 +80,14 @@ function DishesMain() {
     getCategories();
   }, []);
 
+  // Fetch dishes when the active tab changes
+  React.useEffect(() => {
+    if (categories.length > 0) {
+      const activeCategoryId = categories[activeTabIndex].id; // Assuming each category has an 'id' property
+      getDishesByCategoryId(activeCategoryId);
+    }
+  }, [activeTabIndex, categories]);
+
   if (isFetchingCategories) {
     return <Loading />;
   }
@@ -87,11 +97,16 @@ function DishesMain() {
   }
   return (
     <div className="w-full mt-8">
-      <Tabs className="mt-8" variant={"unstyled"} isLazy>
+      <Tabs
+        className="mt-8"
+        variant={"unstyled"}
+        isLazy
+        onChange={(index) => setActiveTabIndex(index)}
+      >
         <TabList width={"fit-content"} className="!w-full flex">
-          {categories.map((c) => (
+          {categories.map((c, index) => (
             <Tab
-              key={c.key}
+              key={index}
               color={"white"}
               className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
             >
@@ -101,11 +116,16 @@ function DishesMain() {
         </TabList>
         <TabIndicator mt="1.5px" height="2px" bg="white" borderRadius="2px" />
         <TabPanels>
-          {/* {status.map((item, index) => (
-            <TabPanel className="mt-3 rounded-md bg-whiteAlpha-100" key={index}>
-              Tab panel {index}
+          {categories.map((category, index) => (
+            <TabPanel className="mt-3 rounded-md" key={index}>
+              <DishesSection
+                dishCategory={category}
+                key={index}
+                categories={categories}
+              />{" "}
+              {/* Pass categoryId to DishesSection */}
             </TabPanel>
-          ))} */}
+          ))}
         </TabPanels>
         {/* <CustomPagination total={status.length} /> */}
       </Tabs>

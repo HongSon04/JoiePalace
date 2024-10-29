@@ -58,7 +58,7 @@ export class PackagesController {
           'http://localhost:3000/images/1.jpg',
           'http://localhost:3000/images/2.jpg',
         ],
-        extra_sevice: [
+        extra_service: [
           { id: 1, quantity: 2 },
           { id: 2, quantity: 1 },
         ],
@@ -141,7 +141,7 @@ export class PackagesController {
           'http://localhost:3000/images/1.jpg',
           'http://localhost:3000/images/2.jpg',
         ],
-        extra_sevice: [
+        extra_service: [
           { id: 1, quantity: 2 },
           { id: 2, quantity: 1 },
         ],
@@ -180,7 +180,7 @@ export class PackagesController {
           'http://localhost:3000/images/1.jpg',
           'http://localhost:3000/images/2.jpg',
         ],
-        extra_sevice: [
+        extra_service: [
           { id: 1, quantity: 2 },
           { id: 2, quantity: 1 },
         ],
@@ -218,7 +218,7 @@ export class PackagesController {
         'http://localhost:3000/images/1.jpg',
         'http://localhost:3000/images/2.jpg',
       ],
-      extra_sevice: [
+      extra_service: [
         { id: 1, quantity: 2 },
         { id: 2, quantity: 1 },
       ],
@@ -262,7 +262,7 @@ export class PackagesController {
         'http://localhost:3000/images/1.jpg',
         'http://localhost:3000/images/2.jpg',
       ],
-      extra_sevice: [
+      extra_service: [
         { id: 1, quantity: 2 },
         { id: 2, quantity: 1 },
       ],
@@ -315,7 +315,7 @@ export class PackagesController {
           'http://localhost:3000/images/1.jpg',
           'http://localhost:3000/images/2.jpg',
         ],
-        extra_sevice: [
+        extra_service: [
           { id: 1, quantity: 2 },
           { id: 2, quantity: 1 },
         ],

@@ -10,3 +10,21 @@ export const fetchUserProfile = async () => {
 
   return response.data.data;
 };
+export const createAccountUser = async (dataToSend) => {
+  const response = await axios.post(API_CONFIG.AUTH.REGISTER, dataToSend);
+
+  if (response.status !== 200 && response.status !== 201) {
+    throw new Error("Có lỗi khi tạo tài khoản");
+  }
+
+  return response.data.data;
+};
+export const loginAccountUser = async (dataToSend) => {
+  const response = await axios.post(API_CONFIG.AUTH.LOGIN, dataToSend);
+
+  if (response.status !== 200 && response.status !== 201) {
+    throw new Error("Có lỗi khi đăng nhập");
+  }
+
+  return response.data.data;
+};

@@ -41,6 +41,10 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
+// is_confirm = false;
+// is_deposit = false;
+// status = 'pending';
+
 function RequestTable() {
   const pathname = usePathname();
 

@@ -42,10 +42,10 @@ function FormInput({
   id,
   type = "text",
   className = "",
+  labelClassName = "font-semibold text-[14px]",
   errorMessage = "",
   isPasswordVisible,
   setIsPasswordVisible,
-  labelClassName = "",
   placeholder = "",
   wrapperClassName = "",
   startContent = null,
@@ -65,8 +65,16 @@ function FormInput({
   optionClassName = "",
 }) {
   const themeClassName = {
-    light: "",
-    dark: "",
+    light: {
+      input:
+        "!bg-whiteAlpha-100 !hover:bg-whiteAlpha-200 !focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400",
+      label: "!text-white",
+    },
+    dark: {
+      input:
+        "!bg-blackAlpha-200 !hover:bg-blackAlpha-400 !focus:bg-blackAlpha-400 !text-gray-800 !placeholder:text-gray-600",
+      label: "!text-gray-600",
+    },
   }[theme];
 
   return (
@@ -75,7 +83,11 @@ function FormInput({
     >
       {/* LABEL */}
       {label !== "" && (
-        <label role="label" htmlFor={id} className={`${labelClassName}`}>
+        <label
+          role="label"
+          htmlFor={id}
+          className={`${labelClassName} ${themeClassName.label}`}
+        >
           {capitalize(label)}
         </label>
       )}
@@ -99,7 +111,7 @@ function FormInput({
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className}`}
+            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
           />
         )}
         {type === "text" && (
@@ -112,7 +124,20 @@ function FormInput({
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className}`}
+            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
+          />
+        )}
+        {type === "number" && (
+          <input
+            ref={inputRef}
+            placeholder={placeholder}
+            role="input"
+            type="number"
+            {...register(name)}
+            id={id || name}
+            name={name}
+            aria-label={ariaLabel}
+            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
           />
         )}
         {type === "password" && (
@@ -125,24 +150,25 @@ function FormInput({
             id={id}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 outline-none border-none text-white placeholder:text-gray-400 w-full flex-1 ${className}`}
+            className={`px-3 py-2 outline-none border-none text-white placeholder:text-gray-400 w-full flex-1 ${className} ${themeClassName.input}`}
           />
         )}
         {type === "select" && (
           <select
+            {...register(name)}
             name={name}
             id={id}
             value={value}
-            className={`select !bg-blackAlpha-100 text-gray-600 hover:text-gray-400 ${className}`}
+            className={`select w-full !bg-blackAlpha-100 text-gray-600 hover:text-gray-400 ${className} ${themeClassName.input}`}
             required={required}
           >
-            {options.map((option) => (
+            {options.map((option, index) => (
               <option
                 value={option.id}
-                key={option.key}
+                key={index}
                 className={`option text-gray-600 ${optionClassName}`}
               >
-                {option.label}
+                {option.name}
               </option>
             ))}
           </select>
@@ -150,6 +176,7 @@ function FormInput({
         {type !== "password" &&
           type !== "textarea" &&
           type !== "text" &&
+          type !== "number" &&
           type !== "select" && (
             <input
               ref={inputRef}
@@ -160,7 +187,7 @@ function FormInput({
               id={id || name}
               name={name}
               aria-label={ariaLabel}
-              className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className}`}
+              className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
             />
           )}
         {type === "password" && (

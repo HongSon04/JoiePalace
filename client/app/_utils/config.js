@@ -1,3 +1,11 @@
+import dishImagePlaceholder from "@/public/alacarte-menu-thumbnail.png";
+import imageUploaderPlaceholder from "@/public/imageUploaderPlaceholder.svg";
+
+export const CONFIG = {
+  DISH_IMAGE_PLACEHOLDER: dishImagePlaceholder,
+  IMAGE_UPLOADER_PLACEHOLDER: imageUploaderPlaceholder,
+};
+
 export const requestStatus = [
   {
     key: "pending",
