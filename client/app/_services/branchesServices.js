@@ -46,12 +46,18 @@ export const fetchCurrentBranch = async (slug) => {
 };
 
 export const postBranchAPI = async (branch) => {
-  const response = await axios.post(API_CONFIG.BRANCHES.CREATE, branch);
-  if (response.status!== 201) {
-    throw new Error("Có lỗi khi tạo chi nhánh mới");
+  try {
+    const response = await axios.post(API_CONFIG.BRANCHES.CREATE, branch);
+    if (response.status!== 201) {
+      throw new Error("Có lỗi khi tạo chi nhánh mới");
+    }
+    return response.data.data;
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error;
   }
-  return response.data.data;
 }
+
 export const fetchBranchDataById = async (branchId) => {
   try {
     const response = await axios.get(API_CONFIG.DASHBOARD.GET_BOOKING_STATUS(branchId));

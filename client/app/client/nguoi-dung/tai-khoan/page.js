@@ -24,12 +24,11 @@ const InputField = ({ label, type, placeholder, name, register, error, trigger }
             {...register(name)}
             onBlur={() => trigger(name)}
         />
-        {error && <p className="text-red-500 text-sm">{error.message}</p>} {/* Display error messages */}
+        {error && <p className="text-red-500 text-sm">{error.message}</p>}
     </div>
 );
 
 const Page = () => {
-    // Initialize `useForm` with `zodResolver`
     const { register, handleSubmit, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(formSchema),
     });
@@ -37,7 +36,6 @@ const Page = () => {
     // Handle form submission
     const onSubmit = (data) => {
         console.log('Form data:', data);
-        // Handle form submission logic here
     };
 
     return (
