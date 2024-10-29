@@ -68,6 +68,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @UseInterceptors(
@@ -150,6 +151,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   getProfile(@Request() req) {
@@ -204,6 +206,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiQuery({ name: 'page', required: false })
@@ -260,6 +263,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy danh sách tài khoản đã bị xóa tạm' })
@@ -327,6 +331,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiQuery({ name: 'page', required: false })
@@ -376,6 +381,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo id' })
@@ -421,6 +427,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo email' })
@@ -454,6 +461,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Thay đổi mật khẩu' })
@@ -491,6 +499,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Thay đổi thông tin cá nhân' })
@@ -524,6 +533,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa tài khoản tạm thời' })
@@ -557,6 +567,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Khôi phục tài khoản đã xóa tạm' })
@@ -590,6 +601,7 @@ export class UserController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa vĩnh viễn tài khoản' })

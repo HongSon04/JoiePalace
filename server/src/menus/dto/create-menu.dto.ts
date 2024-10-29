@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNotEmpty } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateMenuDto {
   @ApiProperty({
@@ -36,4 +36,11 @@ export class CreateMenuDto {
   @IsBoolean({ message: 'Hiện thị phải là một giá trị boolean' })
   @IsEnum([true, false], { message: 'Hiện thị phải là một giá trị boolean' })
   is_show: boolean;
+
+  @ApiProperty({
+    description: 'Ảnh Menu, không được để trống',
+    required: false,
+  })
+  @IsOptional()
+  images?: string[];
 }

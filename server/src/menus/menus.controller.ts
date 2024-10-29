@@ -1,19 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Put,
   Query,
   Request,
-  Put,
-  HttpStatus,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { MenusService } from './menus.service';
-import { CreateMenuDto } from './dto/create-menu.dto';
-import { UpdateMenuDto } from './dto/update-menu.dto';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -22,8 +22,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
+import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { CreateMenuDto } from './dto/create-menu.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
+import { MenusService } from './menus.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Menus - Quản lý thực đơn')
 @Controller('api/menus')
@@ -60,9 +64,46 @@ export class MenusController {
       message: 'Lỗi server vui lòng thử lại sau',
     },
   })
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file) {
+          return cb(
+            new BadRequestException('Không có tệp nào được tải lên'),
+            false,
+          );
+        }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
+      },
+    }),
+  )
   @ApiOperation({ summary: 'Thêm mới menu' })
-  create(@Body() createMenuDto: CreateMenuDto) {
-    return this.menusService.create(createMenuDto);
+  create(
+    @Body() createMenuDto: CreateMenuDto,
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
+  ) {
+    return this.menusService.create(createMenuDto, files);
   }
 
   // ! Get All Menu
@@ -265,9 +306,47 @@ export class MenusController {
       message: 'Không tìm thấy menu',
     },
   })
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file) {
+          return cb(
+            new BadRequestException('Không có tệp nào được tải lên'),
+            false,
+          );
+        }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 6) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 6 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
+      },
+    }),
+  )
   @ApiOperation({ summary: 'Cập nhật menu' })
-  update(@Param('menu_id') id: number, @Body() updateMenuDto: UpdateMenuDto) {
-    return this.menusService.update(id, updateMenuDto);
+  update(
+    @Param('menu_id') id: number,
+    @Body() updateMenuDto: UpdateMenuDto,
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
+  ) {
+    return this.menusService.update(id, updateMenuDto, files);
   }
 
   // ! Soft Delete Menu

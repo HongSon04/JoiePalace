@@ -30,10 +30,10 @@ export class MailService {
       });
     } catch (error) {
       console.log('Lỗi từ MailService->sendUserConfirmationBooking', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -52,10 +52,10 @@ export class MailService {
       });
     } catch (error) {
       console.log('Lỗi từ MailService->confirmRegister', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 }

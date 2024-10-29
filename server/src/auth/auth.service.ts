@@ -90,10 +90,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> register', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
   // ! Login
@@ -137,10 +137,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> login', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -169,10 +169,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> logout', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -204,10 +204,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> changeAvatar', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -345,10 +345,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> verifyEmail', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 

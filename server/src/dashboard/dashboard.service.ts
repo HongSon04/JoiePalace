@@ -73,10 +73,10 @@ export class DashboardService {
         throw error;
       }
       console.log('Lỗi từ dashboardService -> getAllInfo: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -120,10 +120,10 @@ export class DashboardService {
         throw error;
       }
       console.log('Lỗi từ dashboardService -> getAllInfoByEachTime: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -225,10 +225,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getDashboardGeneralInfoByMonth: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -273,10 +273,10 @@ export class DashboardService {
         throw error;
       }
       console.log('Lỗi từ dashboardService -> countAll: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -306,10 +306,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForAllBranch: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -347,10 +347,10 @@ export class DashboardService {
         error,
       );
 
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -389,10 +389,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForAllBranchByMonth: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -440,10 +440,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForAllBranchByQuarter: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -481,10 +481,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForAllBranchByYear: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -530,10 +530,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForAllBranchEachMonth: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -570,10 +570,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> countBookingStatusForAllBranch: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -642,10 +642,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForEachBranch: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -723,10 +723,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForEachBranchByWeek: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -805,10 +805,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForEachBranchByMonth: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -889,10 +889,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForEachBranchByQuarter: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -966,10 +966,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForEachBranchByYear: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -1064,10 +1064,10 @@ export class DashboardService {
         'Lỗi từ dashboardService -> getTotalRevenueForEachBranchEachMonth: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -1124,10 +1124,10 @@ export class DashboardService {
         throw error;
       }
       console.log('Lỗi từ dashboardService -> countBookingStatus: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 }
