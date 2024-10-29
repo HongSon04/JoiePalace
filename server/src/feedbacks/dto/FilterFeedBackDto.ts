@@ -7,42 +7,56 @@ export class FilterFeedBackDto {
     required: false,
   })
   @IsOptional()
-  page: string;
+  page?: string;
 
   @ApiProperty({
     description: 'Số lượng phản hồi trên mỗi trang, mặc định là 10',
     required: false,
   })
   @IsOptional()
-  itemsPerPage: string;
+  itemsPerPage?: string;
+
+  @ApiProperty({
+    description: 'ID của người dùng để lọc phản hồi',
+    required: false,
+  })
+  @IsOptional()
+  user_id?: string;
+
+  @ApiProperty({
+    description: 'ID của booking để lọc phản hồi',
+    required: false,
+  })
+  @IsOptional()
+  booking_id?: string;
 
   @ApiProperty({
     description: 'Từ khóa tìm kiếm để lọc phản hồi',
     required: false,
   })
   @IsOptional()
-  search: string;
+  search?: string;
 
   @ApiProperty({
     description: 'Ngày bắt đầu để lọc phản hồi (định dạng: YYYY-MM-DD)',
     required: false,
   })
   @IsOptional()
-  startDate: string;
+  startDate?: string;
 
   @ApiProperty({
     description: 'Ngày kết thúc để lọc phản hồi (định dạng: YYYY-MM-DD)',
     required: false,
   })
   @IsOptional()
-  endDate: string;
+  endDate?: string;
 
   @ApiProperty({
     description: 'ID của chi nhánh để lọc phản hồi',
     required: false,
   })
   @IsOptional()
-  branch_id: string;
+  branch_id?: string;
 
   @ApiProperty({
     description:
@@ -50,7 +64,7 @@ export class FilterFeedBackDto {
     required: false,
   })
   @IsOptional()
-  is_show: string;
+  is_show?: string;
 
   @ApiProperty({
     description:
@@ -58,5 +72,5 @@ export class FilterFeedBackDto {
     required: false,
   })
   @IsOptional()
-  is_approved: string;
+  is_approved?: string;
 }

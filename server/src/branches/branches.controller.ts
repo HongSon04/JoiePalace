@@ -91,6 +91,7 @@ export class BranchesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @UseInterceptors(
@@ -318,6 +319,7 @@ export class BranchesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo ID' })
@@ -373,6 +375,7 @@ export class BranchesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin chi nhánh theo Slug' })
@@ -524,6 +527,7 @@ export class BranchesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa tạm chi nhánh' })
@@ -560,6 +564,7 @@ export class BranchesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Khôi phục chi nhánh đã xóa tạm' })
@@ -593,6 +598,7 @@ export class BranchesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa vĩnh viễn chi nhánh' })

@@ -104,10 +104,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> create', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -209,10 +209,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -314,10 +314,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -347,10 +347,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> findOne', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -399,10 +399,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> findOneBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -447,10 +447,10 @@ export class CategoriesService {
         'Lỗi từ categories.service.ts -> findCategoryByTagSlug',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -544,10 +544,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> update', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -581,10 +581,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> softDelete', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -619,10 +619,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> restore', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -652,10 +652,10 @@ export class CategoriesService {
         throw error;
       }
       console.log('Lỗi từ categories.service.ts -> destroy', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 

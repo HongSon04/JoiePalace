@@ -37,10 +37,10 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->findOne: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -66,10 +66,10 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->findOneByTransactionId: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -117,10 +117,10 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->update: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -171,10 +171,10 @@ export class DepositsService {
         throw error;
       }
       console.log('Lỗi từ DepositsService->updateByTransactionID: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 }

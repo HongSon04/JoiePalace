@@ -73,6 +73,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Tạo sảnh mới' })
@@ -156,6 +157,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả sảnh theo chi nhánh' })
@@ -192,6 +194,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiParam({ name: 'stage_id', required: true })
@@ -313,6 +316,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa sảnh vĩnh viễn' })

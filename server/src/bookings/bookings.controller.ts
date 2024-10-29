@@ -77,6 +77,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   create(@Body() createBookingDto: CreateBookingDto) {
@@ -206,6 +207,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiQuery({ name: 'page', required: false })
@@ -317,6 +319,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   findOne(@Param('booking_id') id: number) {
@@ -650,6 +653,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   updateStatus(
@@ -685,6 +689,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   delete(@Request() req, @Param('booking_id') id: number) {
@@ -717,6 +722,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   restore(@Param('booking_id') id: number) {

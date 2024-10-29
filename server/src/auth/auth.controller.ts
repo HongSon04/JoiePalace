@@ -52,6 +52,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Người dùng tạo tài khoản' })
@@ -80,6 +81,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Người dùng đăng nhập' })
@@ -114,6 +116,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   logout(@Request() req) {
@@ -140,6 +143,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Làm mới token (Access Token)' })
@@ -170,6 +174,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   sendEmailVerify(@Body() body: { email: string }) {
@@ -196,6 +201,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   verifyToken(@Body() body: VerifyTokenDto) {
@@ -254,6 +260,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   async uploadAvatar(

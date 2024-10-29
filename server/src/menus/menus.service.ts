@@ -16,13 +16,20 @@ import {
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class MenusService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
   // ! Create Menu
-  async create(createMenuDto: CreateMenuDto) {
+  async create(
+    createMenuDto: CreateMenuDto,
+    files: { images?: Express.Multer.File[] },
+  ) {
     try {
       const { name, description, products, price, is_show } = createMenuDto;
       const slug = MakeSlugger(name);
@@ -64,6 +71,15 @@ export class MenusService {
         );
       }
 
+      // ? Upload Image if available
+      const images =
+        files?.images && files.images.length > 0
+          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
+              files.images,
+              'joiepalace/menu',
+            )
+          : ([] as any);
+
       const menus = await this.prismaService.menus.create({
         data: {
           name,
@@ -74,6 +90,7 @@ export class MenusService {
           products: {
             connect: connectproducts,
           },
+          images,
         },
         include: {
           products: {
@@ -93,10 +110,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> create', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -234,10 +251,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> findAll', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -375,10 +392,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -409,10 +426,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> findOne', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -445,15 +462,19 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> findBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
   // ! Update Menu
-  async update(id: number, updateMenuDto: UpdateMenuDto) {
+  async update(
+    id: number,
+    updateMenuDto: UpdateMenuDto,
+    files: { images?: Express.Multer.File[] },
+  ) {
     const { name, description, products, price } = updateMenuDto;
     try {
       const slug = MakeSlugger(name);
@@ -468,6 +489,14 @@ export class MenusService {
 
       if (findMenuByname) {
         throw new BadRequestException('Tên menu đã tồn tại');
+      }
+
+      const findMenuById = await this.prismaService.menus.findUnique({
+        where: { id: Number(id) },
+      });
+
+      if (!findMenuById) {
+        throw new NotFoundException('Menu không tồn tại');
       }
 
       const findProducts = await this.prismaService.products.findMany({
@@ -497,6 +526,15 @@ export class MenusService {
         );
       }
 
+      // ? Upload Image if available
+      const images =
+        files?.images && files.images.length > 0
+          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
+              files.images,
+              'joiepalace/menu',
+            )
+          : ([] as any);
+
       const menu = await this.prismaService.menus.update({
         where: { id: Number(id) },
         data: {
@@ -507,6 +545,7 @@ export class MenusService {
           products: {
             set: connectproducts,
           },
+          images: images ? images : findMenuById.images,
         },
         include: {
           products: {
@@ -529,10 +568,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> update', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -561,10 +600,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> remove', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -593,10 +632,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> restore', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 
@@ -620,10 +659,10 @@ export class MenusService {
         throw error;
       }
       console.log('Lỗi từ menus.service.ts -> destroy', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error,
+      });
     }
   }
 }
