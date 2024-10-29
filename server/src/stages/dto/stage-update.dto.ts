@@ -25,14 +25,12 @@ export class StageUpdateDto {
 
   @ApiProperty({
     type: Number,
-    example: 10,
     description: 'Số lượng bàn tối thiểu (bắt buộc)',
   })
   capacity_min: number;
 
   @ApiProperty({
     type: Number,
-    example: 50,
     description: 'Số lượng bàn tối đa (bắt buộc)',
   })
   capacity_max: number;

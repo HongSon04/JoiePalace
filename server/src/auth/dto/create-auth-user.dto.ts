@@ -5,7 +5,6 @@ export class CreateAuthUserDto {
   @ApiProperty({
     required: true,
     description: 'Họ và tên của người dùng',
-    example: 'Nguyễn Văn A',
   })
   @IsNotEmpty({ message: 'Vui lòng nhập họ và tên' })
   username: string;
@@ -13,7 +12,6 @@ export class CreateAuthUserDto {
   @ApiProperty({
     required: true,
     description: 'Địa chỉ email của người dùng',
-    example: 'example@example.com',
   })
   @IsNotEmpty({ message: 'Vui lòng nhập Email' })
   @IsEmail({}, { message: 'Email không đúng định dạng' })
@@ -22,7 +20,6 @@ export class CreateAuthUserDto {
   @ApiProperty({
     required: true,
     description: 'Mật khẩu của người dùng',
-    example: 'M@tp@ssw0rd',
   })
   @IsNotEmpty({ message: 'Vui lòng nhập mật khẩu' })
   password: string;
@@ -30,7 +27,6 @@ export class CreateAuthUserDto {
   @ApiProperty({
     required: true,
     description: 'Số điện thoại liên hệ của người dùng',
-    example: '0123456789',
   })
   @IsNotEmpty({ message: 'Vui lòng nhập số điện thoại' })
   phone: string;

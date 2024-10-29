@@ -4,7 +4,6 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class CreateDecorDto {
   @ApiProperty({
     description: 'Tên trang trí, không được để trống',
-    example: 'Đèn trang trí',
     required: true,
   })
   @IsNotEmpty({ message: 'Tên trang trí không được để trống' })
@@ -12,7 +11,6 @@ export class CreateDecorDto {
 
   @ApiProperty({
     description: 'Mô tả chi tiết về trang trí, không được để trống',
-    example: 'Đèn trang trí này mang lại ánh sáng ấm áp cho không gian.',
     required: true,
   })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
@@ -20,7 +18,6 @@ export class CreateDecorDto {
 
   @ApiProperty({
     description: 'Mô tả ngắn gọn về trang trí, không được để trống',
-    example: 'Đèn LED trang trí',
     required: true,
   })
   @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
@@ -28,7 +25,6 @@ export class CreateDecorDto {
 
   @ApiProperty({
     description: 'Giá của trang trí, không được để trống',
-    example: 15000000,
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })
@@ -42,7 +38,6 @@ export class CreateDecorDto {
 
   @ApiProperty({
     description: 'Danh sách các ID sản phẩm liên quan đến trang trí',
-    example: [1, 2, 3],
     required: false,
   })
   @IsOptional()

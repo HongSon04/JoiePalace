@@ -4,7 +4,6 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class CreatePackageDto {
   @ApiProperty({
     description: 'Tên gói tiệc, không được để trống',
-    example: 'Gói tiệc Tiệc Cưới',
     required: true,
   })
   @IsNotEmpty({ message: 'Tên gói tiệc không được để trống' })
@@ -12,7 +11,6 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'ID loại tiệc, không được để trống',
-    example: 1,
     required: true,
   })
   @IsNotEmpty({ message: 'Loại tiệc không được để trống' })
@@ -20,7 +18,6 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'ID menu, không được để trống',
-    example: 2,
     required: true,
   })
   @IsNotEmpty({ message: 'Menu không được để trống' })
@@ -28,7 +25,6 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'ID trang trí, không được để trống',
-    example: 3,
     required: true,
   })
   @IsNotEmpty({ message: 'Trang trí không được để trống' })
@@ -36,7 +32,6 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'Mô tả chi tiết về gói tiệc, không được để trống',
-    example: 'Gói tiệc tiệc cưới bao gồm tất cả các dịch vụ cần thiết.',
     required: true,
   })
   @IsNotEmpty({ message: 'Mô tả không được để trống' })
@@ -44,7 +39,6 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'Mô tả ngắn gọn về gói tiệc',
-    example: 'Gói tiệc tiệc cưới cao cấp',
     required: false,
   })
   @IsOptional()
@@ -52,7 +46,6 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'Giá của gói tiệc, không được để trống',
-    example: 1500000,
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })

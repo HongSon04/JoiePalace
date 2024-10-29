@@ -5,7 +5,6 @@ export class CreateBranchDto {
   @ApiProperty({
     required: true,
     description: 'Tên địa điểm của chi nhánh',
-    example: 'Chi nhánh Hà Nội',
   })
   @IsNotEmpty({ message: 'Tên địa điểm không được để trống' })
   name: string;
@@ -13,7 +12,6 @@ export class CreateBranchDto {
   @ApiProperty({
     required: true,
     description: 'Địa chỉ của chi nhánh',
-    example: '123 Đường ABC, Quận 1, Hà Nội',
   })
   @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
   address: string;
@@ -21,7 +19,6 @@ export class CreateBranchDto {
   @ApiProperty({
     required: true,
     description: 'Số điện thoại liên hệ của chi nhánh',
-    example: '0123456789',
   })
   @IsNotEmpty({ message: 'Số điện thoại không được để trống' })
   phone: string;
@@ -29,14 +26,12 @@ export class CreateBranchDto {
   @ApiProperty({
     required: false,
     description: 'Slug của chi nhánh (được tạo tự động)',
-    example: 'chi-nhanh-ha-noi',
   })
   slug?: string;
 
   @ApiProperty({
     required: true,
     description: 'Địa chỉ email liên hệ của chi nhánh',
-    example: 'branch@example.com',
   })
   @IsNotEmpty({ message: 'Email không được để trống' })
   email: string;
@@ -44,14 +39,12 @@ export class CreateBranchDto {
   @ApiProperty({
     required: false,
     description: 'ID của chi nhánh (nếu có)',
-    example: 1,
   })
   branch_id?: number;
 
   @ApiProperty({
     required: true,
     description: 'Slogan của chi nhánh',
-    example: 'Dịch vụ tốt nhất cho bạn',
   })
   @IsNotEmpty({ message: 'Slogan không được để trống' })
   slogan: string;
@@ -59,7 +52,6 @@ export class CreateBranchDto {
   @ApiProperty({
     required: true,
     description: 'Mô tả chi tiết về slogan',
-    example: 'Chúng tôi cam kết mang đến dịch vụ tốt nhất cho khách hàng.',
   })
   @IsNotEmpty({ message: 'Mô tả slogan không được để trống' })
   slogan_description: string;
@@ -67,7 +59,6 @@ export class CreateBranchDto {
   @ApiProperty({
     required: true,
     description: 'Mô tả sơ đồ của chi nhánh',
-    example: 'Sơ đồ chi nhánh với các khu vực rõ ràng.',
   })
   @IsNotEmpty({ message: 'Mô tả sơ đồ không được để trống' })
   diagram_description: string;
@@ -75,7 +66,6 @@ export class CreateBranchDto {
   @ApiProperty({
     required: true,
     description: 'Mô tả thiết bị của chi nhánh',
-    example: 'Thiết bị hiện đại phục vụ cho sự kiện.',
   })
   @IsNotEmpty({ message: 'Mô tả thiết bị không được để trống' })
   equipment_description: string;

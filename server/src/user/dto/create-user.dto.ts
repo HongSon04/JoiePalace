@@ -1,17 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Role } from 'helper/enum/role.enum';
 
 export class CreateUserDto {
   @ApiProperty({
     required: true,
     description: 'Họ và tên của người dùng',
-    example: 'Nguyễn Văn A',
   })
   @IsNotEmpty({ message: 'Vui lòng nhập họ và tên' })
   username: string;
@@ -19,7 +13,6 @@ export class CreateUserDto {
   @ApiProperty({
     required: true,
     description: 'Địa chỉ email của người dùng',
-    example: 'email@example.com',
   })
   @IsNotEmpty({ message: 'Vui lòng nhập Email' })
   email: string;
@@ -27,7 +20,6 @@ export class CreateUserDto {
   @ApiProperty({
     required: false,
     description: 'ID của chi nhánh (nếu có)',
-    example: 1,
   })
   @IsOptional()
   branch_id?: number;
@@ -42,7 +34,6 @@ export class CreateUserDto {
   @ApiProperty({
     required: true,
     description: 'Số điện thoại của người dùng',
-    example: '+84123456789',
   })
   @IsNotEmpty({ message: 'Vui lòng nhập số điện thoại' })
   phone: string;
@@ -51,7 +42,6 @@ export class CreateUserDto {
     required: true,
     enum: Role,
     description: 'Vai trò của người dùng',
-    example: Role.MANAGER,
   })
   @IsEnum(Role, { message: 'Vai trò không hợp lệ' })
   role: Role;
@@ -59,7 +49,6 @@ export class CreateUserDto {
   @ApiProperty({
     required: false,
     description: 'Trạng thái hoạt động của người dùng',
-    example: true,
   })
   @IsOptional()
   active?: boolean;

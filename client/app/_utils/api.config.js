@@ -12,6 +12,7 @@ const PRODUCTS_API = `${HOST}/products`;
 const FEEDBACKS_API = `${HOST}/feedbacks`;
 const PARTYTYPES_API = `${HOST}/party-types`;
 const BOOKING_API = `${HOST}/bookings`;
+const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 
 // API Endpoints
@@ -124,6 +125,13 @@ export const API_CONFIG = {
   BOOKINGS: {
     CREATE: `${BOOKING_API}/create`,
     GET_ALL: `${BOOKING_API}/get-all`,
+  },
+
+  // BLOG TYPES API
+  BLOGS: {
+    // CREATE: `${BLOGS_API}/create`,
+    GET_ALL: `${BLOGS_API}/get-all`,
+    GET_BY_ID: (id) => `${BLOGS_API}/get/${id}`,
   },
 
   // NOTIFICATIONS API

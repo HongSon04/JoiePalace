@@ -213,6 +213,7 @@ body {
   line-height: 1;
 }
 
+
 @layer components {
   .example {
     @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]

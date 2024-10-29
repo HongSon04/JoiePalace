@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TagDto {
-  @ApiProperty({ description: 'ID của thẻ', example: 1 })
+  @ApiProperty({ description: 'ID của thẻ' })
   id: number;
 
-  @ApiProperty({ description: 'Tên của thẻ', example: 'Thẻ Ví dụ' })
+  @ApiProperty({ description: 'Tên của thẻ' })
   name: string;
 
-  @ApiProperty({ description: 'Slug của thẻ', example: 'the-vi-du' })
+  @ApiProperty({ description: 'Slug của thẻ' })
   slug: string;
 }

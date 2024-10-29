@@ -7,6 +7,9 @@ import InputIndex from "./InputIndexClient";
 import { fetchBranchesFromApi } from "../_services/branchesServices";
 import { fecthAllPartyTypes } from "../_services/partyTypesServices";
 import { createNewBooking } from "../_services/bookingServices";
+import { formatDate } from "../_utils/format";
+import useCustomToast from "../_hooks/useCustomToast";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(2, "Vui lòng nhập Họ và tên!"),
@@ -27,6 +30,8 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [listBranches, setListBranches] = useState([]);
   const [listPartyTypes, setListPartyTypes] = useState([]);
+  const toast = useCustomToast();
+  const router = useRouter();
   const [userInfo, setUserInfo] = useState(
     JSON.parse(localStorage.getItem("user"))
   );
@@ -37,12 +42,29 @@ const Contact = () => {
     phone: "",
     guestCount: "",
     date: "",
-    shift: "9h - 15h",
+    shift: "Sáng",
     branch: "",
     budget: "50 - 100 triệu",
     partyType: "",
+    note: "",
   });
 
+<<<<<<< HEAD
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const branches = await fetchBranchesFromApi();
+  //     const partyTypes = await fecthAllPartyTypes();
+  //     setListBranches(branches);
+  //     setListPartyTypes(partyTypes);
+  //   };
+  //   fetchData();
+  //   setFormData({
+  //     ...formData,
+  //     branch: listBranches[0].name,
+  //     partyType: listPartyTypes[0].name,
+  //   });
+  // }, [formData]);
+=======
   useEffect(() => {
     const fetchData = async () => {
       const branches = await fetchBranchesFromApi();
@@ -61,6 +83,7 @@ const Contact = () => {
     };
     fetchData();
   }, []);
+>>>>>>> origin/main
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -84,27 +107,42 @@ const Contact = () => {
     try {
       formSchema.parse(formData);
       setErrors({});
-      // Thực hiện hành động gửi form ở đây
       const dataToSend = {
         user_id: formData.user_id,
         branch_id: formData.branch,
         party_type_id: formData.partyType,
-        stage_id: "",
+        stage_id: 0,
         name: formData.name,
-        phone: formData.phone,
+        phone: formData.phone.toString(),
         email: formData.email,
         company_name: "",
         note: formData.note,
-        number_of_guests: formData.guestCount,
-        budget: formData.budget,
-        shift: formData.shift,
-        organization_date: formData.date,
+        number_of_guests: Number(formData.guestCount),
+        budget: formData.budget.toString(),
+        shift: formData.shift.toString(),
+        organization_date: formatDate(formData.date),
       };
-      console.log("Form submitted successfully:", formData);
-      console.log("Form submitted to send:", dataToSend);
       const response = await createNewBooking(dataToSend);
-      console.log("response", response);
+      if (response.status === 200 || response.status === 201) {
+        toast({
+          position: "top",
+          type: "success",
+          title: "Thành công!",
+          description: "Nhà hàng sẽ liên hệ lại với thời gian sớm nhất 😘😘!",
+          closable: true,
+        });
+      }
+      router.push("/client/cam-on");
     } catch (error) {
+      {
+        toast({
+          position: "top",
+          type: "error",
+          title: "Thất bại!",
+          description: error.response.data.message,
+          closable: true,
+        });
+      }
       error?.errors?.forEach((err) => {
         validationErrors[err.path[0]] = err.message;
       });
@@ -171,10 +209,10 @@ const Contact = () => {
           onChange={handleSelectChange}
           className="w-[40%] border bg-transparent border-darkGreen-400 p-3 py-2 rounded-sm text-white"
         >
-          <option className="bg-darkGreen-800" value="9h - 15h">
+          <option className="bg-darkGreen-800" value="Sáng">
             Ca sáng (9h - 15h)
           </option>
-          <option className="bg-darkGreen-800" value="17h - 21h">
+          <option className="bg-darkGreen-800" value="Tối">
             Ca tối (17h - 21h)
           </option>
         </select>

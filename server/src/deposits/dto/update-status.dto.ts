@@ -6,7 +6,6 @@ import { PaymentMethod } from 'helper/enum/payment_method.enum';
 export class UpdateDepositDto {
   @ApiProperty({
     description: 'Trạng thái của giao dịch, không được để trống',
-    example: DepositStatusEnum.PENDING,
     required: true,
     enum: DepositStatusEnum,
   })
