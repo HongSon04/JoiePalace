@@ -1,6 +1,6 @@
 import AdminHeader from "@/app/_components/AdminHeader";
 import React from "react";
-import "../../_styles/globals.css";
+import "../../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import { BsThreeDots } from "react-icons/bs";
 import { PiShootingStarDuotone } from "react-icons/pi";

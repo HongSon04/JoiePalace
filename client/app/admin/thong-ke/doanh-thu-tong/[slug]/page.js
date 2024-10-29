@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { IoFilter } from 'react-icons/io5';
 import { DateRangePicker } from '@nextui-org/date-picker';
 import { Input } from '@nextui-org/react';
@@ -11,25 +11,186 @@ import Chart from '@/app/_components/Chart';
 import "../../../../_styles/globals.css";
 import TableGrab from '@/app/_components/TableGrab';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
-const Page = () => {
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
+import { fetchRevenueBranchByWeek, fetchRevenueBranchByMonth, fetchRevenueBranchByQuarter, fetchRevenueBranchByYear, fetchAllBranch} from "@/app/_services/apiServices";
+const Page = () => {    
+  const [idBranch, setIdBranch] = useState(null);
+  const [totalWeek, setTotalWeek] = useState(null);
+  const [totalMonth, setTotalMonth] = useState(null);
+  const [totalQuarter, setTotalQuarter] = useState(null);
+  const [totalYear, setTotalYear] = useState(null);
+  const [allBranch, setAllBranch] = useState(null);
+  const [nameBranch, setnNameBranch] = useState(null);
+  useEffect(() => {
+    const storedBranch = localStorage.getItem("currentBranch");
+    const fetchData = async () => {
+      try {
+          const branchObject = JSON.parse(storedBranch);
+          const branchId = branchObject[0].id ;
+          const nameBranch = branchObject[0].name;
+          // console.log(branchId);   
+          setnNameBranch(nameBranch);
+          setIdBranch(branchId); 
 
-  const data = {
-    labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
+          const totalWeek = await fetchRevenueBranchByWeek(branchId);
+          const totalMonth = await  fetchRevenueBranchByMonth(branchId);
+          const totalQuarter = await  fetchRevenueBranchByQuarter(branchId);
+          const totalYear = await  fetchRevenueBranchByYear(branchId);
+          const allBranch = await fetchAllBranch();
+          // console.log(allBranch.data);
+
+          setTotalWeek(totalWeek);
+          setTotalMonth(totalMonth);
+          setTotalQuarter(totalQuarter);
+          setTotalYear(totalYear);
+          setAllBranch(allBranch);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const total_revenue_by_week = totalWeek || [];
+  const total_revenue_by_month = totalMonth|| [];
+  const total_revenue_by_quarter = totalQuarter|| [];
+  const total_revenue_by_year = totalYear|| [];
+
+  const dataByWeek = {
+      labels: Object.keys(total_revenue_by_week), 
+      datasets: [
+          {
+              label: 'Doanh thu',
+              data:Object.values(total_revenue_by_week) 
+          }
+      ]
+  };
+  const dataByMonth = {
+      labels: Object.keys(total_revenue_by_month), 
+      datasets: [
+          {
+              label: 'Doanh thu',
+              data:Object.values(total_revenue_by_month) 
+          }
+      ]
+  };
+  const dataByQuarter = {
+      labels: Object.keys(total_revenue_by_quarter), 
+      datasets: [
+          {
+              label: 'Doanh thu',
+              data:Object.values(total_revenue_by_quarter) 
+          }
+      ]
+  };
+  const dataByYear= {
+      labels: Object.keys(total_revenue_by_year), 
+      datasets: [
+          {
+              label: 'Doanh thu',
+              data:Object.values(total_revenue_by_year) 
+          }
+      ]
+  };
+  const dataBarByWeek = {
+    labels: [''],
     datasets: [
       {
         label: 'Doanh thu',
-        data: [300000000, 500000000, 700000000]
+        data:Object.values(total_revenue_by_week) 
 
       },
     ],
   };
+  const dataBarByMonth = {
+    labels: [''],
+    datasets: [
+      {
+        label: 'Doanh thu',
+        data:Object.values(total_revenue_by_week) 
 
-  const options = [
-    { id: 1, name: 'Option 1', value: 'option1' },
-    { id: 2, name: 'Option 2', value: 'option2' },
-    { id: 3, name: 'Option 3', value: 'option3' },
-  ];
+      },
+    ],
+  };
+  const dataBarByQuarter = {
+    labels: Object.keys(total_revenue_by_quarter),
+    datasets: [
+      {
+        label: 'Doanh thu',
+        data:Object.values(total_revenue_by_week) 
+
+      },
+    ],
+  };
+  const dataBarByYear = {
+    labels: Object.keys(total_revenue_by_quarter),
+    datasets: [
+      {
+        label: 'Doanh thu',
+        data:Object.values(total_revenue_by_week) 
+
+      },
+    ],
+  };
+  const dataBranch = allBranch?.data || []; 
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const BranchName = (nameBranch === 'Hồ Chí Minh') ? 'tổng' : nameBranch;
+  
+  const content = idBranch === 2 ? (
+    <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                <p className="text-base">Doanh thu theo tuần</p>
+            </div>
+            <Chart data={dataByWeek} chartType="line" />
+        </div>
+        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                <p className="text-base">Doanh thu theo tháng</p>
+            </div>
+            <Chart data={dataByMonth} chartType="line" />
+        </div>
+        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                <p className="text-base">Doanh thu theo quý</p>
+            </div>
+            <Chart data={dataByQuarter} chartType="line" />
+        </div>
+        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                <p className="text-base">Doanh thu theo năm</p>
+            </div>
+            <Chart data={dataByYear} chartType="line" />
+        </div>
+    </div>
+  ) : (
+      <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                  <p className="text-base">Doanh thu theo tuần</p>
+              </div>
+              <Chart data={dataBarByWeek} chartType="bar" />
+          </div>
+          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                  <p className="text-base">Doanh thu theo tháng</p>
+              </div>
+              <Chart data={dataBarByMonth} chartType="bar" />
+          </div>
+          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                  <p className="text-base">Doanh thu theo quý</p>
+              </div>
+              <Chart data={dataBarByQuarter} chartType="bar" />
+          </div>
+          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                  <p className="text-base">Doanh thu theo năm</p>
+              </div>
+              <Chart data={dataBarByYear} chartType="bar" />
+          </div>
+      </div>
+  );
+
 
   const toggleFilter = () => {
     setIsFilterVisible(prevState => !prevState);
@@ -38,61 +199,32 @@ const Page = () => {
   return (
     <main className="font-gilroy grid gap-6 p-4 text-white">
           <AdminHeader
-            title="Doanh thu chi nhánh"
+            title="Thống kê doanh thu "
             showSearchForm = {false}
           ></AdminHeader>
       <div className="flex justify-start items-center gap-2 text-base text-gray-500 ">
-        <p>Thống kê</p>
-        <p>/</p>
-        <p>Doanh thu tổng</p>
-        <p>/</p>
-        <p>Doanh thu chi nhánh</p>
-
-       
+        <p>Thống kê doanh thu {BranchName}</p>
       </div>
       <div>
         <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-          <p className="text-base font-semibold">Doanh thu chi nhánh</p>
-          <select className='select w-[300px]'>
-              <option className='option' value="option1">Option 1</option>
-              <option className='option' value="option2">Option 2</option>
-              <option className='option' value="option3">Option 3</option>
-          </select>
+          <p className="text-base font-semibold">Doanh thu {BranchName}</p>
+            {idBranch === 2 ? (
+              <select className='select w-[300px]'>
+                  {dataBranch.map((item) => (
+                      <option className='option' key={item.id} value={item.slug}>
+                          {item.name}
+                      </option>
+                  ))}
+              </select>
+            ) : null}
         </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-              <p className="text-base">Doanh thu theo tuần</p>
-              <p className="text-teal-400 text-xs">Xem thêm</p>
-            </div>
-            <Chart data={data} chartType="line" />
-          </div>
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-              <p className="text-base">Doanh thu theo tháng</p>
-              <p className="text-teal-400 text-xs">Xem thêm</p>
-            </div>
-            <Chart data={data} chartType="line" />
-          </div>
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-              <p className="text-base">Doanh thu theo quý</p>
-              <p className="text-teal-400 text-xs">Xem thêm</p>
-            </div>
-            <Chart data={data} chartType="line" />
-          </div>
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-              <p className="text-base">Doanh thu theo năm</p>
-              <p className="text-teal-400 text-xs">Xem thêm</p>
-            </div>
-            <Chart data={data} chartType="line" />
-          </div>
-        </div>
+        {content}
+       
+        
       </div>
       <div className="relative">
         <div className="flex justify-between items-centern mb-4 ">
-          <p className="text-sm font-bold">Danh sách tiệc chi nhánh Phạm Văn Đồng</p>
+          <p className="text-sm font-bold">Danh sách tiệc {BranchName}</p>
           <div
             onClick={toggleFilter}
             className="bg-whiteAlpha-100 rounded-full py-2.5 px-4 cursor-pointer"
