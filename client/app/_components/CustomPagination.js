@@ -2,11 +2,12 @@
 
 import { Pagination } from "@nextui-org/react";
 
-function CustomPagination({ total }) {
+function CustomPagination({ total, onPageChange }) {
   return (
     <Pagination
       isCompact
       showControls
+      onChange={onPageChange}
       total={total}
       initialPage={1}
       classNames={{

@@ -1,279 +1,135 @@
-// "use client";
+// app/components/ImageUpload.js
+"use client"; // This is a client component
 
-// import { Button } from "@nextui-org/react";
-// import { useCallback, useRef, useState } from "react";
-// import { twMerge } from "tailwind-merge";
+import Image from "next/image";
+import { useState, useCallback } from "react";
+import { CONFIG } from "../_utils/config";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
-// const isAllFiles = (dt) =>
-//   dt.types.every((t) => t === "Files" || t === "application/x-moz-file");
-// const doesAccept = (type, accept) => {
-//   if (!accept) {
-//     return true;
-//   }
+/**
+ * USAGE: 
+ * 
+ * Step 1: set up state in parent component
+ * const [files, setFiles] = useState([]);
+ * 
+  * Step 2: handle the file change in the parent component and then pass onChange handler, state and the setter to the Uploader component
+  * const handleFileChange = (newFiles) => {
+    setFiles(newFiles);
+  };
+  * <Uploader files={files} setFiles={setFiles} />
+ * 
+ * Step 3: handle the files in the parent component
+ */
 
-//   const acceptList = accept.split(",").map((c) => c.trim());
-//   let cond = false;
-//   for (const acceptor of acceptList) {
-//     if (acceptor.endsWith("*")) {
-//       cond ||= type.startsWith(acceptor.slice(0, -1));
-//     } else {
-//       cond ||= type === acceptor;
-//     }
-//   }
-//   return cond;
-// };
-// const isEventAllowed = (e, accept, multiple) => {
-//   if (!isAllFiles(e.dataTransfer)) {
-//     return false;
-//   }
+const Uploader = ({ onFileChange, files, setFiles }) => {
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles(selectedFiles);
+    onFileChange(selectedFiles); // Notify parent component of the new files
+  };
 
-//   const items = Array.from(e.dataTransfer.items);
-//   if (items.length === 0 || (!multiple && items.length > 1)) {
-//     return false;
-//   }
-//   return items.every((c) => doesAccept(c.type, accept));
-// };
+  const handleUnsetFiles = () => {
+    setFiles([]);
+    onFileChange([]); // Notify parent component of the new files
+  };
 
-// export default function FileUploadButton({
-//   accept,
-//   onUpload,
-//   acceptProps = { color: "primary" },
-//   rejectProps = { color: "danger" },
-//   multiple = false,
-//   classNames,
-//   className,
-//   ...props
-// }) {
-//   const inputRef = useRef(null);
-//   const [acceptance, setAcceptance] = useState(null);
-//   const onDragEnter = useCallback(
-//     (e) => {
-//       if (isEventAllowed(e, accept, multiple)) {
-//         setAcceptance("ACCEPT");
-//       } else {
-//         setAcceptance("REJECT");
-//       }
-//     },
-//     [accept, multiple, setAcceptance]
-//   );
-//   const onDragOver = useCallback(
-//     (e) => {
-//       e.preventDefault();
-//       if (isEventAllowed(e, accept, multiple)) {
-//         setAcceptance("ACCEPT");
-//       } else {
-//         setAcceptance("REJECT");
-//       }
-//     },
-//     [accept, multiple, setAcceptance]
-//   );
-//   const onDragFinish = useCallback(
-//     (e) => {
-//       setAcceptance(null);
-//     },
-//     [setAcceptance]
-//   );
-//   const onDrop = useCallback(
-//     (e) => {
-//       e.preventDefault();
-//       e.persist();
-//       e.stopPropagation();
+  const handleRemoveFile = (i) => {
+    const newFiles = [...files];
+    newFiles.splice(i, 1);
+    setFiles(newFiles);
+    onFileChange(newFiles); // Notify parent component of the new files
+  };
 
-//       if (isEventAllowed(e, accept, multiple)) {
-//         const items = Array.from(e.dataTransfer.items);
-//         if (items.length) {
-//           onUpload?.(items.map((c) => c.getAsFile()));
-//         }
-//       }
-
-//       setAcceptance(null);
-//     },
-//     [accept, multiple, onUpload, setAcceptance]
-//   );
-//   const onFileChosen = useCallback(
-//     (e) => {
-//       onUpload?.(Array.from(e.target.files));
-//     },
-//     [onUpload]
-//   );
-//   const onButtonPress = useCallback(() => {
-//     inputRef.current?.click();
-//   }, [inputRef]);
-
-//   return (
-//     <form className={classNames?.wrapper}>
-//       <label htmlFor="_upload">
-//         <Button
-//           {...props}
-//           {...(acceptance === "ACCEPT"
-//             ? acceptProps
-//             : acceptance === "REJECT"
-//             ? rejectProps
-//             : {})}
-//           className={twMerge(
-//             className,
-//             classNames?.button,
-//             acceptance === "ACCEPT"
-//               ? acceptProps?.className
-//               : acceptance === "REJECT"
-//               ? rejectProps?.className
-//               : null
-//           )}
-//           onPress={onButtonPress}
-//           onDragEnter={onDragEnter}
-//           onDragOver={onDragOver}
-//           onDragEnd={onDragFinish}
-//           onDragLeave={onDragFinish}
-//           onDrop={onDrop}
-//         />
-//       </label>
-//       <input
-//         type="file"
-//         role="presentation"
-//         name="_upload"
-//         ref={inputRef}
-//         onChange={onFileChosen}
-//         accept={accept}
-//         multiple={multiple}
-//         className="hidden"
-//       />
-//     </form>
-//   );
-// }
-
-"use client";
-
-import { Button } from "@nextui-org/react";
-import { useCallback, useRef, useState } from "react";
-import { twMerge } from "tailwind-merge";
-
-const isAllFiles = (dt) =>
-  dt.types.every((t) => t === "Files" || t === "application/x-moz-file");
-const doesAccept = (type, accept) => {
-  if (!accept) {
-    return true;
-  }
-
-  const acceptList = accept.split(",").map((c) => c.trim());
-  let cond = false;
-  for (const acceptor of acceptList) {
-    if (acceptor.endsWith("*")) {
-      cond ||= type.startsWith(acceptor.slice(0, -1));
-    } else {
-      cond ||= type === acceptor;
-    }
-  }
-  return cond;
-};
-const isEventAllowed = (e, accept, multiple) => {
-  if (!isAllFiles(e.dataTransfer)) {
-    return false;
-  }
-
-  const items = Array.from(e.dataTransfer.items);
-  if (items.length === 0 || (!multiple && items.length > 1)) {
-    return false;
-  }
-  return items.every((c) => doesAccept(c.type, accept));
-};
-
-export default function FileUploadButton({
-  accept,
-  onUpload,
-  acceptProps = { color: "primary" },
-  rejectProps = { color: "danger" },
-  multiple = false,
-  classNames,
-  className,
-  children,
-  ...props
-}) {
-  const inputRef = useRef(null);
-  const [acceptance, setAcceptance] = useState(null);
-  const onDragEnter = useCallback(
-    (e) => {
-      if (isEventAllowed(e, accept, multiple)) {
-        setAcceptance("ACCEPT");
-      } else {
-        setAcceptance("REJECT");
-      }
-    },
-    [accept, multiple, setAcceptance]
-  );
-  const onDragOver = useCallback(
+  const handleDrop = useCallback(
     (e) => {
       e.preventDefault();
-      if (isEventAllowed(e, accept, multiple)) {
-        setAcceptance("ACCEPT");
-      } else {
-        setAcceptance("REJECT");
-      }
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      setFiles(droppedFiles);
+      onFileChange(droppedFiles); // Notify parent component of the dropped files
     },
-    [accept, multiple, setAcceptance]
+    [onFileChange]
   );
-  const onDragFinish = useCallback(
-    (e) => {
-      setAcceptance(null);
-    },
-    [setAcceptance]
-  );
-  const onDrop = useCallback(
-    (e) => {
-      e.preventDefault();
-      e.persist();
-      e.stopPropagation();
 
-      if (isEventAllowed(e, accept, multiple)) {
-        const items = Array.from(e.dataTransfer.items);
-        if (items.length) {
-          onUpload?.(items.map((c) => c.getAsFile()));
-        }
-      }
+  // Utility function to format file size
+  const formatFileSize = (size) => {
+    if (size < 1024) return `${size} bytes`;
+    else if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
+    else return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+  };
 
-      setAcceptance(null);
-    },
-    [accept, multiple, onUpload, setAcceptance]
-  );
-  const onFileChosen = useCallback(
-    (e) => {
-      onUpload?.(Array.from(e.target.files));
-    },
-    [onUpload]
-  );
-  const onButtonPress = useCallback(() => {
-    inputRef.current?.click();
-  }, [inputRef]);
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
 
   return (
-    <div
-      className={twMerge(
-        className,
-        classNames?.wrapper,
-        acceptance === "ACCEPT"
-          ? acceptProps?.className
-          : acceptance === "REJECT"
-          ? rejectProps?.className
-          : null
+    <div>
+      <div
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        style={{
+          border: "2px dashed #ccc",
+          borderRadius: "5px",
+          padding: "20px",
+          textAlign: "center",
+          marginBottom: "10px",
+        }}
+      >
+        <Image
+          src={CONFIG.IMAGE_UPLOADER_PLACEHOLDER}
+          alt={"Drag and drop your images here, or click to select files"}
+          width={300}
+          height={200}
+        ></Image>
+        <p className="text-base text-gray-400">
+          Kéo và thả ảnh của bạn tại đây, hoặc bấm vào nút chọn ảnh
+        </p>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          style={{ display: "none" }} // Hide the default file input
+          // Register the file input with React Hook Form if needed
+        />
+        <button
+          type="button"
+          className="underline text-gold"
+          onClick={() => document.querySelector('input[type="file"]').click()}
+        >
+          Chọn ảnh{" "}
+        </button>
+      </div>
+      {files.length > 0 && (
+        <div>
+          <h3>Ảnh tải lên:</h3>
+          <ul className="flex flex-col gap-2 mt-3">
+            {files.map((file, index) => (
+              <li
+                key={index}
+                className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex gap-2 items-center"
+              >
+                <button
+                  className="rounded-full text-gray-600 hover:text-gray-800"
+                  onClick={() => handleRemoveFile(index)}
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+                <span>
+                  {file.name} ({formatFileSize(file.size)})
+                </span>{" "}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={handleUnsetFiles}
+            className="text-red-400 underline hover:text-red-500 mt-3"
+          >
+            Delete all
+          </button>
+        </div>
       )}
-      onDragEnter={onDragEnter}
-      onDragOver={onDragOver}
-      onDragEnd={onDragFinish}
-      onDragLeave={onDragFinish}
-      onDrop={onDrop}
-      onClick={onButtonPress}
-      {...props}
-    >
-      {children}
-      <input
-        type="file"
-        role="presentation"
-        name="_upload"
-        ref={inputRef}
-        onChange={onFileChosen}
-        accept={accept}
-        multiple={multiple}
-        className="hidden"
-      />
     </div>
   );
-}
+};
+
+export default Uploader;

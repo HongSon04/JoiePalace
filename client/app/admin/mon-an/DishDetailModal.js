@@ -1,3 +1,5 @@
+"use client";
+
 import CustomInput from "@/app/_components/CustomInput";
 import CustomSelect from "@/app/_components/CustomSelect";
 import FileUploader from "@/app/_components/FileUploader";
@@ -9,6 +11,7 @@ import {
   fetchingSelectedDishSuccess,
 } from "@/app/_lib/features/dishes/dishesSlice";
 import { getDishById, getProductById } from "@/app/_services/productsServices";
+import { API_CONFIG } from "@/app/_utils/api.config";
 import { dishCategories } from "@/app/_utils/config";
 import { _required } from "@/app/_utils/validations";
 import {
@@ -24,22 +27,7 @@ import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 
-const options = [
-  {
-    value: 1,
-    name: "Khai vị",
-  },
-  {
-    value: 2,
-    name: "Món chính",
-  },
-  {
-    value: 3,
-    name: "Món tráng miệng",
-  },
-];
-
-async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
+function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
   const {
     register,
     handleSubmit,
@@ -53,25 +41,39 @@ async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  // console.log(id);
   const { selectedDish } = useSelector((store) => store.dishes);
+  console.log("selected dish", selectedDish);
 
   const dispatch = useDispatch();
-  const { fetchData } = useApiServices();
-
-  const getDishById = React.useCallback(
-    (id) => {
-      fetchData(dispatch, () => getProductById(id), {
-        loadingAction: fetchingSelectedDish,
-        successAction: fetchingSelectedDishSuccess,
-        errorAction: fetchingSelectedDishFailure,
-      });
-    },
-    [dispatch]
-  );
+  const { makeAuthorizedRequest } = useApiServices();
 
   React.useEffect(() => {
+    if (!id) return;
+
+    const getDishById = async (id) => {
+      dispatch(fetchingSelectedDish());
+
+      const data = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.GET_BY_ID(id),
+        "GET",
+        null
+      );
+
+      if (data.success) {
+        console.log(data);
+        dispatch(fetchingSelectedDishSuccess());
+        onOpen();
+      } else {
+        console.log("error", data);
+        dispatch(fetchingSelectedDishFailure(data.message));
+      }
+    };
+
     getDishById(id);
-  }, [getDishById, id]);
+
+    return () => {};
+  }, [id]);
 
   return (
     <Modal
@@ -93,7 +95,7 @@ async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
                 onSubmit={handleSubmit(onSubmit)}
                 className="w-full flex flex-col gap-5"
               >
-                <FileUploader image={selectedDish.image} />
+                <FileUploader image={selectedDish.image || ""} />
                 <FormInput
                   register={register}
                   errors={errors}
@@ -127,9 +129,9 @@ async function DishDetailModal({ isOpen, onOpenChange, onClose, onOpen }) {
                   <select
                     name="dishCategory"
                     id="dishCategory"
-                    value={dishCategories}
                     className="select !bg-blackAlpha-100 text-gray-600 hover:text-gray-400"
                   >
+                    <option value="#">Danh mục món ăn</option>
                     {dishCategories.map((category) => (
                       <option
                         value={category.id}

@@ -33,7 +33,7 @@ export const fetchCurrentBranch = async (slug) => {
     throw new Error("Có lỗi khi lấy dữ liệu chi nhánh");
   }
 
-  console.log(response.data.data);
+  // console.log(response.data.data);
 
   localStorage.setItem(
     "currentBranch",
@@ -45,8 +45,10 @@ export const fetchCurrentBranch = async (slug) => {
 
 export const fetchBranchDataById = async (branchId) => {
   try {
-    const response = await axios.get(API_CONFIG.DASHBOARD.GET_BOOKING_STATUS(branchId));
-    
+    const response = await axios.get(
+      API_CONFIG.DASHBOARD.GET_BOOKING_STATUS(branchId)
+    );
+
     if (Array.isArray(response.data) && response.data.length > 0) {
       return response.data[0];
     } else {
@@ -60,7 +62,9 @@ export const fetchBranchDataById = async (branchId) => {
 
 export const fetchBranchBookingById = async (branchId) => {
   try {
-    const response = await axios.get(API_CONFIG.DASHBOARD.GET_BOOKING_BRANCH(branchId));
+    const response = await axios.get(
+      API_CONFIG.DASHBOARD.GET_BOOKING_BRANCH(branchId)
+    );
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu chi nhánh");
     }
@@ -72,7 +76,9 @@ export const fetchBranchBookingById = async (branchId) => {
 
 export const fetchBranchTotalRevenueMonth = async (branchId) => {
   try {
-    const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_EACH_MONTH(branchId));
+    const response = await axios.get(
+      API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_EACH_MONTH(branchId)
+    );
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu chi nhánh");
     }
@@ -80,4 +86,3 @@ export const fetchBranchTotalRevenueMonth = async (branchId) => {
     throw error;
   }
 };
-

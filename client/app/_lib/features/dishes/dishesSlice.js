@@ -47,6 +47,16 @@ const dishesSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
     },
+    addingDish: (state, action) => {
+      state.isLoading = true;
+    },
+    addingDishSuccess: (state, action) => {
+      state.isLoading = false;
+    },
+    addingDishFailure: (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+    },
   },
   // extraReducers: (builder) => {
   //   builder
@@ -75,25 +85,6 @@ const dishesSlice = createSlice({
   // },
 });
 
-// export const getDishes = createAsyncThunk("dishes/getDishes", async () => {
-//   // const response = await fetch("/api/dishes");
-//   // const data = await response.json();
-
-//   return dishes;
-// });
-
-// export const getDishesByCategory = createAsyncThunk(
-//   "dishes/getDishesByCategory",
-//   async (category) => {
-//     // const response = await fetch(`/api/dishes?category=${category}`);
-//     // const data = await response.json();
-
-//     // return data;
-
-//     return dishes.filter((dish) => dish.category === category);
-//   }
-// );
-
 export const {
   setSelectedDish,
   addingDishCategory,
@@ -105,6 +96,9 @@ export const {
   fetchingCategoryDishes,
   fetchingCategoryDishesSuccess,
   fetchingCategoryDishesFailure,
+  addingDish,
+  addingDishSuccess,
+  addingDishFailure,
 } = dishesSlice.actions;
 
 export default dishesSlice;
