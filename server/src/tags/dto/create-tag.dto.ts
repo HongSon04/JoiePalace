@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
 
 export class CreateTagDto {
-  @ApiProperty({ required: true })
-  @IsNotEmpty({ message: 'Tên thẻ không được để trống' })
+  @ApiProperty({
+    required: true,
+    description: 'Tên của thẻ',
+  })
   name: string;
 }

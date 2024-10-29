@@ -2,30 +2,27 @@ import {
   BadRequestException,
   Body,
   Controller,
-  HttpException,
   HttpStatus,
   Post,
-  Req,
   Request,
   UploadedFile,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateAuthUserDto } from './dto/create-auth-user.dto';
-import { LoginUserDto } from 'src/user/dto/login-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
-  ApiCookieAuth,
   ApiHeaders,
   ApiOperation,
   ApiResponse,
-  ApiTags,
+  ApiTags
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { isPublic } from 'decorator/auth.decorator';
-import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { LoginUserDto } from 'src/user/dto/login-user.dto';
+import { AuthService } from './auth.service';
+import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
 import { VerifyTokenDto } from './dto/verify-token.dto';
 
 @ApiTags('Auth - Xác thực')

@@ -84,6 +84,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
@@ -162,6 +167,11 @@ export class CategoriesService {
           where: whereConditions,
           include: {
             tags: true,
+            products: {
+              include: {
+                tags: true,
+              },
+            },
           },
           skip,
           take: itemsPerPage,
@@ -262,6 +272,11 @@ export class CategoriesService {
           where: whereConditions,
           include: {
             tags: true,
+            products: {
+              include: {
+                tags: true,
+              },
+            },
           },
           skip,
           take: itemsPerPage,
@@ -313,6 +328,11 @@ export class CategoriesService {
         where: { id: Number(id) },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
       if (!category) {
@@ -343,6 +363,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       })) as any;
       // ? Find Children Categories
@@ -352,6 +377,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
       if (childrenCategories.length > 0) {
@@ -397,6 +427,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 
@@ -489,6 +524,11 @@ export class CategoriesService {
         },
         include: {
           tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
         },
       });
 

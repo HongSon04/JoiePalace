@@ -132,9 +132,10 @@ function AdminSidebarNav() {
   const mainOptions = [
     {
       title: "Bảng điều khiển",
-      path: isGeneralBranch
-        ? "/admin/bang-dieu-khien"
-        : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+      // path: isGeneralBranch
+      //   ? "/admin/bang-dieu-khien"
+      //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+      path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
       icon: dashboardIcon,
     },
     {
@@ -144,9 +145,7 @@ function AdminSidebarNav() {
     },
     {
       title: "Thống kê",
-      path: isGeneralBranch
-        ? "/admin/thong-ke/"
-        : `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+      path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
       // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
       icon: statisticIcon,
     },
@@ -204,9 +203,10 @@ function AdminSidebarNav() {
     },
     {
       title: "Liên hệ & hỗ trợ",
-      path: isGeneralBranch
-        ? `/admin/lien-he-ho-tro`
-        : `/admin/lien-he-ho-tro/${currentBranch.slug}`,
+      // path: isGeneralBranch
+      //   ? `/admin/lien-he-ho-tro`
+      //   : `/admin/lien-he-ho-tro/${currentBranch.slug}`,
+      path: `/admin/lien-he-ho-tro/${currentBranch.slug}`,
       icon: contactIcon,
     },
     {

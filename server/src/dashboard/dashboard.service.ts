@@ -1,20 +1,35 @@
+import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import dayjs from 'dayjs';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class DashboardService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
+  ) {
+    dayjs.locale('vi');
+    dayjs.extend(weekOfYear);
+  }
 
   // ! Lấy tất cả thông tin của dashboard (tất cả các chi nhánh)
   async getAllInfo() {
     try {
+      // Kiểm tra xem dữ liệu đã được cache chưa
+      const cachedData = await this.cacheManager.get('getAllInfo');
+      if (cachedData) {
+        return cachedData; // Trả về dữ liệu từ cache
+      }
+
       const count_all_info = await this.countAll();
 
       const promises = [
@@ -35,6 +50,15 @@ export class DashboardService {
         count_booking_status,
       ] = await Promise.all(promises);
 
+      await this.cacheManager.set('getAllInfo', {
+        count_all_info,
+        total_revune_by_week,
+        total_revune_by_month,
+        total_revune_by_quarter,
+        total_revune_by_year,
+        total_revune_each_month,
+        count_booking_status,
+      });
       return {
         count_all_info,
         total_revune_by_week,
@@ -103,6 +127,111 @@ export class DashboardService {
     }
   }
 
+  // ! Lấy tổng thông tin của dashboard theo tháng
+  async getDashboardGeneralInfoByMonth(branch_id: number) {
+    try {
+      // Kiểm tra xem dữ liệu đã được cache chưa
+      const cachedData = await this.cacheManager.get(
+        'getDashboardGeneralInfoByMonth',
+      );
+      if (cachedData) {
+        return cachedData; // Trả về dữ liệu từ cache
+      }
+      let totalUser = 0;
+      let totalPendingBooking = 0;
+      let totalFutureBooking = 0;
+      let totalSuccessBooking = 0;
+      let totalCancelBooking = 0;
+      let totalBooking = 0;
+      // Lấy thời gian đầu và cuối tháng
+      const now = dayjs();
+      const startOfMonth = now.startOf('month').toDate();
+      const endOfMonth = now.endOf('month').toDate();
+
+      // Lấy tổng số lượng user
+      totalUser = await this.prismaService.users.count({
+        where: {
+          deleted: false,
+          created_at: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+        },
+      });
+
+      // Lấy tổng số lượng booking theo trạng thái
+      const bookingCounts = await this.prismaService.bookings.groupBy({
+        by: ['status', 'is_confirm'],
+        where: {
+          created_at: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+          deleted: false,
+          branch_id: branch_id ? { equals: branch_id } : undefined,
+        },
+        _count: {
+          status: true,
+        },
+      });
+
+      // Tính tổng số lượng booking theo trạng thái
+      bookingCounts.forEach((booking) => {
+        switch (booking.status) {
+          case 'pending':
+            totalPendingBooking = booking._count.status;
+            break;
+          case 'success':
+            totalSuccessBooking = booking._count.status;
+            break;
+          case 'cancel':
+            totalCancelBooking = booking._count.status;
+            break;
+        }
+        switch (booking.is_confirm) {
+          case true:
+            totalFutureBooking = booking._count.status;
+            break;
+        }
+      });
+
+      // Tính tổng số lượng booking
+      totalBooking =
+        totalPendingBooking + totalSuccessBooking + totalCancelBooking;
+
+      // Lưu vào cache
+      await this.cacheManager.set('getDashboardGeneralInfoByMonth', {
+        totalUser,
+        totalPendingBooking,
+        totalFutureBooking,
+        totalSuccessBooking,
+        totalCancelBooking,
+        totalBooking,
+      });
+
+      return {
+        totalUser,
+        totalPendingBooking,
+        totalFutureBooking,
+        totalSuccessBooking,
+        totalCancelBooking,
+        totalBooking,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log(
+        'Lỗi từ dashboardService -> getDashboardGeneralInfoByMonth: ',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error,
+      );
+    }
+  }
+
   // ! Tổng số lượng user, branch, product, category, tags, staff,menus,decors,party_type,furniture
   async countAll() {
     try {
@@ -154,29 +283,21 @@ export class DashboardService {
   // ! Tổng doanh thu của tất cả các chi nhánh
   async getTotalRevenueForAllBranch() {
     try {
-      // B1: Lấy tất cả các booking
-      const bookings = await this.prismaService.bookings.findMany({
-        include: {
-          booking_details: {
-            select: {
-              total_amount: true,
-            },
+      // Tính tổng trực tiếp từ database bằng aggregation
+      const result = await this.prismaService.booking_details.aggregate({
+        where: {
+          bookings: {
+            status: 'success',
+            deleted: false,
           },
+        },
+        _sum: {
+          total_amount: true,
         },
       });
 
-      // B2: Tính tổng doanh thu
-      const total = bookings.reduce((acc, booking) => {
-        return (
-          acc +
-          booking.booking_details.reduce(
-            (innerAcc, detail) => innerAcc + detail.total_amount,
-            0,
-          )
-        );
-      }, 0);
-
-      return total;
+      // Trả về kết quả, mặc định là 0 nếu không có dữ liệu
+      return Number(result._sum.total_amount || 0);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -193,50 +314,39 @@ export class DashboardService {
   }
 
   // ! Tổng doanh thu của tất cả các chi nhánh theo tuần
-  async getTotalRevenueForAllBranchByWeek() {
+  async getTotalRevenueForAllBranchByWeek(): Promise<number> {
     try {
-      // B1: Lấy ngày bắt đầu và kết thúc của tuần
-      const now = new Date();
-      const startOfWeek = dayjs(now).startOf('week').toDate();
-      const endOfWeek = dayjs(now).endOf('week').toDate();
+      // Lấy thời gian đầu và cuối tuần
+      const now = dayjs();
+      const startOfWeek = now.startOf('week').toDate();
+      const endOfWeek = now.endOf('week').toDate();
 
-      // B2: Lấy tất cả các booking
-      const bookings = await this.prismaService.bookings.findMany({
+      // Tính tổng doanh thu trực tiếp từ database bằng aggregation
+      const result = await this.prismaService.booking_details.aggregate({
         where: {
-          created_at: {
-            gte: startOfWeek,
-            lte: endOfWeek,
+          bookings: {
+            created_at: {
+              gte: startOfWeek,
+              lte: endOfWeek,
+            },
+            status: 'success',
+            deleted: false,
           },
         },
-        include: {
-          booking_details: {
-            select: {
-              total_amount: true,
-            },
-          },
+        _sum: {
+          total_amount: true,
         },
       });
 
-      // B3: Tính tổng doanh thu
-      const total = bookings.reduce((acc, booking) => {
-        return (
-          acc +
-          booking.booking_details.reduce(
-            (innerAcc, detail) => innerAcc + detail.total_amount,
-            0,
-          )
-        );
-      }, 0);
-
-      return total;
+      // Trả về kết quả, mặc định là 0 nếu không có dữ liệu
+      return Number(result._sum.total_amount || 0);
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log(
+      // Log lỗi ra console để debug
+      console.error(
         'Lỗi từ dashboardService -> getTotalRevenueForAllBranchByWeek: ',
         error,
       );
+
       throw new InternalServerErrorException(
         'Đã có lỗi xảy ra, vui lòng thử lại sau!',
         error,
@@ -247,40 +357,30 @@ export class DashboardService {
   // ! Tổng doanh thu của tất cả các chi nhánh theo tháng
   async getTotalRevenueForAllBranchByMonth() {
     try {
-      // B1: Lấy ngày bắt đầu và kết thúc của tháng
-      const now = new Date();
-      const startOfMonth = dayjs(now).startOf('month').toDate();
-      const endOfMonth = dayjs(now).endOf('month').toDate();
+      // Lấy thời gian đầu và cuối tháng
+      const now = dayjs();
+      const startOfMonth = now.startOf('month').toDate();
+      const endOfMonth = now.endOf('month').toDate();
 
-      // B2: Lấy tất cả các booking
-      const bookings = await this.prismaService.bookings.findMany({
+      // Tính tổng doanh thu trực tiếp từ database bằng aggregation
+      const result = await this.prismaService.booking_details.aggregate({
         where: {
-          created_at: {
-            gte: startOfMonth,
-            lte: endOfMonth,
+          bookings: {
+            created_at: {
+              gte: startOfMonth,
+              lte: endOfMonth,
+            },
+            status: 'success',
+            deleted: false,
           },
         },
-        include: {
-          booking_details: {
-            select: {
-              total_amount: true,
-            },
-          },
+        _sum: {
+          total_amount: true,
         },
       });
 
-      // B3: Tính tổng doanh thu
-      const total = bookings.reduce((acc, booking) => {
-        return (
-          acc +
-          booking.booking_details.reduce(
-            (innerAcc, detail) => innerAcc + detail.total_amount,
-            0,
-          )
-        );
-      }, 0);
-
-      return total;
+      // Trả về kết quả, mặc định là 0 nếu không có dữ liệu
+      return Number(result._sum.total_amount || 0);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -299,50 +399,36 @@ export class DashboardService {
   // ! Tổng doanh thu của tất cả các chi nhánh theo quý
   async getTotalRevenueForAllBranchByQuarter() {
     try {
-      // B1: Lấy ngày bắt đầu và kết thúc của năm
-      const now = new Date();
-      const startOfYear = dayjs(now).startOf('year').toDate();
-      const endOfYear = dayjs(now).endOf('year').toDate();
+      // Step 1: Get the start and end dates for the current year
+      const now = dayjs();
+      const startOfYear = now.startOf('year').toDate();
+      const endOfYear = now.endOf('year').toDate();
 
-      // B2: Lấy tất cả các booking
-      const bookings = await this.prismaService.bookings.findMany({
+      // Step 2: Use Prisma groupBy to calculate monthly total revenue from the database
+      const monthlyRevenue = await this.prismaService.booking_details.groupBy({
+        by: ['created_at'],
         where: {
-          created_at: {
-            gte: startOfYear,
-            lte: endOfYear,
+          bookings: {
+            created_at: {
+              gte: startOfYear,
+              lte: endOfYear,
+            },
+            status: 'success',
+            deleted: false,
           },
         },
-        include: {
-          booking_details: {
-            select: {
-              total_amount: true,
-            },
-          },
+        _sum: {
+          total_amount: true,
         },
       });
 
+      // Step 3: Initialize an array to hold revenue for each quarter
       const quarterlyRevenue = [0, 0, 0, 0];
 
-      // B4: Tính doanh thu cho từng booking
-      bookings.forEach((booking) => {
-        const bookingTotal = booking.booking_details.reduce(
-          (innerAcc, detail) => innerAcc + detail.total_amount,
-          0,
-        );
-
-        // Xác định quý của booking
-        const bookingDate = new Date(booking.created_at);
-        const month = bookingDate.getMonth(); // 0 - 11
-
-        if (month >= 0 && month <= 2) {
-          quarterlyRevenue[0] += bookingTotal; // Q1
-        } else if (month >= 3 && month <= 5) {
-          quarterlyRevenue[1] += bookingTotal; // Q2
-        } else if (month >= 6 && month <= 8) {
-          quarterlyRevenue[2] += bookingTotal; // Q3
-        } else if (month >= 9 && month <= 11) {
-          quarterlyRevenue[3] += bookingTotal; // Q4
-        }
+      // Step 4: Aggregate revenue by quarter
+      monthlyRevenue.forEach((month) => {
+        const quarterIndex = Math.floor(dayjs(month.created_at).month() / 3);
+        quarterlyRevenue[quarterIndex] += Number(month._sum.total_amount) || 0;
       });
 
       return quarterlyRevenue;
@@ -364,40 +450,29 @@ export class DashboardService {
   // ! Tổng doanh thu của tất cả các chi nhánh theo năm
   async getTotalRevenueForAllBranchByYear() {
     try {
-      // B1: Lấy ngày bắt đầu và kết thúc của năm
-      const now = new Date();
-      const startOfYear = dayjs(now).startOf('year').toDate();
-      const endOfYear = dayjs(now).endOf('year').toDate();
+      // B1: Lấy ngày bắt đầu và kết thúc của năm hiện tại
+      const now = dayjs();
+      const startOfYear = now.startOf('year').toDate();
+      const endOfYear = now.endOf('year').toDate();
 
-      // B2: Lấy tất cả các booking
-      const bookings = await this.prismaService.bookings.findMany({
+      // B2: Sử dụng aggregation thay vì findMany để tính tổng
+      const result = await this.prismaService.booking_details.aggregate({
         where: {
-          created_at: {
-            gte: startOfYear,
-            lte: endOfYear,
+          bookings: {
+            created_at: {
+              gte: startOfYear,
+              lte: endOfYear,
+            },
+            status: 'success',
+            deleted: false,
           },
         },
-        include: {
-          booking_details: {
-            select: {
-              total_amount: true,
-            },
-          },
+        _sum: {
+          total_amount: true,
         },
       });
 
-      // B3: Tính tổng doanh thu
-      const total = bookings.reduce((acc, booking) => {
-        return (
-          acc +
-          booking.booking_details.reduce(
-            (innerAcc, detail) => innerAcc + detail.total_amount,
-            0,
-          )
-        );
-      }, 0);
-
-      return total;
+      return result._sum.total_amount || 0;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -416,30 +491,37 @@ export class DashboardService {
   // ! Tổng doanh thu từng tháng trong năm của tất cả các chi nhánh
   async getTotalRevenueForAllBranchEachMonth() {
     try {
-      const data = Array(12).fill(0);
+      const startOfYear = dayjs().startOf('year').toDate();
+      const endOfYear = dayjs().endOf('year').toDate();
 
-      // B1: Lấy tất cả các booking
-      const bookings = await this.prismaService.bookings.findMany({
-        include: {
-          booking_details: {
-            select: {
-              total_amount: true,
+      // B1: Use aggregation to calculate monthly revenue directly in the database
+      const monthlyRevenue = await this.prismaService.booking_details.groupBy({
+        by: ['created_at'],
+        where: {
+          bookings: {
+            created_at: {
+              gte: startOfYear,
+              lte: endOfYear,
             },
+            status: 'success',
+            deleted: false,
           },
+        },
+        _sum: {
+          total_amount: true,
         },
       });
 
-      // B2: Tính tổng doanh thu từng tháng
-      bookings.forEach((booking) => {
-        const month = dayjs(booking.created_at).month();
-        const totalAmount = booking.booking_details.reduce(
-          (acc, cur) => acc + cur.total_amount,
-          0,
-        );
-        data[month] += totalAmount;
+      // B2: Initialize an array with 12 months set to 0
+      const revenueData = Array(12).fill(0);
+
+      // B3: Calculate revenue for each month
+      monthlyRevenue.forEach((record) => {
+        const month = dayjs(record.created_at).month();
+        revenueData[month] += Number(record._sum.total_amount) || 0;
       });
 
-      return data;
+      return revenueData;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -458,6 +540,15 @@ export class DashboardService {
   // ! Thống kê tiệc đang pending, success, cancel, processing của tất cả các chi nhánh
   async countBookingStatusForAllBranch() {
     try {
+      // B1: Sử dụng Prisma groupBy để đếm số lượng theo trạng thái trực tiếp từ database
+      const bookingCounts = await this.prismaService.bookings.groupBy({
+        by: ['status'],
+        _count: {
+          status: true,
+        },
+      });
+
+      // B2: Khởi tạo đối tượng với các trạng thái ban đầu bằng 0
       const data = {
         pending: 0,
         success: 0,
@@ -465,18 +556,9 @@ export class DashboardService {
         processing: 0,
       };
 
-      // B1: Lấy tất cả các booking
-      const bookings = await this.prismaService.bookings.findMany({
-        select: {
-          status: true,
-        },
-      });
-
-      // B2: Tính tổng số tiệc theo từng trạng thái
-      bookings.forEach((booking) => {
-        if (data.hasOwnProperty(booking.status)) {
-          data[booking.status]++;
-        }
+      // B3: Duyệt qua kết quả từ groupBy và gán số lượng vào các trạng thái tương ứng
+      bookingCounts.forEach((booking) => {
+        data[booking.status] = booking._count.status || 0;
       });
 
       return data;
@@ -498,34 +580,26 @@ export class DashboardService {
   // ! Tổng doanh thu của từng chi nhánh
   async getTotalRevenueForEachBranch(branch_id: number) {
     try {
-      const data = {};
-      let branches;
+      // B1: Lấy chi nhánh với điều kiện tùy chọn
+      const branches = await this.prismaService.branches.findMany({
+        where: branch_id ? { id: Number(branch_id) } : undefined,
+      });
 
-      if (!branch_id) {
-        // B1: Lấy tất cả các chi nhánh
-        branches = await this.prismaService.branches.findMany();
-      } else {
-        // B1: Tìm chi nhánh theo id
-        const branch = await this.prismaService.branches.findUnique({
-          where: {
-            id: Number(branch_id),
-          },
-        });
-        if (!branch) {
-          throw new HttpException(
-            'Không tìm thấy chi nhánh',
-            HttpStatus.NOT_FOUND,
-          );
-        }
-        branches = [branch]; // Chỉ lấy chi nhánh cụ thể
+      if (branch_id && branches.length === 0) {
+        throw new HttpException(
+          'Không tìm thấy chi nhánh',
+          HttpStatus.NOT_FOUND,
+        );
       }
 
-      // B2: Lấy tất cả các booking cho từng chi nhánh đồng thời
+      // B2: Lấy bookings và tính tổng từ booking_details
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           branch_id: {
-            in: branches.map((branch) => Number(branch.id)),
+            in: branches.map((branch) => branch.id),
           },
+          status: 'success',
+          deleted: false,
         },
         include: {
           booking_details: {
@@ -537,22 +611,29 @@ export class DashboardService {
       });
 
       // B3: Tính tổng doanh thu cho từng chi nhánh
-      const revenueMap = {};
-      bookings.forEach((booking) => {
-        const total_price = booking.booking_details.reduce(
-          (innerAcc, cur) => innerAcc + cur.total_amount,
-          0,
-        );
-        revenueMap[booking.branch_id] =
-          (revenueMap[booking.branch_id] || 0) + total_price;
-      });
+      const branchRevenues = bookings.reduce(
+        (acc, booking) => {
+          const totalAmount = booking.booking_details.reduce(
+            (sum, detail) => sum + (detail.total_amount || 0),
+            0,
+          );
 
-      // Gán doanh thu cho từng chi nhánh
-      branches.forEach((branch) => {
-        data[branch.name] = revenueMap[branch.id] || 0; // Nếu không có booking, gán 0
-      });
+          acc[booking.branch_id] = (acc[booking.branch_id] || 0) + totalAmount;
+          return acc;
+        },
+        {} as Record<number, number>,
+      );
 
-      return data;
+      // B4: Tạo kết quả với tên chi nhánh
+      const result = branches.reduce(
+        (acc, branch) => {
+          acc[branch.name] = branchRevenues[branch.id] || 0;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+      return result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -652,44 +733,39 @@ export class DashboardService {
   // ! Tổng doanh thu của từng chi nhánh theo tháng
   async getTotalRevenueForEachBranchByMonth(branch_id: number) {
     try {
-      const data = {};
-      let branches;
+      // B1: Lấy chi nhánh với điều kiện tùy chọn
+      const branches = await this.prismaService.branches.findMany({
+        where: branch_id ? { id: Number(branch_id) } : undefined,
+        select: {
+          id: true,
+          name: true,
+        },
+      });
 
-      // B1: Lấy tất cả các chi nhánh hoặc chi nhánh cụ thể
-      if (!branch_id) {
-        branches = await this.prismaService.branches.findMany();
-      } else {
-        const branch = await this.prismaService.branches.findUnique({
-          where: {
-            id: Number(branch_id),
-          },
-        });
-        if (!branch) {
-          throw new HttpException(
-            'Không tìm thấy chi nhánh',
-            HttpStatus.NOT_FOUND,
-          );
-        }
-        branches = [branch]; // Chỉ lấy chi nhánh cụ thể
+      if (branch_id && branches.length === 0) {
+        throw new HttpException(
+          'Không tìm thấy chi nhánh',
+          HttpStatus.NOT_FOUND,
+        );
       }
 
-      // B2: Lấy ngày bắt đầu và kết thúc của tháng
-      const now = new Date();
-      const startOfMonth = dayjs(now).startOf('month').toDate();
-      const endOfMonth = dayjs(now).endOf('month').toDate();
+      // B2: Lấy thời gian của tuần hiện tại
+      const now = dayjs();
+      const dateRange = {
+        gte: now.startOf('week').toDate(),
+        lte: now.endOf('week').toDate(),
+      };
 
-      // B3: Lấy tất cả các booking cho từng chi nhánh trong một truy vấn
+      // B3: Lấy bookings và tính tổng doanh thu
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           branch_id: {
-            in: branches.map((branch) => Number(branch.id)),
+            in: branches.map((branch) => branch.id),
           },
-          created_at: {
-            gte: startOfMonth,
-            lte: endOfMonth,
-          },
+          created_at: dateRange,
         },
-        include: {
+        select: {
+          branch_id: true,
           booking_details: {
             select: {
               total_amount: true,
@@ -698,23 +774,29 @@ export class DashboardService {
         },
       });
 
-      // B4: Tính tổng doanh thu cho từng chi nhánh
-      const revenueMap = {};
-      bookings.forEach((booking) => {
-        const total_price = booking.booking_details.reduce(
-          (innerAcc, cur) => innerAcc + cur.total_amount,
-          0,
-        );
-        revenueMap[booking.branch_id] =
-          (revenueMap[booking.branch_id] || 0) + total_price;
-      });
+      // B4: Tính toán và định dạng kết quả
+      const result = branches.reduce(
+        (acc, { id, name }) => {
+          const branchBookings = bookings.filter(
+            (booking) => booking.branch_id === id,
+          );
+          const totalRevenue = branchBookings.reduce(
+            (sum, booking) =>
+              sum +
+              booking.booking_details.reduce(
+                (detailSum, detail) => detailSum + (detail.total_amount || 0),
+                0,
+              ),
+            0,
+          );
 
-      // Gán doanh thu cho từng chi nhánh
-      branches.forEach((branch) => {
-        data[branch.name] = revenueMap[branch.id] || 0; // Nếu không có booking, gán 0
-      });
+          acc[name] = totalRevenue;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
 
-      return data;
+      return result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -733,87 +815,72 @@ export class DashboardService {
   // ! Tổng doanh thu của từng chi nhánh theo quý
   async getTotalRevenueForEachBranchByQuarter(branch_id: number) {
     try {
-      const data = {};
-      let branches;
+      // B1: Lấy chi nhánh với điều kiện tùy chọn
+      const branches = await this.prismaService.branches.findMany({
+        where: branch_id ? { id: Number(branch_id) } : undefined,
+        select: {
+          id: true,
+          name: true,
+        },
+      });
 
-      // B1: Lấy tất cả các chi nhánh hoặc chi nhánh cụ thể
-      if (!branch_id) {
-        branches = await this.prismaService.branches.findMany();
-
-        // Nếu không có chi nhánh nào, trả về mảng rỗng
-        if (branches.length === 0) {
-          return [];
-        }
-      } else {
-        const branch = await this.prismaService.branches.findUnique({
-          where: {
-            id: Number(branch_id),
-          },
-        });
-        if (!branch || !branch.id) {
-          throw new NotFoundException('Không tìm thấy chi nhánh');
-        }
-        branches = [branch];
+      if (branches.length === 0) {
+        return branch_id
+          ? new NotFoundException('Không tìm thấy chi nhánh')
+          : {};
       }
 
-      // Khởi tạo đối tượng doanh thu cho từng chi nhánh
-      branches.forEach((branch) => {
-        data[branch.name] = [0, 0, 0, 0];
-      });
+      // B2: Lấy thời gian của năm hiện tại
+      const now = dayjs();
+      const dateRange = {
+        gte: now.startOf('year').toDate(),
+        lte: now.endOf('year').toDate(),
+      };
+      // B3: Khởi tạo object kết quả
+      const result = branches.reduce((acc, { name }) => {
+        acc[name] = [0, 0, 0, 0];
+        return acc;
+      }, {});
 
-      // B2: Lấy ngày bắt đầu và kết thúc của năm
-      const now = new Date();
-      const startOfYear = dayjs(now).startOf('year').toDate();
-      const endOfYear = dayjs(now).endOf('year').toDate();
-
-      // B3: Lấy tất cả các booking cho từng chi nhánh trong một truy vấn
+      // B4: Lấy và tính toán doanh thu từ bookings
       const bookings = await this.prismaService.bookings.findMany({
         where: {
-          branch_id: {
-            in: branches.map((branch) => Number(branch.id)),
-          },
-          created_at: {
-            gte: startOfYear,
-            lte: endOfYear,
-          },
+          branch_id: { in: branches.map((branch) => branch.id) },
+          created_at: dateRange,
+          status: 'success',
+          deleted: false,
         },
-        include: {
+        select: {
+          branch_id: true,
+          created_at: true,
           booking_details: {
-            select: {
-              total_amount: true,
-            },
+            select: { total_amount: true },
           },
         },
       });
-      // B4: Tính doanh thu cho từng booking
+
+      // B5: Map branch_id với tên chi nhánh để tránh tìm kiếm lặp đi lặp lại
+      const branchMap = new Map(
+        branches.map((branch) => [branch.id, branch.name]),
+      );
+
+      // B6: Tính toán doanh thu theo quý
       bookings.forEach((booking) => {
-        const bookingTotal = booking.booking_details.reduce(
-          (innerAcc, detail) => innerAcc + detail.total_amount,
+        const branchName = branchMap.get(booking.branch_id);
+        if (!branchName) return;
+
+        const totalAmount = booking.booking_details.reduce(
+          (sum, detail) => sum + (detail.total_amount || 0),
           0,
         );
 
-        // Xác định quý của booking
-        const bookingDate = new Date(booking.created_at);
-        const month = bookingDate.getMonth(); // 0 - 11
+        const month = dayjs(booking.created_at).month();
+        const quarterIndex = Math.floor(month / 3);
 
-        // Cập nhật doanh thu cho từng chi nhánh theo quý
-        const branchName = branches.find(
-          (branch) => branch.id === booking.branch_id,
-        )?.name; // Lấy tên chi nhánh từ id
-        if (branchName) {
-          if (month >= 0 && month <= 2) {
-            data[branchName][0] += bookingTotal; // Q1
-          } else if (month >= 3 && month <= 5) {
-            data[branchName][1] += bookingTotal; // Q2
-          } else if (month >= 6 && month <= 8) {
-            data[branchName][2] += bookingTotal; // Q3
-          } else if (month >= 9 && month <= 11) {
-            data[branchName][3] += bookingTotal; // Q4
-          }
-        }
+        result[branchName][quarterIndex] += totalAmount;
       });
 
-      return data;
+      return result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -832,42 +899,35 @@ export class DashboardService {
   // ! Tổng doanh thu của từng chi nhánh theo năm
   async getTotalRevenueForEachBranchByYear(branch_id: number) {
     try {
-      const data = {};
-      let branches;
+      // B1: Lấy chi nhánh với điều kiện tùy chọn
+      const branches = await this.prismaService.branches.findMany({
+        where: branch_id ? { id: Number(branch_id) } : undefined,
+        select: {
+          id: true,
+          name: true,
+        },
+      });
 
-      // B1: Lấy tất cả các chi nhánh hoặc chi nhánh cụ thể
-      if (!branch_id) {
-        branches = await this.prismaService.branches.findMany();
-      } else {
-        const branch = await this.prismaService.branches.findUnique({
-          where: {
-            id: Number(branch_id),
-          },
-        });
-        if (!branch) {
-          throw new HttpException(
-            'Không tìm thấy chi nhánh',
-            HttpStatus.NOT_FOUND,
-          );
-        }
-        branches = [branch]; // Chỉ lấy chi nhánh cụ thể
+      if (branches.length === 0) {
+        return branch_id
+          ? new NotFoundException('Không tìm thấy chi nhánh')
+          : {};
       }
 
-      // B2: Lấy ngày bắt đầu và kết thúc của năm
-      const now = new Date();
-      const startOfYear = dayjs(now).startOf('year').toDate();
-      const endOfYear = dayjs(now).endOf('year').toDate();
+      // B2: Lấy thời gian của năm hiện tại
+      const now = dayjs();
+      const dateRange = {
+        gte: now.startOf('year').toDate(),
+        lte: now.endOf('year').toDate(),
+      };
 
-      // B3: Lấy tất cả các booking cho từng chi nhánh trong một truy vấn
+      // B3: Lấy bookings và tính toán
       const bookings = await this.prismaService.bookings.findMany({
         where: {
-          branch_id: {
-            in: branches.map((branch) => Number(branch.id)),
-          },
-          created_at: {
-            gte: startOfYear,
-            lte: endOfYear,
-          },
+          branch_id: { in: branches.map((branch) => branch.id) },
+          created_at: dateRange,
+          deleted: false,
+          status: 'success',
         },
         include: {
           booking_details: {
@@ -879,22 +939,25 @@ export class DashboardService {
       });
 
       // B4: Tính tổng doanh thu cho từng chi nhánh
-      const revenueMap = {};
-      bookings.forEach((booking) => {
-        const total_price = booking.booking_details.reduce(
-          (innerAcc, cur) => innerAcc + cur.total_amount,
-          0,
-        );
-        revenueMap[booking.branch_id] =
-          (revenueMap[booking.branch_id] || 0) + total_price;
-      });
+      const branchRevenues = bookings.reduce(
+        (acc, booking) => {
+          const totalAmount = booking.booking_details.reduce(
+            (sum, detail) => sum + (detail.total_amount || 0),
+            0,
+          );
+          acc[booking.branch_id] = (acc[booking.branch_id] || 0) + totalAmount;
+          return acc;
+        },
+        {} as Record<number, number>,
+      );
 
-      // Gán doanh thu cho từng chi nhánh
-      branches.forEach((branch) => {
-        data[branch.name] = revenueMap[branch.id] || 0; // Nếu không có booking, gán 0
-      });
+      // B5: Tạo kết quả cuối cùng
+      const result = branches.reduce((acc, branch) => {
+        acc[branch.name] = branchRevenues[branch.id] || 0;
+        return acc;
+      }, {});
 
-      return data;
+      return result;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -913,133 +976,86 @@ export class DashboardService {
   // ! Tổng doanh thu từng tháng trong năm của từng chi nhánh
   async getTotalRevenueForEachBranchEachMonth(branch_id: number) {
     try {
-      const data = [];
+      // B1: Lấy thời gian của năm hiện tại
+      const now = dayjs();
+      const dateRange = {
+        gte: now.startOf('year').toDate(),
+        lte: now.endOf('year').toDate(),
+      };
 
-      if (!branch_id) {
-        // B1: Lấy tất cả các chi nhánh
-        const branches = await this.prismaService.branches.findMany();
-        // B2: Lấy ngày bắt đầu và kết thúc của năm
-        const now = new Date();
-        const startOfYear = dayjs(now).startOf('year').toDate();
-        const endOfYear = dayjs(now).endOf('year').toDate();
+      // B2: Lấy chi nhánh(s)
+      const branches = await this.prismaService.branches.findMany({
+        where: branch_id ? { id: Number(branch_id) } : undefined,
+        select: {
+          id: true,
+          name: true,
+        },
+      });
 
-        // B3: Lấy tất cả các booking cho từng chi nhánh đồng thời
-        const bookingPromises = branches.map(async (branch) => {
-          const bookings = await this.prismaService.bookings.findMany({
-            where: {
-              branch_id: Number(branch.id),
-              created_at: {
-                gte: startOfYear,
-                lte: endOfYear,
-              },
-            },
-            include: {
-              booking_details: {
-                select: {
-                  total_amount: true,
-                },
-              },
-            },
-          });
-
-          // Tính tổng doanh thu của từng chi nhánh
-          const totalRevenueEachMonth = Array(12).fill(0);
-          let total = 0;
-
-          if (bookings.length === 0) {
-            return {
-              name: branch.name,
-              data: totalRevenueEachMonth,
-              total: 0,
-            };
-          }
-
-          for (let booking of bookings) {
-            const total_price = booking.booking_details.reduce(
-              (acc, cur) => acc + cur.total_amount,
-              0,
-            );
-            const month = dayjs(booking.created_at).month();
-            totalRevenueEachMonth[month] += total_price;
-            total += total_price;
-          }
-
-          return {
-            name: branch.name,
-            data: totalRevenueEachMonth,
-            total: total,
-          };
-        });
-
-        // Chờ tất cả các truy vấn hoàn thành
-        const results = await Promise.all(bookingPromises);
-
-        // B4: Sắp xếp theo tổng doanh thu giảm dần
-        results.sort((a, b) => b.total - a.total);
-        return results;
-      } else {
-        // B1: Lấy chi nhánh theo id
-        const branch = await this.prismaService.branches.findUnique({
-          where: {
-            id: Number(branch_id),
-          },
-        });
-        if (!branch) {
-          throw new HttpException(
-            'Không tìm thấy chi nhánh',
-            HttpStatus.NOT_FOUND,
-          );
-        }
-
-        // B2: Lấy ngày bắt đầu và kết thúc của năm
-        const now = new Date();
-        const startOfYear = dayjs(now).startOf('year').toDate();
-        const endOfYear = dayjs(now).endOf('year').toDate();
-
-        // B3: Lấy tất cả các booking cho chi nhánh đó
-        const bookings = await this.prismaService.bookings.findMany({
-          where: {
-            branch_id: Number(branch_id),
-            created_at: {
-              gte: startOfYear,
-              lte: endOfYear,
-            },
-          },
-          include: {
-            booking_details: {
-              select: {
-                total_amount: true,
-              },
-            },
-          },
-        });
-
-        // Tính tổng doanh thu của chi nhánh đó
-        const totalRevenueEachMonth = Array(12).fill(0);
-        let total = 0;
-
-        if (bookings.length === 0) {
-          throw new HttpException(
-            { data: totalRevenueEachMonth },
-            HttpStatus.CREATED,
-          );
-        }
-
-        for (let booking of bookings) {
-          const total_price = booking.booking_details.reduce(
-            (acc, cur) => acc + cur.total_amount,
-            0,
-          );
-          const month = dayjs(booking.created_at).month();
-          totalRevenueEachMonth[month] += total_price;
-          total += total_price;
-        }
-        return {
-          name: branch.name,
-          data: totalRevenueEachMonth,
-          total: total,
-        };
+      if (branches.length === 0) {
+        throw new NotFoundException('Không tìm thấy chi nhánh');
       }
+
+      // B3: Lấy bookings cho tất cả chi nhánh trong một lần query
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          branch_id: { in: branches.map((branch) => branch.id) },
+          created_at: dateRange,
+          deleted: false,
+          status: 'success',
+        },
+        select: {
+          branch_id: true,
+          created_at: true,
+          booking_details: {
+            select: {
+              total_amount: true,
+            },
+          },
+        },
+      });
+
+      // B4: Tính toán doanh thu cho từng chi nhánh
+      const branchRevenueMap = new Map<number, number[]>();
+      const branchTotalMap = new Map<number, number>();
+
+      // Khởi tạo mảng cho từng chi nhánh
+      branches.forEach((branch) => {
+        branchRevenueMap.set(branch.id, Array(12).fill(0));
+        branchTotalMap.set(branch.id, 0);
+      });
+
+      // Tính toán doanh thu
+      bookings.forEach((booking) => {
+        const totalAmount = booking.booking_details.reduce(
+          (sum, detail) => sum + (detail.total_amount || 0),
+          0,
+        );
+        const month = dayjs(booking.created_at).month(); // Tháng bắt đầu từ 0 (January)
+        const monthlyRevenue = branchRevenueMap.get(booking.branch_id);
+        const currentTotal = branchTotalMap.get(booking.branch_id) || 0;
+
+        if (monthlyRevenue) {
+          monthlyRevenue[month] += totalAmount;
+          branchRevenueMap.set(booking.branch_id, monthlyRevenue);
+          branchTotalMap.set(booking.branch_id, currentTotal + totalAmount);
+        }
+      });
+
+      // B5: Tạo kết quả
+      const results = branches.map((branch) => ({
+        name: branch.name,
+        data: branchRevenueMap.get(branch.id) || Array(12).fill(0),
+        total: branchTotalMap.get(branch.id) || 0,
+      }));
+
+      // B6: Nếu chỉ định branch_id, trả về một chi nhánh
+      if (branch_id) {
+        return results[0];
+      }
+
+      // B7: Sắp xếp theo tổng doanh thu giảm dần
+      return results.sort((a, b) => b.total - a.total);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -1058,58 +1074,50 @@ export class DashboardService {
   // ! Thống kê tiệc đang pending, success, cancel, processing của từng chi nhánh
   async countBookingStatus(branch_id: number) {
     try {
-      console.log(branch_id);
-      // B1: Lấy tất cả các chi nhánh hoặc chi nhánh cụ thể
-      let branches;
-      if (!branch_id) {
-        branches = await this.prismaService.branches.findMany();
-      } else {
-        const branch = await this.prismaService.branches.findUnique({
-          where: {
-            id: Number(branch_id),
-          },
-        });
-        if (!branch) {
-          throw new HttpException(
-            'Không tìm thấy chi nhánh',
-            HttpStatus.NOT_FOUND,
-          );
-        }
-        branches = [branch]; // Chỉ lấy chi nhánh cụ thể
+      // B1: Lấy thông tin chi nhánh
+      const branches = await this.prismaService.branches.findMany({
+        where: branch_id ? { id: Number(branch_id) } : undefined,
+        select: { id: true, name: true },
+      });
+
+      if (branches.length === 0) {
+        throw new NotFoundException('Không tìm thấy chi nhánh');
       }
 
-      // B2: Lấy tất cả các booking cho từng chi nhánh trong một truy vấn
-      const bookings = await this.prismaService.bookings.findMany({
+      // B2: Lấy tất cả các booking theo trạng thái và chi nhánh trong một lần truy vấn
+      const bookingStatusCounts = await this.prismaService.bookings.groupBy({
+        by: ['branch_id', 'status'],
         where: {
-          branch_id: {
-            in: branches.map((branch) => Number(branch.id)),
-          },
+          branch_id: { in: branches.map((branch) => branch.id) },
         },
-        select: {
-          branch_id: true,
+        _count: {
           status: true,
         },
       });
 
-      // B3: Tính tổng số tiệc theo từng trạng thái
-      const statusCounts = branches.map((branch) => {
-        const branchBookings = bookings.filter(
-          (booking) => booking.branch_id === branch.id,
-        );
-        const counts = branchBookings.reduce(
-          (acc, booking) => {
-            acc[booking.status] = (acc[booking.status] || 0) + 1;
-            return acc;
-          },
-          { pending: 0, success: 0, cancel: 0, processing: 0 },
-        );
+      // B3: Khởi tạo dữ liệu ban đầu cho từng chi nhánh với giá trị bằng 0
+      const statusCounts = branches.map((branch) => ({
+        id: branch.id, // Include branch id for matching later
+        name: branch.name,
+        data: {
+          pending: 0,
+          success: 0,
+          cancel: 0,
+          processing: 0,
+        },
+      }));
 
-        return {
-          name: branch.name,
-          data: counts,
-        };
+      // B4: Cập nhật dữ liệu thống kê từ kết quả truy vấn
+      bookingStatusCounts.forEach((statusCount) => {
+        const branchData = statusCounts.find(
+          (branch) => branch.id === statusCount.branch_id,
+        );
+        if (branchData) {
+          branchData.data[statusCount.status] = statusCount._count.status;
+        }
       });
 
+      // B5: Trả về kết quả sau khi cập nhật dữ liệu
       return statusCounts;
     } catch (error) {
       if (error instanceof HttpException) {

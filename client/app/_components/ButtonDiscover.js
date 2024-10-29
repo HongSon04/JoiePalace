@@ -1,4 +1,8 @@
-const ButtonDiscover = ({ name, className, props }) => {
+import { memo } from "react";
+
+const ButtonDiscover = ({ name, className, ...props }) => {
+  console.log(props);
+  
   return (
     <button
       className={`bg-gold flex justify-center items-center gap-1 py-2 rounded-3xl cursor-pointer ${className}`}
@@ -21,4 +25,4 @@ const ButtonDiscover = ({ name, className, props }) => {
   );
 };
 
-export default ButtonDiscover;
+export default memo(ButtonDiscover);

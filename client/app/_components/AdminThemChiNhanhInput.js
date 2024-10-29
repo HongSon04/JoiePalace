@@ -12,22 +12,29 @@ const AdminThemChiNhanhInput = ({ fields, title, heightTextarea, control }) => {
             name={field.name}
             control={control}
             defaultValue=""
-            render={({ field: inputProps }) =>
-              field.type === 'textarea' ? (
-                <textarea
-                  {...inputProps}
-                  placeholder={field.placeholder}
-                  className={`px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 ${heightTextarea} w-full`}
-                />
-              ) : (
-                <input
-                  {...inputProps}
-                  type={field.type || 'text'}
-                  placeholder={field.placeholder}
-                  className="px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
-                />
-              )
-            }
+            render={({ field: inputProps, fieldState }) => (
+              <>
+                {field.type === 'textarea' ? (
+                  <textarea
+                    {...inputProps}
+                    placeholder={field.placeholder}
+                    className={`px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 ${heightTextarea} w-full`}
+                  />
+                ) : (
+                  <input
+                    {...inputProps}
+                    type={field.type || 'text'}
+                    placeholder={field.placeholder}
+                    className="px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
+                  />
+                )}
+                {fieldState.error && (
+                  <span className="text-red-500 text-sm font-semibold">
+                    {fieldState.error.message}
+                  </span>
+                )}
+              </>
+            )}
           />
         ))}
       </div>

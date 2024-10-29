@@ -30,11 +30,11 @@ function Event() {
             <ScrollFullPage>
                 <div className="section ">
                     <section className='select-none flex max-h-screen justify-between items-start max-lg:pt-20 lg:px-[25px] xl:max-w-screen-xl m-auto'>
-                        <div className="flex flex-col justify-center lg:h-screen z-10">
+                        <div className="flex flex-col justify-center lg:h-screen z-10 max-lg:w-[75%]">
                             <img className="w-full h-full object-cover" src="/Wedding-1.jpg" alt="" />
                         </div>
                         <div className="flex flex-col mx-5 z-30 w-[400px] md:h-screen lg:justify-center max-sm:mx-2 ">
-                            <h1 className="text-gold mb-10 font-bold text-fade-in font-gilroy text-7xl max-lg:text-5xl max-sm:text-xl max-sm:mb-2 ">tiệc cưới</h1>
+                            <h1 className="text-gold mb-10 font-bold text-fade-in font-gilroy text-7xl max-lg:text-5xl max-sm:text-xl max-sm:mb-2 ">Tiệc cưới</h1>
                             <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[10px] max-sm:leading-3">
                                 Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất lượng dịch vụ, White Palace là không gian hoàn hảo để triển khai bất kì kế hoạch tiệc cưới nào mà bạn đang ấp ủ, từ các buổi yến tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật giải trí sáng tạo, các tiệc cưới trọng thể của doanh nghiệp như tiệc ra mắt sản phẩm, tiệc tri ân khách hàng, tiệc tất niên, triển lãm thương mại.
                             </p>
@@ -84,7 +84,7 @@ function Event() {
                                         <Image src="/Wedding-5-scaled-e1719420448461.jpg" alt="" />
                                     </div>
                                 </div>
-                                <div className="relative right-[135px] z-[-1]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
+                                <div className="relative right-[135px]  max-lg:right-[40px] max-lg:bottom-[90px] max-sm:right-[25px] max-sm:bottom-[160px]">
                                     <div className="max-w-[641px] max-h-[430px] ">
                                         <Image src="/Wedding-6-e1719420516884.jpg" alt="" />
                                     </div>

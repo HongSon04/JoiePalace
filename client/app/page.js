@@ -13,6 +13,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import InputIndex from "@/app/_components/InputIndexClient";
 import HeaderClient from "./_components/HeaderClient";
+import Contact from "./_components/Contact";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -137,7 +138,7 @@ function Home() {
   };
   return (
     <>
-      <HeaderClient/>
+      <HeaderClient />
       <ScrollFullPage>
         {/* banner */}
         <section className="section banner w-full h-screen relative top-0 left-0">
@@ -642,72 +643,7 @@ function Home() {
               <h1 className="uppercase text-gold font-bold text-5xl leading-[100%]">
                 thông tin liên hệ
               </h1>
-              <form
-                className="w-full h-auto flex flex-col gap-5 overflow-y-scroll pr-1"
-                id="form-information"
-              >
-                <InputIndex type="text" placeholder="Họ và tên*" />
-                <InputIndex type="number" placeholder="Số điện thoại*" />
-                <InputIndex type="email" placeholder="Email*" />
-                <InputIndex type="text" placeholder="Công ty*" />
-                <div className="w-full py-3 flex items-center justify-between border border-b-white border-t-0 border-l-0 border-r-0">
-                  <span>Sự kiện*</span>
-                  <div className="h-full flex items-center gap-3">
-                    <label className="flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name="accountType"
-                        value="business"
-                        className="form-radio text-green-600 focus:ring-green-500 h-4 w-4"
-                      />
-                      <span className="ml-2 text-white">Doanh nghiệp</span>
-                    </label>
-                    <label className="flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name="accountType"
-                        value="business"
-                        className="form-radio text-green-600 focus:ring-green-500 h-4 w-4"
-                      />
-                      <span className="ml-2 text-white">Cá nhân</span>
-                    </label>
-                  </div>
-                </div>
-                <div className="w-full flex items-center justify-between">
-                  <span>Địa điểm*</span>
-                  <div className="w-[40%] h-full flex items-center gap-3">
-                    <select
-                      name=""
-                      id=""
-                      className="w-full border border-darkGreen-700 p-3 py-2 rounded-sm"
-                    >
-                      <option className="text-black" value="1">
-                        Hoàng Văn Thụ
-                      </option>
-                      <option className="text-black" value="2">
-                        Phạm Văn Đồng
-                      </option>
-                      <option className="text-black" value="3">
-                        Võ Văn Kiệt
-                      </option>
-                    </select>
-                  </div>
-                </div>
-                <InputIndex
-                  type="number"
-                  min="0"
-                  placeholder="Số lượng khách*"
-                />
-                <InputIndex type="datetime-local" placeholder="Thời gian*" />
-                <InputIndex
-                  type="text"
-                  placeholder="Ghi chú*"
-                  styles="overflow-hidden"
-                />
-                <div className="w-full flex justify-end">
-                  <ButtonDiscover name={"Gửi"} className={"w-auto px-6"} />
-                </div>
-              </form>
+              <Contact></Contact>
             </div>
             <div className="w-full lg:w-1/2 h-1/2 lg:h-[70%] rounded-sm overflow-hidden">
               <iframe

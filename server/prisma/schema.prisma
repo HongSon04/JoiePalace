@@ -282,6 +282,7 @@ model bookings {
   note              String?
   shift             String
   number_of_guests  Int?
+  budget            String?
   organization_date DateTime
   is_confirm        Boolean           @default(false)
   is_deposit        Boolean           @default(false)
@@ -306,6 +307,8 @@ model booking_details {
   menus          menus    @relation(fields: [menu_id], references: [id])
   deposit_id     Int
   deposits       deposits @relation(fields: [deposit_id], references: [id])
+  table_count    Int      @default(0)
+  chair_count    Int      @default(0)
   party_types    Json?
   decor          Json?
   menu           Json?
@@ -320,19 +323,20 @@ model booking_details {
 }
 
 model feedbacks {
-  id         Int      @id @default(autoincrement())
-  branch_id  Int
-  branches   branches @relation(fields: [branch_id], references: [id])
-  booking_id Int
-  bookings   bookings @relation(fields: [booking_id], references: [id])
-  user_id    Int?
-  users      users?   @relation(fields: [user_id], references: [id])
-  name       String
-  comments   String
-  rate       Float    @default(5)
-  is_show    Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  branch_id   Int
+  branches    branches @relation(fields: [branch_id], references: [id])
+  booking_id  Int
+  bookings    bookings @relation(fields: [booking_id], references: [id])
+  user_id     Int?
+  users       users?   @relation(fields: [user_id], references: [id])
+  name        String
+  comments    String
+  rate        Float    @default(5)
+  is_show     Boolean  @default(true)
+  is_approved Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
 
 model blogs {

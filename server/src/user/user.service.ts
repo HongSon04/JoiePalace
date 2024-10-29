@@ -271,7 +271,10 @@ export class UserService {
           },
           skip,
           take: itemsPerPage,
-          orderBy: { created_at: 'desc' },
+          orderBy: {
+            created_at: 'desc',
+            memberships: { booking_total_amount: 'desc' },
+          },
         }),
         this.prismaService.users.count({ where: whereConditions }),
       ]);
@@ -321,7 +324,6 @@ export class UserService {
         startDate && endDate
           ? { created_at: { gte: new Date(startDate), lte: new Date(endDate) } }
           : {};
-      console.log(sortRangeDate);
 
       const whereConditions: any = {
         deleted: true,
@@ -345,7 +347,10 @@ export class UserService {
           },
           skip,
           take: itemsPerPage,
-          orderBy: { created_at: 'desc' },
+          orderBy: {
+            created_at: 'desc',
+            memberships: { booking_total_amount: 'desc' },
+          },
         }),
         this.prismaService.users.count({ where: whereConditions }),
       ]);
