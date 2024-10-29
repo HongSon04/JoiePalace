@@ -20,7 +20,7 @@ export const fetchAllDashBoard = async () => {
   };
 export const fetchAllTotalRevenueMonth = async () => {
     try {
-        const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH );
+        const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH);
         if (response.status !== 200) {
         throw new Error("Có lỗi khi lấy dữ liệu !");
         }
@@ -30,9 +30,9 @@ export const fetchAllTotalRevenueMonth = async () => {
         throw error; 
     }
 };
-export const fetchAllEachTime = async () => {
+export const fetchAllEachTime = async (branchId) => {
     try {
-        const response = await axios.get(API_CONFIG.DASHBOARD.GET_ALL_INFO_EACH_TIME );
+        const response = await axios.get(API_CONFIG.DASHBOARD.GET_ALL_INFO_EACH_TIME(branchId));
         if (response.status !== 200) {
         throw new Error("Có lỗi khi lấy dữ liệu !");
         }
@@ -44,9 +44,9 @@ export const fetchAllEachTime = async () => {
 };
 
 
-export const fetchRevenueBranchByWeek = async () => {
+export const fetchRevenueBranchByWeek = async (branchId) => {
   try {
-    const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_WEEK);
+    const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_WEEK(branchId));
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
     }
@@ -58,9 +58,9 @@ export const fetchRevenueBranchByWeek = async () => {
 };
 
 
-export const fetchRevenueBranchByMonth = async () => {
+export const fetchRevenueBranchByMonth = async (branchId) => {
   try {
-      const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_MONTH );
+      const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_MONTH(branchId) );
       if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
       }
@@ -71,9 +71,9 @@ export const fetchRevenueBranchByMonth = async () => {
   }
 };
 
-export const fetchRevenueBranchByQuarter = async () => {
+export const fetchRevenueBranchByQuarter = async (branchId) => {
   try {
-      const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_QUARTER);
+      const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_QUARTER(branchId));
       if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
       }
@@ -84,9 +84,9 @@ export const fetchRevenueBranchByQuarter = async () => {
   }
 };
 
-export const fetchRevenueBranchByYear = async () => {
+export const fetchRevenueBranchByYear = async (branchId) => {
   try {
-      const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_YEAR );
+      const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_BRANCH_YEAR(branchId));
       if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
       }
@@ -161,9 +161,9 @@ export const fetchAllBooking = async () => {
       throw error; 
   }
 };
-export const fetchInfoByMonth = async () => {
+export const fetchInfoByMonth = async (branchId) => {
   try {
-    const response = await axios.get(API_CONFIG.DASHBOARD.GET_INFO_BY_MONTH);
+    const response = await axios.get(API_CONFIG.DASHBOARD.GET_INFO_BY_MONTH(branchId));
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
     }

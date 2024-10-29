@@ -7,7 +7,8 @@ import "../../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from '@/app/_components/AdminHeader';
 import { fetchRevenueBranchByWeek, fetchRevenueBranchByMonth, fetchRevenueBranchByQuarter, fetchRevenueBranchByYear, fetchAllBranch} from "@/app/_services/apiServices";
-const Page = () => {    
+const Page = () => {  
+    const [userId, setUserId] = useState(null);  
     const [totalWeek, setTotalWeek] = useState(null);
     const [totalMonth, setTotalMonth] = useState(null);
     const [totalQuarter, setTotalQuarter] = useState(null);
@@ -22,7 +23,7 @@ const Page = () => {
             const totalYear = await  fetchRevenueBranchByYear();
             const allBranch = await fetchAllBranch();
             // console.log(allBranch.data);
-
+            
             setTotalWeek(totalWeek);
             setTotalMonth(totalMonth);
             setTotalQuarter(totalQuarter);
@@ -77,16 +78,7 @@ const Page = () => {
             }
         ]
     };
-    const data = {
-        labels: ['Phạm Văn Đồng', 'Hoàng Văn Thụ', 'Võ Văn Kiệt'],
-        datasets: [
-          {
-            label: 'Doanh thu',
-            data: [300000000, 500000000, 700000000]
-  
-          },
-        ],
-    };
+    
     return (
         <main className="grid gap-6 p-4 text-white">
             <AdminHeader
@@ -133,6 +125,7 @@ const Page = () => {
                         </div>
                         <Chart data={dataByYear} chartType="line"/>
                     </div>
+                    
                 
                 </div>
             </div>
