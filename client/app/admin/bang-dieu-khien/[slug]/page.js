@@ -11,38 +11,44 @@ import { FaPlus } from "react-icons/fa6";
 import "../../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
-import {fetchInfoByMonth,fetchAllDashBoard,fetchUserById, fetchAllTotalRevenueMonth,fetchAllEachTime,fetchAllBooking } from "@/app/_services/apiServices";
+import {fetchInfoByMonth,fetchAllEachTime,fetchAllBooking } from "@/app/_services/apiServices";
 import Link from 'next/link';
+import { fetchBranchBySlug, fetchBranchTotalRevenueMonth } from '@/app/_services/branchesServices';
 
-const Page = () => {
-  const [dataAdmin, setDataAdmin] = useState(null);
-  const [totalRevenueData, setTotalRevenueData] = useState(null);
+const Page = ({params}) => {
+  const {slug} = params;
+  const [dataUser, setDataUser] = useState(null);
+  const [dataTotalAllByMonth, setDataTotalAllByMonth] = useState(null);
+  const [dataRevenueEachMonth, setDataRevenueEachMonth] = useState(null);
   const [dataAllEachTime, setDataAllEachTime] = useState(null);
   const [allBooking, setAllBooking] = useState([]);
   const [dataInfo, setDataInfo] = useState(null);
-  const [slug, setSlug] = useState('');
+  const [dataSlug, setDataSlug] = useState(null);
   const [nameBranch, setnNameBranch] = useState(null);
   useEffect(() => {
-    const storedBranch = localStorage.getItem("currentBranch");
-    const branchId = 0;
+   
     const fetchAminData = async () => {
       try {
-        const branchObject = JSON.parse(storedBranch);
-        const branchSlug = branchObject ? branchObject.slug : ''; 
-        
-        setSlug(branchSlug); 
-
-        const adminData = await fetchAllDashBoard();
-        const revenueData = await fetchAllTotalRevenueMonth(); 
+        const dataSlug = await fetchBranchBySlug(slug);
+        const branchId = dataSlug[0].id;
+        // console.log(branchId);
+       
         const dataAllEachTime = await fetchAllEachTime(branchId);
+        const dataTotalByMonth = await fetchRevenueBranchByMonth(branchId);
+        const dataRevenueEachMonth = await fetchBranchTotalRevenueMonth(branchId);
+        console.log(dataTotalByMonth);
+        
         const allBooking = await fetchAllBooking();
         const dataInfo = await fetchInfoByMonth(branchId);
-        
+
+        setDataTotalAllByMonth(dataTotalByMonth)
+        setDataRevenueEachMonth(dataRevenueEachMonth);
+        setDataSlug(dataSlug);
         setDataInfo(dataInfo);
         setAllBooking(allBooking); 
         setDataAllEachTime(dataAllEachTime); 
-        setDataAdmin(adminData);
-        setTotalRevenueData(revenueData); 
+        // setDataAdmin(adminData);
+        // setTotalRevenueData(revenueData); 
       } catch (error) {
         console.error("Lỗi:", error);
       }
@@ -51,13 +57,15 @@ const Page = () => {
     fetchAminData();
   }, []); 
     const dataBooking = allBooking.data || [];
-    console.log(dataBooking);
+    // console.log(dataBooking);
     
-    const total_revune_each_month = dataAllEachTime?.total_revune_each_month || []; 
+    // const total_revune_each_month = dataAllEachTime?.total_revune_each_month || []; 
     // console.log(total_revune_each_month);
     const total_revune_by_month = dataAllEachTime?.total_revune_by_month || []; 
     // console.log(total_revune_by_month);
-  
+    const total_revune_each_month_branch = dataRevenueEachMonth?.data || []; 
+    // console.log(total_revune_each_month_branch);
+    
     const dataByMonth = {
       labels: Object.keys(total_revune_by_month), 
       datasets: [
@@ -67,24 +75,33 @@ const Page = () => {
           }
       ]
     };
-    const dataEachMonth = {
-      labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-      datasets: total_revune_each_month.map(branch => ({
-        label: branch.name,
-        data: branch.data, 
+    // const dataEachMonth = {
+    //   labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    //   datasets: total_revune_each_month.map(branch => ({
+    //     label: branch.name,
+    //     data: branch.data, 
         
-      }))
+    //   }))
       
+    // };
+    const dataEachMonthBranch = {
+      labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+      datasets: total_revune_each_month_branch.map(branch => ({
+        label: branch.name, 
+        data: branch.data
+      }))
     };
-    const branchCharts = total_revune_each_month.map((branch, index) => (
-      <div key={index} className="p-2 bg-blackAlpha-100 rounded-xl">
-        <Chart data={{
-          labels: dataEachMonth.labels,
-          datasets: [{ label: branch.name, data: branch.data }]
-        }} chartType="bar" />
-        <p className="text-center text-xs">{branch.name}</p>
-      </div>
-    ));
+    
+    
+    // const branchCharts = total_revune_each_month.map((branch, index) => (
+    //   <div key={index} className="p-2 bg-blackAlpha-100 rounded-xl">
+    //     <Chart data={{
+    //       labels: dataEachMonth.labels,
+    //       datasets: [{ label: branch.name, data: branch.data }]
+    //     }} chartType="bar" />
+    //     <p className="text-center text-xs">{branch.name}</p>
+    //   </div>
+    // ));
     function formatDate(dateString) {
       const date = new Date(dateString);
       return date.toLocaleDateString("vi-VN"); 
@@ -107,8 +124,8 @@ const Page = () => {
       >
 
       </AdminHeader>
-      <div className="container px-2 flex gap-[10px]  text-white">
-        {dataAllEachTime ? (
+      <div className="container px-2 flex gap-[16px]  text-white">
+        {dataInfo ? (
           <>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
               <div className="flex justify-between items-center">
@@ -131,10 +148,7 @@ const Page = () => {
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-white text-base font-normal">Khách hàng</p>
-                {/* <div className="flex justify-between items-center gap-1 text-teal-300">
-                  <FiArrowUpRight className="text-2xl" />
-                  <p className="text-base">2%</p>
-                </div> */}
+                
                 <Link href={`/admin/khach-hang/${slug}`}>
                   <PiArrowSquareOutLight className="text-2xl" />
                 </Link>
@@ -189,7 +203,7 @@ const Page = () => {
 
 
 
-      <div className="container  flex gap-8 w-full h-full  p-4">
+      <div className="container  flex gap-4 w-full h-full  p-4">
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl" >
               <div className="flex justify-between gap-[10px] items-center mb-[10px]">
                 <p className="text-base font-semibold ">Khách hàng</p>
@@ -246,7 +260,10 @@ const Page = () => {
             
           </div>
           <div className="grid grid-cols-2 gap-4 h-[500px] overflow-y-auto hide-scrollbar">
-            {branchCharts}
+            {/* {branchCharts} */}
+            <div className="p-4 bg-blackAlpha-100 rounded-xl h-[335px]">
+              <Chart data={dataEachMonthBranch} chartType="bar" />
+          </div>
           </div>
         </div>
       </div>

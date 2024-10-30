@@ -35,6 +35,7 @@ export const API_CONFIG = {
     GET_ALL: `${USER_API}/get-all`,
     GET_ALL_DELETED: `${USER_API}/get-all-deleted`,
     GET_BY_ID: (id) => `${USER_API}/get/${id}`,
+    GET_BY_BRANCH_ID: (id) => `${USER_API}/get-all-by-branch-id/${id}`,
     CHANGE_PASSWORD: `${USER_API}/change-password`,
     CHANGE_PROFILE: `${USER_API}/change-profile`,
     DELETE: (id) => `${USER_API}/delete/${id}`,
@@ -69,9 +70,7 @@ export const API_CONFIG = {
   },
   // DASHBOARD API
   DASHBOARD: {
-    GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
-    GET_ALL_INFO_EACH_TIME:  (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH: `${DASHBOARD_API}/total-revenue-for-all-branch-each-month`,
+    GET_ALL_INFO_EACH_TIME:  (id) => `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
     GET_TOTAL_REVENUE_BRANCH_WEEK:  (id) =>  `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
     GET_TOTAL_REVENUE_BRANCH_QUARTER:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
@@ -83,7 +82,6 @@ export const API_CONFIG = {
     GET_BOOKING_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
     GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`, 
     GET_BOOKING_STATUS: (id) =>`${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>`${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
     
   },
 

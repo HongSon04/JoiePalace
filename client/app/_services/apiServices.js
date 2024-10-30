@@ -18,18 +18,18 @@ export const fetchAllDashBoard = async () => {
       throw error; 
     }
   };
-export const fetchAllTotalRevenueMonth = async () => {
-    try {
-        const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH);
-        if (response.status !== 200) {
-        throw new Error("Có lỗi khi lấy dữ liệu !");
-        }
-        return response.data;
-    } catch (error) {
-        console.error("Lỗi:", error);
-        throw error; 
-    }
-};
+// export const fetchAllTotalRevenueMonth = async () => {
+//     try {
+//         const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH);
+//         if (response.status !== 200) {
+//         throw new Error("Có lỗi khi lấy dữ liệu !");
+//         }
+//         return response.data;
+//     } catch (error) {
+//         console.error("Lỗi:", error);
+//         throw error; 
+//     }
+// };
 export const fetchAllEachTime = async (branchId) => {
     try {
         const response = await axios.get(API_CONFIG.DASHBOARD.GET_ALL_INFO_EACH_TIME(branchId));
@@ -172,4 +172,31 @@ export const fetchInfoByMonth = async (branchId) => {
     console.error("Lỗi:", error);
     throw error; 
   }
+};
+
+export const getUserByBranchId = async (branchId) => {
+  try {
+    const token = getCookie('accessToken'); 
+    const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(branchId), {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu !");
+    }
+    
+    return response.data; 
+  } catch (error) {
+    if (error.response) {
+      console.error("Lỗi từ server:", error.response.data);
+      console.error("Mã lỗi:", error.response.status);
+      console.error("Headers:", error.response.headers);
+    } else {
+      console.error("Lỗi:", error.message);
+    }
+    throw error; 
+  }
+  
 };
