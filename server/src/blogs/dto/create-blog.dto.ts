@@ -46,6 +46,7 @@ export class CreateBlogDto {
   @ApiProperty({
     required: false,
     description: 'Danh sách các ID của thẻ liên quan đến bài viết (nếu có)',
+    example: [1, 2, 3],
   })
   @IsOptional()
   tags?: number[];

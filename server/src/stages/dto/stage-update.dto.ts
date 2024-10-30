@@ -39,6 +39,5 @@ export class StageUpdateDto {
     required: false,
     description: 'Danh sách các hình ảnh của sảnh (nếu cần cập nhật)',
   })
-  @IsOptional()
-  images?: string[];
+  images: string[];
 }

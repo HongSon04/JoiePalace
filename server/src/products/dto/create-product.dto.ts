@@ -33,6 +33,7 @@ export class CreateProductDto {
   @ApiProperty({
     description: 'Danh sách các ID thẻ liên quan đến sản phẩm',
     required: false,
+    example: [1, 2, 3],
   })
   tags?: number[];
 

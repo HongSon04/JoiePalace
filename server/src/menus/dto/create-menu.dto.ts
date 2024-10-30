@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty } from 'class-validator';
 
 export class CreateMenuDto {
   @ApiProperty({
@@ -19,8 +19,9 @@ export class CreateMenuDto {
   @ApiProperty({
     description: 'Danh sách các ID sản phẩm có trong menu',
     required: false,
+    example: [1, 2, 3],
   })
-  products: number[];
+  products?: number[];
 
   @ApiProperty({
     description: 'Giá của menu, không được để trống',
@@ -39,8 +40,7 @@ export class CreateMenuDto {
 
   @ApiProperty({
     description: 'Ảnh Menu, không được để trống',
-    required: false,
+    required: true,
   })
-  @IsOptional()
-  images?: string[];
+  images: string[];
 }
