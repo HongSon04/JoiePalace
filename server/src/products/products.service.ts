@@ -724,7 +724,7 @@ export class ProductsService {
       // Ready data for update
       const slug = MakeSlugger(name);
       const updateData: any = {
-        category_id,
+        category_id: Number(category_id),
         name,
         slug,
         description,
