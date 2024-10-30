@@ -300,7 +300,7 @@ const Page = () => {
             </Link>
           </div>
           
-          <div className="p-4 bg-blackAlpha-100 rounded-xl ">
+          <div className="p-4 bg-blackAlpha-100 rounded-xl h-[335px]">
             <Chart data={dataByMonth} chartType="line" />
           </div>
        

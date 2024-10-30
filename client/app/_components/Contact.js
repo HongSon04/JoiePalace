@@ -49,22 +49,6 @@ const Contact = () => {
     note: "",
   });
 
-<<<<<<< HEAD
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const branches = await fetchBranchesFromApi();
-  //     const partyTypes = await fecthAllPartyTypes();
-  //     setListBranches(branches);
-  //     setListPartyTypes(partyTypes);
-  //   };
-  //   fetchData();
-  //   setFormData({
-  //     ...formData,
-  //     branch: listBranches[0].name,
-  //     partyType: listPartyTypes[0].name,
-  //   });
-  // }, [formData]);
-=======
   useEffect(() => {
     const fetchData = async () => {
       const branches = await fetchBranchesFromApi();
@@ -83,7 +67,6 @@ const Contact = () => {
     };
     fetchData();
   }, []);
->>>>>>> origin/main
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
