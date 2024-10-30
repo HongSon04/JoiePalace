@@ -1,4 +1,4 @@
-name: Deploy NestJS to DigitalOcean
+name: Deploy APP to DigitalOcean
 on:
   push:
     branches: [main]
