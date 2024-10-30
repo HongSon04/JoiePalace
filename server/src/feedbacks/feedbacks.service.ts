@@ -116,9 +116,9 @@ export class FeedbacksService {
             { comments: { contains: search, mode: 'insensitive' } },
           ],
         }),
-        ...(is_show !== undefined && { is_show: Boolean(!is_show) }),
+        ...(is_show !== undefined && { is_show: String(is_show) === 'true' }),
         ...(is_approved !== undefined && {
-          is_approved: Boolean(!is_approved),
+          is_approved: String(is_approved) === 'true',
         }),
         ...(branch_id !== undefined && { branch_id: Number(branch_id) }),
         ...(user_id !== undefined && { user_id: Number(user_id) }),

@@ -64,7 +64,7 @@ export class FilterFeedBackDto {
     required: false,
   })
   @IsOptional()
-  is_show?: string;
+  is_show?: boolean;
 
   @ApiProperty({
     description:
@@ -72,5 +72,5 @@ export class FilterFeedBackDto {
     required: false,
   })
   @IsOptional()
-  is_approved?: string;
+  is_approved?: boolean;
 }
