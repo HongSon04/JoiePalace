@@ -689,7 +689,7 @@ export class ProductsService {
 
       // Check product existence by name
       const findProductByName = await this.prismaService.products.findFirst({
-        where: { name, id: { not: id } },
+        where: { name, id: { not: Number(id) } },
       });
       if (findProductByName) {
         throw new BadRequestException('Tên Sản phẩm đã tồn tại');
