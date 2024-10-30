@@ -259,7 +259,6 @@ export class UserService {
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { role: { contains: search, mode: 'insensitive' } },
         ];
       }
 
@@ -335,7 +334,6 @@ export class UserService {
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { role: { contains: search, mode: 'insensitive' } },
         ];
       }
 
@@ -408,14 +406,19 @@ export class UserService {
           { username: { contains: search, mode: 'insensitive' } },
           { email: { contains: search, mode: 'insensitive' } },
           { phone: { contains: search, mode: 'insensitive' } },
-          { role: { contains: search, mode: 'insensitive' } },
         ],
         ...sortRangeDate,
       };
 
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
-          where: whereConditions,
+          where: {
+            OR: [
+              { username: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+              { phone: { contains: search, mode: 'insensitive' } },
+            ],
+          },
           include: {
             memberships: true,
           },
