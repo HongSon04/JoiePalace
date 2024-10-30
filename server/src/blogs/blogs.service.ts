@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
@@ -68,17 +69,22 @@ export class BlogsService {
         );
       }
 
-      // Check tags existence
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Upload images
@@ -92,11 +98,6 @@ export class BlogsService {
         throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
       }
 
-      // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({
-        id: Number(Number(tag.id)),
-      }));
-
       const createBlog = await this.prismaService.blogs.create({
         data: {
           title,
@@ -106,7 +107,7 @@ export class BlogsService {
           short_description,
           category_id: Number(category_id),
           tags: {
-            connect: tagsConnect,
+            connect: tagsSet,
           },
           images: uploadImages as any,
         },
@@ -823,17 +824,22 @@ export class BlogsService {
         );
       }
 
-      // Check tags existence
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Upload images
@@ -847,11 +853,6 @@ export class BlogsService {
         throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
       }
 
-      // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({
-        id: Number(Number(tag.id)),
-      }));
-
       const updateBlog = await this.prismaService.blogs.update({
         where: { id: Number(id) },
         data: {
@@ -862,7 +863,7 @@ export class BlogsService {
           short_description,
           category_id,
           tags: {
-            connect: tagsConnect,
+            connect: tagsSet,
           },
           images: uploadImages as any,
         },
@@ -953,17 +954,22 @@ export class BlogsService {
         );
       }
 
-      // Check tags existence
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Upload images
@@ -977,11 +983,6 @@ export class BlogsService {
         throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
       }
 
-      // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({
-        id: Number(Number(tag.id)),
-      }));
-
       const updateBlog = await this.prismaService.blogs.update({
         where: { id: Number(existingBlog.id) },
         data: {
@@ -992,7 +993,7 @@ export class BlogsService {
           short_description,
           category_id,
           tags: {
-            connect: tagsConnect,
+            connect: tagsSet,
           },
           images: uploadImages as any,
         },

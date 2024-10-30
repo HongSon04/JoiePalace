@@ -34,7 +34,7 @@ export class CreateProductDto {
     description: 'Danh sách các ID thẻ liên quan đến sản phẩm',
     required: false,
   })
-  tags: number[];
+  tags?: number[];
 
   @ApiProperty({
     description: 'Giá của sản phẩm, không được để trống',

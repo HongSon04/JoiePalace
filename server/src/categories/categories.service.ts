@@ -59,17 +59,23 @@ export class CategoriesService {
         throw new BadRequestException('Upload ảnh thất bại');
       }
 
-      // Validate tags
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
-
-      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
       // Create Categories
       const categories = await this.prismaService.categories.create({
@@ -499,17 +505,24 @@ export class CategoriesService {
         throw new BadRequestException('Upload ảnh thất bại');
       }
 
-      // Validate tags
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
-      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       // ? Update Categories
       const categories = await this.prismaService.categories.update({
         where: { id: Number(id) },

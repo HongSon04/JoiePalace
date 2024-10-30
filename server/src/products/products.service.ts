@@ -33,29 +33,37 @@ export class ProductsService {
     try {
       const { category_id, name, description, short_description, tags, price } =
         createProductDto;
-
+      const slug = MakeSlugger(name);
       // Validate inputs
       if (!files.images || files.images.length === 0) {
         throw new BadRequestException('Ảnh không được để trống');
       }
 
       // Check product existence
-      const existingproduct = await this.prismaService.products.findFirst({
-        where: { name },
+      const existingProduct = await this.prismaService.products.findFirst({
+        where: { OR: [{ name }, { slug }] },
       });
 
-      if (existingproduct) {
+      if (existingProduct) {
         throw new BadRequestException('Sản phẩm đã tồn tại');
       }
 
-      // Check tags existence
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsConnect
+      let tagsConnect = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+      // Check tags existence if tags are provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsConnect if tags exist
+        tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Check category existence
@@ -79,10 +87,8 @@ export class ProductsService {
       }
 
       // Create product entry
-      const slug = MakeSlugger(name);
-      const tagsConnect = existingTags.map((tag) => ({ id: Number(tag.id) }));
 
-      const createproduct = await this.prismaService.products.create({
+      const createProduct = await this.prismaService.products.create({
         data: {
           category_id: Number(category_id),
           name,
@@ -101,7 +107,7 @@ export class ProductsService {
       throw new HttpException(
         {
           message: 'Tạo Sản phẩm thành công',
-          data: FormatReturnData(createproduct, []),
+          data: FormatReturnData(createProduct, []),
         },
         HttpStatus.CREATED,
       );
@@ -674,28 +680,37 @@ export class ProductsService {
         updateProductDto;
 
       // Check product existence
-      const findproduct = await this.prismaService.products.findUnique({
+      const findProduct = await this.prismaService.products.findUnique({
         where: { id: Number(id) },
       });
-      if (!findproduct) {
+      if (!findProduct) {
         throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
       // Check product existence by name
-      const findproductByName = await this.prismaService.products.findFirst({
+      const findProductByName = await this.prismaService.products.findFirst({
         where: { name, id: { not: id } },
       });
-      if (findproductByName) {
+      if (findProductByName) {
         throw new BadRequestException('Tên Sản phẩm đã tồn tại');
       }
-      // Handle tags
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+      // Initialize tagsSet
+      let tagsSet = [];
+
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Check category existence
@@ -708,8 +723,6 @@ export class ProductsService {
 
       // Ready data for update
       const slug = MakeSlugger(name);
-      const tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
-
       const updateData: any = {
         category_id,
         name,
@@ -732,13 +745,13 @@ export class ProductsService {
         }
         // Delete old images
         await this.cloudinaryService.deleteMultipleImagesByUrl(
-          findproduct.images,
+          findProduct.images,
         );
         updateData.images = uploadImages;
       }
 
       // Update product
-      const updatedproduct = await this.prismaService.products.update({
+      const updatedProduct = await this.prismaService.products.update({
         where: { id: Number(id) },
         data: updateData,
         include: { categories: true, tags: true },
@@ -747,7 +760,7 @@ export class ProductsService {
       throw new HttpException(
         {
           message: 'Cập nhật Sản phẩm thành công',
-          data: FormatReturnData(updatedproduct, []),
+          data: FormatReturnData(updatedProduct, []),
         },
         HttpStatus.OK,
       );
