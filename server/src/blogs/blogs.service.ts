@@ -861,7 +861,7 @@ export class BlogsService {
           content,
           description,
           short_description,
-          category_id,
+          category_id: Number(category_id),
           tags: {
             connect: tagsSet,
           },
@@ -991,7 +991,7 @@ export class BlogsService {
           content,
           description,
           short_description,
-          category_id,
+          category_id: Number(category_id),
           tags: {
             connect: tagsSet,
           },

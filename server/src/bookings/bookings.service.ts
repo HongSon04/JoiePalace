@@ -135,7 +135,7 @@ export class BookingsService {
       const contents = {
         name: `Đơn đặt tiệc mới từ ${name}`,
         contents: `Đơn đặt tiệc mới từ ${name}, vào ngày ${dayjs(formattedDate).format('DD/MM/YYYY')}, vào ca ${shift}, vui lòng kiểm tra và xác nhận!`,
-        branch_id,
+        branch_id: Number(branch_id),
         type: TypeNotifyEnum.BOOKING_CREATED,
       };
 
@@ -668,7 +668,7 @@ export class BookingsService {
           number_of_guests: Number(number_of_guests),
           is_confirm,
           is_deposit,
-          party_type_id,
+          party_type_id: Number(party_type_id),
           phone,
           status: status as BookingStatus,
         },

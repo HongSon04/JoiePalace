@@ -14,20 +14,20 @@ export class CreateBookingDto {
     description: 'ID của chi nhánh nơi tổ chức sự kiện',
   })
   @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
-  branch_id: number;
+  branch_id: string;
 
   @ApiProperty({
     required: true,
     description: 'ID của loại sự kiện',
   })
   @IsNotEmpty({ message: 'Vui lòng chọn loại sự kiện' })
-  party_type_id: number;
+  party_type_id: string;
 
   @ApiProperty({
     required: false,
     description: 'ID của sảnh (nếu có)',
   })
-  stage_id?: number;
+  stage_id?: string;
 
   @ApiProperty({
     required: true,

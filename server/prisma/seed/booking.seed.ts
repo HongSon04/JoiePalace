@@ -277,9 +277,9 @@ const booking: CreateBookingDto[] = [
   },
   {
     user_id: 18,
-    branch_id: 1,
+    branch_id: 1 as any,
     budget: '',
-    stage_id: 1,
+    stage_id: 1 as any,
     company_name: 'Công ty R',
     email: 'congtyr@gmail.com',
     phone: '123456789',
@@ -287,7 +287,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 350,
     organization_date: '2024-05-01T00:00:00.000Z',
-    party_type_id: 1,
+    party_type_id: 1 as any,
     shift: 'Tối',
   },
 ];

@@ -91,13 +91,13 @@ export class FilterBookingDto {
     required: false,
     description: 'ID của sảnh',
   })
-  stage_id?: number;
+  stage_id?: string;
 
   @ApiProperty({
     required: false,
     description: 'ID của loại tiệc',
   })
-  party_type_id?: number;
+  party_type_id: string;
 
   @ApiProperty({
     required: false,

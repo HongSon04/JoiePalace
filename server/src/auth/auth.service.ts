@@ -491,7 +491,7 @@ export class AuthService {
   async generateToken(user: UserEntity) {
     const payload = {
       id: Number(user.id),
-      branch_id: user.branch_id,
+      branch_id: Number(user.branch_id),
       username: user.username,
       email: user.email,
       role: user.role,

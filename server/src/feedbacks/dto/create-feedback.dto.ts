@@ -7,14 +7,14 @@ export class CreateFeedbackDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Chi nhánh không được để trống' })
-  branch_id: number;
+  branch_id: string;
 
   @ApiProperty({
     description: 'ID của đơn tiệc, không được để trống',
     required: true,
   })
   @IsNotEmpty({ message: 'Đơn tiệc không được để trống' })
-  booking_id: number;
+  booking_id: string;
 
   @ApiProperty({
     description: 'ID của người dùng (nếu có)',

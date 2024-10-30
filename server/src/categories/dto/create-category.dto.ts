@@ -36,7 +36,7 @@ export class CreateCategoryDto {
     required: false,
   })
   @IsOptional()
-  images: string[];
+  images?: string[];
 
   @ApiProperty({
     description: 'Danh sách các ID thẻ liên quan đến danh mục',
