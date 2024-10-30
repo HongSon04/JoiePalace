@@ -32,7 +32,7 @@ export class MailService {
       console.log('Lỗi từ MailService->sendUserConfirmationBooking', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -54,7 +54,7 @@ export class MailService {
       console.log('Lỗi từ MailService->confirmRegister', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

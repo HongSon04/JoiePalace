@@ -31,7 +31,7 @@ export class FeedbacksService {
             id: Number(booking_id),
           },
         }),
-        user_id
+        user_id !== undefined
           ? this.prismaService.users.findUnique({
               where: {
                 id: Number(user_id),
@@ -75,7 +75,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -157,7 +157,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->findAllShow', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -165,7 +165,8 @@ export class FeedbacksService {
   // ! Cập nhật feedback
   async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
     try {
-      const { name, comments, rate, is_show, is_approved } = updateFeedbackDto;
+      const { name, comments, rate, is_show, is_approved, user_id } =
+        updateFeedbackDto;
 
       const feedback = await this.prismaService.$transaction(async (tx) => {
         const existingFeedback = await tx.feedbacks.findUnique({
@@ -178,6 +179,17 @@ export class FeedbacksService {
           throw new NotFoundException('Không tìm thấy feedback');
         }
 
+        if (user_id !== undefined) {
+          const user = await tx.users.findUnique({
+            where: {
+              id: Number(user_id),
+            },
+          });
+
+          if (!user) {
+            throw new NotFoundException('Không tìm thấy user');
+          }
+        }
         const updatedFeedback = await tx.feedbacks.update({
           where: {
             id: Number(id),
@@ -187,6 +199,9 @@ export class FeedbacksService {
             comments,
             rate: Number(rate),
             is_show,
+            user_id: user_id
+              ? Number(user_id)
+              : Number(existingFeedback.user_id),
             is_approved,
           },
         });
@@ -210,7 +225,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -251,7 +266,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->remove', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

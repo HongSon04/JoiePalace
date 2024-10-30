@@ -174,7 +174,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -194,6 +194,13 @@ export class BookingsService {
       const is_confirm = query.is_confirm;
       const is_deposit = query.is_deposit;
       const status = query.status;
+      const branch_id = Number(query.branch_id);
+      const user_id = Number(query.user_id);
+      const stage_id = Number(query.stage_id);
+      const party_type_id = Number(query.party_type_id);
+      const deleted = query.deleted || false; // Default is false
+      const decor_id = Number(query.decor_id);
+      const deposit_id = Number(query.deposit_id);
 
       // ? Range Date Conditions
       const sortRangeDate: any =
@@ -248,9 +255,43 @@ export class BookingsService {
         whereConditions.is_deposit = Boolean(!is_deposit);
       }
 
-      if (status) {
+      if (status !== undefined) {
         whereConditions.status = status;
       }
+
+      if (branch_id) {
+        whereConditions.branch_id = branch_id;
+      }
+
+      if (user_id) {
+        whereConditions.user_id = user_id;
+      }
+
+      if (stage_id) {
+        whereConditions.stage_id = stage_id;
+      }
+
+      if (party_type_id) {
+        whereConditions.party_type_id = party_type_id;
+      }
+
+      if (decor_id) {
+        whereConditions.booking_details = {
+          every: {
+            decor_id,
+          },
+        };
+      }
+
+      if (deposit_id) {
+        whereConditions.booking_details = {
+          every: {
+            deposit_id,
+          },
+        };
+      }
+
+      whereConditions.deleted = deleted;
 
       // ? Date Conditions
       if (startDate && endDate) {
@@ -342,171 +383,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
-      });
-    }
-  }
-
-  // ! Find All Deleted Booking
-  async findAllDeleted(query: FilterBookingDto) {
-    try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
-      const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
-      const priceSort = query?.priceSort?.toLowerCase();
-      const startDate = query.startDate
-        ? FormatDateToStartOfDay(query.startDate)
-        : '';
-      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
-      const is_confirm = query.is_confirm;
-      const is_deposit = query.is_deposit;
-      const status = query.status;
-
-      // ? Range Date Conditions
-      const sortRangeDate: any =
-        startDate && endDate
-          ? {
-              created_at: {
-                gte: new Date(startDate),
-                lte: new Date(endDate),
-              },
-            }
-          : {};
-      // ? Where Conditions
-      const whereConditions: any = {
-        deleted: true,
-        ...sortRangeDate,
-      };
-
-      if (is_confirm !== undefined) {
-        whereConditions.is_confirm = Boolean(!is_confirm);
-      }
-
-      if (is_deposit !== undefined) {
-        whereConditions.is_deposit = Boolean(!is_deposit);
-      }
-
-      if (status) {
-        whereConditions.status = status;
-      }
-
-      if (search) {
-        whereConditions.OR = [
-          {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            company_name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            email: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            phone: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-        ];
-      }
-
-      // ? Date Conditions
-      if (startDate && endDate) {
-        if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({
-          created_at: { gte: startDate, lte: endDate },
-        });
-      }
-      // ? Fetch Data
-      const [result, total] = await this.prismaService.$transaction([
-        this.prismaService.bookings.findMany({
-          where: whereConditions,
-          include: {
-            users: {
-              select: {
-                id: true,
-                username: true,
-                email: true,
-                memberships_id: true,
-                phone: true,
-                avatar: true,
-                role: true,
-              },
-            },
-            stages: true,
-            branches: true,
-            booking_details: {
-              include: {
-                decors: true,
-                menus: {
-                  include: {
-                    products: {
-                      include: {
-                        tags: true,
-                      },
-                    },
-                  },
-                },
-                deposits: true,
-              },
-            },
-          },
-          orderBy: {
-            created_at: 'desc',
-          },
-          skip,
-          take: itemsPerPage,
-        }),
-        this.prismaService.bookings.count({
-          where: whereConditions,
-        }),
-      ]);
-      if (priceSort === 'asc' || priceSort === 'desc') {
-        result.sort((a, b) => {
-          const totalA = a.booking_details.reduce(
-            (sum, detail) => sum + detail.total_amount,
-            0,
-          );
-          const totalB = b.booking_details.reduce(
-            (sum, detail) => sum + detail.total_amount,
-            0,
-          );
-          return priceSort === 'asc' ? totalA - totalB : totalB - totalA;
-        });
-      }
-      // ? Pagination
-      const lastPage = Math.ceil(total / itemsPerPage);
-      const paginationInfo = {
-        nextPage: page + 1 > lastPage ? null : page + 1,
-        prevPage: page - 1 <= 0 ? null : page - 1,
-        lastPage: lastPage,
-        itemsPerPage,
-        currentPage: page,
-        total,
-      };
-      // ? Response
-      throw new HttpException(
-        { data: FormatReturnData(result, []), pagination: paginationInfo },
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ booking.service.ts -> findAllDeleted: ', error);
-      throw new InternalServerErrorException({
-        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -560,7 +437,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> findOne: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -639,7 +516,7 @@ export class BookingsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -710,7 +587,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> updateStatus: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1154,7 +1031,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1186,7 +1063,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> delete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1221,7 +1098,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> restore: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1269,7 +1146,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> destroy: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

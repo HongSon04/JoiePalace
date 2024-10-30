@@ -130,7 +130,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -215,7 +215,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -300,7 +300,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -386,7 +386,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllByCategory', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -483,7 +483,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugCategory', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -581,7 +581,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllByTag', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -679,7 +679,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugTag', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -756,7 +756,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findOneBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -886,7 +886,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1016,7 +1016,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> updateBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1049,7 +1049,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> delete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1082,7 +1082,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1120,7 +1120,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> hardDelete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

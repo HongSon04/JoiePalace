@@ -68,4 +68,52 @@ export class FilterBookingDto {
     enum: BookingStatus,
   })
   status?: BookingStatus;
+
+  @ApiProperty({
+    required: false,
+    description: 'Đã xóa hay chưa (mặc là định là chưa xóa False)',
+  })
+  deleted?: boolean;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID của chi nhánh',
+  })
+  branch_id?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID của khách hàng',
+  })
+  user_id?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID của sảnh',
+  })
+  stage_id?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID của loại tiệc',
+  })
+  party_type_id?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID của menu',
+  })
+  menu_id?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID của trang trí',
+  })
+  decor_id?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID của đặt cọc',
+  })
+  deposit_id?: number;
 }

@@ -95,7 +95,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> register', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -157,7 +157,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> registerSocialUser', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -205,7 +205,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> login', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -248,7 +248,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> loginSocial', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -280,7 +280,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> logout', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -315,7 +315,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> changeAvatar', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -456,7 +456,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> verifyEmail', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
