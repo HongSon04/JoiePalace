@@ -7,7 +7,7 @@ export class CreateBlogDto {
     description: 'ID của danh mục bài viết',
   })
   @IsNotEmpty({ message: 'Danh mục bài viết không được để trống' })
-  category_id: number;
+  category_id: string;
 
   @ApiProperty({
     required: true,

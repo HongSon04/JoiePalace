@@ -65,5 +65,5 @@ export class CreatePackageDto {
     description:
       'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
   })
-  extra_service: [{ id: number; quantity: number }] | any;
+  extra_service: [{ id: string; quantity: number }] | any;
 }

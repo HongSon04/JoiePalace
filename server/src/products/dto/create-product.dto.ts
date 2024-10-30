@@ -7,7 +7,7 @@ export class CreateProductDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Danh mục không được để trống' })
-  category_id: number;
+  category_id: string;
 
   @ApiProperty({
     description: 'Tên sản phẩm, không được để trống',

@@ -5,7 +5,7 @@ import { TagResDto } from 'src/tags/dto/tag.res.dto';
 export class BlogResDto {
   id: number;
 
-  category_id: number;
+  category_id: string;
 
   category: CategoryResDto;
 

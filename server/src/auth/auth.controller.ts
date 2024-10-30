@@ -292,9 +292,9 @@ export class AuthController {
             false,
           );
         }
-        if (file.size > 1024 * 1024 * 5) {
+       if (file.size > 1024 * 1024 * 10) {
           return cb(
-            new BadRequestException('Kích thước ảnh tối đa 5MB'),
+            new BadRequestException('Kích thước ảnh tối đa là 10MB'),
             false,
           );
         }
