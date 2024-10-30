@@ -53,10 +53,10 @@ export class DecorsService {
 
       // Tính toán tổng giá
       const totalPrice = foundProducts.reduce(
-        (total, product) => total + product.price,
+        (total, product) => Number(total) + Number(product.price),
         0,
       );
-      if (totalPrice < Number(price)) {
+      if (Number(totalPrice) < Number(price)) {
         throw new BadRequestException('Giá trang trí không hợp lệ');
       }
 
@@ -176,7 +176,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -187,7 +187,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];
@@ -322,7 +322,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -333,7 +333,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];

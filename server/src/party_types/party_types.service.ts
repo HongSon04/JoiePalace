@@ -72,7 +72,7 @@ export class PartyTypesService {
         data: {
           name,
           description,
-          price: totalProductPrice,
+          price: Number(totalProductPrice),
           short_description,
           images: images as any,
           products: {
@@ -365,7 +365,7 @@ export class PartyTypesService {
         0,
       );
 
-      if (totalProductPrice !== price) {
+      if (Number(totalProductPrice) !== Number(price)) {
         throw new BadRequestException('Giá loại tiệc không chính xác');
       }
 
@@ -374,7 +374,7 @@ export class PartyTypesService {
         name,
         description,
         short_description,
-        price: totalProductPrice,
+        price: Number(totalProductPrice),
         products: {
           set: foundProducts.map((product) => ({
             id: Number(product.id),

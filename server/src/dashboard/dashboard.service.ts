@@ -706,7 +706,7 @@ export class DashboardService {
           0,
         );
         revenueMap[booking.branch_id] =
-          (revenueMap[booking.branch_id] || 0) + total_price;
+          (revenueMap[booking.branch_id] || 0) + Number(total_price);
       });
 
       // Gán doanh thu cho từng chi nhánh

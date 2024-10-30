@@ -182,7 +182,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -193,7 +193,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];
@@ -323,7 +323,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -334,7 +334,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];

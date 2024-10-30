@@ -794,15 +794,17 @@ export class BookingsService {
               'Không tìm thấy dịch vụ thêm',
               HttpStatus.NOT_FOUND,
             );
-          extraServiceAmount += findExtra.price * extra.quantity;
+          extraServiceAmount +=
+            Number(findExtra.price) * Number(extra.quantity);
           extra.name = findExtra.name;
-          extra.amount = findExtra.price;
-          extra.total_price = findExtra.price * extra.quantity;
+          extra.amount = Number(findExtra.price);
+          extra.total_price = Number(findExtra.price) * Number(extra.quantity);
           extra.description = findExtra.description;
           extra.short_description = findExtra.short_description;
           extra.images = findExtra.images;
-          extra.quantity = extra.quantity;
-          extraServiceAmount += findExtra.price * extra.quantity;
+          extra.quantity = Number(extra.quantity);
+          extraServiceAmount +=
+            Number(findExtra.price) * Number(extra.quantity);
         });
         // Total calculation
         const totalAmount = Number(

@@ -173,12 +173,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice } });
+        whereConditions.AND.push({ price: { gte: Number(minPrice) } });
       }
 
       if (maxPrice > 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { lte: maxPrice } });
+        whereConditions.AND.push({ price: { lte: Number(maxPrice) } });
       }
 
       // Điều kiện ngày tạo
@@ -285,12 +285,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice } });
+        whereConditions.AND.push({ price: { gte: Number(minPrice) } });
       }
 
       if (maxPrice > 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { lte: maxPrice } });
+        whereConditions.AND.push({ price: { lte: Number(maxPrice) } });
       }
 
       // Điều kiện ngày tạo
@@ -484,12 +484,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice } });
+        whereConditions.AND.push({ price: { gte: Number(minPrice) } });
       }
 
       if (maxPrice > 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { lte: maxPrice } });
+        whereConditions.AND.push({ price: { lte: Number(maxPrice) } });
       }
 
       // Điều kiện ngày tạo
@@ -598,12 +598,12 @@ export class ProductsService {
       // Điều kiện giá
       if (minPrice >= 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { gte: minPrice } });
+        whereConditions.AND.push({ price: { gte: Number(minPrice) } });
       }
 
       if (maxPrice > 0) {
         if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({ price: { lte: maxPrice } });
+        whereConditions.AND.push({ price: { lte: Number(maxPrice) } });
       }
 
       // Điều kiện ngày tạo
@@ -729,7 +729,7 @@ export class ProductsService {
         slug,
         description,
         short_description,
-        price,
+        price: Number(price),
         tags: { set: tagsSet },
       };
 
@@ -790,7 +790,7 @@ export class ProductsService {
         throw new BadRequestException('Sản phẩm đã bị xóa');
       }
 
-      const deleteProduct = await this.prismaService.products.update({
+      await this.prismaService.products.update({
         where: { id: Number(id) },
         data: {
           deleted: true,
@@ -829,7 +829,7 @@ export class ProductsService {
         throw new BadRequestException('Sản phẩm chưa bị xóa');
       }
 
-      const restoreproduct = await this.prismaService.products.update({
+      await this.prismaService.products.update({
         where: { id: Number(id) },
         data: {
           deleted: false,

@@ -708,7 +708,7 @@ export class BlogsService {
       await this.prismaService.blogs.update({
         where: { id: Number(blog.id) },
         data: {
-          views: blog.views + 1,
+          views: Number(blog.views) + 1,
         },
       });
 
@@ -742,7 +742,7 @@ export class BlogsService {
       await this.prismaService.blogs.update({
         where: { id: Number(blog.id) },
         data: {
-          views: blog.views + 1,
+          views: Number(blog.views) + 1,
         },
       });
 
@@ -817,7 +817,7 @@ export class BlogsService {
         where: { slug: slug },
       });
 
-      if (existingSlug && existingSlug.id !== id) {
+      if (existingSlug && Number(existingSlug.id) !== Number(id)) {
         throw new HttpException(
           'Tên bài viết đã tồn tại',
           HttpStatus.BAD_REQUEST,
@@ -947,7 +947,7 @@ export class BlogsService {
         where: { slug: newSlug },
       });
 
-      if (existingSlug && existingSlug.id !== existingBlog.id) {
+      if (existingSlug && Number(existingSlug.id) !== Number(existingBlog.id)) {
         throw new HttpException(
           'Tên bài viết đã tồn tại',
           HttpStatus.BAD_REQUEST,
