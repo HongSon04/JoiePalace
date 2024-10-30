@@ -1,0 +1,74 @@
+name: Deploy NestJS to DigitalOcean
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**' 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./server
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './server/package-lock.json'
+      
+      - name: Install dependencies
+        run: npm install
+      
+    #   - name: Run tests
+    #     run: |
+    #       if [ -f "package.json" ] && grep -q "test" "package.json"; then
+    #         npm test
+    #       else
+    #         echo "No test script found"
+    #       fi
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            # Stop PM2 process
+            pm2 stop server
+            # Navigate to project directory
+            cd JoiePalace/server/
+            
+            # Pull latest changes
+            git pull origin main
+            
+            # Install dependencies
+            npm install
+
+            # Run Prisma Generate
+            npx prisma generate
+            
+            # Build application
+            npm run build
+
+            # CD to root
+            cd ../..
+                     
+            # Start PM2 process
+            pm2 start server
+
+            # Save PM2 process
+            pm2 save
+            
