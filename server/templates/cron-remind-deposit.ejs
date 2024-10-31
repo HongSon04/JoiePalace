@@ -16,14 +16,18 @@
                     style="color: white; font-family: 'Beautique Display', serif; font-size: 30px; font-weight: bold; line-height: 30px;">Thông
                     báo nhắc lịch đặt cọc</span>
             </div>
-            <span style="font-weight: bold;">Xin chào <span style="color: #B5905B; font-weight: bold;">con zai của ta
+            <span style="font-weight: bold;">Xin chào <span style="color: #B5905B; font-weight: bold;">
+                    <%= name %>
                 </span>,</span>
             <span style="line-height: 25px;">Chúng tôi ghi nhận rằng bạn đã đặt tiệc ở Palace vào
                 ngày <span style="color: #B5905B; font-weight: bold;">22/12/2024
-                </span> với địa chỉ email: <span style="color: #B5905B; font-weight: bold;">conzai@gmail.com
+                </span> với địa chỉ email: <span style="color: #B5905B; font-weight: bold;">
+                    <%= email %>
                 </span></span>
-            <span>Bạn vui lòng thanh toán tiền cọc trước ngày <span style="color: #B5905B;">15/12/2024 (còn 2
-                    ngày)</span> nếu không lịch đặt tiệc của bạn sẽ bị hủy :(</span>
+            <span>Bạn vui lòng thanh toán tiền cọc trước ngày <span style="color: #B5905B;">
+                    <%= booking_date%>(còn <%= days_left %>
+                            ngày)
+                </span> nếu không lịch đặt tiệc của bạn sẽ bị hủy :(</span>
             <span>Giá trị tiền cọc là: <strong style="color: #B5905B;">50.000.000VNĐ</strong></span>
 
             <div style="width: 100%; background-color: #F4F4F4; height: 2px; border-radius: 100rem;"></div>
