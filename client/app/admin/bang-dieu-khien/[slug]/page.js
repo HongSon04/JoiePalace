@@ -87,7 +87,6 @@ const Page = ({params}) => {
     const dataEachMonthBranch = {
       labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
       datasets: total_revune_each_month_branch.map(branch => ({
-        label: branch.name, 
         data: branch.data
       }))
     };
@@ -253,17 +252,16 @@ const Page = ({params}) => {
         </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
           <div className="flex justify-between items-center mb-[10px]">
-            <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
+            <p className="text-base  font-semibold">Doanh thu tổng / năm</p>
             <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
               <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
             </Link>
             
           </div>
+          
           <div className="grid grid-cols-2 gap-4 h-[500px] overflow-y-auto hide-scrollbar">
             {/* {branchCharts} */}
-            <div className="p-4 bg-blackAlpha-100 rounded-xl h-[335px]">
-              <Chart data={dataEachMonthBranch} chartType="bar" />
-          </div>
+            <Chart data={dataEachMonthBranch} chartType="bar" />
           </div>
         </div>
       </div>
