@@ -8,3 +8,14 @@ export const createNewBooking = async (data) => {
   }
   return { status: response.status, data: response.data.data };
 };
+
+export const fetchAllPartyBookings = async () => {
+  const response = await axios.get(API_CONFIG.BOOKINGS.GET_ALL);
+
+  if (response.status !== 200) {
+    throw new Error("Có lỗi khi lấy thông tin tài khoản");
+  }
+
+  return response.data.data;
+
+}

@@ -162,7 +162,7 @@ function AdminSidebarNav() {
     },
     {
       title: "Quản lý tiệc",
-      path: `/admin/quan-li-tiec/${currentBranch?.slug}`,
+      path: `/admin/quan-ly-tiec/${currentBranch?.slug}`,
       icon: eventIcon,
     },
     {
