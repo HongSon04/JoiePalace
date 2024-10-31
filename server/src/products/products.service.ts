@@ -200,7 +200,7 @@ export class ProductsService {
         this.prismaService.products.findMany({
           where: whereConditions,
           include: { categories: true, tags: true },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
@@ -312,7 +312,7 @@ export class ProductsService {
         this.prismaService.products.findMany({
           where: whereConditions,
           include: { categories: true, tags: true },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
@@ -446,13 +446,13 @@ export class ProductsService {
   }
 
   // ! Get all products by category id
-  async findByCategoryId(query: FilterPriceDto, category_id: number) {
+  async findByCategoryId(query: FilterPriceDto, category_id: string) {
     try {
       // Parse và gán giá trị mặc định cho các tham số
       const page = Number(query.page) || 1;
       const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
+      const skip = (page - 1) * Number(itemsPerPage);
       const priceSort = query?.priceSort?.toLowerCase();
 
       const startDate = query.startDate
@@ -520,7 +520,7 @@ export class ProductsService {
         this.prismaService.products.findMany({
           where: whereConditions,
           include: { categories: true, tags: true },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
@@ -634,7 +634,7 @@ export class ProductsService {
         this.prismaService.products.findMany({
           where: whereConditions,
           include: { categories: true, tags: true },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
         }),

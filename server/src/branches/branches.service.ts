@@ -182,7 +182,7 @@ export class BranchesService {
           include: {
             stages: true,
           },
-          skip: skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -280,7 +280,7 @@ export class BranchesService {
           include: {
             stages: true,
           },
-          skip: skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',

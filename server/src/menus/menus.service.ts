@@ -216,7 +216,7 @@ export class MenusService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             ...orderByConditions,
@@ -357,7 +357,7 @@ export class MenusService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             ...orderByConditions,

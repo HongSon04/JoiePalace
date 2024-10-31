@@ -95,7 +95,7 @@ export class SubscribersService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.subscribers.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',

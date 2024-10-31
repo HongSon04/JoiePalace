@@ -76,7 +76,7 @@ export class TagsService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.tags.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
         }),
         this.prismaService.tags.count({

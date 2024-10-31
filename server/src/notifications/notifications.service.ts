@@ -67,7 +67,7 @@ export class NotificationsService {
           where: {
             user_id: Number(user_id),
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -132,7 +132,7 @@ export class NotificationsService {
           where: {
             user_id: findUser.id,
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',

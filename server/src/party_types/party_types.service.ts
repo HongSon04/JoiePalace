@@ -155,7 +155,7 @@ export class PartyTypesService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -242,7 +242,7 @@ export class PartyTypesService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',

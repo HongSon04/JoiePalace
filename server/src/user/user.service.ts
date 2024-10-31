@@ -268,7 +268,7 @@ export class UserService {
           include: {
             memberships: true,
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -343,7 +343,7 @@ export class UserService {
           include: {
             memberships: true,
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -422,7 +422,7 @@ export class UserService {
           include: {
             memberships: true,
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: { created_at: 'desc' },
         }),

@@ -180,7 +180,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -265,7 +265,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -351,7 +351,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -448,7 +448,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -546,7 +546,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -644,7 +644,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
