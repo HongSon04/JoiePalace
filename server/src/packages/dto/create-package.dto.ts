@@ -14,21 +14,21 @@ export class CreatePackageDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Loại tiệc không được để trống' })
-  party_type_id: number;
+  party_type_id: string;
 
   @ApiProperty({
     description: 'ID menu, không được để trống',
     required: true,
   })
   @IsNotEmpty({ message: 'Menu không được để trống' })
-  menu_id: number;
+  menu_id: string;
 
   @ApiProperty({
     description: 'ID trang trí, không được để trống',
     required: true,
   })
   @IsNotEmpty({ message: 'Trang trí không được để trống' })
-  decor_id: number;
+  decor_id: string;
 
   @ApiProperty({
     description: 'Mô tả chi tiết về gói tiệc, không được để trống',
@@ -65,5 +65,5 @@ export class CreatePackageDto {
     description:
       'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
   })
-  extra_service: [{ id: number; quantity: number }] | any;
+  extra_service: [{ id: string; quantity: number }] | any;
 }

@@ -77,6 +77,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   create(@Body() createBookingDto: CreateBookingDto) {
@@ -206,6 +207,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiQuery({ name: 'page', required: false })
@@ -216,6 +218,14 @@ export class BookingsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'branch_id', required: false, description: '1' })
+  @ApiQuery({ name: 'stage_id', required: false, description: '1' })
+  @ApiQuery({ name: 'party_type_id', required: false, description: '1' })
+  @ApiQuery({ name: 'decor_id', required: false, description: '1' })
+  @ApiQuery({ name: 'menu_id', required: false, description: '1' })
+  @ApiQuery({ name: 'user_id', required: false, description: '1' })
+  @ApiQuery({ name: 'deposit_id', required: false, description: '1' })
+  @ApiQuery({ name: 'deleted', required: false, description: 'true | false' })
   @ApiQuery({
     name: 'is_confirm',
     required: false,
@@ -233,43 +243,6 @@ export class BookingsController {
   })
   findAll(@Query() query: FilterBookingDto) {
     return this.bookingsService.findAll(query);
-  }
-
-  // ! Get All Deleted Booking
-  @Get('get-all-deleted')
-  @ApiHeaders([
-    {
-      name: 'Authorization',
-      description: 'Bearer token',
-    },
-  ])
-  @ApiBearerAuth('authorization')
-  @ApiOperation({ summary: 'Lấy danh sách đơn tiệc' })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'itemsPerPage', required: false })
-  @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'minPrice', required: false })
-  @ApiQuery({ name: 'maxPrice', required: false })
-  @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
-  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
-  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  @ApiQuery({
-    name: 'is_confirm',
-    required: false,
-    description: 'true | false',
-  })
-  @ApiQuery({
-    name: 'is_deposit',
-    required: false,
-    description: 'true | false',
-  })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    description: 'pending | processing | success | cancel',
-  })
-  findAllDeleted(@Query() query: FilterBookingDto) {
-    return this.bookingsService.findAllDeleted(query);
   }
 
   // ! Get One Booking
@@ -317,6 +290,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   findOne(@Param('booking_id') id: number) {
@@ -650,6 +624,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   updateStatus(
@@ -685,6 +660,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   delete(@Request() req, @Param('booking_id') id: number) {
@@ -717,6 +693,7 @@ export class BookingsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   restore(@Param('booking_id') id: number) {

@@ -410,10 +410,10 @@ const PageLocation = () => {
               <span className="uppercase px-[12%] lg:ml-0 font-semibold text-gold inline-block lg:px-44 text-[24px] sm:text-[30px] lg:text-5xl">
                 trang thiết bị
               </span>
-              <span className="z-10 px-[12%] lg:w-[70%] lg:ml-0 lg:px-44 text-xs sm:text-sm lg:text-base">
+              <span className="z-10 px-[12%] lg:w-[70%] lg:ml-0 lg:pl-44 text-xs sm:text-sm lg:text-base">
                 {branch.equipment_description}
               </span>
-              <span className="h-1 w-[10%] bg-gold flex absolute left-0 top-[25%]"></span>
+              <span className="h-1 w-[15%] bg-gold flex absolute left-0 top-[25%]"></span>
             </div>
           </TextFade>
           <TextFade
@@ -700,44 +700,46 @@ const PageLocation = () => {
         </div>
       </section>
       <section className="section w-screen h-screen">
-        <div className="w-full h-full flex flex-col lg:flex-row lg:justify-center lg:items-center gap-7 lg:gap-14 px-[12%] lg:px-44 py-5 lg:py-0">
-          <div className="w-full lg:w-1/2 h-fit lg:h-full flex flex-col gap-8 lg:gap-16">
-            <span className="uppercase text-[24px] sm:text-[30px] lg:text-5xl font-bold text-gold">
-              thông tin liên hệ
-            </span>
-            <div className="w-full h-auto flex flex-col gap-6 lg:gap-11">
-              <span className="uppercase text-[18px] sm:text-[20px] lg:text-2xl font-normal">
-                joice palace phạm văn đồng
+        <div className="h-screen flex items-center">
+          <div className="w-full h-full flex flex-col lg:flex-row lg:justify-center lg:items-center gap-7 lg:gap-14 px-[12%] lg:px-44 py-5 lg:py-0">
+            <div className="w-full lg:w-1/2 h-[50%] lg:h-full flex flex-col justify-center gap-8 lg:gap-16">
+              <span className="uppercase text-[24px] sm:text-[30px] lg:text-5xl font-bold text-gold">
+                thông tin liên hệ
               </span>
-              <div className="w-full h-auto flex flex-col gap-6">
-                <div className="w-full flex gap-3 lg:gap-6">
-                  <Image src="/room.svg" alt="" />
-                  <span className="text-xs sm:text-sm lg:text-base font-normal">
-                    194 Hoàng Văn Thụ, Quận Phú Nhuận, Thành phố Hồ Chí Minh
-                  </span>
-                </div>
-                <div className="w-full flex gap-6">
-                  <Image src="/mail.svg" alt="" />
-                  <span className="text-xs sm:text-sm lg:text-base font-normal">
-                    info@joicepalace.com.vn
-                  </span>
-                </div>
-                <div className="w-full flex gap-6">
-                  <Image src="/phone.svg" alt="" />
-                  <span className="text-xs sm:text-sm lg:text-base font-normal">
-                    035 243 1477
-                  </span>
+              <div className="w-full h-auto flex flex-col gap-6 lg:gap-11">
+                <span className="uppercase text-[18px] sm:text-[20px] lg:text-2xl font-normal">
+                  joice palace phạm văn đồng
+                </span>
+                <div className="w-full h-auto flex flex-col gap-6">
+                  <div className="w-full flex gap-3 lg:gap-6">
+                    <Image src="/room.svg" alt="" />
+                    <span className="text-xs sm:text-sm lg:text-base font-normal">
+                      194 Hoàng Văn Thụ, Quận Phú Nhuận, Thành phố Hồ Chí Minh
+                    </span>
+                  </div>
+                  <div className="w-full flex gap-6">
+                    <Image src="/mail.svg" alt="" />
+                    <span className="text-xs sm:text-sm lg:text-base font-normal">
+                      info@joicepalace.com.vn
+                    </span>
+                  </div>
+                  <div className="w-full flex gap-6">
+                    <Image src="/phone.svg" alt="" />
+                    <span className="text-xs sm:text-sm lg:text-base font-normal">
+                      035 243 1477
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="w-full lg:w-1/2 h-full rounded-sm overflow-hidden">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.9101447446287!2d106.71386767480566!3d10.825879989325873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317529b446117cb9%3A0x7549cfeabc04d7d0!2zV2hpdGUgUGFsYWNlIFBo4bqhbSBWxINuIMSQ4buTbmc!5e1!3m2!1svi!2s!4v1726236625632!5m2!1svi!2s"
-              width="100%"
-              height="100%"
-              loading="lazy"
-            ></iframe>
+            <div className="w-full lg:w-1/2 h-[50%]  rounded-sm overflow-hidden">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.9101447446287!2d106.71386767480566!3d10.825879989325873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317529b446117cb9%3A0x7549cfeabc04d7d0!2zV2hpdGUgUGFsYWNlIFBo4bqhbSBWxINuIMSQ4buTbmc!5e1!3m2!1svi!2s!4v1726236625632!5m2!1svi!2s"
+                width="100%"
+                height="100%"
+                loading="lazy"
+              ></iframe>
+            </div>
           </div>
         </div>
       </section>

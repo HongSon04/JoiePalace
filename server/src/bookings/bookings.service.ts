@@ -1,3 +1,4 @@
+import { find } from 'rxjs';
 import { booking_details } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
@@ -135,7 +136,7 @@ export class BookingsService {
       const contents = {
         name: `Đơn đặt tiệc mới từ ${name}`,
         contents: `Đơn đặt tiệc mới từ ${name}, vào ngày ${dayjs(formattedDate).format('DD/MM/YYYY')}, vào ca ${shift}, vui lòng kiểm tra và xác nhận!`,
-        branch_id,
+        branch_id: Number(branch_id),
         type: TypeNotifyEnum.BOOKING_CREATED,
       };
 
@@ -172,132 +173,144 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> create: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
   // ! Find All Booking
   async findAll(query: FilterBookingDto) {
     try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
-      const search = query.search || '';
+      // Parse pagination params
+      const page = query.page ? parseInt(query.page, 10) : 1;
+      const itemsPerPage = query.itemsPerPage
+        ? parseInt(query.itemsPerPage, 10)
+        : 10;
       const skip = (page - 1) * itemsPerPage;
-      const priceSort = query?.priceSort?.toLowerCase();
-      const startDate = query.startDate
-        ? FormatDateToStartOfDay(query.startDate)
-        : '';
-      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
-      const is_confirm = query.is_confirm;
-      const is_deposit = query.is_deposit;
-      const status = query.status;
 
-      // ? Range Date Conditions
-      const sortRangeDate: any =
-        startDate && endDate
-          ? {
-              created_at: {
-                gte: new Date(startDate),
-                lte: new Date(endDate),
-              },
-            }
-          : {};
-      // ? Where Conditions
+      // Convert deleted to proper boolean
+      const deleted = query.deleted == true ? true : false;
+
+      // Build where conditions using Prisma types
       const whereConditions: any = {
-        deleted: false,
-        ...sortRangeDate,
+        deleted,
+        ...(query.startDate &&
+          query.endDate && {
+            created_at: {
+              gte: FormatDateToStartOfDay(query.startDate),
+              lte: FormatDateToEndOfDay(query.endDate),
+            },
+          }),
       };
 
-      if (search) {
+      // Add search conditions if search exists
+      if (query.search) {
         whereConditions.OR = [
-          {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            company_name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            email: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            phone: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
+          { name: { contains: query.search, mode: 'insensitive' } },
+          { company_name: { contains: query.search, mode: 'insensitive' } },
+          { email: { contains: query.search, mode: 'insensitive' } },
+          { phone: { contains: query.search, mode: 'insensitive' } },
         ];
       }
 
-      if (is_confirm !== undefined) {
-        whereConditions.is_confirm = Boolean(!is_confirm);
+      // Add boolean filters with proper conversion
+      if (query.is_confirm !== undefined) {
+        whereConditions.is_confirm = query.is_confirm == true;
       }
 
-      if (is_deposit !== undefined) {
-        whereConditions.is_deposit = Boolean(!is_deposit);
+      if (query.is_deposit !== undefined) {
+        whereConditions.is_deposit = query.is_deposit == true;
       }
 
-      if (status) {
-        whereConditions.status = status;
+      if (query.status) {
+        whereConditions.status = query.status;
       }
 
-      // ? Date Conditions
-      if (startDate && endDate) {
-        if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({
-          created_at: { gte: startDate, lte: endDate },
-        });
-      }
-      // ? Sort Conditions
+      // Add numeric ID filters with type checking
+      const numericFilters = [
+        { field: 'branch_id', value: query.branch_id },
+        { field: 'user_id', value: query.user_id },
+        { field: 'stage_id', value: query.stage_id },
+        { field: 'party_type_id', value: query.party_type_id },
+      ];
 
-      // ? Fetch Data
-      const [result, total] = await this.prismaService.$transaction([
-        this.prismaService.bookings.findMany({
-          where: whereConditions,
-          include: {
-            users: {
-              select: {
-                id: true,
-                username: true,
-                email: true,
-                memberships_id: true,
-                phone: true,
-                avatar: true,
-                role: true,
-              },
+      numericFilters.forEach(({ field, value }) => {
+        if (value) {
+          whereConditions[field] = parseInt(String(value), 10);
+        }
+      });
+
+      // Add booking details conditions
+      if (query.decor_id || query.deposit_id || query.menu_id) {
+        whereConditions.booking_details = {
+          some: {
+            ...(query.decor_id && {
+              decor_id: parseInt(String(query.decor_id), 10),
+            }),
+            ...(query.deposit_id && {
+              deposit_id: parseInt(String(query.deposit_id), 10),
+            }),
+            ...(query.menu_id && {
+              menu_id: parseInt(String(query.menu_id), 10),
+            }),
+          },
+        };
+      }
+
+      // Price range filters
+      if (query.minPrice || query.maxPrice) {
+        whereConditions.booking_details = {
+          ...whereConditions.booking_details,
+          some: {
+            ...whereConditions.booking_details?.some,
+            total_amount: {
+              ...(query.minPrice && { gte: parseFloat(query.minPrice) }),
+              ...(query.maxPrice && { lte: parseFloat(query.maxPrice) }),
             },
-            branches: true,
-            booking_details: {
+          },
+        };
+      }
+
+      // Define include structure with proper typing
+      const include = {
+        users: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            memberships_id: true,
+            phone: true,
+            avatar: true,
+            role: true,
+          },
+        },
+        branches: true,
+        booking_details: {
+          include: {
+            decors: true,
+            menus: {
               include: {
-                decors: true,
-                menus: {
+                products: {
                   include: {
-                    products: {
-                      include: {
-                        tags: true,
-                      },
-                    },
+                    tags: true,
                   },
                 },
-                deposits: true,
               },
             },
-            stages: true,
+            deposits: true,
           },
-          orderBy: {
-            created_at: 'desc',
-          },
+        },
+        stages: true,
+      };
+
+      // Execute database queries in transaction
+      const [bookings, total] = await this.prismaService.$transaction([
+        this.prismaService.bookings.findMany({
+          where: whereConditions,
+          include,
+          orderBy: { created_at: 'desc' },
           skip,
           take: itemsPerPage,
         }),
@@ -306,208 +319,35 @@ export class BookingsService {
         }),
       ]);
 
-      if (priceSort === 'asc' || priceSort === 'desc') {
-        result.sort((a, b) => {
-          const totalA = a.booking_details.reduce(
-            (sum, detail) => sum + detail.total_amount,
-            0,
-          );
-          const totalB = b.booking_details.reduce(
-            (sum, detail) => sum + detail.total_amount,
-            0,
-          );
-          return priceSort === 'asc' ? totalA - totalB : totalB - totalA;
-        });
-      }
+      // Handle price sorting
+      const priceSortedBookings = query.priceSort
+        ? this.sortBookingsByPrice(bookings, query.priceSort)
+        : bookings;
 
-      // ? Pagination
+      // Calculate pagination
       const lastPage = Math.ceil(total / itemsPerPage);
-      const paginationInfo = {
+      const pagination = {
         nextPage: page + 1 > lastPage ? null : page + 1,
         prevPage: page - 1 <= 0 ? null : page - 1,
-        lastPage: lastPage,
+        lastPage,
         itemsPerPage,
         currentPage: page,
         total,
       };
-      // ? Response
-      throw new HttpException(
-        { data: FormatReturnData(result, []), pagination: paginationInfo },
-        HttpStatus.OK,
-      );
+
+      return {
+        data: FormatReturnData(priceSortedBookings, []),
+        pagination,
+      };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> findAll: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
-    }
-  }
-
-  // ! Find All Deleted Booking
-  async findAllDeleted(query: FilterBookingDto) {
-    try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
-      const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
-      const priceSort = query?.priceSort?.toLowerCase();
-      const startDate = query.startDate
-        ? FormatDateToStartOfDay(query.startDate)
-        : '';
-      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
-      const is_confirm = query.is_confirm;
-      const is_deposit = query.is_deposit;
-      const status = query.status;
-
-      // ? Range Date Conditions
-      const sortRangeDate: any =
-        startDate && endDate
-          ? {
-              created_at: {
-                gte: new Date(startDate),
-                lte: new Date(endDate),
-              },
-            }
-          : {};
-      // ? Where Conditions
-      const whereConditions: any = {
-        deleted: true,
-        ...sortRangeDate,
-      };
-
-      if (is_confirm !== undefined) {
-        whereConditions.is_confirm = Boolean(!is_confirm);
-      }
-
-      if (is_deposit !== undefined) {
-        whereConditions.is_deposit = Boolean(!is_deposit);
-      }
-
-      if (status) {
-        whereConditions.status = status;
-      }
-
-      if (search) {
-        whereConditions.OR = [
-          {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            company_name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            email: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            phone: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-        ];
-      }
-
-      // ? Date Conditions
-      if (startDate && endDate) {
-        if (!whereConditions.AND) whereConditions.AND = [];
-        whereConditions.AND.push({
-          created_at: { gte: startDate, lte: endDate },
-        });
-      }
-      // ? Fetch Data
-      const [result, total] = await this.prismaService.$transaction([
-        this.prismaService.bookings.findMany({
-          where: whereConditions,
-          include: {
-            users: {
-              select: {
-                id: true,
-                username: true,
-                email: true,
-                memberships_id: true,
-                phone: true,
-                avatar: true,
-                role: true,
-              },
-            },
-            stages: true,
-            branches: true,
-            booking_details: {
-              include: {
-                decors: true,
-                menus: {
-                  include: {
-                    products: {
-                      include: {
-                        tags: true,
-                      },
-                    },
-                  },
-                },
-                deposits: true,
-              },
-            },
-          },
-          orderBy: {
-            created_at: 'desc',
-          },
-          skip,
-          take: itemsPerPage,
-        }),
-        this.prismaService.bookings.count({
-          where: whereConditions,
-        }),
-      ]);
-      if (priceSort === 'asc' || priceSort === 'desc') {
-        result.sort((a, b) => {
-          const totalA = a.booking_details.reduce(
-            (sum, detail) => sum + detail.total_amount,
-            0,
-          );
-          const totalB = b.booking_details.reduce(
-            (sum, detail) => sum + detail.total_amount,
-            0,
-          );
-          return priceSort === 'asc' ? totalA - totalB : totalB - totalA;
-        });
-      }
-      // ? Pagination
-      const lastPage = Math.ceil(total / itemsPerPage);
-      const paginationInfo = {
-        nextPage: page + 1 > lastPage ? null : page + 1,
-        prevPage: page - 1 <= 0 ? null : page - 1,
-        lastPage: lastPage,
-        itemsPerPage,
-        currentPage: page,
-        total,
-      };
-      // ? Response
-      throw new HttpException(
-        { data: FormatReturnData(result, []), pagination: paginationInfo },
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ booking.service.ts -> findAllDeleted: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -558,10 +398,10 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> findOne: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -637,10 +477,10 @@ export class BookingsService {
         'Lỗi từ booking.service.ts -> getBookingForNext14Days: ',
         error,
       );
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -654,6 +494,11 @@ export class BookingsService {
       const findBooking = await this.prismaService.bookings.findUnique({
         where: { id: Number(id) },
       });
+      // Status = true =? Check Rank User
+      if (status === BookingStatus.SUCCESS) {
+        this.updateMembershipBooking(findBooking.user_id);
+      }
+
       if (!findBooking) {
         throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
@@ -708,10 +553,10 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> updateStatus: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -778,11 +623,20 @@ export class BookingsService {
         );
       }
 
+      // Status = true =? Check Rank User
+      if (status === BookingStatus.SUCCESS) {
+        this.updateMembershipBooking(findBooking.user_id);
+      }
+
       // ! Update Booking
       await this.prismaService.bookings.update({
         where: { id: Number(id) },
         data: {
-          user_id: Number(user_id),
+          user_id: user_id
+            ? Number(user_id)
+            : findBooking.user_id
+              ? Number(findBooking.user_id)
+              : null,
           branch_id: Number(branch_id),
           name,
           company_name: company_name ? company_name : null,
@@ -791,7 +645,7 @@ export class BookingsService {
           number_of_guests: Number(number_of_guests),
           is_confirm,
           is_deposit,
-          party_type_id,
+          party_type_id: Number(party_type_id),
           phone,
           status: status as BookingStatus,
         },
@@ -917,15 +771,17 @@ export class BookingsService {
               'Không tìm thấy dịch vụ thêm',
               HttpStatus.NOT_FOUND,
             );
-          extraServiceAmount += findExtra.price * extra.quantity;
+          extraServiceAmount +=
+            Number(findExtra.price) * Number(extra.quantity);
           extra.name = findExtra.name;
-          extra.amount = findExtra.price;
-          extra.total_price = findExtra.price * extra.quantity;
+          extra.amount = Number(findExtra.price);
+          extra.total_price = Number(findExtra.price) * Number(extra.quantity);
           extra.description = findExtra.description;
           extra.short_description = findExtra.short_description;
           extra.images = findExtra.images;
-          extra.quantity = extra.quantity;
-          extraServiceAmount += findExtra.price * extra.quantity;
+          extra.quantity = Number(extra.quantity);
+          extraServiceAmount +=
+            Number(findExtra.price) * Number(extra.quantity);
         });
         // Total calculation
         const totalAmount = Number(
@@ -1152,10 +1008,10 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> update: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -1184,10 +1040,10 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> delete: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -1219,10 +1075,10 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> restore: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -1267,11 +1123,96 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> destroy: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
+  }
+
+  // ! Update Membership Booking
+  private async updateMembershipBooking(userId: number) {
+    try {
+      // First get all confirmed bookings and calculate total amount
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          user_id: userId,
+          is_confirm: true,
+          is_deposit: true,
+          status: 'success',
+          deleted: false,
+        },
+        include: {
+          booking_details: {
+            select: {
+              total_amount: true,
+            },
+          },
+        },
+      });
+
+      // Calculate total amount from all booking details
+      const totalAmount = bookings.reduce((sum, booking) => {
+        const bookingTotal = booking.booking_details.reduce(
+          (detailSum, detail) => {
+            return detailSum + Number(detail.total_amount);
+          },
+          0,
+        );
+        return sum + bookingTotal;
+      }, 0);
+
+      if (totalAmount === 0) {
+        return;
+      }
+
+      // Find eligible membership based on total amount
+      const eligibleMembership = await this.prismaService.memberships.findFirst(
+        {
+          where: {
+            deleted: false,
+            booking_total_amount: {
+              lte: totalAmount,
+            },
+          },
+          orderBy: {
+            booking_total_amount: 'desc',
+          },
+          select: {
+            id: true,
+          },
+        },
+      );
+
+      if (eligibleMembership) {
+        // Update user membership
+        await this.prismaService.users.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            memberships_id: eligibleMembership.id,
+          },
+        });
+      }
+    } catch (error) {
+      // Add proper error logging here
+      throw new Error(`Failed to update membership booking: ${error.message}`);
+    }
+  }
+
+  // ! Sort Booking By Price
+  private sortBookingsByPrice(bookings: any[], sortDirection: string): any[] {
+    return [...bookings].sort((a, b) => {
+      const getTotalAmount = (booking: any) =>
+        booking.booking_details.reduce(
+          (sum: number, detail: any) => sum + (detail.total_amount || 0),
+          0,
+        );
+
+      const comparison = getTotalAmount(a) - getTotalAmount(b);
+      return sortDirection.toLowerCase() === 'asc' ? comparison : -comparison;
+    });
   }
 
   // ! Cron Job check booking expired_at and delete it

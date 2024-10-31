@@ -72,7 +72,7 @@ export class PartyTypesService {
         data: {
           name,
           description,
-          price: totalProductPrice,
+          price: Number(totalProductPrice),
           short_description,
           images: images as any,
           products: {
@@ -102,10 +102,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> create: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -155,7 +155,7 @@ export class PartyTypesService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -189,10 +189,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -242,7 +242,7 @@ export class PartyTypesService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -276,10 +276,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -313,10 +313,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> findOne: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -365,7 +365,7 @@ export class PartyTypesService {
         0,
       );
 
-      if (totalProductPrice !== price) {
+      if (Number(totalProductPrice) !== Number(price)) {
         throw new BadRequestException('Giá loại tiệc không chính xác');
       }
 
@@ -374,7 +374,7 @@ export class PartyTypesService {
         name,
         description,
         short_description,
-        price: totalProductPrice,
+        price: Number(totalProductPrice),
         products: {
           set: foundProducts.map((product) => ({
             id: Number(product.id),
@@ -423,10 +423,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> update: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -459,10 +459,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> remove: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -495,10 +495,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> restore: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -529,10 +529,10 @@ export class PartyTypesService {
         throw error;
       }
       console.log('Lỗi từ partyTypesService -> hardDelete: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 }
