@@ -1066,6 +1066,13 @@ export class BlogsService {
         throw new HttpException('Bài viết không tồn tại', HttpStatus.NOT_FOUND);
       }
 
+      if (blog.deleted === false) {
+        throw new HttpException(
+          'Bài viết chưa được xóa tạm thời, không thể khôi phục!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       await this.prismaService.blogs.update({
         where: { id: Number(id) },
         data: {
@@ -1099,9 +1106,9 @@ export class BlogsService {
         throw new HttpException('Bài viết không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      if (blog.deleted) {
+      if (blog.deleted === false) {
         throw new HttpException(
-          'Bài viết phải được xóa mềm trước',
+          'Bài viết chưa được xóa tạm thời, không thể xóa vĩnh viễn!',
           HttpStatus.BAD_REQUEST,
         );
       }

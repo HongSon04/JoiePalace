@@ -552,6 +552,14 @@ export class BranchesService {
       if (!branch) {
         throw new NotFoundException('Địa điểm không tồn tại');
       }
+
+      if (branch.deleted === false) {
+        throw new HttpException(
+          'Chi nhánh chưa được xóa tạm thời, không thể khôi phục!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       await this.prismaService.branches.update({
         where: {
           id: Number(id),
@@ -584,6 +592,13 @@ export class BranchesService {
       });
       if (!branch) {
         throw new NotFoundException('Địa điểm không tồn tại');
+      }
+
+      if (branch.deleted === false) {
+        throw new HttpException(
+          'Chi nhánh chưa được xóa tạm thời, không thể xóa vĩnh viễn!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // ! Tạo một hàm xử lý chung cho việc xóa ảnh và dữ liệu

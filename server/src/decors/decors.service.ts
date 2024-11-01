@@ -586,7 +586,9 @@ export class DecorsService {
       }
 
       if (!decor.deleted) {
-        throw new BadRequestException('Trang trí chưa bị xóa');
+        throw new BadRequestException(
+          'Trang trí chưa bị xóa tạm thời, không thể khôi phục!',
+        );
       }
 
       await this.prismaService.decors.update({
@@ -622,7 +624,9 @@ export class DecorsService {
       }
 
       if (!decor.deleted) {
-        throw new BadRequestException('Trang trí chưa bị xóa');
+        throw new BadRequestException(
+          'Trang trí chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       // Delete images

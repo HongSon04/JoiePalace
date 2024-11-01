@@ -564,6 +564,13 @@ export class UserService {
       if (!user) {
         throw new NotFoundException('User không tồn tại');
       }
+
+      if (!user.deleted) {
+        throw new BadRequestException(
+          'User chưa bị xóa tạm thời, không thể khôi phục!',
+        );
+      }
+
       await this.prismaService.users.update({
         where: {
           id: Number(id),
@@ -597,6 +604,12 @@ export class UserService {
       });
       if (!user) {
         throw new NotFoundException('User không tồn tại');
+      }
+
+      if (!user.deleted) {
+        throw new BadRequestException(
+          'User chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
       // ? Delete Image
       if (user.avatar) {

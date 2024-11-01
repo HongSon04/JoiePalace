@@ -163,7 +163,7 @@ export class MembershipsService {
       );
     }
   }
-  
+
   // ! Get membership by id
   async findOne(id: number) {
     try {
@@ -387,6 +387,12 @@ export class MembershipsService {
         throw new NotFoundException('Hạng thành viên không tồn tại');
       }
 
+      if (!findMembership.deleted) {
+        throw new BadRequestException(
+          'Hạng thành viên chưa bị xóa tạm thời, không thể khôi phục!',
+        );
+      }
+
       await this.prismaService.memberships.update({
         where: {
           id: Number(id),
@@ -429,8 +435,10 @@ export class MembershipsService {
         throw new NotFoundException('Hạng thành viên không tồn tại');
       }
 
-      if (findMembership.deleted === false) {
-        throw new BadRequestException('Hạng thành viên chưa bị xóa tạm thời');
+      if (!findMembership.deleted) {
+        throw new BadRequestException(
+          'Hạng thành viên chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       await this.prismaService.memberships.delete({

@@ -617,6 +617,12 @@ export class MenusService {
         throw new NotFoundException('Menu không tồn tại');
       }
 
+      if (!findMenu.deleted) {
+        throw new BadRequestException(
+          'Menu chưa bị xóa tạm thời, không thể khôi phục',
+        );
+      }
+
       await this.prismaService.menus.update({
         where: { id: Number(id) },
         data: {
@@ -647,6 +653,12 @@ export class MenusService {
       });
       if (!findMenu) {
         throw new NotFoundException('Menu không tồn tại');
+      }
+
+      if (!findMenu.deleted) {
+        throw new BadRequestException(
+          'Menu chưa bị xóa tạm thời, không thể xóa vĩnh viễn',
+        );
       }
 
       await this.prismaService.menus.delete({

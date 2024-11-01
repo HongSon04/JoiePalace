@@ -1090,6 +1090,13 @@ export class BookingsService {
         throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
       }
 
+      if (findBooking.deleted === false) {
+        throw new HttpException(
+          'Đơn tiệc chưa được xóa tạm thời, không thể khôi phục!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       await this.prismaService.bookings.update({
         where: { id: Number(id) },
         data: {
@@ -1131,6 +1138,13 @@ export class BookingsService {
 
       if (!booking) {
         throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
+      }
+
+      if (booking.deleted === false) {
+        throw new HttpException(
+          'Đơn tiệc chưa được xóa tạm thời, không thể xóa vĩnh viễn!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // Xóa deposit nếu có
