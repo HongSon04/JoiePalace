@@ -158,7 +158,7 @@ export class BookingsService {
         customerPhone: phone,
         branchAddress: branch.address,
       };
-      await this.mailService.sendUserConfirmationBooking(bodyMail);
+      await this.mailService.EmailAppointmentSuccessful(bodyMail);
 
       // Trả về thông báo thành công
       throw new HttpException(
@@ -650,6 +650,39 @@ export class BookingsService {
           status: status as BookingStatus,
         },
       });
+
+      // ! Send Notification
+      const contents: any = {
+        name: `Đơn đặt tiệc của ${findBooking.name}`,
+        branch_id: findBooking.branch_id,
+      };
+
+      if (is_confirm === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được xác nhận!`;
+        contents.type = TypeNotifyEnum.BOOKING_CONFIRM;
+      } else if (is_deposit === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được đặt cọc!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'cancel') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã bị hủy!`;
+        contents.type = TypeNotifyEnum.BOOKING_CANCEL;
+      } else if (status === 'processing') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đang được tổ chức!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'success') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được tiến hành!`;
+        contents.type = TypeNotifyEnum.BOOKING_SUCCESS;
+      } else {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã cập nhật!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      }
+
+      await this.notificationService.sendNotifications(
+        contents.name,
+        contents.contents,
+        contents.branch_id,
+        contents.type,
+      );
 
       let organization_date = FormatDateWithShift(
         findBooking.organization_date as any,
@@ -1220,6 +1253,7 @@ export class BookingsService {
   async handleBookingExpiredCron() {
     try {
       const currentDate = new Date();
+      // ! Check booking expired_at
       const bookings = await this.prismaService.bookings.findMany({
         where: {
           deleted: false,
@@ -1242,6 +1276,49 @@ export class BookingsService {
           },
         });
       });
+
+      // ! Check deposit expired_at
+      const deposits = await this.prismaService.deposits.findMany({
+        where: {
+          expired_at: {
+            gte: currentDate,
+          },
+        },
+      });
+
+      // Xóa deposit nếu hết hạn
+      deposits.map(async (deposit) => {
+        // ? Xóa deposit
+        await this.prismaService.deposits.delete({
+          where: { id: Number(deposit.id) },
+        });
+      });
+
+      // ! Send Notification
+      const contents: any = {
+        name: 'Hệ thống',
+        content: 'Đã xóa những đơn đặt tiệc hết hạn',
+        type: TypeNotifyEnum.BOOKING_CANCEL,
+      };
+
+      await this.notificationService.sendNotifications(
+        contents.name,
+        contents.content,
+        null,
+        contents.type,
+      );
+
+      // ! Send Email Booking if is_deposit is false
+      deposits.map(async (deposit) => {
+        // Send Mail
+        const bodyMail = {
+          name: deposit.name,
+          email: deposit.email,
+        };
+        await this.mailService.cancelAppointment(bodyMail.name, bodyMail.email);
+      });
+
+      console.log('Cron Job check booking expired_at and delete it');
     } catch (error) {
       console.log('Lỗi từ booking.service.ts -> handleCron: ', error);
     }
@@ -1295,24 +1372,19 @@ export class BookingsService {
 
       // Prepare notification and email content
       bookings.map(async (booking) => {
-        const { name, email, phone, organization_date, shift, branches } =
-          booking;
-        const formattedDate = FormatDateWithShift(
-          organization_date as any,
-          shift,
-        );
-
         // Send Mail
         const bodyMail = {
-          shift,
-          organization_date: dayjs(formattedDate).format('DD/MM/YYYY'),
-          branchName: branches.name,
-          customerName: name,
-          customerEmail: email,
-          customerPhone: phone,
-          branchAddress: branches.address,
+          name: booking.name,
+          email: booking.email,
+          amount: booking.booking_details[0].total_amount,
+          created_at: booking.created_at,
         };
-        await this.mailService.sendUserConfirmationBooking(bodyMail);
+        await this.mailService.remindDeposit(
+          bodyMail.name,
+          bodyMail.email,
+          bodyMail.amount,
+          bodyMail.created_at,
+        );
       });
     } catch (error) {
       console.log(

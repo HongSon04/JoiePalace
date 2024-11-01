@@ -10,12 +10,14 @@ export class MailService {
     private configService: ConfigService,
   ) {}
 
-  async sendUserConfirmationBooking(body: ConfirmBookingMailDto) {
+  // ! Gửi mail xác nhận đặt lịch
+
+  async EmailAppointmentSuccessful(body: ConfirmBookingMailDto) {
     try {
       await this.mailerService.sendMail({
         to: 'test@gmail.com',
         subject: 'Welcome to Our App! Confirm your Email',
-        template: 'confirm-booking',
+        template: 'email-appointment-successful-booking',
         context: {
           // Dữ liệu cho template
           shift: body.shift,
@@ -25,11 +27,10 @@ export class MailService {
           customerEmail: 'johndoe@gmail.com',
           customerPhone: body.customerPhone,
           branchAddress: body.branchAddress,
-          confirmationLink: 'http://localhost:3000/confirm',
         },
       });
     } catch (error) {
-      console.log('Lỗi từ MailService->sendUserConfirmationBooking', error);
+      console.log('Lỗi từ MailService->EmailAppointmentSuccessful', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
         error: error.message,
@@ -37,6 +38,7 @@ export class MailService {
     }
   }
 
+  // ! Gửi mail xác nhận đăng ký tài khoản
   async confirmRegister(name: string, email: string, token: string) {
     try {
       await this.mailerService.sendMail({
@@ -52,6 +54,62 @@ export class MailService {
       });
     } catch (error) {
       console.log('Lỗi từ MailService->confirmRegister', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
+    }
+  }
+
+  // ! Gừi mail nhắc lịch tiền cọc
+  async remindDeposit(
+    name: string,
+    email: string,
+    amount: number,
+    created_at: string | any,
+  ) {
+    try {
+      const days_left = dayjs(created_at).diff(dayjs(), 'day');
+      const booking_date = dayjs(created_at).format('DD/MM/YYYY');
+      const fortmatAmount = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+      }).format(amount);
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Nhắc nhở thanh toán tiền cọc',
+        template: 'cron-remind-deposit',
+        context: {
+          name,
+          email,
+          date: dayjs().format('DD/MM/YYYY'),
+          days_left,
+          booking_date,
+          amount: fortmatAmount,
+        },
+      });
+    } catch (error) {
+      console.log('Lỗi từ MailService->remindDeposit', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
+    }
+  }
+
+  // ! Gửi mail thông báo hủy lịch
+  async cancelAppointment(name: string, email: string) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Thông báo hủy lịch đặt',
+        template: 'booking-cancelled',
+        context: {
+          name,
+        },
+      });
+    } catch (error) {
+      console.log('Lỗi từ MailService->cancelAppointment', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
         error: error.message,
