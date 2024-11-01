@@ -3,158 +3,158 @@
 import { Image } from "@chakra-ui/react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { fetchBlogDataById, fecthAllBlog } from "@/app/_services/blogServices";
+import { fetchBlogDataBySlug, fecthAllBlog } from "@/app/_services/blogServices";
 import { useEffect, useState } from "react";
-const data = [
-    {
-        "id": 1,
-        "category_id": 1,
-        "title": "test",
-        "slug": "test",
-        "description": "description",
-        "short_description": "short_description",
-        "content": "content",
-        "images": [
-            "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018423/joiepalace/blogs/fmua8fbbjedchqv0ojzf.jpg"
-        ],
-        "views": 2,
-        "created_at": "2024-10-27T08:40:14.373Z",
-        "updated_at": "2024-10-28T15:33:38.488Z",
-        "tags": [
-            {
-                "id": 1,
-                "name": "test1",
-                "slug": "test1",
-                "created_at": "2024-10-24T09:11:45.130Z",
-                "updated_at": "2024-10-24T09:11:45.130Z"
-            },
-            {
-                "id": 2,
-                "name": "test21",
-                "slug": "test21",
-                "created_at": "2024-10-24T09:11:49.692Z",
-                "updated_at": "2024-10-24T09:11:49.692Z"
-            },
-            {
-                "id": 3,
-                "name": "test213",
-                "slug": "test213",
-                "created_at": "2024-10-24T09:11:51.556Z",
-                "updated_at": "2024-10-24T09:11:51.556Z"
-            }
-        ],
-        "categories": {
-            "id": 1,
-            "category_id": null,
-            "name": "Nước uống",
-            "slug": "nuoc-uong",
-            "description": "Đồ uống giải khát",
-            "short_description": "Đồ uống giải khát",
-            "images": [],
-            "deleted": false,
-            "deleted_at": null,
-            "deleted_by": null,
-            "created_by": null,
-            "updated_by": null,
-            "created_at": "2024-10-24T08:11:33.736Z",
-            "updated_at": "2024-10-24T08:11:33.736Z"
-        }
-    },
-    {
-        "id": 2,
-        "category_id": 1,
-        "title": "test2",
-        "slug": "test2",
-        "description": "description",
-        "short_description": "short_description",
-        "content": "content",
-        "images": [
-            "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018635/joiepalace/blogs/gophdvdsqjokdazb4cvk.jpg"
-        ],
-        "views": 1,
-        "created_at": "2024-10-27T08:43:55.538Z",
-        "updated_at": "2024-10-28T15:32:08.188Z",
-        "tags": [
-            {
-                "id": 1,
-                "name": "test1",
-                "slug": "test1",
-                "created_at": "2024-10-24T09:11:45.130Z",
-                "updated_at": "2024-10-24T09:11:45.130Z"
-            },
-            {
-                "id": 2,
-                "name": "test21",
-                "slug": "test21",
-                "created_at": "2024-10-24T09:11:49.692Z",
-                "updated_at": "2024-10-24T09:11:49.692Z"
-            },
-            {
-                "id": 3,
-                "name": "test213",
-                "slug": "test213",
-                "created_at": "2024-10-24T09:11:51.556Z",
-                "updated_at": "2024-10-24T09:11:51.556Z"
-            }
-        ],
-        "categories": {
-            "id": 1,
-            "category_id": null,
-            "name": "Nước uống",
-            "slug": "nuoc-uong",
-            "description": "Đồ uống giải khát",
-            "short_description": "Đồ uống giải khát",
-            "images": [],
-            "deleted": false,
-            "deleted_at": null,
-            "deleted_by": null,
-            "created_by": null,
-            "updated_by": null,
-            "created_at": "2024-10-24T08:11:33.736Z",
-            "updated_at": "2024-10-24T08:11:33.736Z"
-        }
-    },
-    {
-        "id": 3,
-        "category_id": 1,
-        "title": "Đám Cưới Công Nghệ",
-        "slug": "dam-cuoi-cong-nghe",
-        "description": "Đám cưới công nghệ là xu hướng mới trong tổ chức lễ cưới, kết hợp giữa truyền thống và hiện đại.",
-        "short_description": "Khám phá xu hướng đám cưới công nghệ.",
-        "content": "Đám cưới công nghệ đang trở thành một xu hướng phổ biến trong những năm gần đây. Với sự phát triển của công nghệ, các cặp đôi có thể tổ chức lễ cưới của mình một cách độc đáo và sáng tạo hơn bao giờ hết. Từ việc sử dụng drone để quay phim, livestream lễ cưới đến việc tạo ra các trang web riêng cho đám cưới, công nghệ đã mang đến nhiều lựa chọn thú vị cho các cặp đôi. Ngoài ra, các ứng dụng di động cũng giúp khách mời dễ dàng theo dõi thông tin và tham gia vào các hoạt động trong ngày cưới.",
-        "images": [
-            "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018718/joiepalace/blogs/eqovyenkzz8q65vpmccs.png"
-        ],
-        "views": 7,
-        "created_at": "2024-10-27T08:45:19.836Z",
-        "updated_at": "2024-10-28T15:33:41.542Z",
-        "tags": [
-            {
-                "id": 1,
-                "name": "test1",
-                "slug": "test1",
-                "created_at": "2024-10-24T09:11:45.130Z",
-                "updated_at": "2024-10-24T09:11:45.130Z"
-            }
-        ],
-        "categories": {
-            "id": 1,
-            "category_id": null,
-            "name": "Nước uống",
-            "slug": "nuoc-uong",
-            "description": "Đồ uống giải khát",
-            "short_description": "Đồ uống giải khát",
-            "images": [],
-            "deleted": false,
-            "deleted_at": null,
-            "deleted_by": null,
-            "created_by": null,
-            "updated_by": null,
-            "created_at": "2024-10-24T08:11:33.736Z",
-            "updated_at": "2024-10-24T08:11:33.736Z"
-        }
-    }
-]
+// const data = [
+//     {
+//         "id": 1,
+//         "category_id": 1,
+//         "title": "test",
+//         "slug": "test",
+//         "description": "description",
+//         "short_description": "short_description",
+//         "content": "content",
+//         "images": [
+//             "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018423/joiepalace/blogs/fmua8fbbjedchqv0ojzf.jpg"
+//         ],
+//         "views": 2,
+//         "created_at": "2024-10-27T08:40:14.373Z",
+//         "updated_at": "2024-10-28T15:33:38.488Z",
+//         "tags": [
+//             {
+//                 "id": 1,
+//                 "name": "test1",
+//                 "slug": "test1",
+//                 "created_at": "2024-10-24T09:11:45.130Z",
+//                 "updated_at": "2024-10-24T09:11:45.130Z"
+//             },
+//             {
+//                 "id": 2,
+//                 "name": "test21",
+//                 "slug": "test21",
+//                 "created_at": "2024-10-24T09:11:49.692Z",
+//                 "updated_at": "2024-10-24T09:11:49.692Z"
+//             },
+//             {
+//                 "id": 3,
+//                 "name": "test213",
+//                 "slug": "test213",
+//                 "created_at": "2024-10-24T09:11:51.556Z",
+//                 "updated_at": "2024-10-24T09:11:51.556Z"
+//             }
+//         ],
+//         "categories": {
+//             "id": 1,
+//             "category_id": null,
+//             "name": "Nước uống",
+//             "slug": "nuoc-uong",
+//             "description": "Đồ uống giải khát",
+//             "short_description": "Đồ uống giải khát",
+//             "images": [],
+//             "deleted": false,
+//             "deleted_at": null,
+//             "deleted_by": null,
+//             "created_by": null,
+//             "updated_by": null,
+//             "created_at": "2024-10-24T08:11:33.736Z",
+//             "updated_at": "2024-10-24T08:11:33.736Z"
+//         }
+//     },
+//     {
+//         "id": 2,
+//         "category_id": 1,
+//         "title": "test2",
+//         "slug": "test2",
+//         "description": "description",
+//         "short_description": "short_description",
+//         "content": "content",
+//         "images": [
+//             "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018635/joiepalace/blogs/gophdvdsqjokdazb4cvk.jpg"
+//         ],
+//         "views": 1,
+//         "created_at": "2024-10-27T08:43:55.538Z",
+//         "updated_at": "2024-10-28T15:32:08.188Z",
+//         "tags": [
+//             {
+//                 "id": 1,
+//                 "name": "test1",
+//                 "slug": "test1",
+//                 "created_at": "2024-10-24T09:11:45.130Z",
+//                 "updated_at": "2024-10-24T09:11:45.130Z"
+//             },
+//             {
+//                 "id": 2,
+//                 "name": "test21",
+//                 "slug": "test21",
+//                 "created_at": "2024-10-24T09:11:49.692Z",
+//                 "updated_at": "2024-10-24T09:11:49.692Z"
+//             },
+//             {
+//                 "id": 3,
+//                 "name": "test213",
+//                 "slug": "test213",
+//                 "created_at": "2024-10-24T09:11:51.556Z",
+//                 "updated_at": "2024-10-24T09:11:51.556Z"
+//             }
+//         ],
+//         "categories": {
+//             "id": 1,
+//             "category_id": null,
+//             "name": "Nước uống",
+//             "slug": "nuoc-uong",
+//             "description": "Đồ uống giải khát",
+//             "short_description": "Đồ uống giải khát",
+//             "images": [],
+//             "deleted": false,
+//             "deleted_at": null,
+//             "deleted_by": null,
+//             "created_by": null,
+//             "updated_by": null,
+//             "created_at": "2024-10-24T08:11:33.736Z",
+//             "updated_at": "2024-10-24T08:11:33.736Z"
+//         }
+//     },
+//     {
+//         "id": 3,
+//         "category_id": 1,
+//         "title": "Đám Cưới Công Nghệ",
+//         "slug": "dam-cuoi-cong-nghe",
+//         "description": "Đám cưới công nghệ là xu hướng mới trong tổ chức lễ cưới, kết hợp giữa truyền thống và hiện đại.",
+//         "short_description": "Khám phá xu hướng đám cưới công nghệ.",
+//         "content": "Đám cưới công nghệ đang trở thành một xu hướng phổ biến trong những năm gần đây. Với sự phát triển của công nghệ, các cặp đôi có thể tổ chức lễ cưới của mình một cách độc đáo và sáng tạo hơn bao giờ hết. Từ việc sử dụng drone để quay phim, livestream lễ cưới đến việc tạo ra các trang web riêng cho đám cưới, công nghệ đã mang đến nhiều lựa chọn thú vị cho các cặp đôi. Ngoài ra, các ứng dụng di động cũng giúp khách mời dễ dàng theo dõi thông tin và tham gia vào các hoạt động trong ngày cưới.",
+//         "images": [
+//             "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018718/joiepalace/blogs/eqovyenkzz8q65vpmccs.png"
+//         ],
+//         "views": 7,
+//         "created_at": "2024-10-27T08:45:19.836Z",
+//         "updated_at": "2024-10-28T15:33:41.542Z",
+//         "tags": [
+//             {
+//                 "id": 1,
+//                 "name": "test1",
+//                 "slug": "test1",
+//                 "created_at": "2024-10-24T09:11:45.130Z",
+//                 "updated_at": "2024-10-24T09:11:45.130Z"
+//             }
+//         ],
+//         "categories": {
+//             "id": 1,
+//             "category_id": null,
+//             "name": "Nước uống",
+//             "slug": "nuoc-uong",
+//             "description": "Đồ uống giải khát",
+//             "short_description": "Đồ uống giải khát",
+//             "images": [],
+//             "deleted": false,
+//             "deleted_at": null,
+//             "deleted_by": null,
+//             "created_by": null,
+//             "updated_by": null,
+//             "created_at": "2024-10-24T08:11:33.736Z",
+//             "updated_at": "2024-10-24T08:11:33.736Z"
+//         }
+//     }
+// ]
 
 // const contentBanner = [
 //     {
@@ -183,10 +183,9 @@ const Blog = () => {
     const [parentDiv3, setparentDiv3] = useState([]);
 
     useEffect(() => {
-        const getBlog = async (slug) => {
-            // const BlogDataSlug = await fetchBlogDataById(slug);
-            const blogDataSlug = await data.filter(item => item.slug == slug);
-            setBlog(blogDataSlug[0]);
+        const getBlog = async (slug) => {            
+            const blogDataSlug = await fetchBlogDataBySlug(slug);
+            setBlog(blogDataSlug);
         };
         getBlog(slug);
     }, [slug]);

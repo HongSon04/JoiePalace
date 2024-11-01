@@ -53,7 +53,7 @@ const Page = () => {
 
       localStorage.setItem(
         "user",
-        JSON.stringify({ id: user.id, name: user.username, role: user.role })
+        JSON.stringify({ id: user.id, name: user.username, role: user.role, email: user.email})
       );
 
       toast({

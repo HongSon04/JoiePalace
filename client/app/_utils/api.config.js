@@ -1,5 +1,6 @@
 // HOST URL
 const HOST = `https://joieplace.live/api`;
+const MEMBERSHIPS = `https://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
@@ -70,21 +71,21 @@ export const API_CONFIG = {
   // DASHBOARD API
   DASHBOARD: {
     GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
-    GET_ALL_INFO_EACH_TIME:  (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_ALL_INFO_EACH_TIME: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
     GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH: `${DASHBOARD_API}/total-revenue-for-all-branch-each-month`,
-    GET_TOTAL_REVENUE_BRANCH_WEEK:  (id) =>  `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_MONTH:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_QUARTER:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_YEAR:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_WEEK: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_QUARTER: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_YEAR: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
     GET_ALL_BRANCH: `${HOST}/branches/get-all`,
     GET_ALL_BOOKING: `${HOST}/bookings/get-all`,
-    GET_INFO_BY_MONTH:  (id) => `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
+    GET_INFO_BY_MONTH: (id) => `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
     GET_BOOKING_STATUS: (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
     GET_BOOKING_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`, 
-    GET_BOOKING_STATUS: (id) =>`${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>`${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_BOOKING_STATUS: (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+
   },
 
   // PRODUCTS API
@@ -126,13 +127,28 @@ export const API_CONFIG = {
   BOOKINGS: {
     CREATE: `${BOOKING_API}/create`,
     GET_ALL: `${BOOKING_API}/get-all`,
+    GET_BY_ID: `${BOOKING_API}/get`,
+    GET_ALL_BY_IDUSER: (userId) => `${BOOKING_API}/get-all?user_id=${userId}`,
   },
 
   // BLOG TYPES API
   BLOGS: {
     // CREATE: `${BLOGS_API}/create`,
     GET_ALL: `${BLOGS_API}/get-all`,
-    GET_BY_ID: (id) => `${BLOGS_API}/get/${id}`,
+    GET_BY_SLUG: (slug) => `${BLOGS_API}/get-by-slug/${slug}`,
+  },
+
+  //MEMBERSHIPS
+  MEMBERSHIPS: {
+    CREATE: `${MEMBERSHIPS}/create`,
+    GET_ALL: `${MEMBERSHIPS}/get-all`,
+    GET_ALL_DELETED: `${MEMBERSHIPS}/get-all-deleted`,
+    GET_BY_ID: (membershipId) => `${MEMBERSHIPS}/get/${membershipId}`,
+    GET_BY_SLUG: (membershipSlug) => `${MEMBERSHIPS}/get-by-slug/${membershipSlug}`,
+    UPDATE: (membershipId) => `${MEMBERSHIPS}/update/${membershipId}`,
+    DELETE: (membershipId) => `${MEMBERSHIPS}/delete/${membershipId}`,
+    RESTORE: (membershipId) => `${MEMBERSHIPS}/restore/${membershipId}`,
+    HARD_DELETE: (membershipId) => `${MEMBERSHIPS}/hard-delete/${membershipId}`
   },
 
   // NOTIFICATIONS API
