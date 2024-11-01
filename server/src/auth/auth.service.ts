@@ -18,6 +18,8 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import uniqid from 'uniqid';
 import { MailService } from 'src/mail/mail.service';
 import { Cron } from '@nestjs/schedule';
+import { CreateUserSocialDto } from './dto/create-user-social.dto';
+import { LoginUserSocialDto } from './dto/login-user-social.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -27,6 +29,7 @@ export class AuthService {
     private cloudinaryService: CloudinaryService,
     private mailService: MailService,
   ) {}
+
   // ! Register
   async register(createUserDto: CreateAuthUserDto) {
     try {
@@ -90,12 +93,75 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> register', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
+
+  // ! Register Social User
+  async registerSocialUser(createUserSocialDto: CreateUserSocialDto) {
+    try {
+      const { email, name, avatar, platform, password, confirm_password } =
+        createUserSocialDto;
+
+      // ? Check email exist
+      const findEmail = await this.prismaService.users.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (findEmail) {
+        throw new BadRequestException('Email đã tồn tại');
+      }
+
+      // ? Check password
+      if (password !== confirm_password) {
+        throw new BadRequestException('Mật khẩu không khớp');
+      }
+
+      // ? hashed password
+      const hashedPassword = this.hashedPassword(password);
+
+      // ? Create user
+      const user = await this.prismaService.users.create({
+        data: {
+          username: name,
+          email,
+          password: hashedPassword,
+          avatar,
+          platform,
+        },
+        include: {
+          memberships: true,
+        },
+      });
+
+      // ? Generate token
+      const token = await this.generateToken(user);
+
+      // ? Return token
+      throw new HttpException(
+        {
+          message: 'Đăng ký thành công',
+          data: token,
+        },
+        HttpStatus.CREATED,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ auth.service.ts -> registerSocialUser', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
+    }
+  }
+
   // ! Login
   async login(loginUserDto: LoginUserDto) {
     try {
@@ -137,10 +203,53 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> login', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
+    }
+  }
+
+  // ! Login Social
+  async loginSocial(loginUserSocial: LoginUserSocialDto) {
+    try {
+      const { email, platform } = loginUserSocial;
+
+      // ? Check email exist
+      const user = await this.prismaService.users.findFirst({
+        where: {
+          email,
+          platform,
+        },
+        include: {
+          memberships: true,
+        },
+      });
+
+      if (!user) {
+        throw new BadRequestException('Tài khoản không tồn tại');
+      }
+
+      // ? Generate token
+      const token = await this.generateToken(user);
+
+      // ? Return token
+      throw new HttpException(
+        {
+          message: 'Đăng nhập thành công',
+          data: token,
+        },
+        HttpStatus.OK,
       );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ auth.service.ts -> loginSocial', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -169,10 +278,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> logout', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -204,10 +313,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> changeAvatar', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -345,10 +454,10 @@ export class AuthService {
         throw error;
       }
       console.log('Lỗi từ auth.service.ts -> verifyEmail', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -382,7 +491,7 @@ export class AuthService {
   async generateToken(user: UserEntity) {
     const payload = {
       id: Number(user.id),
-      branch_id: user.branch_id,
+      branch_id: Number(user.branch_id),
       username: user.username,
       email: user.email,
       role: user.role,

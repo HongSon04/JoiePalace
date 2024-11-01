@@ -51,10 +51,10 @@ export class SubscribersService {
         throw error;
       }
       console.log('Lỗi từ subscribers.service.ts -> create', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -95,7 +95,7 @@ export class SubscribersService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.subscribers.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -128,10 +128,10 @@ export class SubscribersService {
         throw error;
       }
       console.log('Lỗi từ subscribers.service.ts -> findAll', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -173,10 +173,10 @@ export class SubscribersService {
         throw error;
       }
       console.log('Lỗi từ subscribers.service.ts -> update', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 }

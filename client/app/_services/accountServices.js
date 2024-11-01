@@ -10,6 +10,7 @@ export const fetchUserProfile = async () => {
 
   return response.data.data;
 };
+
 export const createAccountUser = async (dataToSend) => {
   const response = await axios.post(API_CONFIG.AUTH.REGISTER, dataToSend);
 
@@ -26,6 +27,6 @@ export const loginAccountUser = async (dataToSend) => {
     throw new Error("Có lỗi khi đăng nhập");
   }
 
-  return response.data.data;
+  return response;
 };
 

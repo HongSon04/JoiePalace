@@ -1,14 +1,12 @@
 import { memo } from "react";
 
 const ButtonDiscover = ({ name, className, ...props }) => {
-  console.log(props);
-  
   return (
     <button
       className={`bg-gold flex justify-center items-center gap-1 py-2 rounded-3xl cursor-pointer ${className}`}
       {...props}
     >
-      <span className="text-[1em]">{name ? name : "Khám phá"}</span>
+      <span className="text-[1em] flex items-center h-6">{name ? name : "Khám phá"}</span>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

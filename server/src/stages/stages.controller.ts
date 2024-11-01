@@ -73,6 +73,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Tạo sảnh mới' })
@@ -99,9 +100,9 @@ export class StagesController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }
@@ -156,6 +157,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả sảnh theo chi nhánh' })
@@ -192,6 +194,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiParam({ name: 'stage_id', required: true })
@@ -268,9 +271,9 @@ export class StagesController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }
@@ -313,6 +316,7 @@ export class StagesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa sảnh vĩnh viễn' })

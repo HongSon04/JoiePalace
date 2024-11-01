@@ -8,7 +8,7 @@ export class CreateNotificationDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Khách hàng không được để trống' })
-  user_id: number;
+  user_id: string;
 
   @ApiProperty({
     description: 'Loại thông báo, không được để trống',

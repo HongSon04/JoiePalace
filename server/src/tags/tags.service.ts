@@ -49,10 +49,10 @@ export class TagsService {
         throw error;
       }
       console.log('Lỗi từ tag.service.ts -> create: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -76,7 +76,7 @@ export class TagsService {
       const [res, total] = await this.prismaService.$transaction([
         this.prismaService.tags.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
         }),
         this.prismaService.tags.count({
@@ -107,10 +107,10 @@ export class TagsService {
         throw error;
       }
       console.log('Lỗi từ tag.service.ts -> findAll: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -134,10 +134,10 @@ export class TagsService {
         throw error;
       }
       console.log('Lỗi từ tag.service.ts -> findOne: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -161,10 +161,10 @@ export class TagsService {
         throw error;
       }
       console.log('Lỗi từ tag.service.ts -> findBySlug: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -201,10 +201,10 @@ export class TagsService {
         throw error;
       }
       console.log('Lỗi từ tag.service.ts -> update: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -226,10 +226,10 @@ export class TagsService {
         throw error;
       }
       console.log('Lỗi từ tag.service.ts -> remove: ', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 }

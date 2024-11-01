@@ -11,7 +11,7 @@ import { FaPlus } from "react-icons/fa6";
 import "../../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
-import {fetchInfoByMonth,fetchAllEachTime,fetchAllBooking } from "@/app/_services/apiServices";
+import {fetchInfoByMonth,fetchAllEachTime,fetchAllBooking, fetchRevenueBranchByMonth } from "@/app/_services/apiServices";
 import Link from 'next/link';
 import { fetchBranchBySlug, fetchBranchTotalRevenueMonth } from '@/app/_services/branchesServices';
 
@@ -36,7 +36,7 @@ const Page = ({params}) => {
         const dataAllEachTime = await fetchAllEachTime(branchId);
         const dataTotalByMonth = await fetchRevenueBranchByMonth(branchId);
         const dataRevenueEachMonth = await fetchBranchTotalRevenueMonth(branchId);
-        console.log(dataTotalByMonth);
+        console.log(dataRevenueEachMonth);
         
         const allBooking = await fetchAllBooking();
         const dataInfo = await fetchInfoByMonth(branchId);

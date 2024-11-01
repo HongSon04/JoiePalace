@@ -61,13 +61,13 @@ export class PackagesService {
       if (!findDecor) {
         throw new NotFoundException('ID Trang trí không tồn tại');
       }
-      checkPrice += findDecor.price;
+      checkPrice += Number(findDecor.price);
 
       // ? Check menu_id
       const findMenu = await this.prismaService.menus.findUnique({
         where: { id: Number(menu_id) },
       });
-      checkPrice += findMenu.price;
+      checkPrice += Number(findMenu.price);
 
       if (!findMenu) {
         throw new NotFoundException('ID Menu không tồn tại');
@@ -81,7 +81,7 @@ export class PackagesService {
       if (!findPartyType) {
         throw new NotFoundException('ID Loại tiệc không tồn tại');
       }
-      checkPrice += findPartyType.price;
+      checkPrice += Number(findPartyType.price);
 
       // ? Check Extra Service
       extra_service.forEach(async (service) => {
@@ -333,13 +333,13 @@ export class PackagesService {
       if (!findDecor) {
         throw new NotFoundException('ID Trang trí không tồn tại');
       }
-      checkPrice += findDecor.price;
+      checkPrice += Number(findDecor.price);
 
       // ? Check menu_id
       const findMenu = await this.prismaService.menus.findUnique({
         where: { id: Number(menu_id) },
       });
-      checkPrice += findMenu.price;
+      checkPrice += Number(findMenu.price);
 
       if (!findMenu) {
         throw new NotFoundException('ID Menu không tồn tại');
@@ -353,7 +353,7 @@ export class PackagesService {
       if (!findPartyType) {
         throw new NotFoundException('ID Loại tiệc không tồn tại');
       }
-      checkPrice += findPartyType.price;
+      checkPrice += Number(findPartyType.price);
 
       // ? Check Extra Service
       extra_service.forEach(async (service) => {
@@ -474,6 +474,12 @@ export class PackagesService {
         throw new NotFoundException('Gói không tồn tại');
       }
 
+      if (!findPackage.deleted) {
+        throw new BadRequestException(
+          'Gói không bị xóa tạm thời, không thể khôi phục!',
+        );
+      }
+
       await this.prismaService.packages.update({
         where: { id: Number(id) },
         data: {
@@ -510,6 +516,12 @@ export class PackagesService {
 
       if (!findPackage) {
         throw new NotFoundException('Gói không tồn tại');
+      }
+
+      if (!findPackage.deleted) {
+        throw new BadRequestException(
+          'Gói không bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       await this.prismaService.packages.delete({

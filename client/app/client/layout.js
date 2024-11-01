@@ -1,6 +1,7 @@
 import { Col, Row } from "antd";
 import 'fullpage.js/dist/fullpage.css';
 import HeaderClient from "../_components/HeaderClient";
+import { SessionProvider } from "next-auth/react";
 
 
 function layout({ children }) {

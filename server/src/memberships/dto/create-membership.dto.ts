@@ -24,7 +24,8 @@ export class CreateMembershipDto {
 
   @ApiProperty({
     description: 'Danh sách các ID quà tặng liên quan đến hạng thành viên',
-    required: false,
+    required: true,
+    example: [1, 2, 3],
   })
   gifts: number[];
 

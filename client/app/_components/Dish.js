@@ -3,15 +3,20 @@
 import { useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { useDispatch } from "react-redux";
 import { setSelectedDish } from "../_lib/features/dishes/dishesSlice";
 import { formatPrice } from "../_utils/formaters";
 import DishDetailModal from "../admin/mon-an/DishDetailModal";
 import DishDetailSkeleton from "../admin/mon-an/DishDetailSkeleton";
+import { CONFIG } from "../_utils/config";
 
 function Dish(props) {
   const { dish, className, mode, navigate = true, onClick } = props;
+
+  const [image, setImage] = React.useState(
+    dish.images[0] || CONFIG.DISH_IMAGE_PLACEHOLDER
+  );
 
   const { onOpen, isOpen, onClose, onOpenChange } = useDisclosure();
 
@@ -23,9 +28,11 @@ function Dish(props) {
     onOpen();
   };
 
+  const href = navigate ? props.link || `/admin/mon-an?id=${dish.id}` : "#";
+
   return (
     <>
-      <Link href={navigate ? props.link || `/admin/mon-an?id=${dish.id}` : "#"}>
+      <Link href={href}>
         <div
           className={`${
             mode === "dark" ? "bg-zinc-100" : "bg-whiteAlpha-100"
@@ -36,10 +43,11 @@ function Dish(props) {
             <Image
               sizes="80px"
               priority
-              src={dish.image}
+              src={image}
               alt={dish.name}
               fill
               className="rounded-full w-fit object-cover shrink-0"
+              onError={() => setImage(CONFIG.DISH_IMAGE_PLACEHOLDER)}
             />
           </div>
           <h3
@@ -55,7 +63,7 @@ function Dish(props) {
         </div>
       </Link>
 
-      {isOpen && (
+      {/* {isOpen && (
         <Suspense fallback={<DishDetailSkeleton />}>
           <DishDetailModal
             isOpen={isOpen}
@@ -64,7 +72,7 @@ function Dish(props) {
             onOpenChange={onOpenChange}
           />
         </Suspense>
-      )}
+      )} */}
     </>
   );
 }

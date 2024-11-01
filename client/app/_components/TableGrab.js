@@ -4,33 +4,15 @@ import Link from 'next/link';
 import React, { useRef, useState } from 'react';
 import CustomPagination from './CustomPagination';
 
-const TableGrab = () => {
-    const requests = [
-        {
-            id: 1,
-            eventCode: '#12DKAF',
-            eventType: 'Tiệc cưới',
-            host: 'Nguyễn Văn A',
-            bookingDate: '22/12/2024',
-            totalValue: '200.000.000 VND',
-            deposit: '60.000.000 VND',
-            depositDate: '24/12/2024',
-            remaining: '140.000.000 VND',
-            eventDate: '1/1/2025',
-            eventTime: '18:00',
-            paymentDate: '1/1/2025',
-            paymentStatus: 'Đã đặt cọc',
-            expectedGuests: '300',
-            tables: '300 + 2',
-            branch: 'Phạm Văn Đồng',
-            hall: 'Hall A'
-        }
-    ];
-
+const TableGrab = ({ data, pathLink, onStatusChange }) => {
     const overflowContainer = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [scrollLeft, setScrollLeft] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
+    const [selectedItems, setSelectedItems] = useState({});
+    const itemsPerPage = 10;
 
     const handleMouseDown = (e) => {
         setIsDragging(true);
@@ -50,49 +32,127 @@ const TableGrab = () => {
         setIsDragging(false);
     };
 
+    const formatDate = (isoString) => {
+        if (!isoString) return '';
+        const date = new Date(isoString);
+        return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+    };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+    const handleSelectAllChange = () => {
+        setIsSelectAllChecked(!isSelectAllChecked);
+        const newSelectedItems = {};
+        if (!isSelectAllChecked) {
+            data.forEach((item) => {
+                newSelectedItems[item.id] = true;
+            });
+        }
+        setSelectedItems(newSelectedItems);
+    };
+
+    const handleItemCheckboxChange = (itemId) => {
+        setSelectedItems((prevSelectedItems) => ({
+            ...prevSelectedItems,
+            [itemId]: !prevSelectedItems[itemId],
+        }));
+    };
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentData = data ? data.slice(startIndex, startIndex + itemsPerPage) : [];
+
+    const handleStatusChange = (itemId, event) => {
+        const newStatus = parseInt(event.target.value);
+        onStatusChange(itemId, newStatus); 
+    };
+
     return (
-        <div className="">
+        <div>
             <div
                 ref={overflowContainer}
-                className="!overflow-x-auto mt-6"
+                className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6"
                 onMouseDown={handleMouseDown}
                 onMouseLeave={handleMouseLeaveOrUp}
                 onMouseUp={handleMouseLeaveOrUp}
                 onMouseMove={handleMouseMove}
             >
-                <table className="text-sm text-left table table-auto  !overflow-x-scroll">
+                <table className="min-w-full text-sm text-left table table-auto">
                     <thead>
                         <tr>
-                            {['Mã tiệc', 'Loại tiệc', 'Chủ tiệc', 'Ngày đặt', 'Tổng giá trị', 'Tiền cọc', 'Ngày đặt cọc', 'Còn lại phải thanh toán', 'Ngày tổ chức', 'Giờ tổ chức', 'Ngày thanh toán', 'Tình trạng thanh toán', 'Số lượng khách dự kiến', 'Số bàn', 'Chi nhánh', 'Sảnh', ''].map((header) => (
-                                <th key={header}>
+                            <th className='!px-8 !py-6 whitespace-nowrap'>
+                                <div className='flex justify-center items-center h-full'>
+                                    <input 
+                                        type="checkbox" 
+                                        className='w-4 h-4' 
+                                        checked={isSelectAllChecked} 
+                                        onChange={handleSelectAllChange}
+                                    />
+                                </div>
+                            </th>
+                            {['Mã tiệc', 'Chủ tiệc', 'Tên tiệc', 'Ngày đặt', 'Tổng giá trị', 'Tiền cọc', 'Ngày đặt cọc', 'Còn lại phải thanh toán', 'Ngày tổ chức', 'Giờ tổ chức', 'Ngày thanh toán', 'Tình trạng thanh toán', 'Số lượng khách dự kiến', 'Số lượng bàn (chính thức + dự phòng)', 'Chi nhánh',].map((header) => (
+                                <th key={header} className="!px-8 !py-6  whitespace-nowrap">
                                     {header}
                                 </th>
                             ))}
+                            <th className="!px-8 !py-6 w-fit">Chi tiết</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {requests.map((item) => (
-                            <tr key={item.id}>
-                                <td>{item.eventCode}</td>
-                                <td>{item.eventType}</td>
-                                <td>{item.host}</td>
-                                <td>{item.bookingDate}</td>
-                                <td>{item.totalValue}</td>
-                                <td>{item.deposit}</td>
-                                <td>{item.depositDate}</td>
-                                <td>{item.remaining}</td>
-                                <td>{item.eventDate}</td>
-                                <td>{item.eventTime}</td>
-                                <td>{item.paymentDate}</td>
-                                <td>{item.paymentStatus}</td>
-                                <td>{item.expectedGuests}</td>
-                                <td>{item.tables}</td>
-                                <td>{item.branch}</td>
-                                <td>{item.hall}</td>
-                                <td className="w-fit">
-                                    <Link href="#" className="text-cyan-500 hover:text-cyan-700 font-bold">
-                                        Chi tiết
-                                    </Link>
+                        {currentData.map((item) => (
+                            <tr key={item.id} className="">
+                                <td className="!px-8 !py-6 whitespace-nowrap">
+                                    <input 
+                                        type="checkbox" 
+                                        className='w-4 h-4' 
+                                        checked={selectedItems[item.id] || false} 
+                                        onChange={() => handleItemCheckboxChange(item.id)}
+                                    />
+                                </td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">
+                                    <Link href={`/admin/quan-ly-tiec/${pathLink}/${item.id}`}>#{item.id}</Link>
+                                </td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">{item?.users?.username}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">{item.name}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">{formatDate(item.created_at)}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">
+                                    {item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0).toLocaleString('vi-VN')} VNĐ
+                                </td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">
+                                    {item.booking_details?.map((detail, index) => (
+                                        <span key={index}>
+                                            {detail.deposits?.amount ? `${detail.deposits.amount.toLocaleString('vi-VN')} VNĐ` : "Chưa có tiền cọc"}
+                                        </span>
+                                    ))}
+                                </td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">
+                                    {item.booking_details?.[0]?.deposits?.created_at ? formatDate(item.booking_details[0].deposits.created_at) : "Chưa có ngày đặt"}
+                                </td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">
+                                    {item.booking_details?.[0] ? (item.booking_details[0].total_amount - (item.booking_details[0].deposits?.amount || 0)).toLocaleString('vi-VN') : '0'} VNĐ
+                                </td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">{formatDate(item.organization_date)}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">{item.shift}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">{item.paymentDate || "Chưa thanh toán"}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap text-center">
+                                    <select
+                                        value={item.paymentStatus || "Chưa thanh toán"}
+                                       onChange={(e) => handleStatusChange(item.id, e)}
+                                        className="bg-gray-100 border border-gray-300 rounded px-2 py-1"
+                                    >
+                                        <option value="Chưa thanh toán">Chưa thanh toán</option>
+                                        <option value="Đã thanh toán">Đã thanh toán</option>
+                                        <option value="Quá hạn">Quá hạn</option>
+                                    </select>
+                                </td>
+                                <td className="!px-8 !py-6 whitespace-nowrap text-center">{item.number_of_guests}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap text-center">{item.booking_details.map((item, index) => (
+                                    <span key={index}>{item.table_count} +{item.chair_count}</span>
+                                ))}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap text-center">{item.branches.name}</td>
+                                <td className="!px-8 !py-6 whitespace-nowrap">
+                                    <Link href={`${item.id}`} className="text-cyan-500 hover:text-cyan-700 font-bold">Chi tiết</Link>
                                 </td>
                             </tr>
                         ))}
@@ -100,10 +160,15 @@ const TableGrab = () => {
                 </table>
             </div>
             <div className="mt-4">
-                <CustomPagination total={requests.length} />
+                <CustomPagination 
+                    total={data ? data.length : 0} 
+                    onPageChange={handlePageChange} 
+                    itemsPerPage={itemsPerPage}
+                />
             </div>
         </div>
     );
 };
 
 export default TableGrab;
+    

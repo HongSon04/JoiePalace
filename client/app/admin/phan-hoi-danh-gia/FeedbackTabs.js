@@ -2,13 +2,23 @@
 
 import CustomPagination from "@/app/_components/CustomPagination";
 import useApiServices from "@/app/_hooks/useApiServices";
+import useRoleGuard from "@/app/_hooks/useRoleGuard";
 import {
+  approvingFeedbackFailure,
+  approvingFeedbackRequest,
+  approvingFeedbackSuccess,
   fetchFeedbacksFailure,
   fetchFeedbacksRequest,
   fetchFeedbacksSuccess,
+  hidingFeedbackFailure,
+  hidingFeedbackRequest,
+  hidingFeedbackSuccess,
+  updatingFeedbackFailure,
+  updatingFeedbackRequest,
+  updatingFeedbackSuccess,
 } from "@/app/_lib/features/feedbacks/feedbacksSlice";
 import { API_CONFIG } from "@/app/_utils/api.config";
-import { formatDateTime } from "@/app/_utils/formaters";
+import { formatDateTime, formatFullDateTime } from "@/app/_utils/formaters";
 import { capitalize } from "@/app/_utils/helpers";
 import {
   Tab,
@@ -40,8 +50,19 @@ import { Col, Row } from "antd";
 import { format } from "date-fns";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Loading from "../loading";
+import { useParams } from "next/navigation";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import CanNotAccess from "@/app/_components/CanNotAccess";
+import useBranchAccess from "@/app/_hooks/useBranchGuard";
+import Error from "@/app/_components/Error";
 
 function FeedbackTabs() {
+  const { branchSlug } = useParams();
+  const { canAccess, retryUrl } = useBranchAccess(branchSlug);
+
+  const { isLoading } = useRoleGuard();
+
   const [selectedFeedback, setSelectedFeedback] = React.useState({
     id: 0,
     name: "",
@@ -53,18 +74,15 @@ function FeedbackTabs() {
   });
 
   const [date, setDate] = React.useState({
-    start: parseDate(format(new Date().toDateString(), "yyyy-MM-dd")),
+    start: parseDate(
+      format(new Date(new Date().getFullYear(), 0, 1), "yyyy-MM-dd")
+    ),
     end: parseDate(
-      format(
-        new Date(new Date().setDate(new Date().getDate() + 7)),
-        "yyyy-MM-dd"
-      )
+      format(new Date(new Date().getFullYear(), 11, 31), "yyyy-MM-dd")
     ),
   });
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-  const status = ["received", "approved"];
 
   // const feedbacks = [
   //   {
@@ -182,18 +200,32 @@ function FeedbackTabs() {
 
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
-  const { feedbacks, categories } = useSelector((state) => state.feedbacks);
+  const {
+    feedbacks,
+    categories,
+    isLoading: isFetchingFeedback,
+    isError: isFetchingFeedbackError,
+    isApproving,
+    isHiding,
+    error,
+  } = useSelector((store) => store.feedbacks);
+
+  const filteredFeedbacks = feedbacks.filter(
+    (f) => f.created_at >= date.start && f.created_at <= date.end
+  );
+
+  const { currentBranch } = useSelector((store) => store.branch);
+
+  // LATER: check if branch slug equal to general branch, then change the api url
+  const endpoint =
+    branchSlug === API_CONFIG.GENERAL_BRANCH
+      ? API_CONFIG.FEEDBACKS.GET_ALL_SHOW
+      : API_CONFIG.FEEDBACKS.GET_BY_BRANCH(currentBranch.id);
 
   const getFeedbacks = async () => {
     dispatch(fetchFeedbacksRequest());
 
-    const data = await makeAuthorizedRequest(
-      API_CONFIG.FEEDBACKS.GET_ALL_SHOW,
-      "GET",
-      null
-    );
-
-    console.log(data);
+    const data = await makeAuthorizedRequest(endpoint, "GET", null);
 
     if (data.success) {
       dispatch(fetchFeedbacksSuccess(data.data));
@@ -202,18 +234,166 @@ function FeedbackTabs() {
     dispatch(fetchFeedbacksFailure());
   };
 
+  const getRate = (rate) => {
+    if (rate < 10) {
+      return "Rất hài lòng";
+    } else if (rate < 8) {
+      return "Hài lòng";
+    } else if (rate < 6) {
+      return "Bình thường";
+    } else if (rate < 4) {
+      return "Không hài lòng";
+    } else if (rata < 2) {
+      return "Rất không hài lòng";
+    }
+  };
+
   React.useEffect(() => {
     getFeedbacks();
   }, []);
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const perPage = 5; // Number of items per page
+
+  // Calculate the index of the last feedback on the current page
+  const indexOfLastFeedback = currentPage * perPage;
+  // Calculate the index of the first feedback on the current page
+  const indexOfFirstFeedback = indexOfLastFeedback - perPage;
+  // Get the current feedbacks to display
+  const currentFeedbacks = filteredFeedbacks.slice(
+    indexOfFirstFeedback,
+    indexOfLastFeedback
+  );
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const toast = useCustomToast();
+
+  const handleApprove = async (feedback) => {
+    dispatch(approvingFeedbackRequest());
+
+    const data = await makeAuthorizedRequest(
+      API_CONFIG.FEEDBACKS.UPDATE(feedback.id),
+      "PATCH",
+      {
+        branch_id: feedback.branch_id,
+        booking_id: feedback.booking_id,
+        user_id: feedback.bookings.user_id,
+        name: feedback.name,
+        rate: feedback.rate,
+        comments: feedback.comments,
+        is_show: feedback.is_show,
+        is_approved: true,
+      }
+    );
+
+    if (data.success) {
+      dispatch(approvingFeedbackSuccess(data.data));
+
+      toast({
+        title: "Duyệt phản hồi thành công",
+        description: "Phản hồi đã được duyệt. Đang lấy dữ liệu mới",
+      });
+
+      dispatch(fetchFeedbacksRequest());
+
+      const data = await getFeedbacks();
+
+      if (!data) return;
+
+      if (data.success) {
+        dispatch(fetchFeedbacksSuccess(data.data));
+
+        toast({
+          title: "Lấy dữ liệu mới thành công",
+        });
+        dispatch(approvingFeedbackSuccess(data.data));
+      }
+
+      dispatch(fetchFeedbacksFailure());
+      toast({
+        title: "Lấy dữ liệu mới không thành công",
+        description: "Vui lòng thử lại sau",
+      });
+    }
+
+    dispatch(approvingFeedbackFailure());
+    toast({
+      title: "Duyệt phản hồi không thành công",
+      description: "Vui lòng thử lại sau",
+      type: "error",
+    });
+  };
+
+  const handleHide = async (feedback) => {
+    dispatch(hidingFeedbackRequest());
+
+    const data = await makeAuthorizedRequest(
+      API_CONFIG.FEEDBACKS.UPDATE(feedback.id),
+      "PATCH",
+      {
+        branch_id: feedback.branch_id,
+        booking_id: feedback.booking_id,
+        user_id: feedback.bookings.user_id,
+        name: feedback.name,
+        rate: feedback.rate,
+        comments: feedback.comments,
+        is_show: false,
+        is_approved: feedback.is_approved,
+      }
+    );
+
+    if (data.success) {
+      dispatch(hidingFeedbackSuccess(data.data));
+
+      toast({
+        title: "Ẩn phản hồi thành công",
+        description: "Phản hồi đã được ẩn. Đang lấy dữ liệu mới",
+      });
+
+      dispatch(fetchFeedbacksRequest());
+      const data = await getFeedbacks();
+
+      if (!data) return;
+
+      if (data.success) {
+        toast({
+          title: "Lấy dữ liệu mới thành công",
+        });
+        dispatch(fetchFeedbacksSuccess(data.data));
+      }
+
+      dispatch(fetchFeedbacksFailure());
+      toast({
+        title: "Lấy dữ liệu mới không thành công",
+        description: "Vui lòng thử lại sau",
+      });
+    }
+
+    dispatch(hidingFeedbackFailure());
+    toast({
+      title: "Ẩn phản hồi không thành công",
+      description: "Vui lòng thử lại sau",
+      type: "error",
+    });
+  };
+
   return (
     <>
+      {/*  LOADING */}
+      {isLoading && <Loading />}
+      {/*  CAN NOT ACCESS */}
+      {!canAccess && <CanNotAccess retryUrl={retryUrl} />}
+      {error && <Error error={error} />}
       {/*  TABS */}
       <Tabs className="mt-8" variant={"unstyled"}>
         <TabList width={"fit-content"} className="!w-full flex">
-          {categories.map((c) => (
+          {categories.map((c, i) => (
             <Tab
-              key={c.key}
+              key={i}
               color={"white"}
               className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
             >
@@ -250,56 +430,65 @@ function FeedbackTabs() {
         </TabList>
         <TabIndicator mt="1.5px" height="2px" bg="white" borderRadius="2px" />
         <TabPanels>
-          {status.map((item, index) => (
-            <TabPanel className="mt-3 rounded-md" key={index}>
-              {/* HEADER */}
-              <Row className="mb-3">
-                <Col className="font-semibold text-base text-white" span={12}>
-                  Đánh giá
-                </Col>
-                <Col className="font-semibold text-base text-white" span={3}>
-                  Tiệc
-                </Col>
-                <Col className="font-semibold text-base text-white" span={3}>
-                  Độ hài lòng
-                </Col>
-                <Col className="font-semibold text-base text-white" span={3}>
-                  Chi tiết
-                </Col>
-                <Col className="font-semibold text-base text-white" span={3}>
-                  Hành động
-                </Col>
-              </Row>
-              {feedbacks
-                .filter((f) => f.status === item)
-                .map((feedback) => (
-                  <Row
-                    key={feedback.id}
-                    className={`p-2 rounded-md text-white hover:bg-whiteAlpha-200 mb-2 border-top-whiteAlpha-100`}
-                  >
-                    <Col span={12}>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="shrink-0" />
-                        <div className="w-full">
-                          <div className="flex items-center gap-3 w-full">
-                            <h2 className="text-md leading-6 font-semibold">
-                              {feedback.name}
-                            </h2>
-                            <span className="text-xs leading-4 font-normal text-gray-400">
-                              {formatDateTime(feedback.dateTime)}
-                            </span>
+          {categories.map((item, index) => {
+            // Filter feedbacks based on the current category's isApproved and isShow properties
+            const filteredFeedbacks = currentFeedbacks.filter(
+              (f) =>
+                f.is_approved === item.isApproved && f.is_show === item.isShow
+            );
+
+            return (
+              <TabPanel className="mt-3 rounded-md" key={index}>
+                {/* HEADER */}
+                <Row className="mb-3">
+                  <Col className="font-semibold text-base text-white" span={12}>
+                    Đánh giá
+                  </Col>
+                  <Col className="font-semibold text-base text-white" span={3}>
+                    Tiệc
+                  </Col>
+                  <Col className="font-semibold text-base text-white" span={3}>
+                    Độ hài lòng
+                  </Col>
+                  <Col className="font-semibold text-base text-white" span={3}>
+                    Chi tiết
+                  </Col>
+                  <Col className="font-semibold text-base text-white" span={3}>
+                    Hành động
+                  </Col>
+                </Row>
+                {filteredFeedbacks.length > 0 ? (
+                  filteredFeedbacks.map((feedback) => (
+                    <Row
+                      key={feedback.id}
+                      className={`p-2 rounded-md text-white hover:bg-whiteAlpha-200 mb-2 border-top-whiteAlpha-100`}
+                    >
+                      <Col span={12}>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="shrink-0" />
+                          <div className="w-full">
+                            <div className="flex items-center gap-3 w-full">
+                              <h2 className="text-md leading-6 font-semibold">
+                                {feedback.name}
+                              </h2>
+                              <span className="text-xs leading-4 font-normal text-gray-400">
+                                {`${
+                                  formatFullDateTime(feedback.created_at).time
+                                } ${
+                                  formatFullDateTime(feedback.created_at).date
+                                }`}
+                              </span>
+                            </div>
+                            <p className="text-md leading-6 truncate max-w-[90%]">
+                              {feedback.comments}
+                            </p>
                           </div>
-                          <p className="text-md leading-6 truncate max-w-[90%]">
-                            {feedback.feedback}
-                          </p>
                         </div>
-                      </div>
-                    </Col>
-                    <Col span={3} className="flex items-center">
-                      {feedback.bookingId}
-                    </Col>
-                    <Col span={3} className="flex items-center">
-                      {feedback.satisLevel === "normal" && (
+                      </Col>
+                      <Col span={3} className="flex items-center">
+                        {feedback.bookings.name}
+                      </Col>
+                      <Col span={3} className="flex items-center">
                         <Chip
                           color="default"
                           variant="flat"
@@ -307,84 +496,62 @@ function FeedbackTabs() {
                             content: "text-white",
                           }}
                         >
-                          {capitalize(feedback.satisLevel)}
+                          {capitalize(getRate(feedback.rate))}
                         </Chip>
-                      )}
-
-                      {feedback.satisLevel === "good" && (
-                        <Chip
-                          variant="flat"
-                          classNames={{
-                            base: "bg-primary/30",
-                            content: "text-primary",
+                      </Col>
+                      <Col span={3} className="flex items-center">
+                        <Button
+                          size="sm"
+                          className={"bg-whiteAlpha-100 text-white font-bold"}
+                          onPress={() => {
+                            setSelectedFeedback(feedback);
+                            onOpen();
                           }}
                         >
-                          {capitalize(feedback.satisLevel)}
-                        </Chip>
-                      )}
-
-                      {feedback.satisLevel === "great" && (
-                        <Chip color="success" variant="flat">
-                          {capitalize(feedback.satisLevel)}
-                        </Chip>
-                      )}
-
-                      {feedback.satisLevel === "bad" && (
-                        <Chip color="danger" variant="flat">
-                          {capitalize(feedback.satisLevel)}
-                        </Chip>
-                      )}
-                    </Col>
-                    <Col span={3} className="flex items-center">
-                      <Button
-                        size="sm"
-                        className={"bg-whiteAlpha-100 text-white font-bold"}
-                        onPress={() => {
-                          setSelectedFeedback(feedback);
-                          onOpen();
-                        }}
-                      >
-                        Xem
-                      </Button>
-                    </Col>
-                    <Col span={3} className="flex items-center">
-                      <Dropdown variant="flat">
-                        <DropdownTrigger>
-                          <Button
-                            size="sm"
-                            className={"bg-whiteAlpha-100 text-white font-bold"}
-                            isIconOnly
-                          >
-                            <EllipsisHorizontalIcon className="w-5 h-5" />
-                          </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Static Actions">
-                          <DropdownItem variant="flat" key="approve">
-                            Duyệt
-                          </DropdownItem>
-                          <DropdownItem variant="flat" key="hide">
-                            Ẩn
-                          </DropdownItem>
-                          <DropdownItem variant="flat" key="edit">
-                            Chỉnh sửa
-                          </DropdownItem>
-                          <DropdownItem
-                            key="delete"
-                            className="text-danger"
-                            color="danger"
-                            variant="flat"
-                          >
-                            Delete
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </Dropdown>
-                    </Col>
-                  </Row>
-                ))}
-            </TabPanel>
-          ))}
+                          Xem
+                        </Button>
+                      </Col>
+                      <Col span={3} className="flex items-center">
+                        <Dropdown variant="flat">
+                          <DropdownTrigger>
+                            <Button
+                              size="sm"
+                              className={
+                                "bg-whiteAlpha-100 text-white font-bold"
+                              }
+                              isIconOnly
+                            >
+                              <EllipsisHorizontalIcon className="w-5 h-5" />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu aria-label="Static Actions">
+                            <DropdownItem variant="flat" key="approve">
+                              Duyệt
+                            </DropdownItem>
+                            <DropdownItem variant="flat" key="hide">
+                              Ẩn
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </Col>
+                    </Row>
+                  ))
+                ) : (
+                  <p className="text-gray-400 text-center text-base p-8">
+                    Không có dữ liệu
+                  </p>
+                )}
+                {/* Pagination Component */}
+                <CustomPagination
+                  total={Math.ceil(filteredFeedbacks.length / perPage)} // Total number of pages
+                  initialPage={currentPage} // Start on the first page
+                  onPageChange={handlePageChange} // Handle page change
+                  className="mt-4" // Add margin for spacing
+                />
+              </TabPanel>
+            );
+          })}
         </TabPanels>
-        <CustomPagination total={status.length} />
       </Tabs>
       {/* MODAL */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -396,7 +563,7 @@ function FeedbackTabs() {
                   <Avatar className="shrink-0" />
                   <div className="flex flex-col gap-1">
                     <h2 className="text-lg font-semibold">
-                      Mức độ hài lòng: {selectedFeedback.satisLevel}
+                      Mức độ hài lòng: {getRate(selectedFeedback.rate)}
                     </h2>
                     <span className="text-xs text-gray-400">
                       {formatDateTime(new Date())}
@@ -405,22 +572,30 @@ function FeedbackTabs() {
                 </div>
               </ModalHeader>
               <ModalBody>
-                {selectedFeedback.feedback.split("\n").map((f, i) => (
+                {selectedFeedback.comments.split("\n").map((f, i) => (
                   <p key={i} className="text-md">
                     {f}
                   </p>
                 ))}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
-                  Xóa
-                </Button>
-                <Button color="warning" variant="flat" onPress={onClose}>
-                  Ẩn
-                </Button>
-                {selectedFeedback.status === "received" && (
-                  <Button className="bg-teal-400 text-white" onPress={onClose}>
-                    Duyệt
+                {selectedFeedback.is_show && (
+                  <Button
+                    color="default"
+                    variant="flat"
+                    onPress={() => handleHide(selectedFeedback)}
+                    isLoading={isFetchingFeedback}
+                  >
+                    {isHiding ? "Đang ẩn..." : "Ẩn"}
+                  </Button>
+                )}
+                {!selectedFeedback.is_approved && (
+                  <Button
+                    className="bg-teal-400 text-white"
+                    onPress={() => handleApprove(selectedFeedback)}
+                    isLoading={isFetchingFeedback}
+                  >
+                    {isApproving ? "Đang duyệt..." : "Duyệt"}
                   </Button>
                 )}
               </ModalFooter>

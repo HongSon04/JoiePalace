@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const getCurrentBranchFromLocalStorage = () => {
-  if (typeof window !== "undefined" && window.localStorage) {
-    return JSON.parse(localStorage.getItem("currentBranch")) || {};
-  }
-  return {};
-};
+// const getCurrentBranchFromLocalStorage = () => {
+//   if (typeof window !== "undefined" && window.localStorage) {
+//     return JSON.parse(localStorage.getItem("currentBranch")) || {};
+//   }
+//   return {};
+// };
 
 const initialState = {
   branches: [],
-  currentBranch: getCurrentBranchFromLocalStorage(),
+  // currentBranch: getCurrentBranchFromLocalStorage(),
+  currentBranch: {},
   isLoading: false,
   isError: false,
   errorMessage: null,
@@ -19,6 +20,9 @@ const branchSlice = createSlice({
   name: "branch",
   initialState,
   reducers: {
+    getCurrentBranch: (state, action) => {
+      state.currentBranch = action.payload;
+    },
     loading: (state) => {
       state.isLoading = true;
     },
@@ -42,6 +46,11 @@ const branchSlice = createSlice({
   },
 });
 
-export const { fetchBranchesSuccess, fetchBranchSuccess, loading, error } =
-  branchSlice.actions;
+export const {
+  fetchBranchesSuccess,
+  fetchBranchSuccess,
+  loading,
+  error,
+  getCurrentBranch,
+} = branchSlice.actions;
 export default branchSlice;
