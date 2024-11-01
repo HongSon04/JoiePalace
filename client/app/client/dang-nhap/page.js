@@ -10,6 +10,8 @@ import Cookies from "js-cookie";
 import { loginAccountUser } from "@/app/_services/accountServices";
 import { decodeJwt } from "@/app/_utils/helpers";
 import useApiServices from "@/app/_hooks/useApiServices";
+import { login } from "@/app/_lib/features/authentication/accountSlice";
+import { useDispatch } from "react-redux";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -23,7 +25,8 @@ const Page = () => {
   const toast = useCustomToast();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const { tryCatchWrapper } = useApiServices();
+  const { tryCatchWrapper, makeAuthorizedRequest } = useApiServices();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -49,7 +52,7 @@ const Page = () => {
       const postToAPI = async () => {
         const response = await loginAccountUser(formData);
         Cookies.set("accessToken", response.data.data.access_token, {
-          expires: 1,
+          expires: 1 / (60 * 24),
         });
         localStorage.setItem("refreshToken", response.data.data.refresh_token);
         return response.data;
@@ -61,6 +64,7 @@ const Page = () => {
       let user = null;
       if (result.success !== false) {
         user = decodeJwt(result.data.access_token);
+        dispatch(login({ user }));
         localStorage.setItem(
           "user",
           JSON.stringify({ id: user.id, name: user.username, role: user.role })
