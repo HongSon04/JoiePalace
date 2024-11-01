@@ -3,7 +3,11 @@ import axios from "axios";
 import { API_CONFIG } from "@/app/_utils/api.config";
 
 export const fetchBranchesFromApi = async () => {
-  const response = await axios.get(API_CONFIG.BRANCHES.GET_ALL);
+  const response = await axios.get(
+    API_CONFIG.BRANCHES.GET_ALL({
+      itemsPerPage: 99999,
+    })
+  );
 
   if (response.status !== 200) {
     throw new Error("Có lỗi khi lấy danh sách chi nhánh");
@@ -50,6 +54,7 @@ export const postBranchAPI = async (branch) => {
   }
   return response.data.data;
 };
+
 export const fetchBranchDataById = async (branchId) => {
   try {
     const response = await axios.get(

@@ -4,26 +4,26 @@ import imageUploaderPlaceholder from "@/public/imageUploaderPlaceholder.svg";
 export const CONFIG = {
   DISH_IMAGE_PLACEHOLDER: dishImagePlaceholder,
   IMAGE_UPLOADER_PLACEHOLDER: imageUploaderPlaceholder,
+  ITEMS_PER_PAGE: [5, 10, 20, 50, 80, 100],
+  BOOKING_STATUS: [
+    {
+      key: "pending",
+      label: "Chờ xử lý",
+    },
+    {
+      key: "processing",
+      label: "Đang xử lý",
+    },
+    {
+      key: "success",
+      label: "Thành công",
+    },
+    {
+      key: "cancel",
+      label: "Đã hủy",
+    },
+  ],
 };
-
-export const requestStatus = [
-  {
-    key: "pending",
-    label: "Chờ xử lý",
-  },
-  {
-    key: "approved",
-    label: "Đã duyệt",
-  },
-  {
-    key: "rejected",
-    label: "Đã hủy",
-  },
-  {
-    key: "completed",
-    label: "Đã hoàn thành",
-  },
-];
 
 export const roles = [
   {

@@ -1,8 +1,14 @@
 "use client";
 
 import FormInput from "@/app/_components/FormInput";
+import Uploader from "@/app/_components/Uploader";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
+import {
+  fetchingParentCategory,
+  fetchingParentCategoryFailure,
+  fetchingParentCategorySuccess,
+} from "@/app/_lib/features/categories/categoriesSlice";
 import {
   addingDishCategory,
   addingDishCategoryFailure,
@@ -19,6 +25,7 @@ import {
   useDisclosure,
 } from "@nextui-org/modal";
 import { Button } from "@nextui-org/react";
+import { Col, Row } from "antd";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,29 +50,52 @@ function AddDishCategory() {
   const toast = useCustomToast();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [parentCategory, setParentCategory] = React.useState(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm({
     resolver: zodResolver(schema),
   });
 
+  const onInputChange = (e) => {
+    setValue(e.target.name, e.target.value);
+  };
+
   const dispatch = useDispatch();
   const { isLoading, isError } = useSelector((store) => store.dishes);
   const { makeAuthorizedRequest } = useApiServices();
+  const [files, setFiles] = React.useState([]);
+
+  const handleFileChange = (newFiles) => {
+    setFiles(newFiles);
+  };
 
   const handleAddDishCategory = async (data) => {
     dispatch(addingDishCategory());
 
+    const formData = new FormData();
+
+    formData.append("category_id", parseInt(data.category_id, 10));
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("short_description", data.short_description);
+
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    console.log("Form data -> ", formData);
+
     const response = await makeAuthorizedRequest(
       API_CONFIG.CATEGORIES.CREATE,
       "POST",
-      {
-        ...data,
-      }
+      formData
     );
 
     if (response?.success) {
@@ -93,6 +123,7 @@ function AddDishCategory() {
 
   const onSubmit = async (data) => {
     await handleAddDishCategory({
+      category_id: parseInt(parentCategory.id, 10),
       name: data.categoryName,
       description: data.categoryDescription,
       short_description: data.shortDescription,
@@ -107,6 +138,38 @@ function AddDishCategory() {
     }
   }, [isOpen, inputRef]);
 
+  const getParentCategory = async () => {
+    dispatch(fetchingParentCategory());
+
+    const response = await makeAuthorizedRequest(
+      API_CONFIG.CATEGORIES.GET_BY_SLUG(API_CONFIG.FOOD_CATEGORY_SLUG),
+      "GET"
+    );
+
+    if (response.success) {
+      dispatch(fetchingParentCategorySuccess());
+      setParentCategory(response.data.at(0));
+    } else {
+      dispatch(fetchingParentCategoryFailure());
+      toast({
+        title: "Có lỗi khi lấy dữ liệu danh mục",
+        description: response.message,
+      });
+    }
+
+    return response;
+  };
+
+  React.useEffect(() => {
+    async function fetchData() {
+      await getParentCategory();
+    }
+
+    fetchData();
+
+    return () => {};
+  }, []);
+
   return (
     <>
       <Button
@@ -119,7 +182,12 @@ function AddDishCategory() {
       >
         Thêm danh mục món ăn
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        size="3xl"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        scrollBehavior="outside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -129,47 +197,68 @@ function AddDishCategory() {
               <ModalBody>
                 <form
                   onSubmit={handleSubmit(onSubmit)}
-                  className="w-full flex gap-4 flex-col items-end"
+                  className="w-full flex gap-4 flex-col flex-center"
                 >
-                  <FormInput
-                    inputRef={inputRef}
-                    type={"text"}
-                    register={register}
-                    id={"categoryName"}
-                    name={"categoryName"}
-                    ariaLabel={"Tên danh mục"}
-                    placeholder={"Nhập tên danh mục"}
-                    errors={errors}
-                    errorMessage={errors?.categoryName?.message}
-                    className={"!bg-gray-100 !mt-0 !text-gray-600"}
-                    wrapperClassName={"w-full text-gray-600 !mt-0"}
-                  />
-                  <FormInput
-                    type={"textarea"}
-                    register={register}
-                    cols={3}
-                    rows={3}
-                    id={"shortDescription"}
-                    name={"shortDescription"}
-                    ariaLabel={"Mô tả ngắn"}
-                    placeholder={"Nhập mô tả ngắn"}
-                    errors={errors}
-                    errorMessage={errors?.shortDescription?.message}
-                    className={"!bg-gray-100 !mt-0 !text-gray-600"}
-                    wrapperClassName={"w-full text-gray-600 !mt-0"}
-                  />
-                  <FormInput
-                    type={"textarea"}
-                    register={register}
-                    id={"categoryDescription"}
-                    name={"categoryDescription"}
-                    ariaLabel={"Mô tả danh mục"}
-                    placeholder={"Mô tả danh mục đầy đủ"}
-                    errors={errors}
-                    errorMessage={errors?.categoryDescription?.message}
-                    className={"!bg-gray-100 !mt-0 !text-gray-600"}
-                    wrapperClassName={"w-full text-gray-600 !mt-0"}
-                  />
+                  <Row gutter={20}>
+                    <Col span={12}>
+                      {/* IMAGE & UPLOADER */}
+                      <Uploader
+                        onFileChange={handleFileChange}
+                        files={files}
+                        setFiles={setFiles}
+                      />
+                    </Col>
+                    <Col span={12}>
+                      <FormInput
+                        theme="dark"
+                        inputRef={inputRef}
+                        type={"text"}
+                        register={register}
+                        id={"categoryName"}
+                        name={"categoryName"}
+                        ariaLabel={"Tên danh mục"}
+                        placeholder={"Nhập tên danh mục"}
+                        errors={errors}
+                        errorMessage={errors?.categoryName?.message}
+                        className={"!bg-gray-100 !mt-0 !text-gray-600"}
+                        wrapperClassName={"w-full text-gray-600 !mt-0"}
+                        value={watch("categoryName")}
+                        onChange={onInputChange}
+                      />
+                      <FormInput
+                        theme="dark"
+                        type={"textarea"}
+                        register={register}
+                        cols={3}
+                        rows={3}
+                        id={"shortDescription"}
+                        name={"shortDescription"}
+                        ariaLabel={"Mô tả ngắn"}
+                        placeholder={"Nhập mô tả ngắn"}
+                        errors={errors}
+                        errorMessage={errors?.shortDescription?.message}
+                        className={"!bg-gray-100 !mt-0 !text-gray-600"}
+                        wrapperClassName={"w-full text-gray-600 !mt-3"}
+                        value={watch("shortDescription")}
+                        onChange={onInputChange}
+                      />
+                      <FormInput
+                        theme="dark"
+                        type={"textarea"}
+                        register={register}
+                        id={"categoryDescription"}
+                        name={"categoryDescription"}
+                        ariaLabel={"Mô tả danh mục"}
+                        placeholder={"Mô tả danh mục đầy đủ"}
+                        errors={errors}
+                        errorMessage={errors?.categoryDescription?.message}
+                        className={"!bg-gray-100 !mt-0 !text-gray-600"}
+                        wrapperClassName={"w-full text-gray-600 !mt-3"}
+                        value={watch("categoryDescription")}
+                        onChange={onInputChange}
+                      />
+                    </Col>
+                  </Row>
                   <div className="flex w-full justify-end items-center gap-5">
                     <Button
                       onClick={onClose}
@@ -190,11 +279,7 @@ function AddDishCategory() {
                       type="submit"
                       isLoading={isLoading}
                     >
-                      {isLoading
-                        ? "Đang thêm danh mục"
-                        : isError
-                        ? "Thử lại"
-                        : "Thêm danh mục"}
+                      {isLoading ? "Đang thêm danh mục..." : "Thêm danh mục"}
                     </Button>
                   </div>
                 </form>

@@ -12,6 +12,11 @@ const nextConfig = {
         pathname: "/dlpvcsewd/**",
       },
       {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+        pathname: "/dlpvcsewd/**",
+      },
+      {
         protocol: "https",
         hostname: "whitepalace.com.vn",
         pathname: "/wp-content/**",

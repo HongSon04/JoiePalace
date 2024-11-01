@@ -21,7 +21,12 @@ const useApiServices = () => {
   };
 
   // Function to make API requests with optional method and data
-  const apiRequest = async (endpoint, method = "GET", data = null) => {
+  const apiRequest = async (
+    endpoint,
+    method = "GET",
+    data = null,
+    options = {}
+  ) => {
     const accessToken = Cookies.get("accessToken");
 
     // console.log(
@@ -36,6 +41,7 @@ const useApiServices = () => {
           Authorization: `Bearer ${accessToken}`,
         },
         data,
+        ...options,
       });
       return response.data;
     });
@@ -103,7 +109,8 @@ const useApiServices = () => {
   const makeAuthorizedRequest = async (
     endpoint,
     method = "GET",
-    data = null
+    data = null,
+    signal = null // Add signal parameter
   ) => {
     // const accessToken = Cookies.get("accessToken");
     // console.log(
@@ -111,7 +118,7 @@ const useApiServices = () => {
     //   accessToken
     // );
 
-    let dataResponse = await apiRequest(endpoint, method, data);
+    let dataResponse = await apiRequest(endpoint, method, data, signal);
 
     // console.log(
     //   "data response from makeAuthorizedRequest function -> ",
@@ -138,7 +145,7 @@ const useApiServices = () => {
         // localStorage.setItem('accessToken', newAccessToken);
 
         // Retry the request with the new access token
-        dataResponse = await apiRequest(endpoint, method, data);
+        dataResponse = await apiRequest(endpoint, method, data, signal);
 
         // console.log(
         //   "data after retrying the request with new access token -> ",
