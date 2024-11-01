@@ -32,7 +32,7 @@ const Page = () => {
         <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
         {/* Account Section */}
-        <AccountSectionClient title="Tài khoản" />
+        <AccountSectionClient title="Tài khoản" nameUser={"Hồ Duy Hoàng Giang"} phoneUser={"0337678852"} emailUser={"hoduyhoanggiang08@gmail.com"} partyBooked={3} waitingParty={3} totalMoney={"500.000.000 VND"}/>
 
         {/* Bottom Divider */}
         <div className="w-full h-[1px] bg-whiteAlpha-300"></div>

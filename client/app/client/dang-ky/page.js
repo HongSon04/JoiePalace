@@ -45,10 +45,10 @@ const Page = () => {
       formSchema.parse(formData);
       setErrors({});
       const response = await createAccountUser({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        phone: "null",
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          phone: "null",
       });
       
       toast({

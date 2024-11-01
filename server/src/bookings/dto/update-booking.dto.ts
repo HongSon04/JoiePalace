@@ -7,49 +7,49 @@ export class UpdateBookingDto {
     required: false,
     description: 'ID của người dùng (nếu có)',
   })
-  user_id?: number;
+  user_id?: string;
 
   @ApiProperty({
     required: true,
     description: 'ID của đặt chỗ cần cập nhật',
   })
   @IsNotEmpty({ message: 'ID đặt chỗ không được để trống' })
-  booking_id: number;
+  booking_id: string;
 
   @ApiProperty({
     required: true,
     description: 'ID của chi nhánh nơi tổ chức sự kiện',
   })
   @IsNotEmpty({ message: 'ID chi nhánh không được để trống' })
-  branch_id: number;
+  branch_id: string;
 
   @ApiProperty({
     required: true,
     description: 'ID của loại sự kiện',
   })
   @IsNotEmpty({ message: 'ID loại sự kiện không được để trống' })
-  party_type_id: number;
+  party_type_id: string;
 
   @ApiProperty({
     required: true,
     description: 'ID của sảnh tổ chức sự kiện',
   })
   @IsNotEmpty({ message: 'ID sảnh không được để trống' })
-  stage_id: number;
+  stage_id: string;
 
   @ApiProperty({
     required: true,
     description: 'ID của trang trí sự kiện',
   })
   @IsNotEmpty({ message: 'ID trang trí không được để trống' })
-  decor_id: number;
+  decor_id: string;
 
   @ApiProperty({
     required: true,
     description: 'ID của menu sự kiện',
   })
   @IsNotEmpty({ message: 'ID menu không được để trống' })
-  menu_id: number;
+  menu_id: string;
 
   @ApiProperty({
     required: true,
@@ -122,7 +122,7 @@ export class UpdateBookingDto {
     description:
       'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
   })
-  extra_service: [{ id: number; quantity: number }] | any;
+  extra_service: [{ id: string; quantity: number }] | any;
 
   @ApiProperty({
     required: true,

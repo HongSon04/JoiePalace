@@ -126,6 +126,9 @@ export const API_CONFIG = {
   BOOKINGS: {
     CREATE: `${BOOKING_API}/create`,
     GET_ALL: `${BOOKING_API}/get-all`,
+    GET_BY_ID: (id) => `${BOOKING_API}/get/${id}`,
+    UPDATE: (id) => `${BOOKING_API}/update/${id}`,
+    UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
   },
 
   // BLOG TYPES API

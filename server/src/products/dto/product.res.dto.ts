@@ -6,13 +6,13 @@ export class ProductResDto {
     description: 'ID của sản phẩm.',
     example: 1,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'ID của danh mục.',
     example: 1,
   })
-  category_id: number;
+  category_id: string;
 
   @ApiProperty({
     description: 'Tên của sản phẩm',

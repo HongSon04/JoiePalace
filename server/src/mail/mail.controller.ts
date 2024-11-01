@@ -11,8 +11,8 @@ export class MailController {
   constructor(private readonly mailService: MailService) {}
 
   @isPublic()
-  async sendUserConfirmationBooking(@Body() body: ConfirmBookingMailDto) {
-    await this.mailService.sendUserConfirmationBooking(body);
+  async EmailAppointmentSuccessful(@Body() body: ConfirmBookingMailDto) {
+    await this.mailService.EmailAppointmentSuccessful(body);
   }
 
   async confirmRegister(name: string, email: string, token: string) {

@@ -75,7 +75,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> getAllInfo: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -122,7 +122,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> getAllInfoByEachTime: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -227,7 +227,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -275,7 +275,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> countAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -308,7 +308,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -349,7 +349,7 @@ export class DashboardService {
 
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -391,7 +391,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -442,7 +442,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -483,7 +483,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -532,7 +532,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -572,7 +572,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -633,9 +633,7 @@ export class DashboardService {
         {} as Record<string, number>,
       );
 
-      return Number(branch_id) === 0 && branch_id
-        ? this.transformBranchData(result)
-        : result;
+      return branch_id > 0 ? result : this.transformBranchData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -646,7 +644,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -708,7 +706,7 @@ export class DashboardService {
           0,
         );
         revenueMap[booking.branch_id] =
-          (revenueMap[booking.branch_id] || 0) + total_price;
+          (revenueMap[booking.branch_id] || 0) + Number(total_price);
       });
 
       // Gán doanh thu cho từng chi nhánh
@@ -716,9 +714,7 @@ export class DashboardService {
         data[branch.name] = revenueMap[branch.id] || 0; // Nếu không có booking, gán 0
       });
 
-      return Number(branch_id) === 0 && branch_id
-        ? this.transformBranchData(data)
-        : data;
+      return branch_id > 0 ? data : this.transformBranchData(data);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -729,7 +725,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -800,9 +796,7 @@ export class DashboardService {
         {} as Record<string, number>,
       );
 
-      return Number(branch_id) === 0 && branch_id
-        ? this.transformBranchData(result)
-        : result;
+      return branch_id > 0 ? result : this.transformBranchData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -813,7 +807,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -886,11 +880,7 @@ export class DashboardService {
         result[branchName][quarterIndex] += totalAmount;
       });
 
-      if (branch_id) {
-        return result;
-      } else {
-        return this.transformQuarterlyData(result);
-      }
+      return branch_id > 0 ? result : this.transformQuarterlyData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -901,7 +891,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -967,9 +957,7 @@ export class DashboardService {
         return acc;
       }, {});
 
-      return Number(branch_id) === 0 && branch_id
-        ? this.transformBranchData(result)
-        : result;
+      return branch_id > 0 ? result : this.transformBranchData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -980,7 +968,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1069,11 +1057,7 @@ export class DashboardService {
       // B7: Sắp xếp theo tổng doanh thu giảm dần
       const sort = results.sort((a, b) => b.total - a.total);
 
-      if (branch_id) {
-        return sort;
-      } else {
-        return this.transformDataByYear(sort);
-      }
+      return branch_id > 0 ? sort : this.transformDataByYear(sort);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -1084,7 +1068,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1148,7 +1132,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> countBookingStatus: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

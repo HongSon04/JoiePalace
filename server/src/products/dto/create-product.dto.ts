@@ -7,7 +7,7 @@ export class CreateProductDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Danh mục không được để trống' })
-  category_id: number;
+  category_id: string;
 
   @ApiProperty({
     description: 'Tên sản phẩm, không được để trống',
@@ -33,8 +33,9 @@ export class CreateProductDto {
   @ApiProperty({
     description: 'Danh sách các ID thẻ liên quan đến sản phẩm',
     required: false,
+    example: [1, 2, 3],
   })
-  tags: number[];
+  tags?: number[];
 
   @ApiProperty({
     description: 'Giá của sản phẩm, không được để trống',

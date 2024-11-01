@@ -32,8 +32,9 @@ export class CreatePartyTypeDto {
   @ApiProperty({
     description: 'Danh sách các ID sản phẩm liên quan đến loại tiệc',
     required: false,
+    example: [1, 2, 3],
   })
-  products: number[];
+  products?: number[];
 
   @ApiProperty({
     description: 'Giá của loại tiệc, không được để trống',

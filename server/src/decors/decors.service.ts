@@ -53,10 +53,10 @@ export class DecorsService {
 
       // Tính toán tổng giá
       const totalPrice = foundProducts.reduce(
-        (total, product) => total + product.price,
+        (total, product) => Number(total) + Number(product.price),
         0,
       );
-      if (totalPrice < Number(price)) {
+      if (Number(totalPrice) < Number(price)) {
         throw new BadRequestException('Giá trang trí không hợp lệ');
       }
 
@@ -105,7 +105,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -176,7 +176,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -187,7 +187,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];
@@ -218,7 +218,7 @@ export class DecorsService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
@@ -252,7 +252,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -322,7 +322,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -333,7 +333,7 @@ export class DecorsService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];
@@ -364,7 +364,7 @@ export class DecorsService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: { ...orderByConditions, created_at: 'desc' },
         }),
@@ -434,7 +434,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -533,7 +533,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -569,7 +569,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> delete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -605,7 +605,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -643,7 +643,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

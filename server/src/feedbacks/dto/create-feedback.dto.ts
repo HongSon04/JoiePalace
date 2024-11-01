@@ -21,7 +21,7 @@ export class CreateFeedbackDto {
     required: false,
   })
   @IsOptional()
-  user_id?: string;
+  user_id?: number;
 
   @ApiProperty({
     description: 'Tên của người gửi phản hồi, không được để trống',

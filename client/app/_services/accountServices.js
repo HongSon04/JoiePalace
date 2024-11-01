@@ -10,6 +10,7 @@ export const fetchUserProfile = async () => {
 
   return response.data.data;
 };
+
 export const createAccountUser = async (dataToSend) => {
   const response = await axios.post(API_CONFIG.AUTH.REGISTER, dataToSend);
 

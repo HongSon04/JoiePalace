@@ -14,6 +14,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { postBranchAPI } from "@/app/_services/branchesServices";
+import useApiServices from "@/app/_hooks/useApiServices";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import { fetchFeedbacksFailure, fetchFeedbacksRequest } from "@/app/_lib/features/feedbacks/feedbacksSlice";
 
 const fieldsConfig = {
   contact: [
@@ -60,6 +64,8 @@ const branchSchema = z.object({
 function ChiNhanhAddPage() {
   const { isLoading, isError } = useSelector((store) => store.branch);
   const dispatch = useDispatch();
+  const {makeAuthorizedRequest} = useApiServices();
+  const toast = useCustomToast();
 
   const { handleSubmit, control, formState: { errors } } = useForm({
     resolver: zodResolver(branchSchema),
@@ -80,36 +86,50 @@ function ChiNhanhAddPage() {
     }));
   };
 
+
   const onSubmit = async (data) => {
     const formData = {
-      data: {
-        name: data.name,
-        slug: createSlug(data.name),
-        address: data.address,
-        phone: data.phone,
-        email: data.email,
-        rate: 5,
-        images: imagesData.images,
-      },
-      location_detail: {
-        slogan: data.slogan,
-        slogan_description: data.slogan_description,
-        slogan_images: imagesData.slogan_images,
-        diagram_description: data.diagram_description,
-        diagram_images: imagesData.diagram_images,
-        equipment_description: data.equipment_description,
-        equipment_images: imagesData.equipment_images,
-      },
-      space: [
-        {
-          name: data.space_name,
-          description: data.space_description,
-          images: imagesData.space_images,
-        },
-      ],
+      name: data.name,
+      address: data.address,
+      phone: data.phone,
+      // slug: createSlug(data.name),
+      email: data.email,
+      slogan: data.slogan,  
+      slogan_description: data.slogan_description,
+      diagram_description: data.diagram_description,
+      equipment_description: data.equipment_description,
+      images: imagesData.images,
+      slogan_images: imagesData.slogan_images,
+      diagram_images: imagesData.diagram_images,
+      equipment_images: imagesData.equipment_images,
+      // stages: [
+      //   {
+      //     name: data.space_name,
+      //     description: data.space_description,
+      //     images: imagesData.space_images,
+      //   },
+      // ],
     };
     try {
-      await dispatch(postBranchAPI(formData));
+      const response = await makeAuthorizedRequest(API_CONFIG.BRANCHES.CREATE, "POST", formData )
+      console.log(formData)
+      if(response.success){
+        // await postBranchAPI(response)
+        console.log(dispatch(fetchBranchSuccess(response.data)))
+        dispatch(fetchBranchSuccess(response.data))
+        
+      toast({
+        title: "Tạo dữ liệu chi nhánh thành công",
+        description: "Phản hồi đã được duyệt. Đang lấy dữ liệu mới",
+      });
+      
+    }
+    dispatch(fetchFeedbacksFailure());
+    toast({
+      title: "Tạo dữ liệu không thành công",
+      description: "Vui lòng thử lại sau",
+    });
+      console.log(response)
     } catch (error) {
       console.error("Error submitting form: ", error);
     }
@@ -136,10 +156,10 @@ function ChiNhanhAddPage() {
     <form onSubmit={handleSubmit(onSubmit)}>
       {isError && <div className="text-red-500">An error occurred while saving the branch.</div>}
       <AdminHeader showSearchForm={false} title="Chi tiết chi nhánh" />
-      <Stack alignItems="start" spacing="8" direction="row" className="mt-5">
-        <h1 className="text-base leading-6 font-normal text-gray-400">Chi nhánh /</h1>
+      <div className="flex gap-2 mt-5">
+        <h1 className="text-base leading-6 font-normal text-gray-400">Chi nhánh / </h1>
         <span className="text-base leading-6 font-normal text-gray-400">Thêm chi nhánh</span>
-      </Stack>
+      </div>
       <div className="flex flex-col gap-6 w-full mt-6">
         {renderSection('Thông tin liên hệ', fieldsConfig.contact, 'Hình ảnh carousel', 'image-upload-carousel', 'images')}
         {renderSection('Slogan & Mô tả', fieldsConfig.slogan, 'Hình ảnh mô tả', 'image-upload-description', 'slogan_images', 'h-[80px]')}
