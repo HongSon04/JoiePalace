@@ -203,8 +203,9 @@ model menus {
   slug            String            @unique
   description     String
   price           Int
-  is_show         Boolean           @default(false)
   products        products[]        @relation("ProductMenus")
+  images          String[]
+  is_show         Boolean           @default(false)
   deleted         Boolean           @default(false)
   deleted_at      DateTime?
   deleted_by      Int?

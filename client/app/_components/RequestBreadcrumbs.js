@@ -2,12 +2,8 @@
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 
-function RequestBreadcrumbs({ requestId, nameLink }) {
-  const branch = {
-    id: 1,
-    name: "Hoàng Văn Thụ",
-    slug: "hoang-van-thu",
-  };
+function RequestBreadcrumbs({ requestId, nameLink, pathLink, namepath }) {
+
 
   return (
     <Breadcrumb className="text-gray-400 mt-5">
@@ -20,22 +16,22 @@ function RequestBreadcrumbs({ requestId, nameLink }) {
         </BreadcrumbLink>
       </BreadcrumbItem>
 
-      <BreadcrumbItem>
+    { pathLink && (     <BreadcrumbItem>
         <BreadcrumbLink
           className="text-gray-400 hover:text-gray-200"
-          href={`/admin/${nameLink}/${branch.slug}`}
+          href={`/admin/${nameLink}/${pathLink}`}
         >
-          {branch.name}
+          {namepath}
         </BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbItem>
+      </BreadcrumbItem>)}
+      {/* <BreadcrumbItem>
         <BreadcrumbLink
           className="text-gray-400 hover:text-gray-200"
-          href={`/admin/${nameLink}/${branch.slug}/${requestId}`}
+          href={`/admin/${nameLink}/${requestId}`}
         >
           {requestId}
         </BreadcrumbLink>
-      </BreadcrumbItem>
+      </BreadcrumbItem> */}
     </Breadcrumb>
   );
 }

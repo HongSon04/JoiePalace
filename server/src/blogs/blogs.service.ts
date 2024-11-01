@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
@@ -68,17 +69,22 @@ export class BlogsService {
         );
       }
 
-      // Check tags existence
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Upload images
@@ -92,11 +98,6 @@ export class BlogsService {
         throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
       }
 
-      // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({
-        id: Number(Number(tag.id)),
-      }));
-
       const createBlog = await this.prismaService.blogs.create({
         data: {
           title,
@@ -106,7 +107,7 @@ export class BlogsService {
           short_description,
           category_id: Number(category_id),
           tags: {
-            connect: tagsConnect,
+            connect: tagsSet,
           },
           images: uploadImages as any,
         },
@@ -128,10 +129,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> create', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -179,7 +180,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -213,10 +214,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAll', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -264,7 +265,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -298,10 +299,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -350,7 +351,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -384,10 +385,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllByCategory', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -447,7 +448,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -481,10 +482,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugCategory', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -545,7 +546,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -579,10 +580,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllByTag', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -643,7 +644,7 @@ export class BlogsService {
       const [res, total] = await Promise.all([
         this.prismaService.blogs.findMany({
           where: whereConditions,
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           include: {
             tags: true,
@@ -677,10 +678,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugTag', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -707,7 +708,7 @@ export class BlogsService {
       await this.prismaService.blogs.update({
         where: { id: Number(blog.id) },
         data: {
-          views: blog.views + 1,
+          views: Number(blog.views) + 1,
         },
       });
 
@@ -741,7 +742,7 @@ export class BlogsService {
       await this.prismaService.blogs.update({
         where: { id: Number(blog.id) },
         data: {
-          views: blog.views + 1,
+          views: Number(blog.views) + 1,
         },
       });
 
@@ -754,10 +755,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> findOneBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -816,24 +817,29 @@ export class BlogsService {
         where: { slug: slug },
       });
 
-      if (existingSlug && existingSlug.id !== id) {
+      if (existingSlug && Number(existingSlug.id) !== Number(id)) {
         throw new HttpException(
           'Tên bài viết đã tồn tại',
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      // Check tags existence
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Upload images
@@ -847,11 +853,6 @@ export class BlogsService {
         throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
       }
 
-      // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({
-        id: Number(Number(tag.id)),
-      }));
-
       const updateBlog = await this.prismaService.blogs.update({
         where: { id: Number(id) },
         data: {
@@ -860,9 +861,9 @@ export class BlogsService {
           content,
           description,
           short_description,
-          category_id,
+          category_id: Number(category_id),
           tags: {
-            connect: tagsConnect,
+            connect: tagsSet,
           },
           images: uploadImages as any,
         },
@@ -884,10 +885,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> update', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -946,24 +947,29 @@ export class BlogsService {
         where: { slug: newSlug },
       });
 
-      if (existingSlug && existingSlug.id !== existingBlog.id) {
+      if (existingSlug && Number(existingSlug.id) !== Number(existingBlog.id)) {
         throw new HttpException(
           'Tên bài viết đã tồn tại',
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      // Check tags existence
-      const tagsArray = JSON.parse(tags as any);
-      const existingTags = await this.prismaService.tags.findMany({
-        where: { id: { in: tagsArray } },
-      });
+      // Initialize tagsSet
+      let tagsSet = [];
 
-      if (existingTags.length !== tagsArray.length) {
-        throw new HttpException(
-          'Một hoặc nhiều tag không tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
+      // Handle tags if provided
+      if (tags && tags.length > 0) {
+        const tagsArray = JSON.parse(tags as any);
+        const existingTags = await this.prismaService.tags.findMany({
+          where: { id: { in: tagsArray } },
+        });
+
+        if (existingTags.length !== tagsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều tag không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        tagsSet = existingTags.map((tag) => ({ id: Number(tag.id) }));
       }
 
       // Upload images
@@ -977,11 +983,6 @@ export class BlogsService {
         throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
       }
 
-      // Create blog entry
-      const tagsConnect = existingTags.map((tag) => ({
-        id: Number(Number(tag.id)),
-      }));
-
       const updateBlog = await this.prismaService.blogs.update({
         where: { id: Number(existingBlog.id) },
         data: {
@@ -990,9 +991,9 @@ export class BlogsService {
           content,
           description,
           short_description,
-          category_id,
+          category_id: Number(category_id),
           tags: {
-            connect: tagsConnect,
+            connect: tagsSet,
           },
           images: uploadImages as any,
         },
@@ -1014,10 +1015,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> updateBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -1047,10 +1048,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> delete', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -1063,6 +1064,13 @@ export class BlogsService {
 
       if (!blog) {
         throw new HttpException('Bài viết không tồn tại', HttpStatus.NOT_FOUND);
+      }
+
+      if (blog.deleted === false) {
+        throw new HttpException(
+          'Bài viết chưa được xóa tạm thời, không thể khôi phục!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       await this.prismaService.blogs.update({
@@ -1080,10 +1088,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> restore', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -1098,9 +1106,9 @@ export class BlogsService {
         throw new HttpException('Bài viết không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      if (blog.deleted) {
+      if (blog.deleted === false) {
         throw new HttpException(
-          'Bài viết phải được xóa mềm trước',
+          'Bài viết chưa được xóa tạm thời, không thể xóa vĩnh viễn!',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -1118,10 +1126,10 @@ export class BlogsService {
         throw error;
       }
       console.log('Lỗi từ blogs.service.ts -> hardDelete', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 }

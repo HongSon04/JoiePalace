@@ -4,7 +4,7 @@ import { IsNotEmpty } from 'class-validator';
 export class StageDto {
   @ApiProperty({ type: Number, description: 'ID của chi nhánh' })
   @IsNotEmpty({ message: 'Branch ID không được để trống' })
-  branch_id: number;
+  branch_id: string;
 
   @ApiProperty({
     type: String,

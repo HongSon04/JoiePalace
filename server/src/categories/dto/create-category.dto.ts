@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateCategoryDto {
   @ApiProperty({
@@ -14,8 +14,7 @@ export class CreateCategoryDto {
     required: false,
   })
   @IsOptional()
-  @IsInt({ message: 'ID danh mục phải là một số nguyên' })
-  category_id?: number;
+  category_id?: string;
 
   @ApiProperty({
     description: 'Mô tả chi tiết về danh mục, không được để trống',
@@ -41,6 +40,7 @@ export class CreateCategoryDto {
   @ApiProperty({
     description: 'Danh sách các ID thẻ liên quan đến danh mục',
     required: false,
+    example: [1, 2, 3],
   })
   @IsOptional()
   tags?: number[];

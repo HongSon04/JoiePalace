@@ -5,9 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
-
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-
 import Notification from "./Notification";
 
 export const metadata = {

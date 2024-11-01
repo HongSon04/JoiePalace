@@ -61,6 +61,7 @@ export class TagsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Tạo tag' })
@@ -103,6 +104,7 @@ export class TagsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy danh sách tag' })
@@ -137,6 +139,7 @@ export class TagsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy tag theo id' })
@@ -168,6 +171,7 @@ export class TagsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy tag theo slug' })
@@ -207,6 +211,7 @@ export class TagsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Cập nhật tag' })
@@ -239,6 +244,7 @@ export class TagsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa tag' })

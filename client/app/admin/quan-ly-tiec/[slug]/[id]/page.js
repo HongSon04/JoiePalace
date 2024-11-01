@@ -27,10 +27,10 @@ const userSchema = z.object({
 
 const organizationSchema = z.object({
   party: z.enum(['wedding', 'birthday', 'conference'], { message: "Loại tiệc không hợp lệ" }),
-  tables: z.number().min(1, { message: "Số lượng bàn chính thức phải lớn hơn 0" }),
-  spareTables: z.number().min(0, { message: "Số lượng bàn dự phòng không được âm" }),
-  customer: z.number().min(1, { message: "Số lượng khách dự kiến phải lớn hơn 0" }),
-  customerAndChair: z.number().min(1, { message: "Số lượng khách / bàn phải lớn hơn 0" }),
+  tables: z.string().regex(/^\d+$/, { message: "Số lượng bàn chính thức là dạng số" }).min(1, { message: "Số lượng bàn chính thức phải lớn hơn 0" }),
+  spareTables: z.string().regex(/^\d+$/, { message: "Số lượng bàn dự phòng là dạng số" }).min(0, { message: "Số lượng bàn dự phòng không được âm" }),
+  customer: z.string().regex(/^\d+$/, { message: "Số lượng khách dự kiến là dạng số" }).min(1, { message: "Số lượng khách dự kiến phải lớn hơn 0" }),
+  customerAndChair: z.string().regex(/^\d+$/, { message: "Số lượng khách / bàn là dạng số" }).min(1, { message: "Số lượng khách / bàn phải lớn hơn 0" }),
   partyDate: z.string().nonempty({ message: "Ngày đặt tiệc là bắt buộc" }), 
   dateOrganization: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
   timeEvent: z.string().nonempty({ message: "Giờ tổ chức là bắt buộc" }),
@@ -522,7 +522,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 options={detail.options}
                                 register={register}
                                 error={errors[detail.name]}
-                        trigger={trigger}
+                                trigger={trigger}
                             />
                         ))}
                     </div>

@@ -48,12 +48,22 @@ export const fetchCurrentBranch = async (slug) => {
 };
 
 export const postBranchAPI = async (branch) => {
-  const response = await axios.post(API_CONFIG.BRANCHES.CREATE, branch);
-  if (response.status !== 201) {
-    throw new Error("Có lỗi khi tạo chi nhánh mới");
+  try {
+    const response = await axios.post(API_CONFIG.BRANCHES.CREATE, branch);
+    if (response.status!== 201) {
+      throw new Error("Có lỗi khi tạo chi nhánh mới");
+    }
+    return response.data.data;
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error;
   }
+<<<<<<< HEAD
   return response.data.data;
 };
+=======
+}
+>>>>>>> e5ee1dd874c270e8defa67e7be85694d891303e9
 
 export const fetchBranchDataById = async (branchId) => {
   try {

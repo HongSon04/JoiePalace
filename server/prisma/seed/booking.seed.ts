@@ -231,21 +231,6 @@ const booking: CreateBookingDto[] = [
     shift: 'Tối',
   },
   {
-    user_id: 15,
-    branch_id: 1,
-    budget: '',
-    stage_id: 1,
-    company_name: 'Công ty O',
-    email: 'congtyo@gmail.com',
-    phone: '123456789',
-    name: 'Tiệc mừng tốt nghiệp',
-    note: 'Ghi chú',
-    number_of_guests: 400,
-    organization_date: '2024-12-20T00:00:00.000Z',
-    party_type_id: 1,
-    shift: 'Sáng',
-  },
-  {
     user_id: 16,
     branch_id: 1,
     budget: '',
@@ -277,9 +262,9 @@ const booking: CreateBookingDto[] = [
   },
   {
     user_id: 18,
-    branch_id: 1,
+    branch_id: 1 as any,
     budget: '',
-    stage_id: 1,
+    stage_id: 1 as any,
     company_name: 'Công ty R',
     email: 'congtyr@gmail.com',
     phone: '123456789',
@@ -287,7 +272,7 @@ const booking: CreateBookingDto[] = [
     note: 'Ghi chú',
     number_of_guests: 350,
     organization_date: '2024-05-01T00:00:00.000Z',
-    party_type_id: 1,
+    party_type_id: 1 as any,
     shift: 'Tối',
   },
 ];
@@ -597,7 +582,6 @@ const booking_details = [
     stage_id: 1,
     deposit_id: 12,
     decor_id: 1,
-
     menu_id: 1,
     payment_method: 'momo',
     stage: ['ABC'],
@@ -629,22 +613,6 @@ const booking_details = [
     booking_id: 14,
     stage_id: 1,
     deposit_id: 14,
-    decor_id: 1,
-    menu_id: 1,
-    payment_method: 'momo',
-    stage: ['ABC'],
-    decor: ['ABC'],
-    menu: ['ABC'],
-    extra_service: ['ABC'],
-    images: ['ABC'],
-    amount_booking: 10000000,
-    fee: 10,
-    total_amount: 110000000,
-  },
-  {
-    booking_id: 15,
-    stage_id: 1,
-    deposit_id: 15,
     decor_id: 1,
     menu_id: 1,
     payment_method: 'momo',
@@ -706,15 +674,31 @@ const booking_details = [
 ];
 
 export const bookingSeed = async () => {
-  // for (let i = 1; i <= booking.length; i++) {
-  //   const created_booking = await prisma.bookings.create({
-  //     data: {
-  //       ...booking[i],
-  //       party_type_id: 1,
-  //     },
-  //   });
-  //   console.log('Created booking:', created_booking.id);
-  // }
+  for (let i = 0; i < booking.length; i++) {
+    if (i == booking.length - 1) {
+      i = 0;
+    }
+    console.log(i, booking.length);
+    const created_booking = await prisma.bookings.create({
+      data: {
+        user_id: booking[i].user_id!,
+        branch_id: booking[i].branch_id as any,
+        stage_id: booking[i].stage_id as any,
+        party_type_id: booking[i].party_type_id as any,
+        name: booking[i].name,
+        phone: booking[i].phone,
+        email: booking[i].email,
+        company_name: booking[i].company_name,
+        note: booking[i].note,
+        number_of_guests: booking[i].number_of_guests,
+        budget: booking[i].budget,
+        shift: booking[i].shift,
+        organization_date: booking[i].organization_date,
+      },
+    });
+
+    console.log('Created booking:', created_booking.id);
+  }
 
   // for (let i = 1; i <= deposit.length; i++) {
   //   const created_deposit = await prisma.deposits.create({
@@ -724,19 +708,18 @@ export const bookingSeed = async () => {
   //   });
   //   console.log('Created deposit:', created_deposit.id);
   // }
-
-  for (let i = 1; i <= booking_details.length; i++) {
-    const created_booking_details = await prisma.booking_details.create({
-      data: {
-        booking_id: Number(booking_details[i].booking_id),
-        decor_id: Number(booking_details[i].decor_id),
-        menu_id: booking_details[i].menu_id,
-        amount_booking: booking_details[i].amount_booking,
-        deposit_id: 1,
-        fee: booking_details[i].fee,
-        total_amount: booking_details[i].total_amount,
-      } as any,
-    });
-    console.log('Created booking details:', created_booking_details.id);
-  }
+  // for (let i = 1; i <= booking_details.length; i++) {
+  //   const created_booking_details = await prisma.booking_details.create({
+  //     data: {
+  //       booking_id: Number(booking_details[i].booking_id),
+  //       decor_id: Number(booking_details[i].decor_id),
+  //       menu_id: booking_details[i].menu_id,
+  //       amount_booking: booking_details[i].amount_booking,
+  //       deposit_id: 1,
+  //       fee: booking_details[i].fee,
+  //       total_amount: booking_details[i].total_amount,
+  //     } as any,
+  //   });
+  //   console.log('Created booking details:', created_booking_details.id);
+  // }
 };

@@ -170,6 +170,7 @@ export const API_CONFIG = {
       constructUrlWithParams(`${BOOKING_API}/get-all`, params),
     UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
     GET_BY_ID: (id) => `${BOOKING_API}/get/${id}`,
+    UPDATE: (id) => `${BOOKING_API}/update/${id}`,
   },
 
   // BLOGS API

@@ -39,6 +39,7 @@ export class CreateDecorDto {
   @ApiProperty({
     description: 'Danh sách các ID sản phẩm liên quan đến trang trí',
     required: false,
+    example: [1, 2, 3],
   })
   @IsOptional()
   products?: number[];

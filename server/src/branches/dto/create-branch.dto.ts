@@ -75,28 +75,28 @@ export class CreateBranchDto {
     required: false,
     description: 'Ảnh đại diện của chi nhánh',
   })
-  images?: string[];
+  images: string[];
 
   @ApiProperty({
     type: [String],
     required: false,
     description: 'Ảnh slogan của chi nhánh',
   })
-  slogan_images?: string[];
+  slogan_images: string[];
 
   @ApiProperty({
     type: [String],
     required: false,
     description: 'Ảnh sơ đồ của chi nhánh',
   })
-  diagram_images?: string[];
+  diagram_images: string[];
 
   @ApiProperty({
     type: [String],
     required: false,
     description: 'Ảnh trang thiết bị của chi nhánh',
   })
-  equipment_images?: string[];
+  equipment_images: string[];
 }
 export class ImageUploadBranchDto {
   @ApiProperty({ type: [String] })

@@ -11,7 +11,6 @@ import "@/app/_styles/client.css";
 import IconButton from "@/app/_components/IconButton";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import InputIndex from "@/app/_components/InputIndexClient";
 import HeaderClient from "./_components/HeaderClient";
 import Contact from "./_components/Contact";
 
@@ -559,7 +558,7 @@ function Home() {
                       </div>
                     </TextFade>
                   </div>
-                  <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
+                  <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 overflow-hidden">
                     <TextFade
                       settings={{
                         hidden: { opacity: 0, x: 50 },

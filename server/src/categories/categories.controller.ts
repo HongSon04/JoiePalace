@@ -12,7 +12,7 @@ import {
   Query,
   Request,
   UploadedFiles,
-  UseInterceptors
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
@@ -72,6 +72,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Tạo danh mục mới' })
@@ -98,9 +99,9 @@ export class CategoriesController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }
@@ -150,6 +151,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả danh mục' })
@@ -203,6 +205,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả danh mục đã xóa tạm' })
@@ -245,6 +248,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin danh mục theo ID' })
@@ -282,6 +286,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy thông tin danh mục theo slug' })
@@ -321,6 +326,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Lấy danh mục theo tag slug' })
@@ -380,9 +386,9 @@ export class CategoriesController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }
@@ -425,6 +431,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa tạm thời danh mục' })
@@ -458,6 +465,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Khôi phục danh mục đã xóa' })
@@ -491,6 +499,7 @@ export class CategoriesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     example: {
       message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
     },
   })
   @ApiOperation({ summary: 'Xóa vĩnh viễn danh mục' })
