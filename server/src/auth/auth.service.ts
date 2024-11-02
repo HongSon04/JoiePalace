@@ -461,32 +461,6 @@ export class AuthService {
     }
   }
 
-  // ! Cron Job Check Token Expired Date
-  @Cron('0 0 * * * *') // ? Run every hour
-  async checkTokenExpiredDate() {
-    try {
-      const findTokens = await this.prismaService.verify_tokens.findMany({
-        where: {
-          expired_at: {
-            lt: new Date(),
-          },
-        },
-      });
-
-      if (findTokens.length > 0) {
-        await this.prismaService.verify_tokens.deleteMany({
-          where: {
-            id: {
-              in: findTokens.map((token) => Number(token.id)),
-            },
-          },
-        });
-      }
-    } catch (error) {
-      console.log('Lỗi từ auth.service.ts -> checkTokenExpiredDate', error);
-    }
-  }
-
   // ! Generate Token
   async generateToken(user: UserEntity) {
     const payload = {

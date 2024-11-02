@@ -30,6 +30,7 @@ import { MembershipsModule } from './memberships/memberships.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import { PackagesModule } from './packages/packages.module';
+import { CronjobsModule } from './cronjobs/cronjobs.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { PackagesModule } from './packages/packages.module';
     NotificationsModule,
     SubscribersModule,
     PackagesModule,
+    CronjobsModule,
   ],
   controllers: [AppController],
   providers: [
