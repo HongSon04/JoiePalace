@@ -11,186 +11,62 @@ import Chart from '@/app/_components/Chart';
 import "../../../../_styles/globals.css";
 import TableGrab from '@/app/_components/TableGrab';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
-import { fetchRevenueBranchByWeek, fetchRevenueBranchByMonth, fetchRevenueBranchByQuarter, fetchRevenueBranchByYear, fetchAllBranch} from "@/app/_services/apiServices";
-const Page = () => {    
-  const [idBranch, setIdBranch] = useState(null);
-  const [totalWeek, setTotalWeek] = useState(null);
-  const [totalMonth, setTotalMonth] = useState(null);
-  const [totalQuarter, setTotalQuarter] = useState(null);
-  const [totalYear, setTotalYear] = useState(null);
-  const [allBranch, setAllBranch] = useState(null);
+import {fetchAllBranch, fetchAllByBranch} from "@/app/_services/apiServices";
+import { fetchBranchBySlug } from '@/app/_services/branchesServices';
+const Page = ({params}) => {    
+  const {slug} = params;
+  const [dataSlug, setDataSlug] = useState(null);
+  const [branchId, setBranchId] = useState(null);
   const [nameBranch, setnNameBranch] = useState(null);
+  const [allBranch, setAllBranch] = useState(null);
+  const [dataTotalBranch, setdataTotalBranch] = useState(null);
   useEffect(() => {
-    const storedBranch = localStorage.getItem("currentBranch");
     const fetchData = async () => {
       try {
-          const branchObject = JSON.parse(storedBranch);
-          const branchId = branchObject[0].id ;
-          const nameBranch = branchObject[0].name;
-          // console.log(branchId);   
-          setnNameBranch(nameBranch);
-          setIdBranch(branchId); 
+        const dataSlug = await fetchBranchBySlug(slug);
+        const branchId = dataSlug[0].id;
+        const nameBranch = dataSlug[0].name;
 
-          const totalWeek = await fetchRevenueBranchByWeek(branchId);
-          const totalMonth = await  fetchRevenueBranchByMonth(branchId);
-          const totalQuarter = await  fetchRevenueBranchByQuarter(branchId);
-          const totalYear = await  fetchRevenueBranchByYear(branchId);
-          const allBranch = await fetchAllBranch();
-          // console.log(allBranch.data);
+        const dataTotalBranch = await fetchAllByBranch(branchId);
+        const allBranch = await fetchAllBranch();
 
-          setTotalWeek(totalWeek);
-          setTotalMonth(totalMonth);
-          setTotalQuarter(totalQuarter);
-          setTotalYear(totalYear);
-          setAllBranch(allBranch);
+        setDataSlug(dataSlug);
+        setBranchId(branchId);
+        setnNameBranch(nameBranch);
+        setdataTotalBranch(dataTotalBranch);
+        setAllBranch(allBranch);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
     fetchData();
   }, []);
-  const total_revenue_by_week = totalWeek || [];
-  const total_revenue_by_month = totalMonth|| [];
-  const total_revenue_by_quarter = totalQuarter|| [];
-  const total_revenue_by_year = totalYear|| [];
 
-  const dataByWeek = {
-      labels: Object.keys(total_revenue_by_week), 
-      datasets: [
-          {
-              label: 'Doanh thu',
-              data:Object.values(total_revenue_by_week) 
-          }
-      ]
-  };
-  const dataByMonth = {
-      labels: Object.keys(total_revenue_by_month), 
-      datasets: [
-          {
-              label: 'Doanh thu',
-              data:Object.values(total_revenue_by_month) 
-          }
-      ]
-  };
-  const dataByQuarter = {
-      labels: Object.keys(total_revenue_by_quarter), 
-      datasets: [
-          {
-              label: 'Doanh thu',
-              data:Object.values(total_revenue_by_quarter) 
-          }
-      ]
-  };
-  const dataByYear= {
-      labels: Object.keys(total_revenue_by_year), 
-      datasets: [
-          {
-              label: 'Doanh thu',
-              data:Object.values(total_revenue_by_year) 
-          }
-      ]
-  };
-  const dataBarByWeek = {
-    labels: [''],
-    datasets: [
-      {
-        label: 'Doanh thu',
-        data:Object.values(total_revenue_by_week) 
-
-      },
-    ],
-  };
-  const dataBarByMonth = {
-    labels: [''],
-    datasets: [
-      {
-        label: 'Doanh thu',
-        data:Object.values(total_revenue_by_week) 
-
-      },
-    ],
-  };
-  const dataBarByQuarter = {
-    labels: Object.keys(total_revenue_by_quarter),
-    datasets: [
-      {
-        label: 'Doanh thu',
-        data:Object.values(total_revenue_by_week) 
-
-      },
-    ],
-  };
-  const dataBarByYear = {
-    labels: Object.keys(total_revenue_by_quarter),
-    datasets: [
-      {
-        label: 'Doanh thu',
-        data:Object.values(total_revenue_by_week) 
-
-      },
-    ],
-  };
   const dataBranch = allBranch?.data || []; 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const BranchName = (nameBranch === 'Hồ Chí Minh') ? 'tổng' : nameBranch;
-  
-  const content = idBranch === 2 ? (
-    <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                <p className="text-base">Doanh thu theo tuần</p>
-            </div>
-            <Chart data={dataByWeek} chartType="line" />
-        </div>
-        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                <p className="text-base">Doanh thu theo tháng</p>
-            </div>
-            <Chart data={dataByMonth} chartType="line" />
-        </div>
-        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                <p className="text-base">Doanh thu theo quý</p>
-            </div>
-            <Chart data={dataByQuarter} chartType="line" />
-        </div>
-        <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                <p className="text-base">Doanh thu theo năm</p>
-            </div>
-            <Chart data={dataByYear} chartType="line" />
-        </div>
-    </div>
-  ) : (
-      <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                  <p className="text-base">Doanh thu theo tuần</p>
-              </div>
-              <Chart data={dataBarByWeek} chartType="bar" />
-          </div>
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                  <p className="text-base">Doanh thu theo tháng</p>
-              </div>
-              <Chart data={dataBarByMonth} chartType="bar" />
-          </div>
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                  <p className="text-base">Doanh thu theo quý</p>
-              </div>
-              <Chart data={dataBarByQuarter} chartType="bar" />
-          </div>
-          <div className="p-4 bg-whiteAlpha-100 rounded-xl">
-              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                  <p className="text-base">Doanh thu theo năm</p>
-              </div>
-              <Chart data={dataBarByYear} chartType="bar" />
-          </div>
-      </div>
-  );
-
+  const dataBranchChart = dataTotalBranch?.data || []; 
+  const dataChart = {
+    labels: ['Tuần', 'Tháng', 'Năm'], 
+    datasets: [{
+        label: 'Doanh thu',
+        data: [
+          dataBranchChart.total_revune_by_week, 
+          dataBranchChart.total_revune_by_month, 
+          dataBranchChart.total_revune_by_year
+        ]
+    }]
+  };
+  const dataEachMonth = dataBranchChart.total_revune_each_month;
+  const eachMonthChartData = dataEachMonth?.data || []; 
+  const dataEachMonthChart = {
+    labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], 
+    datasets: [{
+        data: [
+          eachMonthChartData
+        ]
+    }]
+  }
 
   const toggleFilter = () => {
     setIsFilterVisible(prevState => !prevState);
@@ -205,10 +81,10 @@ const Page = () => {
       <div className="flex justify-start items-center gap-2 text-base text-gray-500 ">
         <p>Thống kê doanh thu {BranchName}</p>
       </div>
-      <div>
+      <div className='w-full'>
         <div className="flex items-center justify-between gap-[10px] mb-[10px]">
           <p className="text-base font-semibold">Doanh thu {BranchName}</p>
-            {idBranch === 2 ? (
+            {branchId === 2 ? (
               <select className='select w-[300px]'>
                   {dataBranch.map((item) => (
                       <option className='option' key={item.id} value={item.slug}>
@@ -218,7 +94,21 @@ const Page = () => {
               </select>
             ) : null}
         </div>
-        {content}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 bg-blackAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                  {/* <p className="font-bold text-base">Doanh thu theo năm</p> */}
+              </div>
+              <Chart data={dataChart} chartType="bar" />
+          </div>
+          <div className="p-4 bg-blackAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                  {/* <p className="font-bold text-base">Doanh thu theo năm</p> */}
+              </div>
+              <Chart data={dataEachMonthChart} chartType="bar" />
+          </div>
+        </div>
+        
        
         
       </div>
@@ -271,11 +161,11 @@ const Page = () => {
             </div>
           </div>
         )}
-        <div className='w-full'>
+        {/* <div className='w-full'>
           <Suspense fallback={<TableSkeleton/>}>
             <TableGrab></TableGrab>
           </Suspense>
-       </div>
+       </div> */}
       </div>
     
     </main>

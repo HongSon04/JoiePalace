@@ -12,7 +12,7 @@ const Chart = ({ data, chartType }) => {
                 beginAtZero: true,
                 ticks: {
                     font: {
-                        size: 10,
+                        size: 12,
                         family: 'Gilroy',
                     },
                     color: '#ffff',
@@ -22,7 +22,7 @@ const Chart = ({ data, chartType }) => {
             y: {
                 ticks: {
                     font: {
-                        size: 10,
+                        size: 12,
                         family: 'Gilroy'
                     },
                     color: '#ffff',
@@ -43,18 +43,60 @@ const Chart = ({ data, chartType }) => {
                 borderWidth: 1,               
             }
         },
-       barThickness: 15,
+       barThickness: 35,
        backgroundColor: 'rgba(75, 192, 192, 0.6)',      
         borderColor: 'rgba(255, 255, 255, 0.6)',           
         borderWidth: 1,            
         
     };
-
+    const optionsBar = {
+        scales: {
+            x: {
+                beginAtZero: true,
+                ticks: {
+                    font: {
+                        size: 14, 
+                        family: 'Gilroy',
+                    },
+                    color: '#ffff',
+                    padding: 5
+                },
+            },
+            y: {
+                ticks: {
+                    font: {
+                        size: 14, 
+                        family: 'Gilroy'
+                    },
+                    color: '#ffff',
+                    padding: 5,
+                    callback: function(value) {
+                        return value / 1000000 + 'M'; 
+                    }
+                },
+                suggestedMax: 800000000,
+                min: 0,
+            },
+        },
+        elements: {
+            point: {
+                radius: 5,                                      
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',  
+                borderColor: 'rgba(200, 200, 200, 1)',        
+                borderWidth: 1,               
+            }
+        },
+        barThickness: 35,
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',      
+        borderColor: 'rgba(255, 255, 255, 0.6)',           
+        borderWidth: 1,            
+    };
+    
     
     const renderChart = () => {
         switch (chartType) {
             case 'bar':
-                return <Bar data={data} options={options} />;
+                return <Bar data={data} options={optionsBar} />;
             case 'line':
                 return <Line data={data} options={options} />;
             case 'doughnut':
