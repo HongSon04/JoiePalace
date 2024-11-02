@@ -202,11 +202,11 @@ function News() {
                 </div>
                 <>
                     {/* Pagination */}
-                    <nav className="flex items-center justify-start mt-4" aria-label="Pagination">
+                    <nav className="flex items-center justify-center mt-4" aria-label="Pagination">
                         <button
                             onClick={handlePreviousPage}
                             disabled={numberpage === 1}
-                            className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 rounded-xl ${numberpage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <svg
                                 className="shrink-0 size-3.5"
@@ -232,7 +232,7 @@ function News() {
                                         setNumberPage(item);
                                     }
                                 }}
-                                className={`min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${item === numberpage ? 'bg-gold text-white' : 'bg-white text-black hover:bg-gold hover:text-white'}`}
+                                className={`rounded-xl min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${item === numberpage ? 'bg-gold text-white' : 'bg-white text-black hover:bg-gold hover:text-white'}`}
                                 disabled={item === '...'}
                             >
                                 {item}
@@ -242,7 +242,7 @@ function News() {
                         <button
                             onClick={handleNextPage}
                             disabled={numberpage === countNumberPage}
-                            className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === countNumberPage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`bg-white rounded-xl text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === countNumberPage ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <svg
                                 className="shrink-0 size-3.5"

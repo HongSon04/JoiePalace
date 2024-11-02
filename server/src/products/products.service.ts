@@ -202,7 +202,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -314,7 +316,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -522,7 +526,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -636,7 +642,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -826,7 +834,9 @@ export class ProductsService {
       }
 
       if (!findproduct.deleted) {
-        throw new BadRequestException('Sản phẩm chưa bị xóa');
+        throw new BadRequestException(
+          'Sản phẩm chưa bị xóa tạm thời, không thể khôi phục!',
+        );
       }
 
       await this.prismaService.products.update({
@@ -862,6 +872,12 @@ export class ProductsService {
       });
       if (!findproduct) {
         throw new NotFoundException('Sản phẩm không tồn tại');
+      }
+
+      if (!findproduct.deleted) {
+        throw new BadRequestException(
+          'Sản phẩm chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       // Delete images

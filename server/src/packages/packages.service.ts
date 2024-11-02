@@ -474,6 +474,12 @@ export class PackagesService {
         throw new NotFoundException('Gói không tồn tại');
       }
 
+      if (!findPackage.deleted) {
+        throw new BadRequestException(
+          'Gói không bị xóa tạm thời, không thể khôi phục!',
+        );
+      }
+
       await this.prismaService.packages.update({
         where: { id: Number(id) },
         data: {
@@ -510,6 +516,12 @@ export class PackagesService {
 
       if (!findPackage) {
         throw new NotFoundException('Gói không tồn tại');
+      }
+
+      if (!findPackage.deleted) {
+        throw new BadRequestException(
+          'Gói không bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       await this.prismaService.packages.delete({

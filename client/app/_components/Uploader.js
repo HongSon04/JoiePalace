@@ -114,9 +114,8 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
-                <span>
-                  {file.name} ({formatFileSize(file.size)})
-                </span>{" "}
+                <div className="truncate w-full">{file.name}</div>
+                <div className="min-w-max">({formatFileSize(file.size)})</div>
               </li>
             ))}
           </ul>
@@ -124,7 +123,7 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
             onClick={handleUnsetFiles}
             className="text-red-400 underline hover:text-red-500 mt-3"
           >
-            Delete all
+            Xóa tất cả
           </button>
         </div>
       )}

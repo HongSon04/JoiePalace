@@ -27,110 +27,12 @@ const page = () => {
             <p>Khách hàng</p>
             
         </div>
-        <div className="flex justify-between gap-[30px] items-center ">
+        <div className="flex justify-between gap-[30px] items-start ">
             <div className="w-[70%]">
                 <div className="mb-[10px]">
-                <p className="text-base font-semibold">Thống kê lượt khách hàng</p>
+                <p className="text-base font-semibold">Danh sách khách hàng</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 h-full">
-                    <div className="p-2 bg-whiteAlpha-100 rounded-xl">
-                        <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                            <p className="text-base">Thống kê theo tuần </p>
-                        </div>
-                        <div>
-                            <Chart data={data} chartType="line" />
-                        </div>
-                    </div>
-                    <div className="p-2 bg-whiteAlpha-100 rounded-xl">
-                        <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                            <p className="text-base">Thống kê theo tháng </p>
-                        </div>
-                        <div>
-                            <Chart data={data} chartType="line" />
-                        </div>
-                    </div>
-                    <div className="p-2 bg-whiteAlpha-100 rounded-xl">
-                        <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                            <p className="text-base">Thống kê theo quý </p>
-                        </div>
-                        <div>
-                            <Chart data={data} chartType="line" />
-                        </div>
-                    </div>
-                    <div className="p-2 bg-whiteAlpha-100 rounded-xl">
-                        <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                            <p className="text-base">Thống kê theo năm </p>
-                        </div>
-                        <div>
-                            <Chart data={data} chartType="line" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="w-[30%] p4 bg-whiteAlpha-100 h-full rounded-xl ">
-                <div className="flex p-3 gap-[10px] items-center">
-                    <PiShootingStarDuotone className="text-3xl text-yellow-500" />
-                    <p className="text-base font-semibold ">Top khách hàng</p>
-                </div>
-                <div className="flex flex-col p-3 gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
-                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                        <div className="w-full flex justify-between items-center">
-                            <div>
-                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
-                                <div className="flex gap-3 items-center text-xs ">
-                                    <img  src="/image/Group.svg" />
-                                    <p>Đồng</p>
-                                </div>
-                            </div>
-                            <BsThreeDots className="text-xl" />
-                        </div>
-                    </div>
-                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                        <div className="w-full flex justify-between items-center">
-                            <div>
-                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
-                                <div className="flex gap-3 items-center text-xs ">
-                                    <img  src="/image/Group.svg" />
-                                    <p>Đồng</p>
-                                </div>
-                            </div>
-                            <BsThreeDots className="text-xl" />
-                        </div>
-                    </div>
-                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                        <div className="w-full flex justify-between items-center">
-                            <div>
-                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
-                                <div className="flex gap-3 items-center text-xs ">
-                                    <img  src="/image/Group.svg" />
-                                    <p>Đồng</p>
-                                </div>
-                            </div>
-                            <BsThreeDots className="text-xl" />
-                        </div>
-                    </div>
-                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
-                        <div className="w-full flex justify-between items-center">
-                            <div>
-                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
-                                <div className="flex gap-3 items-center text-xs ">
-                                    <img  src="/image/Group.svg" />
-                                    <p>Đồng</p>
-                                </div>
-                            </div>
-                            <BsThreeDots className="text-xl" />
-                        </div>
-                    </div>
-                    
-                </div>  
-            </div>
-                
-        </div>
-        <div className="w-full mt-2">
+                <div className="w-full mt-2">
             <div className="overflow-y-auto max-h-72">
                 <table className="table w-full rounded-lg">
                     <thead>
@@ -205,6 +107,71 @@ const page = () => {
                 </table>
             </div>
         </div>
+            </div>
+            <div className="w-[30%] p4 bg-whiteAlpha-100 h-full rounded-xl ">
+                <div className="flex p-3 gap-[10px] items-center">
+                    <PiShootingStarDuotone className="text-3xl text-yellow-500" />
+                    <p className="text-base font-semibold ">Top khách hàng</p>
+                </div>
+                <div className="flex flex-col p-3 gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
+                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
+                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                        <div className="w-full flex justify-between items-center">
+                            <div>
+                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
+                                <div className="flex gap-3 items-center text-xs ">
+                                    <img  src="/image/Group.svg" />
+                                    <p>Đồng</p>
+                                </div>
+                            </div>
+                            <BsThreeDots className="text-xl" />
+                        </div>
+                    </div>
+                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
+                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                        <div className="w-full flex justify-between items-center">
+                            <div>
+                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
+                                <div className="flex gap-3 items-center text-xs ">
+                                    <img  src="/image/Group.svg" />
+                                    <p>Đồng</p>
+                                </div>
+                            </div>
+                            <BsThreeDots className="text-xl" />
+                        </div>
+                    </div>
+                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
+                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                        <div className="w-full flex justify-between items-center">
+                            <div>
+                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
+                                <div className="flex gap-3 items-center text-xs ">
+                                    <img  src="/image/Group.svg" />
+                                    <p>Đồng</p>
+                                </div>
+                            </div>
+                            <BsThreeDots className="text-xl" />
+                        </div>
+                    </div>
+                    <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
+                        <img className="rounded-full w-[48px]" src="/image/user.jpg" />
+                        <div className="w-full flex justify-between items-center">
+                            <div>
+                                <p className="text-sm  font-semibold mb-[10px]">Tên khách hàng</p>
+                                <div className="flex gap-3 items-center text-xs ">
+                                    <img  src="/image/Group.svg" />
+                                    <p>Đồng</p>
+                                </div>
+                            </div>
+                            <BsThreeDots className="text-xl" />
+                        </div>
+                    </div>
+                    
+                </div>  
+            </div>
+                
+        </div>
+        
 
       
     </main>

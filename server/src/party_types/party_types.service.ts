@@ -477,6 +477,12 @@ export class PartyTypesService {
         throw new NotFoundException('Không tìm thấy loại tiệc');
       }
 
+      if (!partyType.deleted) {
+        throw new BadRequestException(
+          'Loại tiệc chưa bị xóa tạm thời, không thể khôi phục!',
+        );
+      }
+
       await this.prismaService.party_types.update({
         where: { id: Number(id) },
         data: {
@@ -511,6 +517,12 @@ export class PartyTypesService {
 
       if (!partyType) {
         throw new NotFoundException('Không tìm thấy loại tiệc');
+      }
+
+      if (!partyType.deleted) {
+        throw new BadRequestException(
+          'Loại tiệc chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       // Remove images

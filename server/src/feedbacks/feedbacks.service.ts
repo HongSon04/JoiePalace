@@ -108,7 +108,6 @@ export class FeedbacksService {
           : {};
 
       const whereConditions: any = {
-        is_show: true,
         ...sortRangeDate,
         ...(search && {
           OR: [

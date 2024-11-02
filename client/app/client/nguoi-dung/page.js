@@ -9,6 +9,7 @@ import { fetchAllBookingByUserId, fetchBookingById } from '@/app/_services/booki
 import Link from 'next/link';
 import { Result } from 'postcss';
 
+
 const Page = () => {
     const [user, setUser] = useState();
     const [membershipId, setMembershipId] = useState(null);
@@ -34,6 +35,7 @@ const Page = () => {
             "memberships": null
         }
     ];
+
 
     // const parties = [
     //     {
@@ -101,72 +103,76 @@ const Page = () => {
         getData();
     }, []);
 
-    const parties = partyPending.map((item) => ({
-        id: item.id,
-        nameParty: item.name,
-        address: item.company_name,
-        phoneAddress: item.phone,
-        hostName: user?.username,
-        email: user?.email,
-        phoneUser: user?.phone,
-        idParty: `P${item.id}`,
-        partyDate: new Date(item.created_at).toISOString().split("T")[0],
-        dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
-        numberGuest: item.number_of_guests,
-        session: item.shift,
-        tableNumber: Math.ceil(item.number_of_guests / 10),
-        spareTables: 2,
-        linkTo: `/party/${item.id}`,
-        showFull: true,
-        showDetailLink: true,
-        Collapsed: false,
-        hall: "Sảnh A",
-        typeParty: 1,
-        liveOrOnline: "Trực tiếp",
-        space: 1,
-        decorate: item.booking_details.decors.name,
-        typeTable: "Tròn",
-        typeChair: "Ghế nệm bọc vải",
-        guestTable: "10 người/bàn",
-        menu: "Thực đơn 5 món Á",
-        drinks: "Bia Tiger, Nước ngọt Pepsi",
-        payerName: "Nguyễn Văn A",
-        paymentMethod: "Chuyển khoản",
-        menuCostTable: "3,000,000 VND/bàn",
-        amountPayable: item.budget || "0 VND",
-        depositAmount: item.is_deposit ? "50,000,000 VND" : "0 VND",
-        depositStatus: item.is_deposit ? "Đã thanh toán" : "Chưa thanh toán",
-        depositDay: item.is_deposit ? new Date().toISOString().split("T")[0] : "",
-        remainingPaid: item.budget ? `${parseInt(item.budget) - 50000000} VND` : "0 VND",
-        paymentDay: item.organization_date.split("T")[0],
-    }));
-    
-console.log(parties);
+    const parties = partyPending.map((item) => {
+        const dataDetailBooking = item.booking_details.menus;
+        // const dataStages = item.stages;
+        // console.log('decorate:', (dataDetailBooking));
 
-return (
-    <div className="flex flex-col gap-8">
+        return {
+            id: item.id,
+            nameParty: item.name,
+            address: item.company_name,
+            phoneAddress: item.phone,
+            hostName: user?.username,
+            email: user?.email,
+            phoneUser: user?.phone,
+            idParty: `P${item.id}`,
+            partyDate: new Date(item.created_at).toISOString().split("T")[0],
+            dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
+            numberGuest: item.number_of_guests,
+            session: item.shift,
+            tableNumber: Math.ceil(item.number_of_guests / 10),
+            spareTables: 2,
+            linkTo: `/party/${item.id}`,
+            showFull: true,
+            showDetailLink: true,
+            Collapsed: false,
+            // hall: dataStages.name,
+            typeParty: 1,
+            liveOrOnline: "Trực tiếp",
+            space: 1,
+            // decorate: (dataDetailBooking[0].decors)?.name,
+            guestTable: "10 người/bàn/ghế",
+            menu: "Thực đơn 5 món Á",
+            drinks: "Bia Tiger, Nước ngọt Pepsi",
+            payerName: "Nguyễn Văn A",
+            paymentMethod: "Chuyển khoản",
+            menuCostTable: "3,000,000 VND/bàn",
+            amountPayable: item.budget || "0 VND",
+            depositAmount: item.is_deposit ? "50,000,000 VND" : "0 VND",
+            depositStatus: item.is_deposit ? "Đã thanh toán" : "Chưa thanh toán",
+            depositDay: item.is_deposit ? new Date().toISOString().split("T")[0] : "",
+            remainingPaid: item.budget ? `${parseInt(item.budget) - 50000000} VND` : "0 VND",
+            paymentDay: item.organization_date.split("T")[0],
+        }
+    });
 
-        <span className="text-2xl font-bold text-white leading-6">Chung</span>
+    console.log('Data party full:',parties);
 
-        <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={membershipId?.booking_total_amount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${membershipId?.booking_total_amount ? membershipId?.booking_total_amount : 0} VND`} />
+    return (
+        <div className="flex flex-col gap-8">
 
-        <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
-        <div className='flex justify-between'>
-            <span className="text-base font-bold leading-normal text-gold">Tiệc gần nhất</span>
-            <Link href={'nguoi-dung/lich-su-tiec'} className='underline text-gold text-base font-medium cursor-pointer'>Tiệc của bạn</Link>
+            <span className="text-2xl font-bold text-white leading-6">Chung</span>
+
+            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={membershipId?.booking_total_amount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${membershipId?.booking_total_amount ? membershipId?.booking_total_amount : 0} VND`} />
+
+            <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
+            <div className='flex justify-between'>
+                <span className="text-base font-bold leading-normal text-gold">Tiệc gần nhất</span>
+                <Link href={'nguoi-dung/lich-su-tiec'} className='underline text-gold text-base font-medium cursor-pointer'>Tiệc của bạn</Link>
+            </div>
+
+            {parties && parties.length > 0 ? (
+                parties.map(party => (
+                    <div key={party.id} className="cursor-pointer">
+                        <PartySectionClient showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
+                    </div>
+                ))
+            ) : (
+                <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
+            )}
         </div>
-
-        {parties && parties.length > 0 ? (
-            parties.map(party => (
-                <div key={party.id} className="cursor-pointer">
-                    <PartySectionClient showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
-                </div>
-            ))
-        ) : (
-            <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
-        )}
-    </div>
-);
+    );
 };
 
 export default Page;
