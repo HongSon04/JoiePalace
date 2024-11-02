@@ -157,10 +157,11 @@ export const API_CONFIG = {
   },
 
   // PARTY TYPES API
-  PARTYTYPES: {
+  PARTY_TYPES: {
     CREATE: `${PARTYTYPES_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${PARTYTYPES_API}/get-all`, params),
+    GET_BY_ID: (id) => `${PARTYTYPES_API}/get/${id}`,
   },
 
   // BOOKINGS API

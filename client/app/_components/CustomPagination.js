@@ -2,7 +2,13 @@
 
 import { Pagination } from "@nextui-org/react";
 
-function CustomPagination({ total, onChange, page, className }) {
+function CustomPagination({
+  total,
+  onChange,
+  page,
+  className,
+  classNames = {},
+}) {
   return (
     <Pagination
       isCompact
@@ -18,6 +24,7 @@ function CustomPagination({ total, onChange, page, className }) {
         prev: "!bg-whiteAlpha-200 text-gray-400",
         next: "!bg-whiteAlpha-200 text-gray-400",
         cursor: "bg-gold",
+        ...classNames,
       }}
     />
   );

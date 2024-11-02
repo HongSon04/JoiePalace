@@ -7,11 +7,7 @@ function Page() {
   const router = useRouter();
   router.push("/auth/chon-chi-nhanh");
 
-  return (
-    <div>
-      <Loading />
-    </div>
-  );
+  return <Loading />;
 }
 
 export default Page;
