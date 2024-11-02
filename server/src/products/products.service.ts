@@ -190,9 +190,9 @@ export class ProductsService {
       }
 
       // Sắp xếp theo giá
-      let orderByConditions: any = {};
+      let orderByConditions: any[] = [];
       if (priceSort === 'asc' || priceSort === 'desc') {
-        orderByConditions.price = priceSort;
+        orderByConditions.push({ price: priceSort });
       }
 
       // Lấy danh sách Sản phẩm và tổng số
