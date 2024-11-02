@@ -2,14 +2,16 @@
 
 import { Pagination } from "@nextui-org/react";
 
-function CustomPagination({ total, onPageChange }) {
+function CustomPagination({ total, onChange, page, className }) {
   return (
     <Pagination
       isCompact
+      page={page}
       showControls
-      onChange={onPageChange}
+      onChange={onChange}
       total={total}
       initialPage={1}
+      className={className}
       classNames={{
         base: "!flex-center mt-5",
         item: "!bg-whiteAlpha-200 text-gray-400",

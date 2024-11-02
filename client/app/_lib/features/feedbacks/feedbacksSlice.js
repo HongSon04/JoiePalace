@@ -10,8 +10,8 @@ const initialState = {
   categories: [
     { id: "requested", name: "Đã nhận", isApproved: false, isShow: true },
     { id: "approved", name: "Đã duyệt", isApproved: true, isShow: true },
-    { id: "hide", name: "Ẩn", isApproved: false, isShow: false },
   ],
+  pagination: {},
 };
 
 const feedbacksSlice = createSlice({
@@ -23,7 +23,8 @@ const feedbacksSlice = createSlice({
     },
     fetchFeedbacksSuccess: (state, action) => {
       state.isLoading = false;
-      state.feedbacks = action.payload;
+      state.feedbacks = action.payload.data;
+      state.pagination = action.payload.pagination;
     },
     fetchFeedbacksFailure: (state, action) => {
       state.isLoading = false;
@@ -35,7 +36,6 @@ const feedbacksSlice = createSlice({
     },
     approvingFeedbackSuccess: (state, action) => {
       state.isApproving = false;
-      state.feedbacks = action.payload;
     },
     approvingFeedbackFailure: (state, action) => {
       state.isApproving = false;
@@ -47,7 +47,6 @@ const feedbacksSlice = createSlice({
     },
     hidingFeedbackSuccess: (state, action) => {
       state.isHiding = false;
-      state.feedbacks = action.payload;
     },
     hidingFeedbackFailure: (state, action) => {
       state.isHiding = false;

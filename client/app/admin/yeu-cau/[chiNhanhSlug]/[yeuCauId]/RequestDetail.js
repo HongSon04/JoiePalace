@@ -14,7 +14,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { partyTypes } from "@/app/_utils/config";
 import { _require } from "@/app/_utils/validations";
 
-function RequestDetail() {
+function RequestDetail({ selectedRequest }) {
   const request = {
     id: 1,
     name: "Nguyễn Văn A",

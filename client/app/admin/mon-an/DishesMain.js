@@ -1,10 +1,18 @@
 "use client";
 
-import { dishCategories } from "@/app/_utils/config";
-import DishesSection from "./DishesSection";
+import Error from "@/app/_components/Error";
 import useApiServices from "@/app/_hooks/useApiServices";
-import { API_CONFIG } from "@/app/_utils/api.config";
 import useRoleGuard from "@/app/_hooks/useRoleGuard";
+import {
+  fetchingCategories,
+  fetchingCategoriesFailure,
+  fetchingCategoriesSuccess,
+} from "@/app/_lib/features/categories/categoriesSlice";
+import {
+  fetchingCategoryDishes,
+  fetchingCategoryDishesSuccess,
+} from "@/app/_lib/features/dishes/dishesSlice";
+import { API_CONFIG } from "@/app/_utils/api.config";
 import {
   Tab,
   TabIndicator,
@@ -13,21 +21,11 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import { Chip, DateRangePicker } from "@nextui-org/react";
-import CustomPagination from "@/app/_components/CustomPagination";
-import Loading from "../loading";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchingCategories,
-  fetchingCategoriesFailure,
-  fetchingCategoriesSuccess,
-} from "@/app/_lib/features/categories/categoriesSlice";
 import React from "react";
-import Error from "@/app/_components/Error";
-import {
-  fetchingCategoryDishes,
-  fetchingCategoryDishesSuccess,
-} from "@/app/_lib/features/dishes/dishesSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Loading from "../loading";
+import DishesSection from "./DishesSection";
+import DishesTable from "./DishesTable";
 
 function DishesMain() {
   const { isLoading } = useRoleGuard();
@@ -48,7 +46,7 @@ function DishesMain() {
     dispatch(fetchingCategories());
 
     const data = await makeAuthorizedRequest(
-      API_CONFIG.CATEGORIES.GET_BY_SLUG("thuc-an"),
+      API_CONFIG.CATEGORIES.GET_BY_SLUG(API_CONFIG.FOOD_CATEGORY_SLUG),
       "GET"
     );
 
@@ -124,6 +122,11 @@ function DishesMain() {
                 categories={categories}
               />{" "}
               {/* Pass categoryId to DishesSection */}
+              {/* <DishesTable
+                key={index}
+                dishCategory={category}
+                categories={categories}
+              /> */}
             </TabPanel>
           ))}
         </TabPanels>
