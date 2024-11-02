@@ -379,7 +379,7 @@ export class CategoriesService {
       // ? Find Children Categories
       const childrenCategories = await this.prismaService.categories.findMany({
         where: {
-          category_id: category.id,
+          category_id: Number(category.id),
         },
         include: {
           tags: true,
@@ -531,7 +531,11 @@ export class CategoriesService {
           slug,
           description,
           short_description,
-          category_id: Number(category_id) || null,
+          category_id: category_id
+            ? Number(category_id)
+            : findCategories.category_id
+              ? Number(findCategories.category_id)
+              : null,
           images: images.length > 0 ? images : findCategories.images,
           tags: { set: tagsSet },
         },
