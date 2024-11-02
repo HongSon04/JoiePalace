@@ -239,16 +239,23 @@ function FormInput({
 
   // for defaultValue
   defaultValue = "",
+  readOnly = false,
 }) {
   const themeClassName = {
     light: {
-      input:
-        "!bg-whiteAlpha-100 !hover:bg-whiteAlpha-200 !focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400",
+      input: `${
+        startContent || endContent
+          ? "bg-transparent"
+          : "!bg-whiteAlpha-100 !hover:bg-whiteAlpha-200 !focus:bg-whiteAlpha-200"
+      } !text-white !placeholder:text-gray-400`,
       label: "!text-white",
     },
     dark: {
-      input:
-        "!bg-blackAlpha-200 !hover:bg-blackAlpha-400 !focus:bg-blackAlpha-400 !text-gray-800 !placeholder:text-gray-600",
+      input: `${
+        startContent || endContent
+          ? "bg-transparent"
+          : "!bg-whiteAlpha-100 !hover:bg-whiteAlpha-200 !focus:bg-whiteAlpha-200"
+      } !text-gray-800 !placeholder:text-gray-600`,
       label: "!text-gray-600",
     },
   }[theme];
@@ -271,11 +278,12 @@ function FormInput({
       <div
         role="input-wrapper"
         className={`w-full rounded-lg overflow-hidden ${
-          type === "password"
+          type === "password" || startContent || endContent
             ? "flex items-center bg-whiteAlpha-100 hover:bg-whiteAlpha-200"
             : ""
-        }`}
+        } ${startContent || endContent ? "px-2" : ""}`}
       >
+        {startContent}
         {type === "textarea" && (
           <textarea
             {...register(name)}
@@ -289,8 +297,8 @@ function FormInput({
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
-            // defaultValue={defaultValue}
+            className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400 w-full ${className} ${themeClassName.input}`}
+            readOnly={readOnly}
           />
         )}
         {type === "text" && (
@@ -305,8 +313,8 @@ function FormInput({
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
-            // defaultValue={defaultValue}
+            className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400  w-full ${className} ${themeClassName.input}`}
+            readOnly={readOnly}
           />
         )}
         {type === "number" && (
@@ -321,8 +329,8 @@ function FormInput({
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
-            // defaultValue={defaultValue}
+            className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
+            readOnly={readOnly}
           />
         )}
         {type === "password" && (
@@ -338,7 +346,7 @@ function FormInput({
             name={name}
             aria-label={ariaLabel}
             className={`px-3 py-2 outline-none border-none text-white placeholder:text-gray-400 w-full flex-1 ${className} ${themeClassName.input}`}
-            // defaultValue={defaultValue}
+            readOnly={readOnly}
           />
         )}
         {type === "select" && (
@@ -350,7 +358,7 @@ function FormInput({
             onChange={onChange}
             className={`select w-full !bg-blackAlpha-100 text-gray-600 hover:text-gray-400 ${className} ${themeClassName.input}`}
             required={required}
-            // defaultValue={defaultValue}
+            readOnly={readOnly}
           >
             {options.map((option, index) => (
               <option
@@ -379,10 +387,18 @@ function FormInput({
               id={id || name}
               name={name}
               aria-label={ariaLabel}
-              className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
-              // defaultValue={defaultValue}
+              className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400 focus:bg-whiteAlpha-400 w-full ${className} ${
+                themeClassName.input
+              } ${
+                startContent || endContent
+                  ? "!bg-transparent px-2"
+                  : "px-3 bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400"
+              }`}
+              readOnly={readOnly}
             />
           )}
+
+        {endContent}
         {type === "password" && (
           <Button
             role="toggle-button"

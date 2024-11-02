@@ -9,6 +9,7 @@ import sidebarSlice from "./features/sidebar/sidebarSlice";
 import themeSlice from "./features/theme/themeSlice";
 import categoriesSlice from "./features/categories/categoriesSlice";
 import feedbacksSlice from "./features/feedbacks/feedbacksSlice";
+import partyTypesSlice from "./features/partyTypes/partyTypesSlice";
 
 // import services
 
@@ -23,6 +24,7 @@ const store = configureStore({
     branch: branchSlice.reducer,
     categories: categoriesSlice.reducer,
     feedbacks: feedbacksSlice.reducer,
+    partyTypes: partyTypesSlice.reducer,
   },
 });
 

@@ -231,12 +231,6 @@ function RequestTable() {
     return () => {};
   }, []);
 
-  const statusOptions = [
-    { name: "Đã xử lý", uid: "processing" },
-    { name: "Đã hủy", uid: "cancel" },
-    { name: "Chưa xử lý", uid: "pending" },
-  ];
-
   const columns = [
     { name: "ID", uid: "id", sortable: true },
     { name: "Tên", uid: "name", sortable: true },
@@ -455,6 +449,9 @@ function RequestTable() {
         page={currentPage}
         total={pagination.lastPage}
         onChange={onPageChange}
+        classNames={{
+          base: "flex justify-center",
+        }}
       />
     );
   }, [currentPage, pagination.lastPage]);

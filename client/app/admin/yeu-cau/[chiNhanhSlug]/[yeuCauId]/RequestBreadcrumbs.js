@@ -1,13 +1,12 @@
 "use client";
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 
 function RequestBreadcrumbs({ requestId }) {
-  const branch = {
-    id: 1,
-    name: "Hoàng Văn Thụ",
-    slug: "hoang-van-thu",
-  };
+  const { currentBranch } = useSelector((store) => store.branch);
+
+  const branch = currentBranch || { name: "", slug: "" };
 
   return (
     <Breadcrumb className="text-gray-400 mt-5">
