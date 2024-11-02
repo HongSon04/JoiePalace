@@ -118,7 +118,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -202,7 +202,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -230,7 +232,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -314,7 +316,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -342,7 +346,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -373,7 +377,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -408,7 +412,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> get10PerCategory', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -440,7 +444,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -522,7 +526,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -550,7 +556,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findByCategoryId', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -636,7 +642,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -664,7 +672,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findByTagId', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -771,7 +779,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -810,7 +818,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> deleteProduct', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -826,7 +834,9 @@ export class ProductsService {
       }
 
       if (!findproduct.deleted) {
-        throw new BadRequestException('Sản phẩm chưa bị xóa');
+        throw new BadRequestException(
+          'Sản phẩm chưa bị xóa tạm thời, không thể khôi phục!',
+        );
       }
 
       await this.prismaService.products.update({
@@ -849,7 +859,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> restoreproduct', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -862,6 +872,12 @@ export class ProductsService {
       });
       if (!findproduct) {
         throw new NotFoundException('Sản phẩm không tồn tại');
+      }
+
+      if (!findproduct.deleted) {
+        throw new BadRequestException(
+          'Sản phẩm chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       // Delete images
@@ -880,7 +896,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

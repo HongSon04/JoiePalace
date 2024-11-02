@@ -2,18 +2,16 @@
 
 import AdminHeader from "@/app/_components/AdminHeader";
 import RequestBreadcrumbs from "./RequestBreadcrumbs";
-import StatusSelect from "./StatusSelect";
 import RequestDetail from "./RequestDetail";
 
-function page({ params: { yeuCauId } }) {
+function Page({ params: { yeuCauId } }) {
   return (
     <div>
       <AdminHeader title={"Yêu cầu"} showSearchForm={false} />
-      <RequestBreadcrumbs requestId={yeuCauId} />
-      <StatusSelect />
-      <RequestDetail />
+      {/* <RequestBreadcrumbs requestId={yeuCauId} /> */}
+      <RequestDetail id={yeuCauId} />
     </div>
   );
 }
 
-export default page;
+export default Page;

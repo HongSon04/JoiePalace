@@ -59,9 +59,15 @@ function Form({}) {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm({
     resolver: zodResolver(schema),
   });
+
+  const onInputChange = (e) => {
+    setValue(e.target.name, e.target.value);
+  };
 
   const toast = useCustomToast();
   const { branchSlug } = useParams();
@@ -141,7 +147,7 @@ function Form({}) {
       }
 
       if (!currentBranch) return;
-      console.log(currentBranch);
+      // console.log(currentBranch);
 
       // CHECK IF USER BELONGS TO THE BRANCH
       if (user?.branch_id !== currentBranch?.id) {
@@ -167,7 +173,7 @@ function Form({}) {
         closable: true,
       });
 
-      router.push(`/admin/bang-dieu-khien/${branchSlug}`);
+      window.location.href = `/admin/bang-dieu-khien/${currentBranch.slug}`;
     }
   };
 
@@ -229,6 +235,8 @@ function Form({}) {
             register={register}
             errors={errors}
             errorMessage={errors?.email?.message}
+            value={watch("email")}
+            onChange={onInputChange}
           ></FormInput>
           <FormInput
             id={"password"}
@@ -241,6 +249,8 @@ function Form({}) {
             isPasswordVisible={isPasswordVisible}
             setIsPasswordVisible={handleSetPasswordVisible}
             errorMessage={errors?.password?.message}
+            value={watch("password")}
+            onChange={onInputChange}
           ></FormInput>
           <Button
             type="submit"

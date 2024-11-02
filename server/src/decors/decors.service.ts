@@ -105,7 +105,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -220,7 +220,9 @@ export class DecorsService {
           },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.decors.count({
           where: whereConditions,
@@ -252,7 +254,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -366,7 +368,9 @@ export class DecorsService {
           },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.decors.count({
           where: whereConditions,
@@ -434,7 +438,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -533,7 +537,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -569,7 +573,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> delete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -586,7 +590,9 @@ export class DecorsService {
       }
 
       if (!decor.deleted) {
-        throw new BadRequestException('Trang trí chưa bị xóa');
+        throw new BadRequestException(
+          'Trang trí chưa bị xóa tạm thời, không thể khôi phục!',
+        );
       }
 
       await this.prismaService.decors.update({
@@ -605,7 +611,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -622,7 +628,9 @@ export class DecorsService {
       }
 
       if (!decor.deleted) {
-        throw new BadRequestException('Trang trí chưa bị xóa');
+        throw new BadRequestException(
+          'Trang trí chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       // Delete images
@@ -643,7 +651,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

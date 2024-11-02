@@ -190,7 +190,7 @@ export class PaymentMethodsService {
       console.log('Lỗi từ payment_method.service.ts -> momo', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -332,7 +332,7 @@ export class PaymentMethodsService {
       console.log('Lỗi từ payment_method.service.ts -> vnpay', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -435,7 +435,7 @@ export class PaymentMethodsService {
       console.log('Lỗi từ payment_method.service.ts -> onepay', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -558,7 +558,7 @@ export class PaymentMethodsService {
       console.log('Lỗi từ payment_method.service.ts -> zaloPay', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

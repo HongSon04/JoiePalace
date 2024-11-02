@@ -104,7 +104,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -191,7 +191,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -278,7 +278,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -315,7 +315,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findOne: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -425,7 +425,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -461,7 +461,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> remove: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -475,6 +475,12 @@ export class PartyTypesService {
 
       if (!partyType) {
         throw new NotFoundException('Không tìm thấy loại tiệc');
+      }
+
+      if (!partyType.deleted) {
+        throw new BadRequestException(
+          'Loại tiệc chưa bị xóa tạm thời, không thể khôi phục!',
+        );
       }
 
       await this.prismaService.party_types.update({
@@ -497,7 +503,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> restore: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -511,6 +517,12 @@ export class PartyTypesService {
 
       if (!partyType) {
         throw new NotFoundException('Không tìm thấy loại tiệc');
+      }
+
+      if (!partyType.deleted) {
+        throw new BadRequestException(
+          'Loại tiệc chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
 
       // Remove images
@@ -531,7 +543,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> hardDelete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

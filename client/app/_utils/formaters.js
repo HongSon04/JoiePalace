@@ -5,6 +5,11 @@ export function formatDateTime(dateTime) {
   return date.toLocaleString();
 }
 
+export function ISOStringToDateTimeString(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleString();
+}
+
 export function formatRelativeTime(dateTime) {
   return formatDistanceToNow(new Date(dateTime), { addSuffix: true });
 }
@@ -55,14 +60,14 @@ export const formatFullDateTime = (input) => {
 };
 
 // Example usage
-try {
-  const formattedDateTime = formatDateTime("2024-10-25T09:07:54.323Z");
-  console.log(formattedDateTime.iso); // Outputs: 2024-10-25T09:07:54.323Z
-  console.log(formattedDateTime.time); // Outputs: 09:07 AM
-  console.log(formattedDateTime.date); // Outputs: 25/10/2024
-} catch (error) {
-  console.error(error.message);
-}
+// try {
+//   const formattedDateTime = formatDateTime("2024-10-25T09:07:54.323Z");
+//   // console.log(formattedDateTime.iso); // Outputs: 2024-10-25T09:07:54.323Z
+//   // console.log(formattedDateTime.time); // Outputs: 09:07 AM
+//   // console.log(formattedDateTime.date); // Outputs: 25/10/2024
+// } catch (error) {
+//   console.error(error.message);
+// }
 
 // Example usage
 // const date = new Date("2024-10-25T09:07:54.323Z");

@@ -92,7 +92,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -125,7 +125,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getProfile: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -180,7 +180,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changePassword: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -226,7 +226,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changeProfile: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -301,7 +301,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -376,7 +376,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAllDeleted: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -452,7 +452,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAllByBranchId: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -483,7 +483,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getById: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -514,7 +514,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getById: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -548,7 +548,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> softDelete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -564,6 +564,13 @@ export class UserService {
       if (!user) {
         throw new NotFoundException('User không tồn tại');
       }
+
+      if (!user.deleted) {
+        throw new BadRequestException(
+          'User chưa bị xóa tạm thời, không thể khôi phục!',
+        );
+      }
+
       await this.prismaService.users.update({
         where: {
           id: Number(id),
@@ -582,7 +589,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> restore: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -597,6 +604,12 @@ export class UserService {
       });
       if (!user) {
         throw new NotFoundException('User không tồn tại');
+      }
+
+      if (!user.deleted) {
+        throw new BadRequestException(
+          'User chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
       // ? Delete Image
       if (user.avatar) {
@@ -615,7 +628,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> hardDelete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

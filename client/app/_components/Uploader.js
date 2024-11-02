@@ -1,10 +1,10 @@
 // app/components/ImageUpload.js
 "use client"; // This is a client component
 
-import Image from "next/image";
-import { useState, useCallback } from "react";
-import { CONFIG } from "../_utils/config";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import { useCallback } from "react";
+import { CONFIG } from "../_utils/config";
 
 /**
  * USAGE: 
@@ -47,7 +47,7 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
       setFiles(droppedFiles);
       onFileChange(droppedFiles); // Notify parent component of the dropped files
     },
-    [onFileChange]
+    [onFileChange, setFiles]
   );
 
   // Utility function to format file size
@@ -114,9 +114,8 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
-                <span>
-                  {file.name} ({formatFileSize(file.size)})
-                </span>{" "}
+                <div className="truncate w-full">{file.name}</div>
+                <div className="min-w-max">({formatFileSize(file.size)})</div>
               </li>
             ))}
           </ul>
@@ -124,7 +123,7 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
             onClick={handleUnsetFiles}
             className="text-red-400 underline hover:text-red-500 mt-3"
           >
-            Delete all
+            Xóa tất cả
           </button>
         </div>
       )}

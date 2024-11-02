@@ -1,13 +1,31 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import imagePlaceholder from "@/public/alacarte-menu-thumbnail.png";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  selectedDish: {},
+  selectedDish: {
+    images: [""],
+  },
   dishes: [],
+  pagination: {
+    total: 0,
+    currentPage: 1,
+    lastPage: 1,
+    prePage: null,
+    nextPage: null,
+    itemsPerPage: 10,
+  },
   categoryDishes: [],
   error: "",
   isLoading: false,
   isError: false,
+  isAddingDishCategory: false,
+  isAddingDishCategoryError: false,
+  isAddingDish: false,
+  isAddingDishError: false,
+  isUpdatingDish: false,
+  isUpdatingDishError: false,
+  isDeletingDish: false,
+  isDeletingDishError: false,
 };
 
 const dishesSlice = createSlice({
@@ -18,14 +36,14 @@ const dishesSlice = createSlice({
       state.selectedDish = action.payload;
     },
     addingDishCategory: (state, action) => {
-      state.isLoading = true;
+      state.isAddingDishCategory = true;
     },
     addingDishCategorySuccess: (state, action) => {
-      state.isLoading = false;
+      state.isAddingDishCategory = false;
     },
     addingDishCategoryFailure: (state, action) => {
-      state.isLoading = false;
-      state.isError = true;
+      state.isAddingDishCategory = false;
+      state.isAddingDishCategoryError = true;
     },
     fetchingSelectedDish: (state, action) => {
       state.isLoading = true;
@@ -42,20 +60,55 @@ const dishesSlice = createSlice({
     },
     fetchingCategoryDishesSuccess: (state, action) => {
       state.isLoading = false;
+      state.categoryDishes = action.payload.data;
+      state.pagination = action.payload.pagination;
     },
     fetchingCategoryDishesFailure: (state, action) => {
       state.isLoading = false;
       state.isError = true;
     },
     addingDish: (state, action) => {
-      state.isLoading = true;
+      state.isAddingDish = true;
     },
     addingDishSuccess: (state, action) => {
-      state.isLoading = false;
+      state.isAddingDish = false;
+      state.dishes = [
+        ...state.dishes.filter((dish) => dish.id !== action.payload.id),
+        action.payload,
+      ];
     },
     addingDishFailure: (state, action) => {
-      state.isLoading = false;
-      state.isError = true;
+      state.isAddingDish = false;
+      state.isAddingDishError = true;
+    },
+    updateDishRequest: (state, action) => {
+      state.isUpdatingDish = true;
+    },
+    updateDishSuccess: (state, action) => {
+      state.isUpdatingDish = false;
+      state.dishes = [
+        ...state.dishes.filter((dish) => dish.id !== action.payload.id),
+        action.payload,
+      ];
+    },
+    updateDishFailure: (state, action) => {
+      state.isUpdatingDish = false;
+      state.isUpdatingDishError = true;
+    },
+
+    deleteDishRequest: (state, action) => {
+      state.isDeletingDish = true;
+    },
+    deleteDishSuccess: (state, action) => {
+      state.isDeletingDish = false;
+      state.categoryDishes = state.categoryDishes.filter(
+        (dish) => dish.id !== action.payload
+      );
+    },
+    deleteDishFailure: (state, action) => {
+      state.isDeletingDish = false;
+      state.isDeletingDishError = true;
+      state.error = action.payload;
     },
   },
   // extraReducers: (builder) => {
@@ -87,18 +140,29 @@ const dishesSlice = createSlice({
 
 export const {
   setSelectedDish,
+
   addingDishCategory,
   addingDishCategorySuccess,
   addingDishCategoryFailure,
+
   fetchingSelectedDish,
   fetchingSelectedDishSuccess,
   fetchingSelectedDishFailure,
   fetchingCategoryDishes,
   fetchingCategoryDishesSuccess,
   fetchingCategoryDishesFailure,
+
   addingDish,
   addingDishSuccess,
   addingDishFailure,
+
+  updateDishRequest,
+  updateDishSuccess,
+  updateDishFailure,
+
+  deleteDishRequest,
+  deleteDishSuccess,
+  deleteDishFailure,
 } = dishesSlice.actions;
 
 export default dishesSlice;

@@ -29,7 +29,18 @@ const categoriesSlice = createSlice({
     addingCategorySuccess(state) {
       state.isLoading = false;
     },
-    addingCategoryFailure(state) {
+    addingCategoryFailure(state, action) {
+      state.isLoading = false;
+      state.error = action.payload;
+      state.isError = true;
+    },
+    fetchingParentCategory(state) {
+      state.isLoading = true;
+    },
+    fetchingParentCategorySuccess(state) {
+      state.isLoading = false;
+    },
+    fetchingParentCategoryFailure(state, action) {
       state.isLoading = false;
       state.error = action.payload;
       state.isError = true;
@@ -41,9 +52,14 @@ export const {
   fetchingCategories,
   fetchingCategoriesSuccess,
   fetchingCategoriesFailure,
+
   addingCategory,
   addingCategorySuccess,
   addingCategoryFailure,
+
+  fetchingParentCategory,
+  fetchingParentCategorySuccess,
+  fetchingParentCategoryFailure,
 } = categoriesSlice.actions;
 
 export default categoriesSlice;
