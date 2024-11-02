@@ -308,7 +308,10 @@ export class BookingsController {
 
   // ! Get Booking For Next 14 Days
   @Get('get-booking-list/:branch_id')
-  @ApiOperation({ summary: 'Lấy danh sách đơn tiệc trong 14 ngày tới' })
+  @ApiOperation({
+    summary:
+      'Lấy danh sách đơn tiệc trong 14 ngày tới (dành cho clients sau dữ liệu booking)',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     example: {
