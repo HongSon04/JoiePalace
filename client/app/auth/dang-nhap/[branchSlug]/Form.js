@@ -173,7 +173,7 @@ function Form({}) {
         closable: true,
       });
 
-      router.push(`/admin/bang-dieu-khien/${branchSlug}`);
+      window.location.href = `/admin/bang-dieu-khien/${currentBranch.slug}`;
     }
   };
 

@@ -69,7 +69,7 @@ function AdminSidebar() {
 
       enterAnimation();
     }
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, animate, scope]);
 
   return (
     <motion.div

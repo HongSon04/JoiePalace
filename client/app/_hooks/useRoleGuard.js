@@ -19,7 +19,7 @@ const useRoleGuard = (requiredRoles = ["admin", "manager"]) => {
     if (storedBranch) {
       dispatch(getCurrentBranch(storedBranch));
     }
-  }, []);
+  }, [dispatch]);
 
   React.useEffect(() => {
     const checkUserRole = () => {

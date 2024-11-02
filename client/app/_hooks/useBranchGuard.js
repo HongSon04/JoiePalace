@@ -17,7 +17,7 @@ const useBranchAccess = (branchSlug) => {
     if (storedBranch) {
       dispatch(getCurrentBranch(storedBranch));
     }
-  }, []);
+  }, [dispatch]);
 
   React.useEffect(() => {
     if (currentBranch) {
@@ -42,7 +42,7 @@ const useBranchAccess = (branchSlug) => {
         }
       }
     }
-  }, [branchSlug]);
+  }, [branchSlug, currentBranch]);
 
   return { canAccess, retryUrl };
 };
