@@ -287,6 +287,8 @@ export class BookingsService {
           },
         },
         branches: true,
+        stages: true,
+        party_types: true,
         booking_details: {
           include: {
             decors: true,
@@ -302,7 +304,6 @@ export class BookingsService {
             deposits: true,
           },
         },
-        stages: true,
       };
 
       // Execute database queries in transaction
@@ -370,12 +371,17 @@ export class BookingsService {
           },
           branches: true,
           stages: true,
+          party_types: true,
           booking_details: {
             include: {
               decors: true,
               menus: {
                 include: {
-                  products: true,
+                  products: {
+                    include: {
+                      tags: true,
+                    },
+                  },
                 },
               },
               deposits: true,

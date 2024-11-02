@@ -100,7 +100,9 @@ export const fetchBranchTotalRevenueMonth = async (branchId) => {
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu chi nhánh");
     }
+    return response.data;
   } catch (error) {
-    throw error;
+    console.error("Lỗi khi lấy doanh thu:", error);
+    throw error; 
   }
 };
