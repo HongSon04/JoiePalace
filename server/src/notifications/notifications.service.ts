@@ -50,7 +50,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> sendNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -67,7 +67,7 @@ export class NotificationsService {
           where: {
             user_id: Number(user_id),
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -105,7 +105,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> getNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -132,7 +132,7 @@ export class NotificationsService {
           where: {
             user_id: findUser.id,
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             created_at: 'desc',
@@ -172,7 +172,7 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -216,7 +216,7 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

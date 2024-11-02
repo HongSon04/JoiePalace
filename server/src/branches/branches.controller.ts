@@ -105,7 +105,7 @@ export class BranchesController {
       {
         fileFilter: (req, file, cb) => {
           const allowedExtensions = /\.(jpg|jpeg|png)$/;
-          const maxSize = 1024 * 1024 * 5; // 5MB
+          const maxSize = 1024 * 1024 * 10; // 10MB
 
           // Kiểm tra nếu file là mảng
           const files = Array.isArray(file) ? file : [file];
@@ -126,7 +126,7 @@ export class BranchesController {
             if (f.size > maxSize) {
               return cb(
                 new HttpException(
-                  `Kích thước ảnh tối đa 5MB cho trường "${f.fieldname}"`,
+                  `Kích thước ảnh tối đa 10MB cho trường "${f.fieldname}"`,
                   HttpStatus.BAD_REQUEST,
                 ),
                 false,
@@ -448,7 +448,7 @@ export class BranchesController {
       {
         fileFilter: (req, file, cb) => {
           const allowedExtensions = /\.(jpg|jpeg|png)$/;
-          const maxSize = 1024 * 1024 * 5; // 5MB
+          const maxSize = 1024 * 1024 * 10; // 10MB
 
           // Kiểm tra nếu file là mảng
           const files = Array.isArray(file) ? file : [file];
@@ -469,7 +469,7 @@ export class BranchesController {
             if (f.size > maxSize) {
               return cb(
                 new HttpException(
-                  `Kích thước ảnh tối đa 5MB cho trường "${f.fieldname}"`,
+                  `Kích thước ảnh tối đa 10MB cho trường "${f.fieldname}"`,
                   HttpStatus.BAD_REQUEST,
                 ),
                 false,

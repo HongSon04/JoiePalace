@@ -75,7 +75,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> getAllInfo: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -122,7 +122,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> getAllInfoByEachTime: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -227,7 +227,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -275,7 +275,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> countAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -308,7 +308,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -349,7 +349,7 @@ export class DashboardService {
 
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -391,7 +391,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -442,7 +442,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -483,7 +483,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -532,7 +532,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -572,7 +572,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -633,7 +633,7 @@ export class DashboardService {
         {} as Record<string, number>,
       );
 
-      return result;
+      return branch_id > 0 ? result : this.transformBranchData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -644,7 +644,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -706,7 +706,7 @@ export class DashboardService {
           0,
         );
         revenueMap[booking.branch_id] =
-          (revenueMap[booking.branch_id] || 0) + total_price;
+          (revenueMap[booking.branch_id] || 0) + Number(total_price);
       });
 
       // Gán doanh thu cho từng chi nhánh
@@ -714,7 +714,7 @@ export class DashboardService {
         data[branch.name] = revenueMap[branch.id] || 0; // Nếu không có booking, gán 0
       });
 
-      return data;
+      return branch_id > 0 ? data : this.transformBranchData(data);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -725,7 +725,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -796,7 +796,7 @@ export class DashboardService {
         {} as Record<string, number>,
       );
 
-      return result;
+      return branch_id > 0 ? result : this.transformBranchData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -807,7 +807,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -880,7 +880,7 @@ export class DashboardService {
         result[branchName][quarterIndex] += totalAmount;
       });
 
-      return result;
+      return branch_id > 0 ? result : this.transformQuarterlyData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -891,7 +891,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -957,7 +957,7 @@ export class DashboardService {
         return acc;
       }, {});
 
-      return result;
+      return branch_id > 0 ? result : this.transformBranchData(result);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -968,7 +968,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1055,7 +1055,9 @@ export class DashboardService {
       }
 
       // B7: Sắp xếp theo tổng doanh thu giảm dần
-      return results.sort((a, b) => b.total - a.total);
+      const sort = results.sort((a, b) => b.total - a.total);
+
+      return branch_id > 0 ? sort : this.transformDataByYear(sort);
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -1066,7 +1068,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1118,7 +1120,11 @@ export class DashboardService {
       });
 
       // B5: Trả về kết quả sau khi cập nhật dữ liệu
-      return statusCounts;
+      if (branch_id) {
+        return statusCounts;
+      } else {
+        return this.transformDataStatusWithBranches(statusCounts);
+      }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -1126,8 +1132,108 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> countBookingStatus: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
+  }
+
+  transformBranchData(data) {
+    // Create a new object to hold the transformed data
+    const result = {};
+
+    // Iterate through each key in the original data
+    for (const branch in data) {
+      if (branch === 'Hồ Chí Minh') {
+        // Set up "Hồ Chí Minh" with value and other branches in nested structure
+        result[branch] = {
+          value: data[branch],
+          branches: { ...data, [branch]: undefined },
+        };
+      } else {
+        // Keep other branches as they are
+        result[branch] = data[branch];
+      }
+    }
+
+    // Remove "Hồ Chí Minh" from nested branches inside the "Hồ Chí Minh" object
+    delete result['Hồ Chí Minh'].branches['Hồ Chí Minh'];
+
+    return result;
+  }
+
+  transformQuarterlyData(data) {
+    // Initialize the result object
+    const result = {};
+
+    // Iterate over each branch
+    for (const branch in data) {
+      if (branch === 'Hồ Chí Minh') {
+        // Set up "Hồ Chí Minh" with quarterly values and other branches in a nested structure
+        result[branch] = {
+          value: data[branch],
+          branches: { ...data, [branch]: undefined }, // Copy all data except "Hồ Chí Minh"
+        };
+      } else {
+        // Keep other branches as they are
+        result[branch] = data[branch];
+      }
+    }
+
+    // Remove self-reference to "Hồ Chí Minh" in its own nested branches
+    delete result['Hồ Chí Minh'].branches['Hồ Chí Minh'];
+
+    return result;
+  }
+
+  transformDataByYear(data) {
+    // Separate "Hồ Chí Minh" data and other branches
+    const hoChiMinhBranch = data.find(
+      (branch) => branch.name === 'Hồ Chí Minh',
+    );
+    const otherBranches = data.filter(
+      (branch) => branch.name !== 'Hồ Chí Minh',
+    );
+
+    // Transform data as required
+    return {
+      ...Object.fromEntries(
+        otherBranches.map((branch) => [
+          branch.name,
+          { data: branch.data, total: branch.total },
+        ]),
+      ),
+      'Hồ Chí Minh': {
+        value: hoChiMinhBranch.total,
+        branches: Object.fromEntries(
+          otherBranches.map((branch) => [
+            branch.name,
+            { data: branch.data, total: branch.total },
+          ]),
+        ),
+      },
+    };
+  }
+
+  transformDataStatusWithBranches(data) {
+    // Extract "Hồ Chí Minh" entry and other branches
+    const hoChiMinhBranch = data.find(
+      (branch) => branch.name === 'Hồ Chí Minh',
+    );
+    const otherBranches = data.filter(
+      (branch) => branch.name !== 'Hồ Chí Minh',
+    );
+
+    // Format result with "Hồ Chí Minh" including other branches under `branches`
+    return {
+      ...Object.fromEntries(
+        otherBranches.map((branch) => [branch.name, branch.data]),
+      ),
+      'Hồ Chí Minh': {
+        ...hoChiMinhBranch.data,
+        branches: Object.fromEntries(
+          otherBranches.map((branch) => [branch.name, branch.data]),
+        ),
+      },
+    };
   }
 }

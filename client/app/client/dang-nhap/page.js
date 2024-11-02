@@ -7,11 +7,9 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import React, { useState } from "react";
 import Cookies from "js-cookie";
-import {
-  createAccountUser,
-  loginAccountUser,
-} from "@/app/_services/accountServices";
+import { loginAccountUser } from "@/app/_services/accountServices";
 import { decodeJwt } from "@/app/_utils/helpers";
+import useApiServices from "@/app/_hooks/useApiServices";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -25,6 +23,7 @@ const Page = () => {
   const toast = useCustomToast();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const { tryCatchWrapper } = useApiServices();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -43,28 +42,47 @@ const Page = () => {
     e.preventDefault();
     const validationErrors = {};
     setLoading(true);
+    // main
     try {
       formSchema.parse(formData);
       setErrors({});
-      const response = await loginAccountUser(formData);
-      Cookies.set("accessToken", response.access_token, { expires: 1 });
-      localStorage.setItem("refreshToken", response.refresh_token);
-      const user = decodeJwt(response.access_token);
+      const postToAPI = async () => {
+        const response = await loginAccountUser(formData);
+        Cookies.set("accessToken", response.data.data.access_token, {
+          expires: 1,
+        });
+        localStorage.setItem("refreshToken", response.data.data.refresh_token);
+        return response.data;
+      };
+      const result = await tryCatchWrapper(postToAPI, {
+        message: "Vui lòng kiểm tra lại thông tin!",
+      });
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ id: user.id, name: user.username, role: user.role, email: user.email})
-      );
-
+      let user = null;
+      if (result.success !== false) {
+        user = decodeJwt(result.data.access_token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: user.id, name: user.username, role: user.role })
+        );
+      }
       toast({
         position: "top",
-        type: "success",
-        title: "Đăng nhập thành công!",
-        description: "Chào mừng bạn đã trở lại!",
+        type: result.success === false ? "error" : "success",
+        title: `${
+          result.success === false
+            ? "Đăng nhập thất bại!"
+            : "Đăng nhập thành công!"
+        }`,
+        description:
+          result.success === false
+            ? result?.error?.message
+            : `Chào mừng ${user?.username} đã trở lại ✌️✌️`,
         closable: true,
       });
       setLoading(false);
-      router.push("/");
+
+      result.success !== false ? router.push("/") : null;
     } catch (error) {
       if (error.response) {
         toast({

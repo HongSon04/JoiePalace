@@ -112,7 +112,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -182,7 +182,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -193,7 +193,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];
@@ -216,7 +216,7 @@ export class MenusService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             ...orderByConditions,
@@ -253,7 +253,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -323,7 +323,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            gte: minPrice,
+            gte: Number(minPrice),
           },
         },
       ];
@@ -334,7 +334,7 @@ export class MenusService {
         ...(whereConditions.AND || []),
         {
           price: {
-            lte: maxPrice,
+            lte: Number(maxPrice),
           },
         },
       ];
@@ -357,7 +357,7 @@ export class MenusService {
               },
             },
           },
-          skip,
+          skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
             ...orderByConditions,
@@ -394,7 +394,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -428,7 +428,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -464,7 +464,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -570,7 +570,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -602,7 +602,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> remove', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -634,7 +634,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -661,7 +661,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

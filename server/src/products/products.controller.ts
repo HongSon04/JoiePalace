@@ -391,7 +391,7 @@ export class ProductsController {
   @ApiQuery({ name: 'endDate', required: false })
   findByCategoryId(
     @Query() query: FilterPriceDto,
-    @Param('category_id') category_id: number,
+    @Param('category_id') category_id: string,
   ) {
     return this.productsService.findByCategoryId(query, category_id);
   }

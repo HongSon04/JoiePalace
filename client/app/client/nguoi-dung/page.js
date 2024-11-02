@@ -7,6 +7,7 @@ import { fecthDatabyMembershipId } from '@/app/_services/membershipsServices';
 import { fetchAllBookingByUserId, fetchBookingById } from '@/app/_services/bookingServices';
 
 import Link from 'next/link';
+import { Result } from 'postcss';
 
 const Page = () => {
     const [user, setUser] = useState();
@@ -34,7 +35,7 @@ const Page = () => {
         }
     ];
 
-    // const parties = [    
+    // const parties = [
     //     {
     //         id: '1',
     //         nameParty: "Tiệc cưới của cô dâu Trần Thị A và chú rể Nguyễn Văn B",
@@ -99,6 +100,7 @@ const Page = () => {
         };
         getData();
     }, []);
+
     const parties = partyPending.map((item) => ({
         id: item.id,
         nameParty: item.name,
@@ -119,10 +121,10 @@ const Page = () => {
         showDetailLink: true,
         Collapsed: false,
         hall: "Sảnh A",
-        typeParty: "Tiệc sinh nhật",
+        typeParty: 1,
         liveOrOnline: "Trực tiếp",
-        space: "Rộng rãi",
-        decorate: "Hoa hồng đỏ và trắng",
+        space: 1,
+        decorate: item.booking_details.decors.name,
         typeTable: "Tròn",
         typeChair: "Ghế nệm bọc vải",
         guestTable: "10 người/bàn",
@@ -138,42 +140,33 @@ const Page = () => {
         remainingPaid: item.budget ? `${parseInt(item.budget) - 50000000} VND` : "0 VND",
         paymentDay: item.organization_date.split("T")[0],
     }));
+    
+console.log(parties);
 
-    useEffect( () => {
-        const fectData = async() => {
-            try {
-                const fecthDataPartyByid = await fetchBookingById();
-            } catch (error) {
-                
-            }
-        }
-        fectData();
-    },[party]);
+return (
+    <div className="flex flex-col gap-8">
 
-    return (
-        <div className="flex flex-col gap-8">
+        <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
-            <span className="text-2xl font-bold text-white leading-6">Chung</span>
+        <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={membershipId?.booking_total_amount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${membershipId?.booking_total_amount ? membershipId?.booking_total_amount : 0} VND`} />
 
-            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={membershipId?.booking_total_amount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${membershipId?.booking_total_amount ? membershipId?.booking_total_amount : 0} VND`} />
-
-            <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
-            <div className='flex justify-between'>
-                <span className="text-base font-bold leading-normal text-gold">Tiệc gần nhất</span>
-                <Link href={'nguoi-dung/lich-su-tiec'} className='underline text-gold text-base font-medium cursor-pointer'> show tất cả tiệc</Link>
-            </div>
-
-            {parties && parties.length > 0 ? (
-                parties.map(party => (
-                    <div key={party.id} className="cursor-pointer">
-                        <PartySectionClient showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
-                    </div>
-                ))
-            ) : (
-                <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
-            )}
+        <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
+        <div className='flex justify-between'>
+            <span className="text-base font-bold leading-normal text-gold">Tiệc gần nhất</span>
+            <Link href={'nguoi-dung/lich-su-tiec'} className='underline text-gold text-base font-medium cursor-pointer'>Tiệc của bạn</Link>
         </div>
-    );
+
+        {parties && parties.length > 0 ? (
+            parties.map(party => (
+                <div key={party.id} className="cursor-pointer">
+                    <PartySectionClient showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
+                </div>
+            ))
+        ) : (
+            <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
+        )}
+    </div>
+);
 };
 
 export default Page;

@@ -100,9 +100,9 @@ export class StagesController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }
@@ -271,9 +271,9 @@ export class StagesController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }

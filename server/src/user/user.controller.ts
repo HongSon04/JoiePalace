@@ -86,9 +86,9 @@ export class UserController {
             false,
           );
         }
-        if (file.size > 1024 * 1024 * 5) {
+        if (file.size > 1024 * 1024 * 10) {
           return cb(
-            new BadRequestException('Kích thước ảnh tối đa 5MB'),
+            new BadRequestException('Kích thước ảnh tối đa là 10MB'),
             false,
           );
         }
@@ -132,6 +132,7 @@ export class UserController {
         username: 'string',
         platform: 'string',
         avatar: 'string',
+        phone: 'string',
         role: 'string',
         active: 'boolean',
         verify_at: 'date',
@@ -182,6 +183,7 @@ export class UserController {
           platform: 'string',
           avatar: 'string',
           role: 'string',
+          phone: 'string',
           active: 'boolean',
           verify_at: 'date',
           deleted: 'boolean',
@@ -239,6 +241,7 @@ export class UserController {
           platform: 'string',
           avatar: 'string',
           role: 'string',
+          phone: 'string',
           active: 'boolean',
           verify_at: 'date',
           deleted: 'boolean',
@@ -301,6 +304,7 @@ export class UserController {
           platform: 'string',
           avatar: 'string',
           role: 'string',
+          phone: 'string',
           active: 'boolean',
           verify_at: 'date',
           deleted: 'boolean',
@@ -363,6 +367,7 @@ export class UserController {
         platform: 'string',
         avatar: 'string',
         role: 'string',
+        phone: 'string',
         active: 'boolean',
         verify_at: 'date',
         created_at: 'string',
@@ -409,6 +414,7 @@ export class UserController {
         platform: 'string',
         avatar: 'string',
         role: 'string',
+        phone: 'string',
         active: 'boolean',
         verify_at: 'date',
         created_at: 'string',

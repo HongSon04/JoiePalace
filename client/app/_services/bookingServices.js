@@ -34,7 +34,7 @@ export const fetchAllBookingByUserId = async (userId) => {
 };
 export const fetchBookingById = async (id) => {
   try {
-    const response = await axios.get(API_CONFIG.BOOKINGS.GET_BY_IDUSER(id));
+    const response = await axios.get(API_CONFIG.BOOKINGS.GET_BY_ID(id));
 
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu");

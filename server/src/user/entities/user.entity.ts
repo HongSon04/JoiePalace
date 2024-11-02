@@ -4,7 +4,7 @@ class Memberships {
   slug: string;
   descriptions: string;
   images: string[];
-  gifts: string[];
+  gifts: number[];
   created_at: Date;
   updated_at: Date;
 }
