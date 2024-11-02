@@ -8,16 +8,14 @@ import AdminThemChiNhanhInputAndImg from "@/app/_components/AdminThemChiNhanhInp
 import IconButton from "@/app/_components/IconButton";
 import IconButtonSave from "@/app/_components/IconButtonSave";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { postBranchAPI } from "@/app/_services/branchesServices";
 import useApiServices from "@/app/_hooks/useApiServices";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import useCustomToast from "@/app/_hooks/useCustomToast";
-import { fetchFeedbacksFailure, fetchFeedbacksRequest } from "@/app/_lib/features/feedbacks/feedbacksSlice";
+import { fetchFeedbacksFailure, fetchBranchSuccess } from "@/app/_lib/features/feedbacks/feedbacksSlice";
 
 const fieldsConfig = {
   contact: [
@@ -32,20 +30,7 @@ const fieldsConfig = {
   ],
   diagram: [{ type: 'textarea', placeholder: 'Mô tả sơ đồ', name: 'diagram_description' }],
   equipment: [{ type: 'textarea', placeholder: 'Mô tả trang thiết bị', name: 'equipment_description' }],
-  space: [
-    { type: 'text', placeholder: 'Tên không gian', name: 'space_name' },
-    { type: 'textarea', placeholder: 'Mô tả không gian', name: 'space_description' },
-  ],
-};
-
-const createSlug = (str) => {
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
+  
 };
 
 const branchSchema = z.object({
@@ -57,14 +42,16 @@ const branchSchema = z.object({
   slogan_description: z.string().optional(),
   diagram_description: z.string().optional(),
   equipment_description: z.string().optional(),
-  space_name: z.string().min(1, { message: "Tên không gian là bắt buộc" }).optional(),
-  space_description: z.string().optional(),
+  images: z.array(z.string()).min(1, { message: "Hình ảnh không được để trống" }),
+  slogan_images: z.array(z.string()).min(1, { message: "Hình ảnh slogan không được để trống" }),
+  diagram_images: z.array(z.string()).min(1, { message: "Hình ảnh sơ đồ không được để trống" }),
+  equipment_images: z.array(z.string()).min(1, { message: "Hình ảnh thiết bị không được để trống" }),
 });
 
 function ChiNhanhAddPage() {
-  const { isLoading, isError } = useSelector((store) => store.branch);
+  const { isError } = useSelector((store) => store.branch);
   const dispatch = useDispatch();
-  const {makeAuthorizedRequest} = useApiServices();
+  const { makeAuthorizedRequest } = useApiServices();
   const toast = useCustomToast();
 
   const { handleSubmit, control, formState: { errors } } = useForm({
@@ -86,52 +73,37 @@ function ChiNhanhAddPage() {
     }));
   };
 
-
   const onSubmit = async (data) => {
-    const formData = {
-      name: data.name,
-      address: data.address,
-      phone: data.phone,
-      // slug: createSlug(data.name),
-      email: data.email,
-      slogan: data.slogan,  
-      slogan_description: data.slogan_description,
-      diagram_description: data.diagram_description,
-      equipment_description: data.equipment_description,
-      images: imagesData.images,
-      slogan_images: imagesData.slogan_images,
-      diagram_images: imagesData.diagram_images,
-      equipment_images: imagesData.equipment_images,
-      // stages: [
-      //   {
-      //     name: data.space_name,
-      //     description: data.space_description,
-      //     images: imagesData.space_images,
-      //   },
-      // ],
-    };
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+
+    // Append images
+    imagesData.images.forEach((image) => formData.append("images", image));
+    imagesData.slogan_images.forEach((image) => formData.append("slogan_images", image));
+    imagesData.diagram_images.forEach((image) => formData.append("diagram_images", image));
+    imagesData.equipment_images.forEach((image) => formData.append("equipment_images", image));
+
     try {
-      const response = await makeAuthorizedRequest(API_CONFIG.BRANCHES.CREATE, "POST", formData )
-      console.log(formData)
-      if(response.success){
-        // await postBranchAPI(response)
-        console.log(dispatch(fetchBranchSuccess(response.data)))
-        dispatch(fetchBranchSuccess(response.data))
-        
-      toast({
-        title: "Tạo dữ liệu chi nhánh thành công",
-        description: "Phản hồi đã được duyệt. Đang lấy dữ liệu mới",
-      });
-      
-    }
-    dispatch(fetchFeedbacksFailure());
-    toast({
-      title: "Tạo dữ liệu không thành công",
-      description: "Vui lòng thử lại sau",
-    });
-      console.log(response)
+      const response = await makeAuthorizedRequest(API_CONFIG.BRANCHES.CREATE, "POST", formData);
+      if (response.success) {
+        dispatch(fetchBranchSuccess(response.data));
+        toast({
+          title: "Tạo dữ liệu chi nhánh thành công",
+          description: "Phản hồi đã được duyệt. Đang lấy dữ liệu mới",
+        });
+      } else {
+        dispatch(fetchFeedbacksFailure());
+        toast({
+          title: "Tạo dữ liệu không thành công",
+          description: response.message || "Vui lòng thử lại sau",
+        });
+      }
     } catch (error) {
       console.error("Error submitting form: ", error);
+      toast({
+        title: "Đã xảy ra lỗi",
+        description: "Vui lòng thử lại sau",
+      });
     }
   };
 
@@ -152,8 +124,20 @@ function ChiNhanhAddPage() {
     </div>
   );
 
+  const renderSectionImg = (imgTitle, inputId, onImagesChange, imageName, control) =>{
+    return (
+        <AdminThemChiNhanhInput
+          title={imgTitle}
+          inputId={inputId}
+          control={control}
+          onImagesChange={onImagesChange}
+          name={imageName}
+        />
+    )
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
       {isError && <div className="text-red-500">An error occurred while saving the branch.</div>}
       <AdminHeader showSearchForm={false} title="Chi tiết chi nhánh" />
       <div className="flex gap-2 mt-5">
@@ -166,7 +150,6 @@ function ChiNhanhAddPage() {
         {renderSection('Sơ đồ', fieldsConfig.diagram, 'Hình ảnh sơ đồ', 'image-upload-diagram', 'diagram_images', 'h-[160px]')}
         {renderSection('Trang thiết bị', fieldsConfig.equipment, 'Hình ảnh trang thiết bị', 'image-upload-equipment', 'equipment_images', 'h-[160px]')}
         {renderSection('Không gian hội nghị', fieldsConfig.space, 'Hình ảnh mô tả', 'image-upload-space', 'space_images', 'h-[100px]')}
-
         <AdminThemChiNhanhInputAndImg title="Sảnh" height="290px" inputId="input-image-upload-map" input={false} />
       </div>
 

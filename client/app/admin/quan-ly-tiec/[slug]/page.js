@@ -11,6 +11,7 @@ import { fetchAllPartyBookings } from '@/app/_services/bookingServices';
 import { fetchBranchDataById } from '@/app/_services/branchesServices';
 import useApiServices from '@/app/_hooks/useApiServices';
 import { API_CONFIG } from '@/app/_utils/api.config';
+import useCustomToast from '@/app/_hooks/useCustomToast';
 
 const ChiTietTiecPage = ({ params }) => {
     const { slug } = params;
@@ -20,6 +21,7 @@ const ChiTietTiecPage = ({ params }) => {
     const [filterStatus, setFilterStatus] = useState(1); 
     const { makeAuthorizedRequest } = useApiServices();
     const [branch, setBranch] = useState('');
+    const toast = useCustomToast();
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -49,6 +51,7 @@ const ChiTietTiecPage = ({ params }) => {
         };
 
         fetchBookings();
+
     }, []);
 
     const options = [
@@ -74,7 +77,11 @@ const ChiTietTiecPage = ({ params }) => {
     const handleStatusChange = (e) => {
         const selectedValue = parseInt(e.target.value);
         setFilterStatus(selectedValue);
-        // Có thể cần lọc theo trạng thái tại đây
+
+        toast({
+            title: "Cập nhật trạng thái thành công",
+            description: "Phản hồi đã được duyệt. Đang lấy dữ liệu mới",
+        });
     };
 
     const filterBookings = (option) => {
