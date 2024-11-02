@@ -112,7 +112,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -217,7 +217,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -322,7 +322,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -355,7 +355,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -379,7 +379,7 @@ export class CategoriesService {
       // ? Find Children Categories
       const childrenCategories = await this.prismaService.categories.findMany({
         where: {
-          category_id: category.id,
+          category_id: Number(category.id),
         },
         include: {
           tags: true,
@@ -407,7 +407,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> findOneBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -455,7 +455,7 @@ export class CategoriesService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -531,7 +531,11 @@ export class CategoriesService {
           slug,
           description,
           short_description,
-          category_id: Number(category_id) || null,
+          category_id: category_id
+            ? Number(category_id)
+            : findCategories.category_id
+              ? Number(findCategories.category_id)
+              : null,
           images: images.length > 0 ? images : findCategories.images,
           tags: { set: tagsSet },
         },
@@ -559,7 +563,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -596,7 +600,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> softDelete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -640,7 +644,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -689,7 +693,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
