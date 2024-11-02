@@ -190,9 +190,9 @@ export class ProductsService {
       }
 
       // Sắp xếp theo giá
-      let orderByConditions: any[] = [];
+      let orderByConditions: any = {};
       if (priceSort === 'asc' || priceSort === 'desc') {
-        orderByConditions.push({ price: priceSort });
+        orderByConditions.price = priceSort;
       }
 
       // Lấy danh sách Sản phẩm và tổng số
@@ -202,7 +202,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -314,7 +316,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -522,7 +526,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
@@ -636,7 +642,9 @@ export class ProductsService {
           include: { categories: true, tags: true },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: { ...orderByConditions, created_at: 'desc' },
+          orderBy: {
+            ...(orderByConditions ? orderByConditions : { created_at: 'desc' }),
+          },
         }),
         this.prismaService.products.count({ where: whereConditions }),
       ]);
