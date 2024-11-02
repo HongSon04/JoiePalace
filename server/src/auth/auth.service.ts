@@ -9,15 +9,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma.service';
-import { User as UserEntity } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { CreateAuthUserDto } from './dto/create-auth-user.dto';
-import { LoginUserDto } from 'src/user/dto/login-user.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import uniqid from 'uniqid';
 import { MailService } from 'src/mail/mail.service';
-import { Cron } from '@nestjs/schedule';
+import { PrismaService } from 'src/prisma.service';
+import { LoginUserDto } from 'src/user/dto/login-user.dto';
+import { User as UserEntity } from 'src/user/entities/user.entity';
+import uniqid from 'uniqid';
+import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { CreateUserSocialDto } from './dto/create-user-social.dto';
 import { LoginUserSocialDto } from './dto/login-user-social.dto';
 @Injectable()
