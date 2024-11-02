@@ -111,7 +111,7 @@ export const fetchTotalEachMonth = async (branchId) => {
 };
 export const fetchAllBranch = async () => {
   try {
-      const response = await axios.get(API_CONFIG.BRANCHES.GET_ALL );
+      const response = await axios.get(API_CONFIG.BRANCHES.GET_ALL() );
       if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
       }
