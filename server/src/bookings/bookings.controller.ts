@@ -416,7 +416,20 @@ export class BookingsController {
   // ! Update Booking
   @Patch('update/:booking_id')
   @isPublic()
-  @ApiOperation({ summary: 'Cập nhật thông tin một đơn tiệc' })
+  @ApiOperation({
+    summary: 'Cập nhật thông tin một đơn tiệc',
+    description: `Cách tính tổng tiền tiệc:
+Bàn: 200k/1 (1 bàn = 1 ghế, 1 bàn = 1 menu)
+Ghế: 50k/1 
+orther service: lấy giá của ID * quantity (điền các cặp id value như là nước bánh kem, MC)
+extra service: như trên nhưng chỉ điền khi is_deposit = true thì điền 
+
+Tổng tiền bàn + tổng tiền ghế + tiền trang trí (decor) + tiền loại tiệc+ tiền sảnh (stages) + tổng tiền menu + tổng tiền bàn dự phòng + tổng tiền ghế dự phòng + tổng tiền dịch vụ khác + tổng tiền dịch vụ them = Tổng tiền (amount)
+
+Phí sẽ là 10% (không cần + vô tổng tiền)
+
+amount sẽ gửi lên BE check trùng giá thì pass`,
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

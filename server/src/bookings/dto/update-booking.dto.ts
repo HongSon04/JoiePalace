@@ -114,10 +114,10 @@ export class UpdateBookingDto {
   })
   @IsNotEmpty({ message: 'Số lượng bàn dự phòng không được để trống' })
   spare_table_count: number;
-  
+
   @ApiProperty({
     description:
-      'Tổng tiền của sự kiện: Tiền trang trí + tiền ghế 100k/1 ghế 50k/1 (1 bàn = 10 ghế) => (100k + (50k * 10)) + tiền menu (menu * tổng bàn) + phí',
+      'Tổng tiền của sự kiện: Tiền trang trí + tiền ghế 200k/1 ghế 50k/1 (1 bàn = 10 ghế) => (200k + (50k * 10)) + tiền menu (menu * tổng bàn) + tiền sảnh + phí',
   })
   @IsNotEmpty({ message: 'Tổng tiền không được để trống' })
   amount: number;
@@ -127,10 +127,19 @@ export class UpdateBookingDto {
       { id: 1, quantity: 2 },
       { id: 2, quantity: 1 },
     ],
-    description:
-      'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
+    description: 'Danh sách các dịch vụ khác (ví dụ nước uống, bánh kem, ...)',
   })
-  extra_service: [{ id: string; quantity: number }] | any;
+  other_service?: [{ id: string; quantity: number }] | any;
+
+  @ApiProperty({
+    example: [
+      { id: 1, quantity: 2 },
+      { id: 2, quantity: 1 },
+    ],
+    description:
+      'Danh sách các dịch vụ thêm (chỉ điền id và số lượng khi đã đặt cọc thành công)',
+  })
+  extra_service?: [{ id: string; quantity: number }] | any;
 
   @ApiProperty({
     required: true,

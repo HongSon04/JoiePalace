@@ -754,12 +754,13 @@ export class BookingsService {
       validateExists(decor, 'decor');
       validateExists(menu, 'menu');
       // ? Calculate accessory amounts
-      let tableAmount = Number(table_count) * 100000;
-      let spareTableAmount = Number(spare_table_count) * 100000;
+      let tableAmount = Number(table_count) * 200000;
+      let spareTableAmount = Number(spare_table_count) * 200000;
       let chair_count = table_count * 10;
       let spare_chair_count = spare_table_count * 10;
-      let chairAmount = chair_count * 20000;
-      let spareChairAmount = spare_chair_count * 20000;
+      let chairAmount = chair_count * 50000;
+      let spareChairAmount = spare_chair_count * 50000;
+      let totalMenuAmount = Number(menu.price) * Number(table_count);
 
       if (table_count > findStages.capacity_max) {
         throw new BadRequestException(
@@ -788,12 +789,12 @@ export class BookingsService {
       } = decor;
 
       // ? Format Menu
-      const {
+      let {
         created_at: createdAtMenu,
         updated_at: updatedAtMenu,
         ...menuFormat
       } = menu;
-
+      (menuFormat as any).total_amount = totalMenuAmount;
       // ? Format Party Type
       const {
         created_at: createdAtPartyType,
@@ -829,11 +830,13 @@ export class BookingsService {
         // Total calculation
         const totalAmount = Number(
           Number(decor.price) +
-            Number(menu.price) +
+            Number(totalMenuAmount) +
             Number(stage.price) +
             Number(party_types.price) +
             Number(tableAmount) +
             Number(chairAmount) +
+            Number(spareChairAmount) +
+            Number(spareTableAmount) +
             Number(extraServiceAmount),
         );
         if (Number(amount) !== totalAmount) {
@@ -932,11 +935,13 @@ export class BookingsService {
         // Total calculation
         const totalAmount = Number(
           Number(decor.price) +
-            Number(menu.price) +
+            Number(totalMenuAmount) +
             Number(stage.price) +
             Number(party_types.price) +
             Number(tableAmount) +
-            Number(chairAmount),
+            Number(chairAmount) +
+            Number(spareChairAmount) +
+            Number(spareTableAmount),
         );
         if (Number(amount) !== totalAmount) {
           throw new HttpException(
@@ -1225,7 +1230,7 @@ export class BookingsService {
       // First get all confirmed bookings and calculate total amount
       const bookings = await this.prismaService.bookings.findMany({
         where: {
-          user_id: userId,
+          user_id: Number(userId),
           is_confirm: true,
           is_deposit: true,
           status: 'success',
