@@ -239,7 +239,7 @@ function RequestTable() {
 
     fetchData();
 
-    return () => {};
+    return () => { };
   }, [fetchRequests]);
 
   const columns = [

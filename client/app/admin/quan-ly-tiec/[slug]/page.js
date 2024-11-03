@@ -1,7 +1,4 @@
-// ChiTietTiecPage.js
-
 'use client';
-
 import { Suspense, useState, useEffect, useCallback } from 'react';
 import HeaderSelect from './HeaderSelect';
 import RequestBreadcrumbs from '@/app/_components/RequestBreadcrumbs';
@@ -12,6 +9,7 @@ import { fetchBranchDataById } from '@/app/_services/branchesServices';
 import useApiServices from '@/app/_hooks/useApiServices';
 import { API_CONFIG } from '@/app/_utils/api.config';
 import useCustomToast from '@/app/_hooks/useCustomToast';
+import RequestTableWrapper from "@/app/_components/RequestTableWrapper";
 
 const ChiTietTiecPage = ({ params }) => {
     const { slug } = params;
@@ -22,37 +20,40 @@ const ChiTietTiecPage = ({ params }) => {
     const { makeAuthorizedRequest } = useApiServices();
     const [branch, setBranch] = useState('');
     const toast = useCustomToast();
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user && user.branch_id) {
-            fetchBranchData(user.branch_id);
+        if (typeof window !== 'undefined') {
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+            setUser(storedUser);
+            if (storedUser && storedUser.branch_id) {
+                fetchBranchData(storedUser.branch_id);
+            }
         }
     }, []);
 
     const fetchBranchData = useCallback(async (id) => {
         try {
-            const response = await fetchBranchDataById(id);
+            const response = await makeAuthorizedRequest(API_CONFIG.BRANCHES.GET_BY_ID(id), 'GET');
             setBranch(response.name); 
         } catch (err) {
-            console.error("Error fetching branch: " + err);
+            console.error("Error fetching branch:", err);
         }
     }, []);
 
-    useEffect(() => {
-        const fetchBookings = async () => {
-            try {
-                const response = await fetchAllPartyBookings();
-                setBookings(response);
-                setFilteredBookings(response); 
-            } catch (error) {
-                console.error("Error fetching bookings: " + error);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchBookings = async () => {
+    //         try {
+    //             const response = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.GET_ALL);
+    //             setBookings(response);
+    //             setFilteredBookings(response); 
+    //         } catch (error) {
+    //             console.error("Error fetching bookings:", error);
+    //         }
+    //     };
 
-        fetchBookings();
-
-    }, []);
+    //     fetchBookings();
+    // }, []);
 
     const options = [
         { id: 1, value: 1, name: "Theo tuần" },
@@ -103,12 +104,10 @@ const ChiTietTiecPage = ({ params }) => {
     };
 
     const updatePaymentStatus = async (itemId, newStatus) => {
-        console.log(itemId, newStatus)
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE_STATUS(itemId), "PATCH", {
                 status: newStatus
             });
-            console.log(response)
             if (response.success) {
                 const updatedBookings = await fetchAllPartyBookings();
                 setBookings(updatedBookings);
@@ -123,7 +122,7 @@ const ChiTietTiecPage = ({ params }) => {
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={branch} />
             <RequestBreadcrumbs requestId={slug} nameLink={'quan-ly-tiec'} pathLink={slug} namepath={branch} />
-            <div className='flex justify-between items-center w-full mt-8'>
+            {/* <div className='flex justify-between items-center w-full mt-8'>
                 <h1 className='text-lg font-bold leading-8 flex-1 text-left text-white'>Danh sách tiệc</h1>
                 <div className='flex gap-5'>
                     <select
@@ -155,7 +154,10 @@ const ChiTietTiecPage = ({ params }) => {
                 <Suspense fallback={<TableSkeleton />}>
                     <TableGrab data={filteredBookings} pathLink={slug} onStatusChange={updatePaymentStatus} />
                 </Suspense>
-            </div>
+            </div> */}
+            <Suspense fallback={<TableSkeleton />}>
+                <RequestTableWrapper />
+            </Suspense>
         </div>
     );
 };

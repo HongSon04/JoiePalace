@@ -35,8 +35,8 @@ const InputDetailCustomer = ({
                     {...register(name)}
                     onBlur={() => trigger(name)}
                 >
-                    {options.map(option => (
-                        <option className='text-black' key={option.id} value={option.value}>
+                    {options.map((option, index) => (
+                        <option className='text-black' key={index} value={option.value}>
                             {option.label}
                         </option>
                     ))}
@@ -59,22 +59,6 @@ const InputDetailCustomer = ({
             )}
         </div>
     );
-};
-
-InputDetailCustomer.propTypes = {
-    svg: PropTypes.node,
-    title: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    placeholder: PropTypes.string,
-    options: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-        value: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-    })),
-    name: PropTypes.string.isRequired,
-    register: PropTypes.func,
-    error: PropTypes.object,
-    trigger: PropTypes.func,
 };
 
 export default InputDetailCustomer;
