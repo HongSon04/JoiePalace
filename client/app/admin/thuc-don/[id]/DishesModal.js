@@ -58,7 +58,7 @@ function DishesModal({
     if (isOpen) {
       setSelectedMenuDishes(menuDishes[category]);
     }
-  }, [isOpen, menuDishes, menuInfo, category]);
+  }, [isOpen, menuDishes, menuInfo, category, setSelectedMenuDishes]);
 
   React.useEffect(() => {
     if (selectedMenuDishes && selectedMenuDishes.length === 0)

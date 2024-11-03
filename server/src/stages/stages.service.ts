@@ -65,7 +65,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -101,7 +101,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> getAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -126,7 +126,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> getStageById: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -203,7 +203,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -229,7 +229,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> delete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

@@ -14,7 +14,8 @@ const Page = () => {
     const [user, setUser] = useState();
     const [membershipId, setMembershipId] = useState(null);
     const [party, setParty] = useState();
-    const [partyDetails, setPartyDetails] = useState([]);
+    const [partDetails, setPartyDetails] = useState([]);
+    const [resonParty, setResonParty] = useState([]);
     const [partySuccess, setPartySuccess] = useState([]);
     const [partyPending, setPartyPending] = useState([]);
     const data = [
@@ -82,72 +83,84 @@ const Page = () => {
     useEffect(() => {
         const getData = async () => {
             try {
+                // Set user data
                 setUser(data[0]);
 
-                if (data[0].memberships_id) {
-                    const fetchedDataByMembershipId = await fecthDatabyMembershipId(data[0].memberships_id);
+                // Fetch membership data if available
+                if (data[0]?.memberships_id) {
+                    const fetchedDataByMembershipId = await fetchDatabyMembershipId(data[0].memberships_id);
                     setMembershipId(fetchedDataByMembershipId);
                 }
 
+                // Fetch all bookings for the user
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(1);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending');
 
+                if (fetchedAllBookingsPending.length > 0) {
+                    const parties = fetchedAllBookingsPending.map((item) => {
+                        const dataDetailBooking = item.booking_details;
+                        const dataStages = item.stages;
+                        const dataMenus = dataDetailBooking[0]?.menus;
+                        const datadePosits = dataDetailBooking[0]?.deposits;
+
+                        return {
+                            id: item.id,
+                            nameParty: item.name,
+                            address: item.company_name,
+                            phoneAddress: item.phone,
+                            hostName: data[0]?.username,
+                            email: data[0]?.email,
+                            phoneUser: data[0]?.phone,
+                            idParty: `P${item.id}`,
+                            partyDate: new Date(item.created_at).toISOString().split("T")[0],
+                            dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
+                            numberGuest: item.number_of_guests,
+                            session: item.shift,
+                            tableNumber: Math.ceil(item.number_of_guests / 10),
+                            spareTables: 2,
+                            linkTo: `/party/${item.id}`,
+                            showFull: true,
+                            showDetailLink: true,
+                            Collapsed: false,
+                            hall: dataStages.name,
+                            typeParty: item.name,
+                            liveOrOnline: "Trực tiếp",
+                            space: 1,
+                            decorate: dataDetailBooking[0]?.decors?.name || "Không có trang trí",
+                            guestTable: "10 người/bàn",
+                            menu: dataMenus?.name,
+                            drinks: "Bia Tiger, Nước ngọt Pepsi",
+                            payerName: item.name,
+                            paymentMethod: `Chuyển khoản ${datadePosits?.payment_method}`,
+                            menuCostTable: `${dataMenus?.price} VND/bàn`,
+                            amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount} VND` : "0 VND",
+                            depositAmount: item.is_deposit ? `${datadePosits?.amount} VND` : "0 VND",
+                            depositStatus: item.is_deposit ? "Đã thanh toán" : "Chưa thanh toán",
+                            depositDay: item.is_deposit ? new Date(datadePosits?.created_at).toISOString().split("T")[0] : "",
+                            remainingPaid: (item.total_amount && item.depositAmount) ? `${parseInt(item.total_amount) - parseInt(item.depositAmount)} VND` : "0 VND",
+                            paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
+                        };
+                    });
+                    setResonParty(parties);
+                }
+
+                // Set successful and pending parties
                 setPartySuccess(fetchedAllBookingsSuccess);
                 setPartyPending(fetchedAllBookingsPending);
                 setParty(fetchedAllBookingsMembershipId);
             } catch (error) {
-                console.log('Chưa lấy được dữ liệu người dùng', error);
+                console.error('Chưa lấy được dữ liệu người dùng', error);
             }
         };
+
         getData();
-    }, []);
+    }, []); 
 
-    const parties = partyPending.map((item) => {
-        const dataDetailBooking = item.booking_details.menus;
-        // const dataStages = item.stages;
-        // console.log('decorate:', (dataDetailBooking));
 
-        return {
-            id: item.id,
-            nameParty: item.name,
-            address: item.company_name,
-            phoneAddress: item.phone,
-            hostName: user?.username,
-            email: user?.email,
-            phoneUser: user?.phone,
-            idParty: `P${item.id}`,
-            partyDate: new Date(item.created_at).toISOString().split("T")[0],
-            dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
-            numberGuest: item.number_of_guests,
-            session: item.shift,
-            tableNumber: Math.ceil(item.number_of_guests / 10),
-            spareTables: 2,
-            linkTo: `/party/${item.id}`,
-            showFull: true,
-            showDetailLink: true,
-            Collapsed: false,
-            // hall: dataStages.name,
-            typeParty: 1,
-            liveOrOnline: "Trực tiếp",
-            space: 1,
-            // decorate: (dataDetailBooking[0].decors)?.name,
-            guestTable: "10 người/bàn/ghế",
-            menu: "Thực đơn 5 món Á",
-            drinks: "Bia Tiger, Nước ngọt Pepsi",
-            payerName: "Nguyễn Văn A",
-            paymentMethod: "Chuyển khoản",
-            menuCostTable: "3,000,000 VND/bàn",
-            amountPayable: item.budget || "0 VND",
-            depositAmount: item.is_deposit ? "50,000,000 VND" : "0 VND",
-            depositStatus: item.is_deposit ? "Đã thanh toán" : "Chưa thanh toán",
-            depositDay: item.is_deposit ? new Date().toISOString().split("T")[0] : "",
-            remainingPaid: item.budget ? `${parseInt(item.budget) - 50000000} VND` : "0 VND",
-            paymentDay: item.organization_date.split("T")[0],
-        }
-    });
 
-    console.log('Data party full:',parties);
+
+    // console.log('Data party full:', parties);
 
     return (
         <div className="flex flex-col gap-8">
@@ -162,10 +175,10 @@ const Page = () => {
                 <Link href={'nguoi-dung/lich-su-tiec'} className='underline text-gold text-base font-medium cursor-pointer'>Tiệc của bạn</Link>
             </div>
 
-            {parties && parties.length > 0 ? (
-                parties.map(party => (
+            {resonParty && resonParty.length > 0 ? (
+                resonParty.map(party => (
                     <div key={party.id} className="cursor-pointer">
-                        <PartySectionClient showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
+                        <PartySectionClient showFull={false} Collapsed={false} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
                     </div>
                 ))
             ) : (

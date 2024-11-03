@@ -1,10 +1,10 @@
 // app/components/ImageUpload.js
 "use client"; // This is a client component
 
-import Image from "next/image";
-import { useState, useCallback } from "react";
-import { CONFIG } from "../_utils/config";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import { useCallback } from "react";
+import { CONFIG } from "../_utils/config";
 
 /**
  * USAGE: 
@@ -47,7 +47,7 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
       setFiles(droppedFiles);
       onFileChange(droppedFiles); // Notify parent component of the dropped files
     },
-    [onFileChange]
+    [onFileChange, setFiles]
   );
 
   // Utility function to format file size

@@ -33,7 +33,7 @@ export class MailService {
       console.log('Lỗi từ MailService->EmailAppointmentSuccessful', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -56,7 +56,7 @@ export class MailService {
       console.log('Lỗi từ MailService->confirmRegister', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -92,7 +92,7 @@ export class MailService {
       console.log('Lỗi từ MailService->remindDeposit', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -112,7 +112,7 @@ export class MailService {
       console.log('Lỗi từ MailService->cancelAppointment', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

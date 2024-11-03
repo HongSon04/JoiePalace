@@ -1,7 +1,7 @@
 "use client";
 
-import { Grid, GridItem, Heading, Image } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import { Grid, GridItem, Heading, Image } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 
 const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) => {
     const [description, setDescription] = useState([]);
@@ -12,18 +12,18 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
 
     const handleAddDescription = (event) => {
         const files = Array.from(event.target.files);
-        const readFiles = files.map(file =>
-            new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = () => reject(reader.error);
-                reader.readAsDataURL(file);
-            })
-        );
+        const newImages = [];
 
-        Promise.all(readFiles)
-            .then(newImages => setDescription(prev => [...prev, ...newImages]))
-            .catch(error => console.error('Error reading files:', error));
+        files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                newImages.push(reader.result);
+                if (newImages.length === files.length) {
+                    setDescription((prev) => [...prev, ...newImages]);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
     };
 
     const renderImageItem = (item, index) => (
@@ -43,8 +43,8 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
                 </div>
                 {input && (
                     <input
-                        type='text'
-                        placeholder='Tên không gian'
+                        type="text"
+                        placeholder="Tên không gian"
                         className="px-2 py-1 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
                     />
                 )}
@@ -76,7 +76,7 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
                                 id={inputId}
                                 type="file"
                                 accept="image/*"
-                                style={{ display: 'none' }}
+                                style={{ display: "none" }}
                                 onChange={handleAddDescription}
                                 multiple
                             />

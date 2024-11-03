@@ -163,7 +163,15 @@ function RequestTable() {
         }
       }
     },
-    [currentPage, itemsPerPage, searchQuery, dispatch, makeAuthorizedRequest]
+    [
+      currentPage,
+      itemsPerPage,
+      searchQuery,
+      dispatch,
+      makeAuthorizedRequest,
+      date.end,
+      date.start,
+    ]
   );
 
   React.useEffect(() => {
@@ -180,46 +188,49 @@ function RequestTable() {
         controller.abort();
       }
     };
-  }, [currentPage, itemsPerPage, date, searchQuery]);
+  }, [currentPage, itemsPerPage, date, searchQuery, fetchRequests]);
 
-  const handleUpdateStatus = React.useCallback(async (id) => {
-    const confirm = window.confirm(
-      `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id}?`
-    );
-
-    if (!confirm) return;
-
-    if (confirm) {
-      dispatch(updatingRequest());
-
-      const data = await makeAuthorizedRequest(
-        API_CONFIG.BOOKINGS.UPDATE_STATUS(id),
-        "PATCH",
-        {
-          is_confirm: true,
-          is_deposit: false,
-          status: "processing",
-        }
+  const handleUpdateStatus = React.useCallback(
+    async (id) => {
+      const confirm = window.confirm(
+        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id}?`
       );
 
-      if (data.success) {
-        fetchRequests();
-        toast({
-          title: "Cập nhật trạng thái thành công",
-          description: "Yêu cầu đã được xử lý",
-          type: "success",
-        });
-        dispatch(updatingRequestSuccess());
-      } else {
-        toast({
-          title: "Cập nhật trạng thái thất bại",
-          description: "Yêu cầu chưa được cập nhật",
-          type: "error",
-        });
-        dispatch(fetchingRequestFailure());
+      if (!confirm) return;
+
+      if (confirm) {
+        dispatch(updatingRequest());
+
+        const data = await makeAuthorizedRequest(
+          API_CONFIG.BOOKINGS.UPDATE_STATUS(id),
+          "PATCH",
+          {
+            is_confirm: true,
+            is_deposit: false,
+            status: "processing",
+          }
+        );
+
+        if (data.success) {
+          fetchRequests();
+          toast({
+            title: "Cập nhật trạng thái thành công",
+            description: "Yêu cầu đã được xử lý",
+            type: "success",
+          });
+          dispatch(updatingRequestSuccess());
+        } else {
+          toast({
+            title: "Cập nhật trạng thái thất bại",
+            description: "Yêu cầu chưa được cập nhật",
+            type: "error",
+          });
+          dispatch(fetchingRequestFailure());
+        }
       }
-    }
-  }, []);
+    },
+    [dispatch, makeAuthorizedRequest, fetchRequests, toast]
+  );
 
   React.useEffect(() => {
     async function fetchData() {
@@ -229,7 +240,7 @@ function RequestTable() {
     fetchData();
 
     return () => {};
-  }, []);
+  }, [fetchRequests]);
 
   const columns = [
     { name: "ID", uid: "id", sortable: true },
@@ -258,7 +269,7 @@ function RequestTable() {
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
     );
-  }, [visibleColumns]);
+  }, [visibleColumns, columns]);
 
   const sortedItems = React.useMemo(() => {
     return [...requests].sort((a, b) => {
@@ -270,81 +281,84 @@ function RequestTable() {
     });
   }, [sortDescriptor, requests]);
 
-  const renderCell = React.useCallback((item, columnKey) => {
-    const cellValue = item[columnKey];
+  const renderCell = React.useCallback(
+    (item, columnKey) => {
+      const cellValue = item[columnKey];
 
-    switch (columnKey) {
-      case "shift":
-        return cellValue === "Sáng" ? (
-          <Chip
-            className="text-gray-800 bg-white"
-            startContent={<BsSun size={12} className="text-gray-800" />}
-          >
-            {cellValue}
-          </Chip>
-        ) : (
-          <Chip
-            className="text-white bg-blackAlpha-500"
-            startContent={<BsMoon size={12} className="text-white" />}
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "organization_date":
-        return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
-      case "name":
-        return (
-          <item
-            avatarProps={{ radius: "lg", src: item.avatar }}
-            description={item.email}
-            name={cellValue}
-          >
-            {item.email}
-          </item>
-        );
-      case "status":
-        return (
-          // <select
-          //   name="status"
-          //   value={cellValue}
-          //   className="select relative z-50"
-          //   onClick={(e) => e.stopPropagation()}
-          //   onMouseDown={(e) => e.stopPropagation()}
-          // >
-          //   {CONFIG.BOOKING_STATUS.map((status) => (
-          //     <option value={status.key} key={status.key} className="option">
-          //       {status.label}
-          //     </option>
-          //   ))}
-          // </select>
-          <Chip variant="flat" color="warning">
-            Chưa xử lý
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex justify-center items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>
-                  <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
-                </DropdownItem>
-                <DropdownItem onClick={() => handleUpdateStatus(item.id)}>
-                  Cập nhật trạng thái
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+      switch (columnKey) {
+        case "shift":
+          return cellValue === "Sáng" ? (
+            <Chip
+              className="text-gray-800 bg-white"
+              startContent={<BsSun size={12} className="text-gray-800" />}
+            >
+              {cellValue}
+            </Chip>
+          ) : (
+            <Chip
+              className="text-white bg-blackAlpha-500"
+              startContent={<BsMoon size={12} className="text-white" />}
+            >
+              {cellValue}
+            </Chip>
+          );
+        case "organization_date":
+          return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
+        case "name":
+          return (
+            <item
+              avatarProps={{ radius: "lg", src: item.avatar }}
+              description={item.email}
+              name={cellValue}
+            >
+              {item.email}
+            </item>
+          );
+        case "status":
+          return (
+            // <select
+            //   name="status"
+            //   value={cellValue}
+            //   className="select relative z-50"
+            //   onClick={(e) => e.stopPropagation()}
+            //   onMouseDown={(e) => e.stopPropagation()}
+            // >
+            //   {CONFIG.BOOKING_STATUS.map((status) => (
+            //     <option value={status.key} key={status.key} className="option">
+            //       {status.label}
+            //     </option>
+            //   ))}
+            // </select>
+            <Chip variant="flat" color="warning">
+              Chưa xử lý
+            </Chip>
+          );
+        case "actions":
+          return (
+            <div className="relative flex justify-center items-center gap-2">
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    <VerticalDotsIcon className="text-default-300" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem>
+                    <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                  </DropdownItem>
+                  <DropdownItem onClick={() => handleUpdateStatus(item.id)}>
+                    Cập nhật trạng thái
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [handleUpdateStatus, pathname]
+  );
 
   const onItemsPerPageChange = React.useCallback((e) => {
     setItemsPerPage(Number(e.target.value));
@@ -441,7 +455,19 @@ function RequestTable() {
         )}
       </div>
     );
-  }, [visibleColumns, onItemsPerPageChange, requests.length, onSearchChange]);
+  }, [
+    visibleColumns,
+    onItemsPerPageChange,
+    onSearchChange,
+    isShowTips,
+    itemsPerPage,
+    searchQuery,
+    date,
+    setDate,
+    columns,
+    setVisibleColumns,
+    setIsShowTips,
+  ]);
 
   const bottomContent = React.useMemo(() => {
     return (

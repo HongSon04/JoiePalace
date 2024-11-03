@@ -50,7 +50,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> sendNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -105,7 +105,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> getNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -172,7 +172,7 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -216,7 +216,7 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
