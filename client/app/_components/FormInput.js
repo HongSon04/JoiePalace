@@ -246,7 +246,7 @@ function FormInput({
       input: `${
         startContent || endContent
           ? "bg-transparent"
-          : "!bg-whiteAlpha-100 !hover:bg-whiteAlpha-200 !focus:bg-whiteAlpha-200"
+          : "!bg-gray-100 !hover:bg-gray-200 !focus:bg-gray-200"
       } !text-white !placeholder:text-gray-400`,
       label: "!text-white",
     },
@@ -254,7 +254,7 @@ function FormInput({
       input: `${
         startContent || endContent
           ? "bg-transparent"
-          : "!bg-whiteAlpha-100 !hover:bg-whiteAlpha-200 !focus:bg-whiteAlpha-200"
+          : "!bg-gray-100 !hover:bg-gray-200 !focus:bg-gray-200"
       } !text-gray-800 !placeholder:text-gray-600`,
       label: "!text-gray-600",
     },

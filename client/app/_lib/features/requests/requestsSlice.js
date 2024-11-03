@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   requests: [],
@@ -53,7 +54,7 @@ const requestsSlice = createSlice({
       state.requests = action.payload.data;
       state.pagination = action.payload.pagination;
     },
-    fetchingRequestFailure(state) {
+    fetchingRequestsFailure(state) {
       state.isFetchingRequests = false;
       state.isFetchingRequestsError = true;
     },
@@ -70,7 +71,94 @@ const requestsSlice = createSlice({
       state.isUpdatingRequestError = true;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      // Fetching category requests
+      .addCase(fetchRequests.pending, (state) => {
+        state.isFetchingRequests = true;
+        state.isFetchingRequestsError = false;
+      })
+      .addCase(fetchRequests.fulfilled, (state, action) => {
+        state.isFetchingRequests = false;
+        state.isFetchingRequestsError = false;
+        state.requests = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(fetchRequests.rejected, (state, action) => {
+        state.isFetchingRequests = false;
+        state.isFetchingRequestsError = true;
+        state.error = action.payload;
+      })
+      // Updating a request
+      .addCase(updateRequestStatus.pending, (state) => {
+        state.isUpdatingRequest = true;
+        state.isUpdatingRequestError = false;
+      })
+      .addCase(updateRequestStatus.fulfilled, (state, action) => {
+        state.isUpdatingRequest = false;
+        state.requests = state.requests.map((request) =>
+          request.id === action.payload.id ? action.payload : request
+        ); // Update the request in the state
+        state.isUpdatingRequestError = false;
+      })
+      .addCase(updateRequestStatus.rejected, (state, action) => {
+        state.isUpdatingRequest = false;
+        state.isUpdatingRequestError = true;
+        state.error = action.payload; // Use the error message from the rejected action
+      });
+  },
 });
+
+// Fetch category requests
+export const fetchRequests = createAsyncThunk(
+  "requests/fetchRequests",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    dispatch(fetchingRequests());
+
+    const response = await makeAuthorizedRequest(
+      API_CONFIG.BOOKINGS.GET_ALL(params),
+      "GET",
+      null,
+      { signal }
+    );
+
+    // console.log("response from fetchRequests thunk -> ", response);
+    if (response.success) {
+      dispatch(fetchingRequestsSuccess(response));
+      return response; // Return the response for further use
+    } else {
+      dispatch(fetchingRequestsFailure(response));
+      return rejectWithValue(response.message);
+    }
+  }
+);
+
+// Update a request
+export const updateRequestStatus = createAsyncThunk(
+  "requests/updateRequestStatus",
+  async ({ requestId, requestData }, { dispatch, rejectWithValue }) => {
+    dispatch(updatingRequest());
+
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.BOOKINGS.UPDATE_STATUS(requestId),
+        "PATCH",
+        requestData
+      );
+
+      if (response.success) {
+        dispatch(updatingRequestSuccess(response));
+      } else {
+        dispatch(updatingRequestFailure(response));
+      }
+
+      return response;
+    } catch (error) {
+      dispatch(updatingRequestFailure(error));
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 export const {
   setRequests,
@@ -79,7 +167,7 @@ export const {
 
   fetchingRequests,
   fetchingRequestsSuccess,
-  fetchingRequestFailure,
+  fetchingRequestsFailure,
 
   updatingRequest,
   updatingRequestSuccess,

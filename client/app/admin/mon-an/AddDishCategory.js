@@ -266,11 +266,12 @@ function AddDishCategory() {
                       startContent={
                         <XMarkIcon className="w-5 h-5 text-gray-600 font-semibold shrink-0" />
                       }
+                      radius="full"
                     >
                       Hủy
                     </Button>
                     <Button
-                      className="bg-teal-400 hover:bg-teal-500 text-white font-semibold"
+                      className="bg-teal-400 hover:bg-teal-500 text-white "
                       startContent={
                         !isLoading ? (
                           <PlusIcon className="w-5 h-5 text-white font-semibold shrink-0" />
@@ -278,6 +279,7 @@ function AddDishCategory() {
                       }
                       type="submit"
                       isLoading={isLoading}
+                      radius="full"
                     >
                       {isLoading ? "Đang thêm danh mục..." : "Thêm danh mục"}
                     </Button>
