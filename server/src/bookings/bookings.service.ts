@@ -587,6 +587,7 @@ export class BookingsService {
         table_count,
         spare_table_count,
         phone,
+        other_service,
         extra_service,
         status,
       } = updateBookingDto;
@@ -774,6 +775,29 @@ export class BookingsService {
         );
       }
 
+      // ? Orther Service
+      let otherServiceAmount = 0;
+      // ! Fetch booking with relations
+      other_service.map(async (orther) => {
+        const findOther = await this.prismaService.products.findUnique({
+          where: { id: Number(orther.id) },
+        });
+        if (!findOther)
+          throw new HttpException(
+            'Không tìm thấy dịch vụ thêm',
+            HttpStatus.NOT_FOUND,
+          );
+        otherServiceAmount += Number(findOther.price) * Number(orther.quantity);
+        orther.name = findOther.name;
+        orther.amount = Number(findOther.price);
+        orther.total_price = Number(findOther.price) * Number(orther.quantity);
+        orther.description = findOther.description;
+        orther.short_description = findOther.short_description;
+        orther.images = findOther.images;
+        orther.quantity = Number(orther.quantity);
+        otherServiceAmount += Number(findOther.price) * Number(orther.quantity);
+      });
+
       // ? Format Stage
       const {
         created_at: createdAtStage,
@@ -837,6 +861,7 @@ export class BookingsService {
             Number(chairAmount) +
             Number(spareChairAmount) +
             Number(spareTableAmount) +
+            Number(otherServiceAmount) +
             Number(extraServiceAmount),
         );
         if (Number(amount) !== totalAmount) {
@@ -941,7 +966,8 @@ export class BookingsService {
             Number(tableAmount) +
             Number(chairAmount) +
             Number(spareChairAmount) +
-            Number(spareTableAmount),
+            Number(spareTableAmount) +
+            Number(otherServiceAmount),
         );
         if (Number(amount) !== totalAmount) {
           throw new HttpException(
