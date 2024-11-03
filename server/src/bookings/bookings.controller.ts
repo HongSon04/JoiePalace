@@ -419,7 +419,7 @@ export class BookingsController {
   @ApiOperation({
     summary: 'Cập nhật thông tin một đơn tiệc',
     description: `Cách tính tổng tiền tiệc:
-Bàn: 200k/1 (1 bàn = 1 ghế, 1 bàn = 1 menu)
+Bàn: 200k/1 (1 bàn = 10 ghế, 1 bàn = 1 menu)
 Ghế: 50k/1 
 orther service: lấy giá của ID * quantity (điền các cặp id value như là nước bánh kem, MC)
 extra service: như trên nhưng chỉ điền khi is_deposit = true thì điền 
