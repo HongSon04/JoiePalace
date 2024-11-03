@@ -26,18 +26,20 @@ const Page = ({params}) => {
         const dataSlug = await fetchBranchBySlug(slug);
         const branchId = dataSlug[0].id;
         const nameBranch = dataSlug[0].name;
-
-        const dataTotalBranch = await fetchAllByBranch(branchId);
-        const allBranch = await fetchAllBranch();
-
+    
+        const [dataTotalBranch, allBranch] = await Promise.all([
+            fetchAllByBranch(branchId),
+            fetchAllBranch()
+        ]);
+    
         setDataSlug(dataSlug);
         setBranchId(branchId);
         setnNameBranch(nameBranch);
         setdataTotalBranch(dataTotalBranch);
         setAllBranch(allBranch);
-      } catch (error) {
+    } catch (error) {
         console.error("Error fetching data:", error);
-      }
+    }    
     };
     fetchData();
   }, []);

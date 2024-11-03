@@ -121,58 +121,27 @@ export const fetchAllBranch = async () => {
       throw error; 
   }
 };
-// export const fetchUserById = async (userId) => {
-//   try {
-//     const token = getCookie('accessToken');
-//     const response = await axios.get(API_CONFIG.USER.GET_BY_ID(userId), {
-//       headers: {
-//         'Authorization': `Bearer ${token}`,
-//       }
-//     });
-    
-//     if (response.status !== 200) {
-//       throw new Error("Có lỗi khi lấy dữ liệu !");
-//     }
-//     return response.data;
-//   } catch (error) {
-//     console.error("Lỗi:", error);
-//     throw error;
-//   }
-// };
-
-
-// export const fetchBranchById = async (branchId) => {
-//   try {
-//     const response = await axios.get(API_CONFIG.BRANCHES.GET_BY_ID(branchId));
-    
-//     if (response.status !== 200) {
-//       throw new Error("Có lỗi khi lấy dữ liệu !");
-//       }
-//       return response.data;
-//   } catch (error) {
-//     console.error("Lỗi:", error);
-//     throw error;
-//   }
-// };
-export const fetchAllBooking = async () => {
+export const fetchUserByBranchId = async (userId) => {
   try {
-      const token = getCookie('accessToken');
-      const response = await axios.get(API_CONFIG.DASHBOARD.GET_ALL_BOOKING, {
-          headers: {
-              'Authorization': `Bearer ${token}`,
-          }
-      });
-
-      if (response.status !== 200) {
-          throw new Error("Có lỗi khi lấy dữ liệu !");
+    const token = getCookie('accessToken');
+    const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(userId), {
+      headers: {
+        'Authorization': `Bearer ${token}`,
       }
-      
-      return response.data;
+    });
+    
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu !");
+    }
+    return response.data;
   } catch (error) {
-      console.error("Lỗi:", error);
-      throw error; 
+    console.error("Lỗi:", error);
+    throw error;
   }
 };
+
+
+
 export const fetchInfoByMonth = async (branchId) => {
   try {
     const response = await axios.get(API_CONFIG.DASHBOARD.GET_INFO_BY_MONTH(branchId));
