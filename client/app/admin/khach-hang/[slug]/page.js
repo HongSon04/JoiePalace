@@ -1,20 +1,40 @@
+"use client";
+
 import AdminHeader from "@/app/_components/AdminHeader";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../../../_styles/globals.css";
 import Chart from "@/app/_components/Chart";
 import { BsThreeDots } from "react-icons/bs";
 import { PiShootingStarDuotone } from "react-icons/pi";
+import Image from "next/image";
+import { fetchUserByBranchId } from "@/app/_services/apiServices";
+import { fetchBranchBySlug } from "@/app/_services/branchesServices";
+const Page = ({params}) => {    
+  const {slug} = params;
+  const [dataSlug, setDataSlug] = useState(null);
+  const [branchId, setBranchId] = useState(null);
+  const [dataUser, setDataUser] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const dataSlug = await fetchBranchBySlug(slug);
+        const branchId = dataSlug[0].id;
+    
+        const [dataUser] = await Promise.all([
+          fetchUserByBranchId(branchId)
+        ]);
+        setDataUser(dataUser);
+        setDataSlug(dataSlug);
+        setBranchId(branchId);
+        console.log(dataUser);
+        
 
-const page = () => {
-  const data = {
-    labels: ["Phạm Văn Đồng", "Hoàng Văn Thụ", "Võ Văn Kiệt"],
-    datasets: [
-      {
-        label: "Doanh thu",
-        data: [300000000, 500000000, 700000000],
-      },
-    ],
-  };
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }    
+    };
+    fetchData();
+  }, []);
   return (
     <main className=" grid gap-6 p-4 text-white">
       <AdminHeader
@@ -121,66 +141,50 @@ const page = () => {
             <p className="text-base font-semibold ">Top khách hàng</p>
           </div>
           <div className="flex flex-col p-3 gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
-            <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-              <Image className="rounded-full w-[48px]" src="/image/user.jpg" />
-              <div className="w-full flex justify-between items-center">
-                <div>
-                  <p className="text-sm  font-semibold mb-[10px]">
-                    Tên khách hàng
-                  </p>
-                  <div className="flex gap-3 items-center text-xs ">
-                    <Image src="/image/Group.svg" />
-                    <p>Đồng</p>
+            {dataUser && dataUser.data.length > 0 ? (
+                  dataUser.data.map((item, index) => (
+                      <div key={index} className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
+                        {item.avatar ? (
+                              <Image
+                                  className="rounded-full w-[48px]"
+                                  src={item.avatar}
+                                  alt="User profile"
+                                  width={48}
+                                  height={48}
+                              />
+                          ) : (
+                              <Image
+                                  className="rounded-full w-[48px]"
+                                  src="/image/user.jpg"
+                                  alt="Default User"
+                                  width={48}
+                                  height={48}
+                              />
+                          )}
+
+                          <div className="w-full flex justify-between items-center">
+                              <div>
+                                  <p className="text-sm mb-[10px] font-semibold">
+                                      {item.username || "N/A"}
+                                  </p>
+                                  <div className="flex gap-3 items-center text-xs">
+                                      {item.membership_id ? ( 
+                                          <>
+                                              <Image src="/image/Group.svg" alt="Membership Icon" />
+                                              <p>{item.memberships}</p>
+                                          </>
+                                      ) : null}
+                                  </div>
+                              </div>
+                              <BsThreeDots className="text-xl" />
+                          </div>
+                      </div>
+                  ))
+              ) : (
+                  <div className="loading-message">
+                      <p className="text-center">Đang tải dữ liệu.</p>
                   </div>
-                </div>
-                <BsThreeDots className="text-xl" />
-              </div>
-            </div>
-            <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-              <Image className="rounded-full w-[48px]" src="/image/user.jpg" />
-              <div className="w-full flex justify-between items-center">
-                <div>
-                  <p className="text-sm  font-semibold mb-[10px]">
-                    Tên khách hàng
-                  </p>
-                  <div className="flex gap-3 items-center text-xs ">
-                    <Image src="/image/Group.svg" />
-                    <p>Đồng</p>
-                  </div>
-                </div>
-                <BsThreeDots className="text-xl" />
-              </div>
-            </div>
-            <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-              <Image className="rounded-full w-[48px]" src="/image/user.jpg" />
-              <div className="w-full flex justify-between items-center">
-                <div>
-                  <p className="text-sm  font-semibold mb-[10px]">
-                    Tên khách hàng
-                  </p>
-                  <div className="flex gap-3 items-center text-xs ">
-                    <Image src="/image/Group.svg" />
-                    <p>Đồng</p>
-                  </div>
-                </div>
-                <BsThreeDots className="text-xl" />
-              </div>
-            </div>
-            <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-              <Image className="rounded-full w-[48px]" src="/image/user.jpg" />
-              <div className="w-full flex justify-between items-center">
-                <div>
-                  <p className="text-sm  font-semibold mb-[10px]">
-                    Tên khách hàng
-                  </p>
-                  <div className="flex gap-3 items-center text-xs ">
-                    <Image src="/image/Group.svg" />
-                    <p>Đồng</p>
-                  </div>
-                </div>
-                <BsThreeDots className="text-xl" />
-              </div>
-            </div>
+              )}
           </div>
         </div>
       </div>
@@ -188,4 +192,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

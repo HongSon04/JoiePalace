@@ -13,6 +13,7 @@ import TableGrab from '@/app/_components/TableGrab';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
 import {fetchAllBranch, fetchAllByBranch} from "@/app/_services/apiServices";
 import { fetchBranchBySlug } from '@/app/_services/branchesServices';
+import RequestTableWrapper from '@/app/_components/RequestTableWrapper';
 const Page = ({params}) => {    
   const {slug} = params;
   const [dataSlug, setDataSlug] = useState(null);
@@ -124,50 +125,12 @@ const Page = ({params}) => {
             <IoFilter className="text-xl" />
           </div>
         </div>
-        {isFilterVisible && (
-          <div className="absolute mt-2 w-[300px]  rounded-xl right-0 top-[40px]  0 z-10 text-gray-500 bg-white">
-            <DateRangePicker className="max-w-xs w-full " />
-            <div className="flex justify-center items-center gap-2 ">
-              <Input
-                type="number"
-                placeholder="0"
-                labelPlacement="outside"
-                
-                startContent={
-                  <div className="pointer-events-none flex items-center ">
-                    <RiMoneyDollarCircleLine className="text-default-400 w-[24px] h-[24px]" />
-                  </div>
-                }
-                
-              />
-              <Input
-                type="number"
-                placeholder="0"
-                labelPlacement="outside"
-                
-                startContent={
-                  <div className="pointer-events-none flex items-center">
-                    <RiMoneyDollarCircleLine className="text-default-400 w-[24px] h-[24px]" />
-                  </div>
-                }
-                
-              />
-            </div>
-            <div className="flex justify-start items-center gap-2 p-3 rounded-mediumcursor-pointer">  
-              <HiArrowDown />
-              <p>Giá giảm dần</p>
-            </div>
-            <div className="flex justify-start items-center gap-2 p-3 rounded-mediumcursor-pointer">
-              <HiArrowUp />
-              <p>Giá tăng dần</p>
-            </div>
-          </div>
-        )}
-        {/* <div className='w-full'>
-          <Suspense fallback={<TableSkeleton/>}>
-            <TableGrab></TableGrab>
-          </Suspense>
-       </div> */}
+        
+        <div className='overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
+          {/* <Suspense fallback={<TableSkeleton/>}>
+            <RequestTableWrapper />
+          </Suspense> */}
+       </div>
       </div>
     
     </main>

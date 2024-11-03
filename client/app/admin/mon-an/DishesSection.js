@@ -10,13 +10,16 @@ import {
   addingDish,
   addingDishFailure,
   addingDishSuccess,
+  deleteDish,
   deleteDishFailure,
   deleteDishRequest,
   deleteDishSuccess,
+  fetchCategoryDishes,
   fetchingCategoryDishes,
   fetchingCategoryDishesFailure,
   fetchingCategoryDishesSuccess,
   setSelectedDish,
+  updateDish,
 } from "@/app/_lib/features/dishes/dishesSlice";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import { CONFIG } from "@/app/_utils/config";
@@ -41,6 +44,7 @@ import { z } from "zod";
 import Loading from "../loading";
 import SearchForm from "@/app/_components/SearchForm";
 import DishesSectionSkeleton from "@/app/_components/skeletons/DishesSectionSkeleton";
+import Link from "next/link";
 
 const schema = z.object({
   name: z.string().nonempty("Tên món không được để trống"),
@@ -76,18 +80,7 @@ function DishesSection({ dishCategory, categories }) {
   const [sortByPrice, setSortByPrice] = React.useState("DESC"); // ASC or DESC
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  React.useEffect(() => {
-    async function fetchData() {
-      await fetchCategoryDishes(dishCategory.id, {
-        page: currentPage,
-        itemsPerPage: itemsPerPage,
-      });
-    }
-
-    fetchData();
-
-    return () => {};
-  }, []);
+  // console.log(dishCategory);
 
   const handleSearch = async (e) => {
     setSearchQuery(e.target.value);
@@ -105,54 +98,6 @@ function DishesSection({ dishCategory, categories }) {
     setCurrentPage(page);
   };
 
-  React.useEffect(() => {
-    const abortController = new AbortController();
-    const fetchData = async () => {
-      try {
-        await fetchCategoryDishes(dishCategory.id, {
-          page: currentPage,
-          itemsPerPage: itemsPerPage,
-          search: searchQuery,
-          priceSort: sortByPrice,
-        });
-      } catch (error) {
-        console.error("Fetch error:", error);
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [currentPage, itemsPerPage, searchQuery, sortByPrice]);
-
-  const fetchCategoryDishes = async (
-    categoryId,
-    params = {
-      page: currentPage,
-      itemsPerPage: itemsPerPage,
-    }
-  ) => {
-    dispatch(fetchingCategoryDishes());
-
-    const data = await makeAuthorizedRequest(
-      API_CONFIG.PRODUCTS.GET_BY_CATEGORY(categoryId, params),
-      "GET",
-      null
-    );
-
-    if (data.success) {
-      dispatch(fetchingCategoryDishesSuccess(data));
-      return;
-    }
-
-    if (data.error) {
-      dispatch(fetchingCategoryDishesFailure(data));
-      return;
-    }
-  };
-
   const {
     register,
     handleSubmit,
@@ -168,133 +113,9 @@ function DishesSection({ dishCategory, categories }) {
 
   const [files, setFiles] = React.useState([]);
 
-  const handleFileChange = (newFiles) => {
+  const handleFileChange = React.useCallback((newFiles) => {
     setFiles(newFiles);
-  };
-
-  const handleUpdateDish = async (data) => {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("price", data.price);
-    formData.append("short_description", data.short_description);
-    formData.append("description", data.description);
-    formData.append("category_id", dishCategory.id);
-
-    // Append each file to the FormData
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        formData.append("images", file); // Append each image to the FormData
-        console.log("Appending file:", file); // Log each file being appended
-      });
-    }
-
-    dispatch(addingDish());
-
-    // console.log("Adding dish with data:", formData);
-
-    const response = await makeAuthorizedRequest(
-      API_CONFIG.PRODUCTS.UPDATE(selectedDish.id),
-      "PATCH",
-      formData
-    );
-
-    if (response.success) {
-      console.log("Update dish response:", response);
-
-      dispatch(addingDishSuccess(response.data));
-      toast({
-        title: "Đã cập nhật món ăn",
-        description: "Món ăn đã được cập nhật thành công",
-        type: "success",
-      });
-      setIsOpenDetailModal(false);
-    } else {
-      dispatch(addingDishFailure(response.message));
-      toast({
-        title: "Lỗi khi cập nhật món ăn",
-        description: response.message,
-        type: "error",
-      });
-    }
-  };
-
-  const handleAddDish = async (data) => {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("price", data.price);
-    formData.append("short_description", data.short_description);
-    formData.append("description", data.description);
-    formData.append("category_id", data.category);
-
-    // Append each file to the FormData
-    if (files && files.length > 0) {
-      files.forEach((file) => {
-        formData.append("images", file); // Append each image to the FormData
-        console.log("Appending file:", file); // Log each file being appended
-      });
-    }
-
-    dispatch(addingDish());
-
-    // console.log("Adding dish with data:", formData);
-
-    const response = await makeAuthorizedRequest(
-      API_CONFIG.PRODUCTS.CREATE,
-      "POST",
-      formData
-    );
-
-    if (response.success) {
-      dispatch(addingDishSuccess(response.data));
-      toast({
-        title: "Đã thêm món ăn",
-        description: "Món ăn đã được thêm vào thành công",
-        type: "success",
-      });
-
-      await fetchCategoryDishes(dishCategory.id);
-    } else {
-      dispatch(addingDishFailure(response.message));
-      toast({
-        title: "Lỗi khi thêm món ăn",
-        description: response.message,
-        type: "error",
-      });
-    }
-  };
-
-  const handleDeleteDish = async (dishId) => {
-    const confirm = window.confirm("Bạn có chắc chắn muốn xóa món ăn này?");
-
-    if (!confirm) return;
-
-    dispatch(deleteDishRequest());
-
-    const data = await makeAuthorizedRequest(
-      API_CONFIG.PRODUCTS.DELETE(dishId),
-      "DELETE"
-    );
-
-    if (data.success) {
-      dispatch(deleteDishSuccess(data));
-      toast({
-        title: "Đã xóa món ăn",
-        description: "Món ăn đã được xóa thành công",
-        type: "success",
-      });
-
-      await fetchCategoryDishes(dishCategory.id);
-    } else {
-      dispatch(deleteDishFailure(data.message));
-      toast({
-        title: "Lỗi khi xóa món ăn",
-        description: data.message,
-        type: "error",
-      });
-    }
-
-    setIsOpenDetailModal(false);
-  };
+  }, []);
 
   const openDetailModal = () => {
     setIsOpenDetailModal(true);
@@ -311,7 +132,7 @@ function DishesSection({ dishCategory, categories }) {
     setValue(name, inputValue);
   };
 
-  const handleModalClose = () => {
+  const handleModalClose = React.useCallback(() => {
     // Perform any additional actions here
     dispatch(setSelectedDish(null)); // Reset the selected dish
 
@@ -320,20 +141,56 @@ function DishesSection({ dishCategory, categories }) {
 
     // Finally, close the modal
     setIsOpenDetailModal(false);
-  };
+  }, [dispatch, reset]);
 
-  const onSubmit = async (data) => {
-    if (selectedDish) {
-      await handleUpdateDish(data); // Update dish if selected
-    } else {
-      await handleAddDish(data); // Add new dish
-    }
-  };
+  const onSubmit = React.useCallback(
+    async (data) => {
+      if (selectedDish) {
+        const result = await dispatch(
+          updateDish({ dishId: selectedDish.id, dishData: data })
+        ).unwrap();
+
+        if (result.success) {
+          toast({
+            title: "Cập nhật thành công",
+            description: "Món ăn đã được cập nhật",
+            type: "success",
+          });
+        } else {
+          toast({
+            title: "Cập nhật thất bại",
+            description: "Món ăn chưa được cập nhật",
+            type: "error",
+          });
+        }
+      } else {
+        const result = await dispatch(addingDish(data)).unwrap(); // Add dish if not selected
+
+        if (result.success) {
+          toast({
+            title: "Xóa thành công",
+            description: "Món ăn đã được xóa",
+            type: "success",
+          });
+        } else {
+          toast({
+            title: "Xóa thất bại",
+            description: "Món ăn chưa được xóa",
+            type: "error",
+          });
+        }
+      }
+    },
+    [selectedDish]
+  );
+
+  const handleDeleteDish = React.useCallback((dishId) => {
+    dispatch(deleteDish(dishId));
+  }, []);
 
   React.useEffect(() => {
     const handle = () => {
       if (selectedDish) {
-        // console.log("Selected dish in useEffect hook:", selectedDish);
         setImgSrc(
           (selectedDish && selectedDish?.images[0]) ||
             CONFIG.DISH_IMAGE_PLACEHOLDER
@@ -356,12 +213,44 @@ function DishesSection({ dishCategory, categories }) {
     return () => {};
   }, [selectedDish]);
 
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const params = {
+      page: currentPage, // or any other page you want to start with
+      itemsPerPage,
+      search: searchQuery,
+      priceSort: sortByPrice,
+    };
+    dispatch(
+      fetchCategoryDishes({ categoryId: dishCategory.id, params, signal })
+    );
+
+    return () => {
+      abortController.abort();
+    };
+  }, [dishCategory.id, currentPage, itemsPerPage, searchQuery, sortByPrice]);
+
+  // useEffect for other dependencies
+  React.useEffect(() => {
+    const params = {
+      page: currentPage,
+      itemsPerPage,
+      search: searchQuery,
+      priceSort: sortByPrice,
+    };
+
+    dispatch(fetchCategoryDishes({ categoryId: dishCategory.id, params }));
+  }, [dishCategory.id, currentPage, itemsPerPage, sortByPrice]);
+
   return (
     <>
       <div className="mb-5">
         <div className="flex justify-between items-center">
           {/* ITEMS PER PAGE */}
-          <div className="flex-center gap-3">
+          <label htmlFor="perPage" className="flex-center gap-3 text-gray-300">
+            Số món trên trang
             <select
               name="perPage"
               id="perPage"
@@ -388,8 +277,7 @@ function DishesSection({ dishCategory, categories }) {
                 100
               </option>
             </select>
-            <span className="text-white">món trên trang</span>
-          </div>
+          </label>
           <div className="flex-1 flex gap-3 justify-end">
             <SearchForm
               classNames={{
@@ -415,13 +303,21 @@ function DishesSection({ dishCategory, categories }) {
             </select>
           </div>
         </div>
-        {isLoading ? (
-          <DishesSectionSkeleton />
-        ) : isError ? (
-          <div className="flex justify-center items-center">
-            <p className="text-gray-400">Failed to load dishes</p>
+        {isLoading && <DishesSectionSkeleton />}
+        {isError && (
+          <div className="flex flex-col gap-3 justify-center items-center">
+            <p className="text-gray-400">Tải món ăn thất bại</p>
+            <button
+              className="text-gray-400 underline"
+              onClick={() =>
+                typeof window !== undefined && window.location.reload()
+              }
+            >
+              Thử lại
+            </button>
           </div>
-        ) : (
+        )}
+        {!isLoading && !isError && (
           <Row gutter={[12, 12]} className="mt-3">
             {categoryDishes &&
               categoryDishes.map((dish, index) => (
@@ -462,12 +358,13 @@ function DishesSection({ dishCategory, categories }) {
             </Col>
           </Row>
         )}
-
-        <CustomPagination
-          onChange={handlePageChange}
-          total={pagination ? Math.ceil(pagination.total / itemsPerPage) : 1}
-          page={currentPage}
-        ></CustomPagination>
+        {pagination && pagination.lastPage > 1 && (
+          <CustomPagination
+            onChange={handlePageChange}
+            total={pagination.lastPage}
+            page={currentPage}
+          ></CustomPagination>
+        )}
         {/* MODAL */}
         {isOpenDetailModal && (
           <Suspense fallback={<Loading />}>

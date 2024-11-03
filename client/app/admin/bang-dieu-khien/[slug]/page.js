@@ -59,10 +59,12 @@ const Page = ({ params }) => {
       try {
         const dataSlug = await fetchBranchBySlug(slug);
         const branchId = dataSlug[0].id;
+        // console.log(branchId);
+        
         const { startDate, endDate } = getCurrentMonthStartAndEnd();
         const dataBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            branch_id : 1,
+            branch_id : branchId,
             is_confirm: false,
             is_deposit: false,
             status : "pending"
@@ -71,14 +73,12 @@ const Page = ({ params }) => {
           "GET",
           null
         );
-        console.log(startDate);
-        console.log(endDate);
         const dataBookingByMonth = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             start_date: startDate,
             end_date: endDate,
             itemsPerPage: 10,
-            branch_id: 1
+            branch_id: branchId
           }),
           "GET",
           null
@@ -101,7 +101,7 @@ const Page = ({ params }) => {
             fetchUserByBranchId(branchId),
             
         ]);
-        // console.log(dataInfo);
+        // console.log(dataUser);
         setDataBookingByMonth(dataBookingByMonth.data);
         setDataUser(dataUser);
         setdataTotalAdminByWeek(dataTotalAdminByWeek);
@@ -121,7 +121,7 @@ const Page = ({ params }) => {
 
     fetchAminData();
   }, []);
-
+  
   const createChartData = (data, label) => {
     let chartData = {
       labels: [],

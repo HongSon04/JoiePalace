@@ -21,10 +21,7 @@ function Dish(props) {
 
   // console.log(dish);
 
-  const [image, setImage] = React.useState(
-    dish.images[0] || CONFIG.DISH_IMAGE_PLACEHOLDER
-    // CONFIG.DISH_IMAGE_PLACEHOLDER
-  );
+  const [image, setImage] = React.useState(dish.images[0]);
 
   const { onOpen } = useDisclosure();
 
