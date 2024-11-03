@@ -2,39 +2,33 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Box, Image, Button, Text } from '@chakra-ui/react';
-import axios from 'axios';
 
 const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialImages = [] }) => {
   const [images, setImages] = useState(initialImages); // Khởi tạo với hình ảnh đã có
   const imagesRef = useRef(images);
 
   useEffect(() => {
-    // Gọi khi có sự thay đổi ở images
     if (imagesRef.current !== images) {
       onImagesChange(name, images);
-      imagesRef.current = images; // Cập nhật ref sau khi gọi onImagesChange
+      imagesRef.current = images; 
     }
-  }, [images, onImagesChange, name]); // Thêm đúng dependency array
+  }, [images, onImagesChange, name]); 
 
-  const uploadImageToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', 'pictures');
-    formData.append('upload_preset', 'bzs31ttb'); // Thay thế bằng upload preset của bạn
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
 
-    const response = await axios.post(`https://api.cloudinary.com/v1_1/dx22tntue/image/upload`, formData);
-    return response.data.secure_url; // URL của hình ảnh đã upload
-  };
+    const newImages = files.map((file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
 
-  const handleImageUpload = async (event) => {
-    try {
-      const files = Array.from(event.target.files);
-      const uploadPromises = files.map(file => uploadImageToCloudinary(file));
-      const newImages = await Promise.all(uploadPromises);
-      setImages((prevImages) => [...prevImages, ...newImages]);
-    } catch (error) {
-      console.error("Error uploading images:", error);
-    }
+      return new Promise((resolve) => {
+        reader.onload = () => resolve(reader.result);
+      });
+    });
+
+    Promise.all(newImages).then((urls) => {
+      setImages((prevImages) => [...prevImages, ...urls]);
+    });
   };
 
   const handleDeleteImage = (index) => {

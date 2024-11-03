@@ -64,7 +64,7 @@ const TableGrab = ({ data, pathLink, onStatusChange }) => {
     const currentData = data ? data.slice(startIndex, startIndex + itemsPerPage) : [];
 
     const handleStatusChange = (itemId, event) => {
-        const newStatus = parseInt(event.target.value);
+        const newStatus = event.target.value;
         onStatusChange(itemId, newStatus); 
     };
 
@@ -137,13 +137,14 @@ const TableGrab = ({ data, pathLink, onStatusChange }) => {
                                 <td className="!px-8 !py-6 whitespace-nowrap">{item.paymentDate || "Chưa thanh toán"}</td>
                                 <td className="!px-8 !py-6 whitespace-nowrap text-center">
                                     <select
-                                        value={item.paymentStatus || "Chưa thanh toán"}
+                                        value={item.status || "Chưa thanh toán"}
                                        onChange={(e) => handleStatusChange(item.id, e)}
                                         className="bg-gray-100 border border-gray-300 rounded px-2 py-1"
                                     >
-                                        <option value="Chưa thanh toán">Chưa thanh toán</option>
-                                        <option value="Đã thanh toán">Đã thanh toán</option>
-                                        <option value="Quá hạn">Quá hạn</option>
+                                        <option value="pending">Đang chờ thanh toán</option>
+                                        <option value="processing">Đang xử lý</option>
+                                        <option value="success ">Đã thanh toán</option>
+                                        <option value="cancel">Hủy</option>
                                     </select>
                                 </td>
                                 <td className="!px-8 !py-6 whitespace-nowrap text-center">{item.number_of_guests}</td>

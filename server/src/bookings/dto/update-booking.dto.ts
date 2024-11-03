@@ -107,6 +107,14 @@ export class UpdateBookingDto {
   })
   @IsNotEmpty({ message: 'Số lượng bàn không được để trống' })
   table_count: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Số lượng bàn dự phòng',
+  })
+  @IsNotEmpty({ message: 'Số lượng bàn dự phòng không được để trống' })
+  spare_table_count: number;
+  
   @ApiProperty({
     description:
       'Tổng tiền của sự kiện: Tiền trang trí + tiền ghế 100k/1 ghế 50k/1 (1 bàn = 10 ghế) => (100k + (50k * 10)) + tiền menu (menu * tổng bàn) + phí',
