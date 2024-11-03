@@ -1,22 +1,17 @@
 "use client";
 
 import AdminHeader from "@/app/_components/AdminHeader";
-import RequestTableWrapper from "@/app/_components/RequestTableWrapper";
+import RequestTable from "@/app/_components/RequestTable";
 import TableSkeleton from "@/app/_components/skeletons/TableSkeleton";
-import { getCurrentBranch } from "@/app/_lib/features/branch/branchSlice";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-import React, { Suspense } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import PageBreadcrumbs from "./PageBreadcrumbs";
+import { Suspense } from "react";
 
-function Page({ params }) {
-  const { chiNhanhSlug } = params;
+function Page() {
   return (
     <div>
       <AdminHeader title={"Yêu cầu"} showSearchForm={false} />
       {/* <PageBreadcrumbs branchSlug={chiNhanhSlug} /> */}
       <Suspense fallback={<TableSkeleton />}>
-        <RequestTableWrapper />
+        <RequestTable />
       </Suspense>
     </div>
   );
