@@ -11,6 +11,7 @@ const initialState = {
     nextPage: null,
     prevPage: null,
   },
+  error: null,
   selectedRequest: null,
 
   isFetchingRequests: false,
@@ -54,9 +55,10 @@ const requestsSlice = createSlice({
       state.requests = action.payload.data;
       state.pagination = action.payload.pagination;
     },
-    fetchingRequestsFailure(state) {
+    fetchingRequestsFailure(state, action) {
       state.isFetchingRequests = false;
       state.isFetchingRequestsError = true;
+      state.error = action.payload;
     },
 
     updatingRequest(state) {
@@ -77,12 +79,14 @@ const requestsSlice = createSlice({
       .addCase(fetchRequests.pending, (state) => {
         state.isFetchingRequests = true;
         state.isFetchingRequestsError = false;
+        state.error = null;
       })
       .addCase(fetchRequests.fulfilled, (state, action) => {
         state.isFetchingRequests = false;
         state.isFetchingRequestsError = false;
         state.requests = action.payload.data;
         state.pagination = action.payload.pagination;
+        state.error = null;
       })
       .addCase(fetchRequests.rejected, (state, action) => {
         state.isFetchingRequests = false;
@@ -138,13 +142,13 @@ export const fetchRequests = createAsyncThunk(
       { signal }
     );
 
-    // console.log("response from fetchRequests thunk -> ", response);
+    console.log("response from fetchRequests thunk -> ", response);
     if (response.success) {
       dispatch(fetchingRequestsSuccess(response));
       return response; // Return the response for further use
     } else {
-      dispatch(fetchingRequestsFailure(response));
-      return rejectWithValue(response.message);
+      dispatch(fetchingRequestsFailure(response.error.message));
+      return rejectWithValue(response.error.message);
     }
   }
 );

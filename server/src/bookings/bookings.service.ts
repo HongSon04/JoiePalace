@@ -192,7 +192,6 @@ export class BookingsService {
 
       // Convert deleted to proper boolean
       const deleted = query.deleted == true ? true : false;
-
       // Build where conditions using Prisma types
       const whereConditions: any = {
         deleted,
@@ -204,6 +203,7 @@ export class BookingsService {
             },
           }),
       };
+      console.log('whereConditions: ', whereConditions);
 
       // Add search conditions if search exists
       if (query.search) {
@@ -636,6 +636,24 @@ export class BookingsService {
         this.updateMembershipBooking(findBooking.user_id);
       }
 
+      let gift = [];
+      if (user_id) {
+        const findUser = await this.prismaService.users.findUnique({
+          where: { id: Number(user_id) },
+          include: {
+            memberships: {
+              select: {
+                gifts: true,
+              },
+            },
+          },
+        });
+
+        if (findUser) {
+          gift = findUser.memberships.gifts;
+        }
+      }
+
       // ! Update Booking
       await this.prismaService.bookings.update({
         where: { id: Number(id) },
@@ -906,6 +924,7 @@ export class BookingsService {
               : 0,
             spare_table_price: spare_table_count ? Number(spareTableAmount) : 0,
             extra_service: extra_service,
+            gift,
             fee,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
@@ -1010,8 +1029,8 @@ export class BookingsService {
               menu_id: Number(menu_id),
               decor: decorFormat,
               menu: menuFormat,
-              extra_service: null,
-              gift: null,
+              extra_service: extra_service ? extra_service : null,
+              gift,
               table_count: Number(table_count),
               chair_count: Number(chair_count),
               spare_chair_count: spare_table_count
@@ -1041,8 +1060,8 @@ export class BookingsService {
               party_types: partyTypeFormat,
               decor: decorFormat,
               menu: menuFormat,
-              extra_service: null,
-              gift: null,
+              extra_service: extra_service ? extra_service : null,
+              gift,
               fee,
               table_count: Number(table_count),
               chair_count: Number(chair_count),

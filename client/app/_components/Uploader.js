@@ -3,7 +3,7 @@
 
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { CONFIG } from "../_utils/config";
 
 /**
@@ -22,10 +22,14 @@ import { CONFIG } from "../_utils/config";
  */
 
 const Uploader = ({ onFileChange, files, setFiles }) => {
+  const fileInputRef = React.createRef();
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
-    onFileChange(selectedFiles); // Notify parent component of the new files
+    onFileChange(selectedFiles);
+
+    // console.log("Files change from uploader", selectedFiles);
   };
 
   const handleUnsetFiles = () => {
@@ -81,20 +85,21 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
           height={200}
         ></Image>
         <p className="text-base text-gray-400">
-          Kéo và thả ảnh của bạn tại đây, hoặc bấm vào nút chọn ảnh
+          Kéo và thả ảnh của bạn tại đây, <br /> hoặc bấm vào nút chọn ảnh
         </p>
         <input
           type="file"
           accept="image/*"
           multiple
           onChange={handleFileChange}
+          ref={fileInputRef}
           style={{ display: "none" }} // Hide the default file input
           // Register the file input with React Hook Form if needed
         />
         <button
           type="button"
           className="underline text-gold"
-          onClick={() => document.querySelector('input[type="file"]').click()}
+          onClick={() => fileInputRef.current.click()}
         >
           Chọn ảnh{" "}
         </button>
