@@ -113,7 +113,25 @@ export class UserService {
       if (!findUser) {
         throw new NotFoundException('User không tồn tại');
       }
-      const { password, refresh_token, ...user } = findUser;
+
+      const {
+        totalAmount,
+        totalBookingPending,
+        totalBookingSuccess,
+        totalBookingCancel,
+        totalBookingProcess,
+        totalDepositAmount,
+      } = await this.getBookingDashboardDataByUserId(Number(reqUser.id));
+
+      let { password, refresh_token, ...user } = findUser as any;
+
+      user.totalAmount = totalAmount;
+      user.totalBookingPending = totalBookingPending;
+      user.totalBookingSuccess = totalBookingSuccess;
+      user.totalBookingCancel = totalBookingCancel;
+      user.totalBookingProcess = totalBookingProcess;
+      user.totalDepositAmount = totalDepositAmount;
+
       throw new HttpException(
         {
           data: FormatReturnData(user, ['password', 'refresh_token']),
@@ -558,9 +576,26 @@ export class UserService {
       if (!user) {
         throw new NotFoundException('User không tồn tại');
       }
+      const {
+        totalAmount,
+        totalBookingPending,
+        totalBookingSuccess,
+        totalBookingCancel,
+        totalBookingProcess,
+        totalDepositAmount,
+      } = await this.getBookingDashboardDataByUserId(Number(user.id));
+
+      let { password, refresh_token, ...userFormat } = user as any;
+
+      userFormat.totalAmount = totalAmount;
+      userFormat.totalBookingPending = totalBookingPending;
+      userFormat.totalBookingSuccess = totalBookingSuccess;
+      userFormat.totalBookingCancel = totalBookingCancel;
+      userFormat.totalBookingProcess = totalBookingProcess;
+      userFormat.totalDepositAmount = totalDepositAmount;
 
       throw new HttpException(
-        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        { data: FormatReturnData(userFormat, ['password', 'refresh_token']) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -590,8 +625,26 @@ export class UserService {
         throw new NotFoundException('User không tồn tại');
       }
 
+      const {
+        totalAmount,
+        totalBookingPending,
+        totalBookingSuccess,
+        totalBookingCancel,
+        totalBookingProcess,
+        totalDepositAmount,
+      } = await this.getBookingDashboardDataByUserId(Number(user.id));
+
+      let { password, refresh_token, ...userFormat } = user as any;
+
+      userFormat.totalAmount = totalAmount;
+      userFormat.totalBookingPending = totalBookingPending;
+      userFormat.totalBookingSuccess = totalBookingSuccess;
+      userFormat.totalBookingCancel = totalBookingCancel;
+      userFormat.totalBookingProcess = totalBookingProcess;
+      userFormat.totalDepositAmount = totalDepositAmount;
+
       throw new HttpException(
-        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        { data: FormatReturnData(userFormat, ['password', 'refresh_token']) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -718,6 +771,66 @@ export class UserService {
         error: error,
       });
     }
+  }
+
+  // ? Get Booking Dashboard Data by User ID
+  async getBookingDashboardDataByUserId(user_id: number) {
+    // ? Find Booking and calculate total amount
+    const booking = await this.prismaService.bookings.findMany({
+      where: {
+        user_id: Number(user_id),
+      },
+      include: {
+        booking_details: {
+          include: {
+            deposits: true,
+          },
+        },
+      },
+    });
+
+    let totalAmount = 0;
+    let totalBookingPending = 0;
+    let totalBookingSuccess = 0;
+    let totalBookingCancel = 0;
+    let totalBookingProcess = 0;
+    let totalDepositAmount = 0;
+
+    booking.forEach((item) => {
+      switch (item.status) {
+        case 'pending':
+          totalBookingPending += 1;
+          break;
+        case 'success':
+          totalBookingSuccess += 1;
+          totalDepositAmount += item.booking_details.reduce(
+            (total, item) => total + item.deposits.amount,
+            0,
+          );
+          totalAmount += item.booking_details.reduce(
+            (total, item) => total + item.total_amount,
+            0,
+          );
+          break;
+        case 'cancel':
+          totalBookingCancel += 1;
+          break;
+        case 'processing':
+          totalBookingProcess += 1;
+          break;
+        default:
+          break;
+      }
+    });
+
+    return {
+      totalAmount,
+      totalBookingPending,
+      totalBookingSuccess,
+      totalBookingCancel,
+      totalBookingProcess,
+      totalDepositAmount,
+    };
   }
 
   // ! Generate Token

@@ -586,3 +586,7 @@ select {
   background-image: url(/line-group.svg);
   z-index: 1;
 }
+.table-container {
+  max-width: 100%; 
+  overflow-x: auto;
+}

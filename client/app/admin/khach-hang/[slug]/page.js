@@ -9,43 +9,54 @@ import { PiShootingStarDuotone } from "react-icons/pi";
 import Image from "next/image";
 import { fetchUserByBranchId } from "@/app/_services/apiServices";
 import { fetchBranchBySlug } from "@/app/_services/branchesServices";
+import CustomPagination from "@/app/_components/CustomPagination";
+
 const Page = ({params}) => {    
   const {slug} = params;
   const [dataSlug, setDataSlug] = useState(null);
   const [branchId, setBranchId] = useState(null);
-  const [dataUser, setDataUser] = useState(null);
+  const [dataUser, setDataUser] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const dataSlug = await fetchBranchBySlug(slug);
         const branchId = dataSlug[0].id;
-    
-        const [dataUser] = await Promise.all([
-          fetchUserByBranchId(branchId)
-        ]);
-        setDataUser(dataUser);
+        const [userData] = await Promise.all([fetchUserByBranchId(branchId)]);
+        
+        setDataUser(userData.data || []); 
         setDataSlug(dataSlug);
         setBranchId(branchId);
-        console.log(dataUser);
-        
-
-    } catch (error) {
+      } catch (error) {
         console.error("Error fetching data:", error);
-    }    
+      }    
     };
     fetchData();
-  }, []);
+  }, [slug]);
+  console.log(dataUser);
+  
+  const totalItems = dataUser.length;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = dataUser.slice(indexOfFirstItem, indexOfLastItem); 
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <main className=" grid gap-6 p-4 text-white">
+    <main className="grid gap-6 p-4 text-white">
       <AdminHeader
         title="Khách hàng"
         showBackButton={false}
         showSearchForm={false}
-      ></AdminHeader>
-      <div className="flex justify-start items-center gap-2 text-base text-gray-500       ">
+      />
+      <div className="flex justify-start items-center gap-2 text-base text-gray-500">
         <p>Khách hàng</p>
       </div>
-      <div className="flex justify-between gap-[30px] items-start ">
+      <div className="flex justify-between gap-[30px] items-start">
         <div className="w-[70%]">
           <div className="mb-[10px]">
             <p className="text-base font-semibold">Danh sách khách hàng</p>
@@ -65,126 +76,64 @@ const Page = ({params}) => {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  <tr>
-                    <td>#1IF39FP</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>VIP</td>
-                    <td>0939283829</td>
-                    <td>12</td>
-                    <td>2.000.000.000 VND</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#1IF39FP</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>VIP</td>
-                    <td>0939283829</td>
-                    <td>12</td>
-                    <td>2.000.000.000 VND</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#1IF39FP</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>VIP</td>
-                    <td>0939283829</td>
-                    <td>12</td>
-                    <td>2.000.000.000 VND</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#1IF39FP</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>VIP</td>
-                    <td>0939283829</td>
-                    <td>12</td>
-                    <td>2.000.000.000 VND</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#1IF39FP</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>VIP</td>
-                    <td>0939283829</td>
-                    <td>12</td>
-                    <td>2.000.000.000 VND</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
+                  {currentItems.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.id}</td>
+                      <td>{item.name}</td>
+                      {/* <td>{item.level}</td>
+                      <td>{item.phone}</td>
+                      <td>{item.partyCount}</td>
+                      <td>{item.totalSpent} VND</td> */}
+                      <td>
+                        <p className="text-teal-400 text-xs font-bold">Chi tiết</p>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+            <CustomPagination
+              total={Math.ceil(totalItems / itemsPerPage)}
+              page={currentPage}
+              onChange={handlePageChange}
+            />
           </div>
         </div>
-        <div className="w-[30%] p4 bg-whiteAlpha-100 h-full rounded-xl ">
+        <div className="w-[30%] p-4 bg-whiteAlpha-100 h-full rounded-xl">
           <div className="flex p-3 gap-[10px] items-center">
             <PiShootingStarDuotone className="text-3xl text-yellow-500" />
-            <p className="text-base font-semibold ">Top khách hàng</p>
+            <p className="text-base font-semibold">Top khách hàng</p>
           </div>
           <div className="flex flex-col p-3 gap-3 max-h-[500px] overflow-y-auto hide-scrollbar">
-            {dataUser && dataUser.data.length > 0 ? (
-                  dataUser.data.map((item, index) => (
-                      <div key={index} className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-                        {item.avatar ? (
-                              <Image
-                                  className="rounded-full w-[48px]"
-                                  src={item.avatar}
-                                  alt="User profile"
-                                  width={48}
-                                  height={48}
-                              />
-                          ) : (
-                              <Image
-                                  className="rounded-full w-[48px]"
-                                  src="/image/user.jpg"
-                                  alt="Default User"
-                                  width={48}
-                                  height={48}
-                              />
-                          )}
-
-                          <div className="w-full flex justify-between items-center">
-                              <div>
-                                  <p className="text-sm mb-[10px] font-semibold">
-                                      {item.username || "N/A"}
-                                  </p>
-                                  <div className="flex gap-3 items-center text-xs">
-                                      {item.membership_id ? ( 
-                                          <>
-                                              <Image src="/image/Group.svg" alt="Membership Icon" />
-                                              <p>{item.memberships}</p>
-                                          </>
-                                      ) : null}
-                                  </div>
-                              </div>
-                              <BsThreeDots className="text-xl" />
-                          </div>
+            {dataUser.length > 0 ? (
+              dataUser.map((item, index) => (
+                <div key={index} className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50">
+                  {item.avatar ? (
+                    <Image className="rounded-full w-[48px]" src={item.avatar} alt="User profile" width={48} height={48} />
+                  ) : (
+                    <Image className="rounded-full w-[48px]" src="/image/user.jpg" alt="Default User" width={48} height={48} />
+                  )}
+                  <div className="w-full flex justify-between items-center">
+                    <div>
+                      <p className="text-sm mb-[10px] font-semibold">{item.username || "N/A"}</p>
+                      <div className="flex gap-3 items-center text-xs">
+                        {item.membership_id && (
+                          <>
+                            <Image src="/image/Group.svg" alt="Membership Icon" />
+                            <p>{item.memberships}</p>
+                          </>
+                        )}
                       </div>
-                  ))
-              ) : (
-                  <div className="loading-message">
-                      <p className="text-center">Đang tải dữ liệu.</p>
+                    </div>
+                    <BsThreeDots className="text-xl" />
                   </div>
-              )}
+                </div>
+              ))
+            ) : (
+              <div className="loading-message">
+                <p className="text-center">Đang tải dữ liệu.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

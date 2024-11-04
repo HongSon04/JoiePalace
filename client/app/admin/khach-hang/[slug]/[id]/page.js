@@ -1,44 +1,46 @@
 import AdminHeader from "@/app/_components/AdminHeader";
 import React from "react";
+import Image from "next/image";
 import { PiMedalLight } from "react-icons/pi";
 const page = () => {
   return (
-    <main className="grid gap-6 p-4 ">
+    <main className="grid gap-6 p-4 text-white ">
       <AdminHeader title="Khách hàng" showSearchForm={false}></AdminHeader>
       <div className="flex justify-start items-center gap-2 text-base ">
         <p>Khách hàng</p>
         <p>/</p>
         <p>Thông tin chi tiết</p>
       </div>
-      <div className="flex justify-between gap-[30px]">
-        <div className="w-[25%] h-[345px] p-5 bg-whiteAlpha-100 rounded-lg grid gap-[22px]">
+       <div className="w-full  p-5 bg-whiteAlpha-100 rounded-lg grid gap-[22px]">
           <div className="flex gap-3 items-center">
-            <Image className="rounded-full w-[90px]" src="/image/user.jpg" />
+            <Image width={35} height={35} className="rounded-full w-[90px]" src="/image/user.jpg" />
             <div>
               <p className="text-xs mb-3">Hạng thành viên</p>
-              <div className="flex gap-3 items-center text-xs ">
-                <Image src="/image/Group.svg" />
+              <div className="flex gap-3 items-center text-base ">
+                <Image width={24} height={24} src="/image/Group.svg" />
                 <p>Đồng</p>
               </div>
             </div>
           </div>
-          <div className="grid gap-[10px] w-full">
-            <div className="p-3 bg-whiteAlpha-50 rounded-lg">
+          <div className="flex gap-4 justify-between  w-full">
+            <div className="p-3 bg-whiteAlpha-50 rounded-lg w-1/3">
               <p>Tên</p>
             </div>
-            <div className="p-3  bg-whiteAlpha-50 rounded-lg">
+            <div className="p-3  bg-whiteAlpha-50 rounded-lg w-1/3">
               <p>Email</p>
             </div>
-            <div className="p-3  bg-whiteAlpha-50 rounded-lg">
+            <div className="p-3  bg-whiteAlpha-50 rounded-lg w-1/3">
               <p>Số điện thoại</p>
             </div>
           </div>
         </div>
-        <div className="w-[75%] rounded-lg bg-whiteAlpha-100 ">
+      <div className="flex justify-between gap-[30px]">
+       
+        <div className="rounded-lg bg-whiteAlpha-100 ">
           <div className="w-full grid gap-[20px] p-4">
             <p className="text-lg font-bold">Tiệc đã hoàn thành</p>
-            <div className="overflow-x-auto overflow-y-auto max-h-[325px] max-w-[800px] ">
-              <table className="table table-chinhanh rounded-lg">
+            <div className="overflow-x-auto overflow-y-auto max-h-[325px]  ">
+              <table className="table table-chinhanh rounded-lg w-full">
                 <thead>
                   <tr>
                     <th>Mã tiệc</th>
@@ -215,7 +217,7 @@ const page = () => {
               </table>
             </div>
             <p className="text-lg font-bold">Tiệc dự kiến diễn ra</p>
-            <div className="overflow-x-auto overflow-y-auto max-h-[325px] max-w-[800px] ">
+            <div className="overflow-x-auto overflow-y-auto max-h-[325px]  ">
               <table className="table table-chinhanh rounded-lg">
                 <thead>
                   <tr>

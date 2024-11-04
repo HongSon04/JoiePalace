@@ -13,7 +13,7 @@ import TableGrab from '@/app/_components/TableGrab';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
 import {fetchAllBranch, fetchAllByBranch} from "@/app/_services/apiServices";
 import { fetchBranchBySlug } from '@/app/_services/branchesServices';
-import RequestTableWrapper from '@/app/_components/RequestTableWrapper';
+import BookingsTable from './BookingsTable';
 const Page = ({params}) => {    
   const {slug} = params;
   const [dataSlug, setDataSlug] = useState(null);
@@ -116,21 +116,16 @@ const Page = ({params}) => {
         
       </div>
       <div className="relative">
-        <div className="flex justify-between items-centern mb-4 ">
+        <div className="flex justify-between items-centern">
           <p className="text-sm font-bold">Danh sách tiệc {BranchName}</p>
-          <div
-            onClick={toggleFilter}
-            className="bg-whiteAlpha-100 rounded-full py-2.5 px-4 cursor-pointer"
-          >
-            <IoFilter className="text-xl" />
-          </div>
         </div>
         
-        <div className='overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-          {/* <Suspense fallback={<TableSkeleton/>}>
-            <RequestTableWrapper />
-          </Suspense> */}
-       </div>
+        <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
+          <Suspense fallback={<TableSkeleton />}>
+            <BookingsTable branchId={1} />
+          </Suspense>
+        </div>
+
       </div>
     
     </main>
