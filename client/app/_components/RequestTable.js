@@ -141,13 +141,7 @@ function RequestTable() {
       endDate: formattedEndDate,
     };
 
-    const fetchData = async () => {
-      const result = await dispatch(fetchRequests({ params })).unwrap();
-
-      console.log(result);
-    };
-
-    fetchData();
+    dispatch(fetchRequests({ params }));
 
     return () => {};
   }, [currentPage, itemsPerPage]);
@@ -179,15 +173,7 @@ function RequestTable() {
       endDate: formattedEndDate,
     };
 
-    const fetchData = async () => {
-      const result = await dispatch(
-        fetchRequests({ signal: controller.signal, params })
-      ).unwrap();
-
-      console.log(result);
-    };
-
-    fetchData();
+    dispatch(fetchRequests({ signal: controller.signal, params }));
 
     return () => {
       controller.abort();
