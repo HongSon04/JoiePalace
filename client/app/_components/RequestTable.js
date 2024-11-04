@@ -1,11 +1,9 @@
 import {
   ExclamationCircleIcon,
-  MoonIcon,
-  SunIcon,
   EllipsisVerticalIcon as VerticalDotsIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { getLocalTimeZone, parseDate } from "@internationalized/date";
+import { parseDate } from "@internationalized/date";
 import {
   Button,
   Chip,
@@ -14,42 +12,37 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Spinner,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
   TableRow,
-  item,
+  User,
 } from "@nextui-org/react";
-import { format, formatDate } from "date-fns";
+import { format } from "date-fns";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
+import { BsMoon, BsSun } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import useApiServices from "../_hooks/useApiServices";
+import useCustomToast from "../_hooks/useCustomToast";
 import {
   fetchingRequestFailure,
-  fetchingRequestsSuccess,
-  updatingRequest,
+  fetchingRequestsFailure,
+  fetchRequests,
+  updateRequestStatus,
   updatingRequestSuccess,
 } from "../_lib/features/requests/requestsSlice";
-import { API_CONFIG } from "../_utils/api.config";
 import { CONFIG } from "../_utils/config";
 import { capitalize } from "../_utils/helpers";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import CustomPagination from "./CustomPagination";
 import SearchForm from "./SearchForm";
-import { ISOStringToDateTimeString } from "../_utils/formaters";
-import { BsMoon, BsSun } from "react-icons/bs";
-import useCustomToast from "../_hooks/useCustomToast";
-import { MdDoubleArrow, MdKeyboardDoubleArrowLeft } from "react-icons/md";
-
-const statusColorMap = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
+import Loading from "../loading";
+import LoadingContent from "./LoadingContent";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
@@ -63,13 +56,35 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
+const columns = [
+  { name: "ID", uid: "id", sortable: true },
+  { name: "Tên", uid: "name", sortable: true },
+  { name: "Số điện thoại", uid: "phone", sortable: true },
+  { name: "Email", uid: "email" },
+  { name: "Số lượng khách", uid: "number_of_guests", sortable: true },
+  { name: "Ngày dự kiến", uid: "organization_date", sortable: true },
+  { name: "Buổi", uid: "shift", sortable: true },
+  { name: "Trạng thái", uid: "status", sortable: true },
+  { name: "Hành động", uid: "actions" },
+];
+
 function RequestTable() {
   const pathname = usePathname();
-  const { requests, pagination, isFetchingRequests, isFetchingRequestsError } =
-    useSelector((store) => store.requests);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const {
+    requests,
+    pagination,
+    isFetchingRequests,
+    isFetchingRequestsError,
+    isUpdatingRequest,
+    isUpdatingRequestError,
+  } = useSelector((store) => store.requests);
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = React.useState(
+    searchParams.get("page") || 1
+  );
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
   const [date, setDate] = React.useState({
     start: parseDate(
@@ -80,7 +95,6 @@ function RequestTable() {
     ),
   });
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [abortController, setAbortController] = React.useState(null);
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
 
@@ -88,107 +102,45 @@ function RequestTable() {
     setCurrentPage(page);
   };
 
-  const onSearchChange = (e) => {
+  const onSearchChange = React.useCallback((e) => {
     const query = e.target.value;
     setSearchQuery(query);
-
-    // Abort the previous request if it exists
-    if (abortController) {
-      abortController.abort();
-    }
-
-    // Create a new AbortController for the new request
-    const controller = new AbortController();
-    setAbortController(controller);
-
-    // Fetch new requests with the new AbortController signal
-    fetchRequests(controller.signal);
-  };
-
-  const fetchRequests = React.useCallback(
-    async (signal = null) => {
-      if (!signal) {
-        const startDate = formatDate(
-          date.start.toDate(getLocalTimeZone()).toISOString(),
-          "dd-MM-yyyy"
-        );
-        const endDate = formatDate(
-          date.end.toDate(getLocalTimeZone()).toISOString(),
-          "dd-MM-yyyy"
-        );
-
-        const data = await makeAuthorizedRequest(
-          API_CONFIG.BOOKINGS.GET_ALL({
-            page: currentPage,
-            itemsPerPage: itemsPerPage,
-            search: searchQuery,
-            is_confirm: false,
-            is_deposit: false,
-            startDate,
-            endDate,
-          }),
-          "GET",
-          null
-        );
-
-        if (data.success) {
-          dispatch(fetchingRequestsSuccess(data));
-        } else {
-          dispatch(fetchingRequestFailure(data.message));
-        }
-      }
-
-      try {
-        const data = await makeAuthorizedRequest(
-          API_CONFIG.BOOKINGS.GET_ALL({
-            page: currentPage,
-            itemsPerPage: itemsPerPage,
-            search: searchQuery,
-            is_confirm: false,
-            is_deposit: false,
-          }),
-          "GET",
-          null,
-          { signal }
-        );
-
-        if (data.success) {
-          dispatch(fetchingRequestsSuccess(data));
-        } else {
-          dispatch(fetchingRequestFailure(data.message));
-        }
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          dispatch(fetchingRequestFailure(error.message));
-        }
-      }
-    },
-    [
-      currentPage,
-      itemsPerPage,
-      searchQuery,
-      dispatch,
-      makeAuthorizedRequest,
-      date.end,
-      date.start,
-    ]
-  );
+  }, []);
 
   React.useEffect(() => {
-    // Create a new AbortController for the initial request
-    const controller = new AbortController();
-    setAbortController(controller);
-
-    // Fetch requests with the new AbortController signal
-    fetchRequests(controller.signal);
-
-    // Cleanup function to abort the request on unmount or dependency change
-    return () => {
-      if (controller) {
-        controller.abort();
-      }
+    const params = {
+      is_confirm: false,
+      is_deposit: false,
+      status: "pending",
+      page: currentPage,
+      itemsPerPage,
+      // startDate: formatDate(date.start, "dd-MM-yyyy"),
+      // endDate: formatDate(date.end, "dd-MM-yyyy"),
     };
-  }, [currentPage, itemsPerPage, date, searchQuery, fetchRequests]);
+
+    dispatch(fetchRequests({ params }));
+
+    return () => {};
+  }, [currentPage, itemsPerPage]);
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+
+    const params = {
+      is_confirm: false,
+      is_deposit: false,
+      status: "pending",
+      page: currentPage,
+      itemsPerPage,
+      search: searchQuery,
+    };
+
+    dispatch(fetchRequests({ signal: controller.signal, params }));
+
+    return () => {
+      controller.abort();
+    };
+  }, [currentPage, itemsPerPage, date, searchQuery]);
 
   const handleUpdateStatus = React.useCallback(
     async (id) => {
@@ -199,61 +151,34 @@ function RequestTable() {
       if (!confirm) return;
 
       if (confirm) {
-        dispatch(updatingRequest());
-
-        const data = await makeAuthorizedRequest(
-          API_CONFIG.BOOKINGS.UPDATE_STATUS(id),
-          "PATCH",
-          {
-            is_confirm: true,
-            is_deposit: false,
-            status: "processing",
-          }
-        );
+        const data = await dispatch(
+          updateRequestStatus({
+            requestId: id,
+            requestData: {
+              is_deposit: false,
+              is_confirm: false,
+              status: "processing",
+            },
+          })
+        ).unwrap();
 
         if (data.success) {
-          fetchRequests();
           toast({
             title: "Cập nhật trạng thái thành công",
             description: "Yêu cầu đã được xử lý",
             type: "success",
           });
-          dispatch(updatingRequestSuccess());
         } else {
           toast({
             title: "Cập nhật trạng thái thất bại",
             description: "Yêu cầu chưa được cập nhật",
             type: "error",
           });
-          dispatch(fetchingRequestFailure());
         }
       }
     },
     [dispatch, makeAuthorizedRequest, fetchRequests, toast]
   );
-
-  React.useEffect(() => {
-    async function fetchData() {
-      await fetchRequests();
-    }
-
-    fetchData();
-
-    return () => { };
-  }, [fetchRequests]);
-
-  const columns = [
-    { name: "ID", uid: "id", sortable: true },
-    { name: "Tên", uid: "name", sortable: true },
-    { name: "Số điện thoại", uid: "phone", sortable: true },
-    { name: "Email", uid: "email" },
-    { name: "Số lượng khách", uid: "number_of_guests", sortable: true },
-    { name: "Ngày dự kiến", uid: "organization_date", sortable: true },
-    { name: "Buổi", uid: "shift", sortable: true },
-    { name: "Trạng thái", uid: "status", sortable: true },
-    { name: "Hành động", uid: "actions" },
-  ];
-
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -262,15 +187,13 @@ function RequestTable() {
     column: "organization_date",
     direction: "descending",
   });
-
   const headerColumns = React.useMemo(() => {
     if (visibleColumns === "all") return columns;
 
     return columns.filter((column) =>
       Array.from(visibleColumns).includes(column.uid)
     );
-  }, [visibleColumns, columns]);
-
+  }, [visibleColumns]);
   const sortedItems = React.useMemo(() => {
     return [...requests].sort((a, b) => {
       const first = a[sortDescriptor.column];
@@ -306,13 +229,13 @@ function RequestTable() {
           return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "name":
           return (
-            <item
+            <User
               avatarProps={{ radius: "lg", src: item.avatar }}
               description={item.email}
               name={cellValue}
             >
               {item.email}
-            </item>
+            </User>
           );
         case "status":
           return (
@@ -455,19 +378,7 @@ function RequestTable() {
         )}
       </div>
     );
-  }, [
-    visibleColumns,
-    onItemsPerPageChange,
-    onSearchChange,
-    isShowTips,
-    itemsPerPage,
-    searchQuery,
-    date,
-    setDate,
-    columns,
-    setVisibleColumns,
-    setIsShowTips,
-  ]);
+  }, [visibleColumns, isShowTips, itemsPerPage, searchQuery, date]);
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -525,7 +436,12 @@ function RequestTable() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"No requests found"} items={sortedItems}>
+      <TableBody
+        emptyContent={"No requests found"}
+        items={sortedItems}
+        isLoading={isFetchingRequests || isUpdatingRequest}
+        loadingContent={<LoadingContent />}
+      >
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => (

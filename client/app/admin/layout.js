@@ -15,7 +15,7 @@ function Layout({ children }) {
 
   React.useEffect(() => {
     const storedBranch = JSON.parse(localStorage.getItem("currentBranch"));
-    console.log(storedBranch);
+    // console.log(storedBranch);
 
     if (storedBranch) {
       dispatch(getCurrentBranch(storedBranch));

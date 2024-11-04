@@ -30,6 +30,7 @@ import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @ApiTags('User - Quản lý người dùng')
 @Controller('api/user')
@@ -439,6 +440,36 @@ export class UserController {
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo email' })
   getByEmail(@Param('email') email: string): Promise<any> {
     return this.userService.getByEmail(email);
+  }
+
+  // ! Forgot Password
+  @Post('forgot-password')
+  @isPublic()
+  @ApiOperation({ summary: 'Quên mật khẩu' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Thay đổi mật khẩu thành công, vui lòng đăng nhập lại!',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Email hoặc token không đúng hoặc không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
+    },
+  })
+  forgotPassword(
+    @Body()
+    body: ForgotPasswordDto,
+  ) {
+    return this.userService.forgotPassword(body);
   }
 
   // ! Change Password

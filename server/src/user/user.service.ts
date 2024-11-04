@@ -22,6 +22,8 @@ import {
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
 import { Role } from 'helper/enum/role.enum';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class UserService {
@@ -128,6 +130,91 @@ export class UserService {
         error: error,
       });
     }
+  }
+
+  // ! Forgot Password
+  async forgotPassword(body: ForgotPasswordDto) {
+    try {
+      const { confirm_password, email, new_password, token } = body;
+
+      // ? Find user
+      const findUser = await this.prismaService.users.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (!findUser) {
+        throw new NotFoundException(
+          'Email hoặc token không đúng hoặc không tồn tại!',
+        );
+      }
+
+      // ? Find token
+      const findToken = await this.prismaService.verify_tokens.findFirst({
+        where: {
+          email,
+          token,
+        },
+      });
+
+      if (!findToken) {
+        throw new NotFoundException(
+          'Email hoặc token không đúng hoặc không tồn tại',
+        );
+      }
+
+      // ? Check token expired
+      if (new Date(findToken.expired_at) < new Date()) {
+        // ? Delete token
+        await this.prismaService.verify_tokens.deleteMany({
+          where: {
+            email,
+          },
+        });
+        throw new BadRequestException('Token đã hết hạn');
+      }
+
+      // ? Check password
+      if (new_password !== confirm_password) {
+        throw new BadRequestException('Mật khẩu xác nhận không khớp');
+      }
+
+      // ? Hashed password
+      const hashedPassword = this.hashedPassword(new_password);
+
+      // ? Update password
+      await this.prismaService.users.update({
+        where: {
+          email,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+
+      // ? Delete token
+      await this.prismaService.verify_tokens.deleteMany({
+        where: {
+          email,
+        },
+      });
+
+      // ! Logout user
+      await this.prismaService.users.update({
+        where: {
+          email,
+        },
+        data: {
+          refresh_token: null,
+        },
+      });
+
+      throw new HttpException(
+        'Thay đổi mật khẩu thành công, vui lòng đăng nhập lại!',
+        HttpStatus.OK,
+      );
+    } catch (error) {}
   }
 
   // ! Change Password
