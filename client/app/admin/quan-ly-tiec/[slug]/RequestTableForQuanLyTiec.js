@@ -33,7 +33,6 @@ import {
   fetchingRequestFailure,
   fetchingRequestsFailure,
   fetchRequests,
-  fetchRequestsByBranch,
   updateRequestStatus,
   updatingRequestSuccess,
 } from "../../../_lib/features/requests/requestsSlice";
@@ -124,14 +123,13 @@ function RequestTable() {
       is_confirm: false,
       is_deposit: false,
       // status: "pending",
-      branch_id: branchDetail_id,
       page: currentPage,
       itemsPerPage,
       // startDate: formatDate(date.start, "dd-MM-yyyy"),
       // endDate: formatDate(date.end, "dd-MM-yyyy"),
     };
 
-    dispatch(fetchRequestsByBranch({ params }));
+    dispatch(fetchRequests({ params }));
 
     return () => {};
   }, [currentPage, itemsPerPage]);
@@ -142,14 +140,13 @@ function RequestTable() {
     const params = {
       is_confirm: false,
       is_deposit: false,
-      status: "pending",
-      branch_id: branchDetail_id,
+      // status: "pending",
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
     };
 
-    dispatch(fetchRequestsByBranch({ signal: controller.signal, params }));
+    dispatch(fetchRequests({ signal: controller.signal, params }));
 
     return () => {
       controller.abort();
@@ -191,7 +188,7 @@ function RequestTable() {
         }
       }
     },
-    [dispatch, makeAuthorizedRequest, fetchRequestsByBranch, toast]
+    [dispatch, makeAuthorizedRequest, fetchRequests, toast]
   );
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
