@@ -239,19 +239,19 @@ function RequestTable() {
           );
         case "status":
           return (
-              <select
-                name="status"
-                value={cellValue}
-                className="select relative z-50"
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
-              >
-                {CONFIG.BOOKING_STATUS.map((status) => (
-                  <option value={status.key} key={status.key} className="z-50">
-                    {status.label}
-                  </option>
-                ))}
-              </select>
+            <select
+              name="status"
+              value={cellValue}
+              className="select relative z-50"
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              {CONFIG.BOOKING_STATUS.map((status) => (
+                <option value={status.key} key={status.key} className="option">
+                  {status.label}
+                </option>
+              ))}
+            </select>
           );
         case "actions":
           return (
