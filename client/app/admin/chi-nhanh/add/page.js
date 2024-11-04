@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import AdminHeader from "@/app/_components/AdminHeader";
 import AdminThemChiNhanhImg from "@/app/_components/AdminThemChiNhanhImg";
 import AdminThemChiNhanhInput from "@/app/_components/AdminThemChiNhanhInput";
-import AdminThemChiNhanhInputAndImg from "@/app/_components/AdminThemChiNhanhInputAndImg";
 import IconButton from "@/app/_components/IconButton";
 import IconButtonSave from "@/app/_components/IconButtonSave";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
@@ -16,6 +15,7 @@ import useApiServices from "@/app/_hooks/useApiServices";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import useCustomToast from "@/app/_hooks/useCustomToast";
 import { fetchFeedbacksFailure, fetchBranchSuccess } from "@/app/_lib/features/feedbacks/feedbacksSlice";
+import AdminThemChiNhanhInputAndImg from "@/app/_components/AdminThemChiNhanhInputAndImg";
 
 const fieldsConfig = {
   contact: [
@@ -30,7 +30,6 @@ const fieldsConfig = {
   ],
   diagram: [{ type: 'textarea', placeholder: 'Mô tả sơ đồ', name: 'diagram_description' }],
   equipment: [{ type: 'textarea', placeholder: 'Mô tả trang thiết bị', name: 'equipment_description' }],
-  
 };
 
 const branchSchema = z.object({
@@ -42,10 +41,11 @@ const branchSchema = z.object({
   slogan_description: z.string().optional(),
   diagram_description: z.string().optional(),
   equipment_description: z.string().optional(),
-  images: z.array(z.string()).min(1, { message: "Hình ảnh không được để trống" }),
-  slogan_images: z.array(z.string()).min(1, { message: "Hình ảnh slogan không được để trống" }),
-  diagram_images: z.array(z.string()).min(1, { message: "Hình ảnh sơ đồ không được để trống" }),
-  equipment_images: z.array(z.string()).min(1, { message: "Hình ảnh thiết bị không được để trống" }),
+  images: z.array(z.instanceof(File)).optional(),
+  slogan_images: z.array(z.instanceof(File)).optional(),
+  diagram_images: z.array(z.instanceof(File)).optional(),
+  equipment_images: z.array(z.instanceof(File)).optional(),
+  stage: z.array(z.instanceof(File)).optional(),
 });
 
 function ChiNhanhAddPage() {
@@ -54,7 +54,7 @@ function ChiNhanhAddPage() {
   const { makeAuthorizedRequest } = useApiServices();
   const toast = useCustomToast();
 
-  const { handleSubmit, control, formState: { errors } } = useForm({
+  const { handleSubmit, control, setValue } = useForm({
     resolver: zodResolver(branchSchema),
   });
 
@@ -63,78 +63,73 @@ function ChiNhanhAddPage() {
     slogan_images: [],
     diagram_images: [],
     equipment_images: [],
-    space_images: [],
   });
 
-  const onImagesChange = (name, images) => {
-    setImagesData((prevData) => ({
-      ...prevData,
-      [name]: images,
-    }));
+  const onImagesChange = (name, files) => {
+    setImagesData((prev) => ({ ...prev, [name]: files }));
+    setValue(name, files, { shouldValidate: true });
   };
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
-
-    // Append images
-    imagesData.images.forEach((image) => formData.append("images", image));
-    imagesData.slogan_images.forEach((image) => formData.append("slogan_images", image));
-    imagesData.diagram_images.forEach((image) => formData.append("diagram_images", image));
-    imagesData.equipment_images.forEach((image) => formData.append("equipment_images", image));
-
+  const handleFormSubmit = async (formData) => {
     try {
       const response = await makeAuthorizedRequest(API_CONFIG.BRANCHES.CREATE, "POST", formData);
       if (response.success) {
         dispatch(fetchBranchSuccess(response.data));
-        toast({
-          title: "Tạo dữ liệu chi nhánh thành công",
-          description: "Phản hồi đã được duyệt. Đang lấy dữ liệu mới",
-        });
+        showToast("success", "Tạo dữ liệu chi nhánh thành công", "Phản hồi đã được duyệt. Đang lấy dữ liệu mới");
       } else {
-        dispatch(fetchFeedbacksFailure());
-        toast({
-          title: "Tạo dữ liệu không thành công",
-          description: response.message || "Vui lòng thử lại sau",
-        });
+        handleError(response.message || "Vui lòng thử lại sau");
       }
     } catch (error) {
       console.error("Error submitting form: ", error);
-      toast({
-        title: "Đã xảy ra lỗi",
-        description: "Vui lòng thử lại sau",
-      });
+      handleError("Đã xảy ra lỗi");
     }
   };
 
-  const renderSection = (title, fields, imgTitle, inputId, imageName, heightTextarea) => (
-    <div className="flex gap-5">
-      <AdminThemChiNhanhInput
-        fields={fields}
-        title={title}
-        control={control}
-        heightTextarea={heightTextarea}
-      />
-      <AdminThemChiNhanhImg
-        title={imgTitle}
-        inputId={inputId}
-        onImagesChange={onImagesChange}
-        name={imageName}
-      />
-    </div>
+  const onSubmit = async (data) => {
+    const formData = new FormData();
+
+    // Append text fields
+    Object.entries(data).forEach(([key, value]) => {
+      if (!key.includes("images")) {
+        formData.append(key, value);
+      }
+    });
+
+    // Append image files
+    Object.entries(imagesData).forEach(([key, files]) => {
+      files.forEach((file) => formData.append(key, file));
+    });
+
+    await handleFormSubmit(formData);
+  };
+
+  const handleError = (message) => {
+    dispatch(fetchFeedbacksFailure());
+    showToast("error", "Tạo dữ liệu không thành công", message);
+  };
+
+  const showToast = (status, title, description) => {
+    toast({ title, description, status });
+  };
+
+  const renderSection = (title, fields, heightTextarea = 'h-[120px]') => (
+    <AdminThemChiNhanhInput
+      fields={fields}
+      title={title}
+      control={control}
+      heightTextarea={heightTextarea}
+    />
   );
 
-  const renderSectionImg = (imgTitle, inputId, onImagesChange, imageName, control) =>{
-    return (
-        <AdminThemChiNhanhInput
-          title={imgTitle}
-          inputId={inputId}
-          control={control}
-          onImagesChange={onImagesChange}
-          name={imageName}
-        />
-    )
-  }
+  const renderImageSection = (title, name, inputId) => (
+    <AdminThemChiNhanhImg
+      title={title}
+      inputId={inputId}
+      onImagesChange={onImagesChange}
+      name={name}
+      initialImages={imagesData[name]}
+    />
+  );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -145,14 +140,24 @@ function ChiNhanhAddPage() {
         <span className="text-base leading-6 font-normal text-gray-400">Thêm chi nhánh</span>
       </div>
       <div className="flex flex-col gap-6 w-full mt-6">
-        {renderSection('Thông tin liên hệ', fieldsConfig.contact, 'Hình ảnh carousel', 'image-upload-carousel', 'images')}
-        {renderSection('Slogan & Mô tả', fieldsConfig.slogan, 'Hình ảnh mô tả', 'image-upload-description', 'slogan_images', 'h-[80px]')}
-        {renderSection('Sơ đồ', fieldsConfig.diagram, 'Hình ảnh sơ đồ', 'image-upload-diagram', 'diagram_images', 'h-[160px]')}
-        {renderSection('Trang thiết bị', fieldsConfig.equipment, 'Hình ảnh trang thiết bị', 'image-upload-equipment', 'equipment_images', 'h-[160px]')}
-        {renderSection('Không gian hội nghị', fieldsConfig.space, 'Hình ảnh mô tả', 'image-upload-space', 'space_images', 'h-[100px]')}
+        <div className="flex gap-5">
+          {renderSection('Thông tin liên hệ', fieldsConfig.contact)}
+          {renderImageSection('Hình ảnh carousel', 'images', 'image-upload-carousel')}
+        </div>
+        <div className="flex gap-5">
+          {renderSection('Slogan & Mô tả', fieldsConfig.slogan)}
+          {renderImageSection('Hình ảnh mô tả', 'slogan_images', 'image-upload-description')}
+        </div>
+        <div className="flex gap-5">
+          {renderSection('Sơ đồ', fieldsConfig.diagram)}
+          {renderImageSection('Hình ảnh sơ đồ', 'diagram_images', 'image-upload-diagram')}
+        </div>
+        <div className="flex gap-5">
+          {renderSection('Trang thiết bị', fieldsConfig.equipment)}
+          {renderImageSection('Hình ảnh trang thiết bị', 'equipment_images', 'image-upload-equipment')}
+        </div>
         <AdminThemChiNhanhInputAndImg title="Sảnh" height="290px" inputId="input-image-upload-map" input={false} />
       </div>
-
       <div className="flex w-full mt-6">
         <IconButton className="bg-whiteAlpha-200 text-white" type="button">
           <ArrowLeftIcon width={20} height={20} color="white" />

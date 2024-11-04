@@ -319,6 +319,7 @@ model booking_details {
   party_types       Json?
   decor             Json?
   menu              Json?
+  other_service     Json?
   extra_service     Json?
   gift              Json?
   images            String[]
