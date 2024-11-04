@@ -100,6 +100,7 @@ function DishesMain() {
         variant={"unstyled"}
         isLazy
         onChange={(index) => setActiveTabIndex(index)}
+        defaultIndex={activeTabIndex}
       >
         <TabList width={"fit-content"} className="!w-full flex">
           {categories.map((c, index) => (

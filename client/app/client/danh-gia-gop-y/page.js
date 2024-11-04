@@ -48,7 +48,7 @@ function Feedback() {
         <section>
             <section className="md:min-h-screen bg-image-tintuc flex flex-col justify-center max-md:h-[415px]">
                 <div className="">
-                    <h1 className="text-[80px] text-center font-bold mb-10 font-gilroy max-sm:text-xl ">Tin Tức Mới Nhất</h1>
+                    <h1 className="text-[80px] text-center font-bold mb-10 font-gilroy max-sm:text-xl ">Đánh giá & góp ý</h1>
                     <p className="text-center text-base max-sm:text-[13px]">Chúng tôi luôn sẵn lòng đón nhận mọi sự góp ý  từ quý khách. <br />
                         Đó sẽ là động lực giúp Joie Palace phát triển và nâng cao <br /> chất lượng dịch vụ</p>
                 </div>

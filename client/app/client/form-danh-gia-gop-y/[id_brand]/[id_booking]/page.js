@@ -79,7 +79,7 @@ function Fromfeedback() {
             notification.classList.remove('show');
             notification.classList.remove('success');
             notification.classList.remove('error');
-            router.push("/");
+            router.push("/client/cam-on");
         }, 3000);
     };
 

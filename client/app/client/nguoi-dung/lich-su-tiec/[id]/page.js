@@ -6,50 +6,100 @@ import OutlineFeedBack from "@/public/OutlineFeedBack.svg";
 import Image from 'next/image';
 import PartySectionClient from '@/app/_components/PartySectionClient';
 import { fetchBookingById } from '@/app/_services/bookingServices';
+import { useRouter } from 'next/navigation';
 
 const Page = ({ params }) => {
     const { id } = params;
     const [party, setParty] = useState([]);
+    const [partyPartyDetails, setPartyDetails] = useState([]);
     const [user, setUser] = useState();
-    const data = [
-        {
-            "id": 1,
-            "branch_id": null,
-            "username": "admin",
-            "email": "admin1@gmail.com",
-            "platform": null,
-            "phone": "0315346764",
-            "avatar": null,
-            "role": "admin",
-            "active": true,
-            "verify_at": null,
-            "created_at": "2024-10-24T08:11:32.239Z",
-            "updated_at": "2024-10-31T02:38:12.031Z",
-            "memberships_id": null,
-            "memberships": null
-        }
-    ];
+    const [statusParty, setStatusParty] = useState();
+    const router = useRouter();
+
+
     useEffect(() => {
         const getData = async () => {
-            setUser(data[0]);
+            const getUser = JSON.parse(localStorage.getItem("user"));
+            if (getUser) {
+                setUser(getUser);
+            } else {
+                router.push('/');
+            }
             try {
                 const fetchData = await fetchBookingById(id);
-
+                setPartyDetails(fetchData)
                 if (fetchData.length > 0) {
                     const parties = fetchData.map((item) => {
                         const dataDetailBooking = item.booking_details;
                         const dataStages = item.stages;
                         const dataMenus = dataDetailBooking[0]?.menus;
+                        const drinksPrice = dataMenus?.products.reduce((total, item) => {
+                            if (item.category_id === 2) { // thí dụ nước categories == 2
+                                return total + (item.price || 0);
+                            }
+                            return total;
+                        }, 0)
+                        const dataDecors = dataDetailBooking[0]?.decors;
                         const datadePosits = dataDetailBooking[0]?.deposits;
+                        setStatusParty(item.status);
+
+                        // Tính chi phí bàn và ghế
+                        const tableCount = dataDetailBooking[0]?.table_count || 0;
+                        const tablePrice = tableCount * 200000;
+                        const chairPrice = tableCount * 10 * 50000;
+
+                        // Chi phí menu
+                        const menuCost = dataMenus?.price || 0;
+
+                        // Chi phí bàn và ghế dự phòng
+                        const spareTableCount = 2;
+                        const spareTableCost = spareTableCount * 200000;
+                        const spareChairCost = spareTableCount * 10 * 50000;
+
+                        // Các chi phí cụ thể khác
+                        const decorCost = dataDecors?.price || 0;
+                        const stageCost = dataStages?.price || 0;
+                        const partyTypeCost = item.party_types.price || 0;
+                        const additionalServiceCost = 0; // chi phí của dịch vụ bổ sung nếu có thì thêm
+
+                        // Chi phí dịch vụ khác
+                        const otherServicesCost = item.other_services?.reduce((total, service) => {
+                            return total + (service.price * service.quantity);
+                        }, 0) || 0;
+
+
+                        // Chi phí dịch vụ thêm (chỉ tính khi is_deposit là true)
+                        const extraServicesCost = item.extra_services?.reduce((total, service) => {
+                            if (service.is_deposit) {
+                                return total + (service.price * service.quantity); // Giá mỗi dịch vụ thêm dựa trên ID * số lượng
+                            }
+                            return total;
+                        }, 0) || 0;
+
+                        // Tính tổng chi phí
+                        const amount =
+                            tablePrice +                  // Tổng chi phí bàn
+                            chairPrice +                  // Tổng chi phí ghế
+                            decorCost +                   // Chi phí trang trí
+                            partyTypeCost +               // Chi phí loại tiệc
+                            stageCost +                   // Chi phí sảnh
+                            menuCost +                    // Chi phí menu
+                            drinksPrice +                 // Chi phí nước
+                            spareTableCost +              // Chi phí bàn dự phòng
+                            spareChairCost +              // Chi phí ghế dự phòng
+                            additionalServiceCost +       // Chi phí dịch vụ bổ sung
+                            otherServicesCost +           // Chi phí dịch vụ khác
+                            extraServicesCost;
+
 
                         return {
                             id: item.id,
                             nameParty: item.name,
                             address: item.company_name,
                             phoneAddress: item.phone,
-                            hostName: data[0]?.username,
-                            email: data[0]?.email,
-                            phoneUser: data[0]?.phone,
+                            hostName: getUser?.name,
+                            email: getUser?.email,
+                            phoneUser: getUser?.phone,
                             idParty: `P${item.id}`,
                             partyDate: new Date(item.created_at).toISOString().split("T")[0],
                             dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
@@ -71,28 +121,27 @@ const Page = ({ params }) => {
                             drinks: "Bia Tiger, Nước ngọt Pepsi",
                             payerName: item.name,
                             paymentMethod: `Chuyển khoản ${datadePosits?.payment_method}`,
-                            menuCostTable: datadePosits?.status ==='pending' ? 'Đang chờ thanh toán'  : "Chưa thanh toán",
+                            menuCostTable: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Chưa thanh toán",
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND ` : "0 VND",
                             depositAmount: datadePosits?.amount ? `${datadePosits?.amount.toLocaleString('vi-VN')} VND` : "0 VND",
-                            depositStatus: datadePosits?.status ==='pending' ? 'Đang chờ thanh toán'  : "Chưa thanh toán",
+                            depositStatus: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Chưa thanh toán",
                             depositDay: formatDate(datadePosits?.created_at),
                             remainingPaid: (dataDetailBooking[0].total_amount && datadePosits?.amount) ? `${(parseInt(dataDetailBooking[0].total_amount) - parseInt(datadePosits?.amount)).toLocaleString('vi-VN')} VND` : `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND`,
                             paymentDay: formatDate(datadePosits?.created_at),
                             typeTable: "Tùy chỉnh",
                             typeChair: "Tùy chỉnh",
                             // Chi phí khác
-                            costTable: `${dataMenus?.price.toLocaleString('vi-VN')} VND/bàn`,
-                            decorationCost: "15,000,000 VND",
-                            soundStage: "20,000,000 VND",
-                            hallRental: "30,000,000 VND",
-                            tableRental: "7,500,000 VND",
-                            chairRental: "4,500,000 VND",
-                            paymentStatus: "Đã thanh toán",
+                            costTable: `${(amount / tableCount).toLocaleString('vi-VN')} VND/bàn`,
+                            decorationCost: `${dataDecors?.price.toLocaleString('vi-VN')} VND`,
+                            soundStage: 'Đã tính',
+                            hallRental: `${dataStages?.price.toLocaleString('vi-VN')} VND`,
+                            tableRental: "200.000 VND / 1 bàn",
+                            chairRental: "50.000 VND / 1 ghế",
+                            paymentStatus: `${((tablePrice + chairPrice + menuCost + drinksPrice) / tableCount).toLocaleString('vi-VN')} VND / bàn` || 0,
                             snack: "Bánh ngọt, Trái cây",
                             vat: "10%",
-                            drinksCost: "20,000,000 VND",
-                            arise: "10,000,000 VND",
-
+                            drinksCost: `${drinksPrice.toLocaleString('vi-VN')} VND / bàn` || 0,
+                            arise: item.is_deposit ? '' : "Không có",
                         };
                     });
                     setParty(parties);
@@ -176,14 +225,16 @@ const Page = ({ params }) => {
                     <button className='px-4 py-3 rounded bg-white flex items-center justify-center'>
                         <Image src={DownloadIcon} alt='clipBoard' objectFit='cover'></Image>
                     </button>
-                    <button className='px-4 py-3 rounded bg-white flex items-center justify-center'>
+                    <button className='px-4 py-3 rounded bg-white flex items-center justify-center' onClick={() => router.push(`/client/form-danh-gia-gop-y/${partyPartyDetails[0].branch_id}/${partyPartyDetails[0].id}`)}>
                         <Image src={OutlineFeedBack} alt='clipBoard' objectFit='cover'></Image>
                     </button>
                 </div>
             </div>
 
             <div className='flex items-center'>
-                <span className='text-cyan-400 text-base'>• Đã hoàn thành</span>
+                <span className='text-cyan-400 text-base'>
+                    • {`${statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pedding' ? 'Đang chờ' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang xử lý'}`}
+                </span>
             </div>
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             {party && party.length > 0 ? (

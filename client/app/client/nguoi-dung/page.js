@@ -18,25 +18,8 @@ const Page = () => {
     const [resonParty, setResonParty] = useState([]);
     const [partySuccess, setPartySuccess] = useState([]);
     const [partyPending, setPartyPending] = useState([]);
-    const data = [
-        {
-            "id": 1,
-            "branch_id": null,
-            "username": "admin",
-            "email": "admin1@gmail.com",
-            "platform": null,
-            "phone": "0315346764",
-            "avatar": null,
-            "role": "admin",
-            "active": true,
-            "verify_at": null,
-            "created_at": "2024-10-24T08:11:32.239Z",
-            "updated_at": "2024-10-31T02:38:12.031Z",
-            "memberships_id": null,
-            "memberships": null
-        }
-    ];
-
+    const [partyTotalAmount, setTotalAmount] = useState(0);
+    const router = useRouter();
 
     // const parties = [
     //     {
@@ -78,17 +61,20 @@ const Page = () => {
     //         menuCostTable: "3,000,000 VND/bàn",
     //         paymentDay: "2024-10-20",
     //     },
-    // ];
+    // ];    
 
     useEffect(() => {
         const getData = async () => {
+            const getUser = JSON.parse(localStorage.getItem("user"));
+            if (getUser) {
+                setUser(getUser);
+            } else {
+                router.push('/');
+            }
             try {
-                // Set user data
-                setUser(data[0]);
-
                 // Fetch membership data if available
-                if (data[0]?.memberships_id) {
-                    const fetchedDataByMembershipId = await fetchDatabyMembershipId(data[0].memberships_id);
+                if (user?.memberships_id) {
+                    const fetchedDataByMembershipId = await fetchDatabyMembershipId(user.memberships_id);
                     setMembershipId(fetchedDataByMembershipId);
                 }
 
@@ -97,8 +83,8 @@ const Page = () => {
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending');
 
-                if (fetchedAllBookingsPending.length > 0) {
-                    const parties = fetchedAllBookingsPending.map((item) => {
+                if (fetchedAllBookingsSuccess.length > 0) {
+                    const parties = fetchedAllBookingsSuccess.map((item) => {
                         const dataDetailBooking = item.booking_details;
                         const dataStages = item.stages;
                         const dataMenus = dataDetailBooking[0]?.menus;
@@ -109,9 +95,9 @@ const Page = () => {
                             nameParty: item.name,
                             address: item.company_name,
                             phoneAddress: item.phone,
-                            hostName: data[0]?.username,
-                            email: data[0]?.email,
-                            phoneUser: data[0]?.phone,
+                            hostName: getUser?.name,
+                            email: getUser?.email,
+                            phoneUser: getUser?.phone,
                             idParty: `P${item.id}`,
                             partyDate: new Date(item.created_at).toISOString().split("T")[0],
                             dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
@@ -141,9 +127,16 @@ const Page = () => {
                             remainingPaid: (item.total_amount && item.depositAmount) ? `${parseInt(item.total_amount) - parseInt(item.depositAmount)} VND` : "0 VND",
                             paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
                         };
+
+
                     });
                     setResonParty(parties);
                 }
+
+                const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
+                    return total + item.booking_details[0].total_amount;
+                }, 0);
+                setTotalAmount(total_amountUser)
 
                 // Set successful and pending parties
                 setPartySuccess(fetchedAllBookingsSuccess);
@@ -155,19 +148,14 @@ const Page = () => {
         };
 
         getData();
-    }, []); 
-
-
-
-
-    // console.log('Data party full:', parties);
+    }, []);
 
     return (
         <div className="flex flex-col gap-8">
 
             <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
-            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={membershipId?.booking_total_amount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${membershipId?.booking_total_amount ? membershipId?.booking_total_amount : 0} VND`} />
+            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={membershipId?.booking_total_amount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} />
 
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             <div className='flex justify-between'>

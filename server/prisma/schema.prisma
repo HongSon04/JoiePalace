@@ -299,28 +299,34 @@ model bookings {
 }
 
 model booking_details {
-  id             Int      @id @default(autoincrement())
-  booking_id     Int      @unique
-  bookings       bookings @relation(fields: [booking_id], references: [id])
-  decor_id       Int
-  decors         decors   @relation(fields: [decor_id], references: [id])
-  menu_id        Int
-  menus          menus    @relation(fields: [menu_id], references: [id])
-  deposit_id     Int
-  deposits       deposits @relation(fields: [deposit_id], references: [id])
-  table_count    Int      @default(0)
-  chair_count    Int      @default(0)
-  party_types    Json?
-  decor          Json?
-  menu           Json?
-  extra_service  Json?
-  gift           Json?
-  images         String[]
-  amount_booking Int      @default(0)
-  fee            Int      @default(0)
-  total_amount   Int      @default(0)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  booking_id        Int      @unique
+  bookings          bookings @relation(fields: [booking_id], references: [id])
+  decor_id          Int
+  decors            decors   @relation(fields: [decor_id], references: [id])
+  menu_id           Int
+  menus             menus    @relation(fields: [menu_id], references: [id])
+  deposit_id        Int
+  deposits          deposits @relation(fields: [deposit_id], references: [id])
+  table_count       Int      @default(0)
+  table_price       Int      @default(0)
+  chair_count       Int      @default(0)
+  chair_price       Int      @default(0)
+  spare_table_count Int      @default(0)
+  spare_table_price Int      @default(0)
+  spare_chair_count Int      @default(0)
+  spare_chair_price Int      @default(0)
+  party_types       Json?
+  decor             Json?
+  menu              Json?
+  extra_service     Json?
+  gift              Json?
+  images            String[]
+  amount_booking    Int      @default(0)
+  fee               Int      @default(0)
+  total_amount      Int      @default(0)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 }
 
 model feedbacks {

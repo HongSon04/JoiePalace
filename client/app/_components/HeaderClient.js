@@ -63,8 +63,8 @@ const HeaderClient = () => {
   if (!listBranches) return;
   return (
     <header className={`fixed top-0 left-0 w-full z-40 text-white`}>
-      <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-transparent">
-        <div className="h-full flex items-center gap-14 flex-row-reverse">
+      <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-primary">
+        <div className="h-full flex items-center gap-4 flex-row-reverse">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +124,7 @@ const HeaderClient = () => {
             JOIE PALACE
           </span>
         </div>
-        <div className="h-full flex items-center gap-14 flex-row-reverse">
+        <div className="h-full flex items-center gap-4 flex-row-reverse">
           <div className="flex items-center gap-2 max-lg:hidden">
             <span className="px-2 text-white h-6 flex justify-center items-center rounded-md cursor-pointer">
               en
