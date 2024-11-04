@@ -33,6 +33,7 @@ import {
   fetchingRequestFailure,
   fetchingRequestsFailure,
   fetchRequests,
+  fetchRequestsByBranch,
   updateRequestStatus,
   updatingRequestSuccess,
 } from "../../../_lib/features/requests/requestsSlice";
@@ -47,23 +48,23 @@ import LoadingContent from "../../../_components/LoadingContent";
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
-  "email",
-  "phone",
+  "total_amount",
+  "created_at",
   "status",
-  "number_of_guests",
+  "amount_booking",
   "organization_date",
-  "shift",
+  "amount_to_be_paid",
   "actions",
 ];
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "Tên", uid: "name", sortable: true },
-  { name: "Số điện thoại", uid: "phone", sortable: true },
-  { name: "Email", uid: "email" },
-  { name: "Số lượng khách", uid: "number_of_guests", sortable: true },
+  { name: "Chủ tiệc / Loại tiệc", uid: "name", sortable: true },
+  { name: "Ngày đặt", uid: "created_at", sortable: true },
+  { name: "Tổng giá trị", uid: "total_amount", sortable: true },
+  { name: "Tiền cọc", uid: "amount_booking", sortable: true },
   { name: "Ngày dự kiến", uid: "organization_date", sortable: true },
-  { name: "Buổi", uid: "shift", sortable: true },
+  { name: "Số tiền cần phải thanh toán", uid: "amount_to_be_paid", sortable: true },
   { name: "Trạng thái", uid: "status", sortable: true },
   { name: "Hành động", uid: "actions" },
 ];
@@ -94,6 +95,17 @@ function RequestTable() {
       format(new Date(new Date().getFullYear(), 11, 31), "yyyy-MM-dd")
     ),
   });
+  const [branchDetail_id, setBranchDetail_id] = React.useState(null)
+
+  React.useEffect(() => {
+    if(typeof window !== 'undefined') {
+      const storeUser = JSON.parse(localStorage.getItem('user'));
+      if(storeUser?.branch_id) {
+        setBranchDetail_id(storeUser.branch_id)
+      }
+    }
+  },[])
+
   const [searchQuery, setSearchQuery] = React.useState("");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
@@ -111,14 +123,15 @@ function RequestTable() {
     const params = {
       is_confirm: false,
       is_deposit: false,
-      status: "pending",
+      // status: "pending",
+      branch_id: branchDetail_id,
       page: currentPage,
       itemsPerPage,
       // startDate: formatDate(date.start, "dd-MM-yyyy"),
       // endDate: formatDate(date.end, "dd-MM-yyyy"),
     };
 
-    dispatch(fetchRequests({ params }));
+    dispatch(fetchRequestsByBranch({ params }));
 
     return () => {};
   }, [currentPage, itemsPerPage]);
@@ -130,12 +143,13 @@ function RequestTable() {
       is_confirm: false,
       is_deposit: false,
       status: "pending",
+      branch_id: branchDetail_id,
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
     };
 
-    dispatch(fetchRequests({ signal: controller.signal, params }));
+    dispatch(fetchRequestsByBranch({ signal: controller.signal, params }));
 
     return () => {
       controller.abort();
@@ -177,7 +191,7 @@ function RequestTable() {
         }
       }
     },
-    [dispatch, makeAuthorizedRequest, fetchRequests, toast]
+    [dispatch, makeAuthorizedRequest, fetchRequestsByBranch, toast]
   );
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -207,7 +221,6 @@ function RequestTable() {
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
-
       switch (columnKey) {
         case "shift":
           return cellValue === "Sáng" ? (
@@ -225,6 +238,33 @@ function RequestTable() {
               {cellValue}
             </Chip>
           );
+        case "total_amount": 
+        const totalAmount = item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0)
+        return new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        }).format(totalAmount);
+
+        case "amount_booking":
+          const amount_booking = item.booking_details?.map((detail) => detail.deposits?.amount ? `${detail.deposits.amount}` : "Chưa có tiền cọc")
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(amount_booking);
+
+        case 'amount_to_be_paid': 
+        const bookingDetails = item.booking_details?.[0];
+        const totalAmount_paid = bookingDetails?.total_amount || 0;
+        const depositAmount = bookingDetails?.deposits?.amount || 0;
+        const amountPaid = totalAmount_paid - depositAmount;
+      
+        return new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        }).format(amountPaid);
+        
+        case "deposit_amount":
+        case "created_at": return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "organization_date":
           return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "name":
@@ -239,19 +279,22 @@ function RequestTable() {
           );
         case "status":
           return (
-            <select
-              name="status"
-              value={cellValue}
-              className="select relative z-50"
-              onClick={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              {CONFIG.BOOKING_STATUS.map((status) => (
-                <option value={status.key} key={status.key} className="option">
-                  {status.label}
-                </option>
-              ))}
-            </select>
+            // <select
+            //   name="status"
+            //   value={cellValue}
+            //   className="select relative z-50"
+            //   onClick={(e) => e.stopPropagation()}
+            //   onMouseDown={(e) => e.stopPropagation()}
+            // >
+            //   {CONFIG.BOOKING_STATUS.map((status) => (
+            //     <option value={status.key} key={status.key} className="option">
+            //       {status.label}
+            //     </option>
+            //   ))}
+            // </select>
+            <Chip variant="flat" color="warning">
+              Chưa xử lý
+            </Chip>
           );
         case "actions":
           return (
