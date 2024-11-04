@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import HeaderSelect from '../HeaderSelect';
 import RequestBreadcrumbsForQuanLyTiec from './RequestBreadcrumbsForQuanLyTiec';
 import InputDetailCustomer from './InputDetailCustomer';
@@ -11,6 +11,8 @@ import ButtonCustomAdmin from '@/app/_components/ButtonCustomAdmin';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import useApiServices from '@/app/_hooks/useApiServices';
+import { API_CONFIG } from '@/app/_utils/api.config';
 
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
@@ -60,7 +62,7 @@ const formSchema = userSchema.merge(organizationSchema);
 
 const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const { id } = params;
-
+    const { makeAuthorizedRequest } = useApiServices();
     const inputInfoUser = [
         {
             svg: (
@@ -427,9 +429,54 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         },
     ]
 
-    const { register, handleSubmit, formState: { errors }, trigger } = useForm({
-        resolver: zodResolver(formSchema),  // Sử dụng schema đã kết hợp
+    const { control, handleSubmit, reset, formState: { errors }, trigger } = useForm({
+        resolver: zodResolver(formSchema),
+        
     });
+    const fetchDataDetailsParty = useCallback(async () => {
+        try {
+            const response = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.GET_BY_ID(id), 'GET');
+            const partyData = response.data[0];
+            if (response) {
+                reset({
+                    nameHost: partyData.name || '',
+                    email: partyData.email || '',
+                    phone: partyData.phone,
+                    party: partyData.party,
+                    tables: partyData.tables,
+                    spareTables: partyData.spareTables,
+                    customer: partyData.customer,
+                    customerAndChair: partyData.customerAndChair,
+                    partyDate: partyData.partyDate,
+                    dateOrganization: partyData.dateOrganization,
+                    timeEvent: partyData.timeEvent,
+                    menu: partyData.menu,
+                    snack: partyData.snack,
+                    tableType: partyData.tableType,
+                    chairType: partyData.chairType,
+                    decor: partyData.decor,
+                    color: partyData.color,
+                    hall: partyData.hall,
+                    danceTroupe: partyData.danceTroupe,
+                    stageAndLed: partyData.stageAndLed,
+                    cake: partyData.cake,
+                    champagne: partyData.champagne,
+                    namePayer: partyData.namePayer,
+                    amountPayable: partyData.amountPayable,
+                    depositAmount: partyData.depositAmount,
+                    depositDate: partyData.depositDate,
+                    remainingAmountPaid: partyData.remainingAmountPaid,
+                    dataPay: partyData.dataPay,
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching party details:', error);
+        }
+    }, [id, reset]);
+    
+    useEffect(()=>{
+        fetchDataDetailsParty()
+    },[fetchDataDetailsParty])
 
     const onSubmit = (data) => {
         console.log('Dữ liệu form hợp lệ:', data);
@@ -459,9 +506,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 type={detail.type}
                                 name={detail.name}
                                 placeholder={detail.placeholder}
-                                register={register}
                                 error={errors[detail.name]}
                                 trigger={trigger}
+                                control={control}
                             />
                         ))}
                     </div>
@@ -478,9 +525,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 name={detail.name}
                                 placeholder={detail.placeholder}
                                 options={detail.options}
-                                register={register}
                                 error={errors[detail.name]}
-                        trigger={trigger}
+                                trigger={trigger}
+                                control={control}
                             />
                         ))}
                         <div className='flex flex-col gap-2'>
@@ -520,9 +567,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 name={detail.name}
                                 placeholder={detail.placeholder}
                                 options={detail.options}
-                                register={register}
                                 error={errors[detail.name]}
                                 trigger={trigger}
+                                control={control}
                             />
                         ))}
                     </div>

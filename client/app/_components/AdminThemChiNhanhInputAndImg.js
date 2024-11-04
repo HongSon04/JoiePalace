@@ -80,13 +80,6 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
                     name={name}
                     onChange={(e) => handleDescriptionChange(index, e.target.value)}
                 />
-                <input
-                    type="text"
-                    placeholder="Giai đoạn"
-                    value={stages[index]}
-                    onChange={(e) => handleStageChange(index, e.target.value)}
-                    className="px-2 py-1 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
-                />
             </div>
         </GridItem>
     );
