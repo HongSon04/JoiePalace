@@ -192,7 +192,6 @@ export class BookingsService {
 
       // Convert deleted to proper boolean
       const deleted = query.deleted == true ? true : false;
-
       // Build where conditions using Prisma types
       const whereConditions: any = {
         deleted,
@@ -204,6 +203,7 @@ export class BookingsService {
             },
           }),
       };
+      console.log('whereConditions: ', whereConditions);
 
       // Add search conditions if search exists
       if (query.search) {

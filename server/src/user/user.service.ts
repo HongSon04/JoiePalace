@@ -1,4 +1,3 @@
-import { User as UserEntity } from './entities/user.entity';
 import {
   BadRequestException,
   HttpException,
@@ -7,23 +6,23 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from 'src/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ChangePasswordUserDto } from './dto/change-password-user.dto';
-import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { FilterDto } from 'helper/dto/Filter.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Role } from 'helper/enum/role.enum';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
-import { Role } from 'helper/enum/role.enum';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { ChangePasswordUserDto } from './dto/change-password-user.dto';
+import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { Cron } from '@nestjs/schedule';
+import { User as UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -351,7 +350,7 @@ export class UserService {
 
       const sortRangeDate: any =
         startDate && endDate
-          ? { created_at: { gte: new Date(startDate), lte: new Date(endDate) } }
+          ? { created_at: { gte: startDate, lte: endDate } }
           : {};
 
       const whereConditions: any = {
@@ -367,7 +366,7 @@ export class UserService {
         ];
       }
 
-      const [res, total] = await this.prismaService.$transaction([
+      const [users, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
           include: {
@@ -376,7 +375,6 @@ export class UserService {
           skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
-            created_at: 'desc',
             memberships: { booking_total_amount: 'desc' },
           },
         }),
@@ -392,9 +390,22 @@ export class UserService {
         itemsPerPage,
         total,
       };
+
+      // Lấy booking statistics cho tất cả users cùng một lúc
+      const userStatsPromises = users.map((user) =>
+        this.getBookingDashboardDataByUserId(Number(user.id)),
+      );
+      const userStats = await Promise.all(userStatsPromises);
+
+      // Kết hợp thông tin booking với user data
+      const enrichedUsers = users.map((user, index) => ({
+        ...user,
+        ...userStats[index],
+      }));
+
       throw new HttpException(
         {
-          data: FormatReturnData(res, ['password', 'refresh_token']),
+          data: FormatReturnData(enrichedUsers, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -442,7 +453,7 @@ export class UserService {
         ];
       }
 
-      const [res, total] = await this.prismaService.$transaction([
+      const [users, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
           include: {
@@ -451,7 +462,6 @@ export class UserService {
           skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
-            created_at: 'desc',
             memberships: { booking_total_amount: 'desc' },
           },
         }),
@@ -467,9 +477,22 @@ export class UserService {
         itemsPerPage,
         total,
       };
+
+      // Lấy booking statistics cho tất cả users cùng một lúc
+      const userStatsPromises = users.map((user) =>
+        this.getBookingDashboardDataByUserId(Number(user.id)),
+      );
+      const userStats = await Promise.all(userStatsPromises);
+
+      // Kết hợp thông tin booking với user data
+      const enrichedUsers = users.map((user, index) => ({
+        ...user,
+        ...userStats[index],
+      }));
+
       throw new HttpException(
         {
-          data: FormatReturnData(res, ['password', 'refresh_token']),
+          data: FormatReturnData(enrichedUsers, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -515,7 +538,7 @@ export class UserService {
         ...sortRangeDate,
       };
 
-      const [res, total] = await this.prismaService.$transaction([
+      const [users, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: {
             OR: [
@@ -543,9 +566,22 @@ export class UserService {
         itemsPerPage,
         total,
       };
+
+      // Lấy booking statistics cho tất cả users cùng một lúc
+      const userStatsPromises = users.map((user) =>
+        this.getBookingDashboardDataByUserId(Number(user.id)),
+      );
+      const userStats = await Promise.all(userStatsPromises);
+
+      // Kết hợp thông tin booking với user data
+      const enrichedUsers = users.map((user, index) => ({
+        ...user,
+        ...userStats[index],
+      }));
+
       throw new HttpException(
         {
-          data: FormatReturnData(res, ['password', 'refresh_token']),
+          data: FormatReturnData(enrichedUsers, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -775,8 +811,7 @@ export class UserService {
 
   // ? Get Booking Dashboard Data by User ID
   async getBookingDashboardDataByUserId(user_id: number) {
-    // ? Find Booking and calculate total amount
-    const booking = await this.prismaService.bookings.findMany({
+    const bookings = await this.prismaService.bookings.findMany({
       where: {
         user_id: Number(user_id),
       },
@@ -789,48 +824,41 @@ export class UserService {
       },
     });
 
-    let totalAmount = 0;
-    let totalBookingPending = 0;
-    let totalBookingSuccess = 0;
-    let totalBookingCancel = 0;
-    let totalBookingProcess = 0;
-    let totalDepositAmount = 0;
-
-    booking.forEach((item) => {
-      switch (item.status) {
-        case 'pending':
-          totalBookingPending += 1;
-          break;
-        case 'success':
-          totalBookingSuccess += 1;
-          totalDepositAmount += item.booking_details.reduce(
-            (total, item) => total + item.deposits.amount,
-            0,
-          );
-          totalAmount += item.booking_details.reduce(
-            (total, item) => total + item.total_amount,
-            0,
-          );
-          break;
-        case 'cancel':
-          totalBookingCancel += 1;
-          break;
-        case 'processing':
-          totalBookingProcess += 1;
-          break;
-        default:
-          break;
-      }
-    });
-
-    return {
-      totalAmount,
-      totalBookingPending,
-      totalBookingSuccess,
-      totalBookingCancel,
-      totalBookingProcess,
-      totalDepositAmount,
+    // Khởi tạo object để theo dõi các metrics
+    const metrics = {
+      totalAmount: 0,
+      totalBookingPending: 0,
+      totalBookingSuccess: 0,
+      totalBookingCancel: 0,
+      totalBookingProcess: 0,
+      totalDepositAmount: 0,
     };
+
+    // Sử dụng reduce thay vì forEach để tính toán metrics
+    return bookings.reduce((acc, booking) => {
+      if (
+        booking.status === 'success' &&
+        booking.is_deposit == true &&
+        booking.is_confirm == true
+      ) {
+        acc.totalBookingSuccess++;
+        acc.totalDepositAmount += booking.booking_details.reduce(
+          (total, detail) => total + detail.deposits.amount,
+          0,
+        );
+        acc.totalAmount += booking.booking_details.reduce(
+          (total, detail) => total + detail.total_amount,
+          0,
+        );
+      } else if (booking.status === 'pending') {
+        acc.totalBookingPending++;
+      } else if (booking.status === 'cancel') {
+        acc.totalBookingCancel++;
+      } else if (booking.status === 'processing') {
+        acc.totalBookingProcess++;
+      }
+      return acc;
+    }, metrics);
   }
 
   // ! Generate Token
