@@ -192,7 +192,6 @@ export class BookingsService {
 
       // Convert deleted to proper boolean
       const deleted = query.deleted == true ? true : false;
-
       // Build where conditions using Prisma types
       const whereConditions: any = {
         deleted,
@@ -204,6 +203,7 @@ export class BookingsService {
             },
           }),
       };
+      console.log('whereConditions: ', whereConditions);
 
       // Add search conditions if search exists
       if (query.search) {
@@ -587,6 +587,7 @@ export class BookingsService {
         table_count,
         spare_table_count,
         phone,
+        other_service,
         extra_service,
         status,
       } = updateBookingDto;
@@ -633,6 +634,24 @@ export class BookingsService {
       // Status = true =? Check Rank User
       if (status === BookingStatus.SUCCESS) {
         this.updateMembershipBooking(findBooking.user_id);
+      }
+
+      let gift = [];
+      if (user_id) {
+        const findUser = await this.prismaService.users.findUnique({
+          where: { id: Number(user_id) },
+          include: {
+            memberships: {
+              select: {
+                gifts: true,
+              },
+            },
+          },
+        });
+
+        if (findUser) {
+          gift = findUser.memberships.gifts;
+        }
       }
 
       // ! Update Booking
@@ -754,12 +773,13 @@ export class BookingsService {
       validateExists(decor, 'decor');
       validateExists(menu, 'menu');
       // ? Calculate accessory amounts
-      let tableAmount = Number(table_count) * 100000;
-      let spareTableAmount = Number(spare_table_count) * 100000;
+      let tableAmount = Number(table_count) * 200000;
+      let spareTableAmount = Number(spare_table_count) * 200000;
       let chair_count = table_count * 10;
       let spare_chair_count = spare_table_count * 10;
-      let chairAmount = chair_count * 20000;
-      let spareChairAmount = spare_chair_count * 20000;
+      let chairAmount = chair_count * 50000;
+      let spareChairAmount = spare_chair_count * 50000;
+      let totalMenuAmount = Number(menu.price) * Number(table_count);
 
       if (table_count > findStages.capacity_max) {
         throw new BadRequestException(
@@ -772,6 +792,29 @@ export class BookingsService {
           'Số lượng bàn quá ít so với sức chứa tối thiểu của sảnh',
         );
       }
+
+      // ? Orther Service
+      let otherServiceAmount = 0;
+      // ! Fetch booking with relations
+      other_service.map(async (orther) => {
+        const findOther = await this.prismaService.products.findUnique({
+          where: { id: Number(orther.id) },
+        });
+        if (!findOther)
+          throw new HttpException(
+            'Không tìm thấy dịch vụ thêm',
+            HttpStatus.NOT_FOUND,
+          );
+        otherServiceAmount += Number(findOther.price) * Number(orther.quantity);
+        orther.name = findOther.name;
+        orther.amount = Number(findOther.price);
+        orther.total_price = Number(findOther.price) * Number(orther.quantity);
+        orther.description = findOther.description;
+        orther.short_description = findOther.short_description;
+        orther.images = findOther.images;
+        orther.quantity = Number(orther.quantity);
+        otherServiceAmount += Number(findOther.price) * Number(orther.quantity);
+      });
 
       // ? Format Stage
       const {
@@ -788,12 +831,12 @@ export class BookingsService {
       } = decor;
 
       // ? Format Menu
-      const {
+      let {
         created_at: createdAtMenu,
         updated_at: updatedAtMenu,
         ...menuFormat
       } = menu;
-
+      (menuFormat as any).total_amount = totalMenuAmount;
       // ? Format Party Type
       const {
         created_at: createdAtPartyType,
@@ -829,11 +872,14 @@ export class BookingsService {
         // Total calculation
         const totalAmount = Number(
           Number(decor.price) +
-            Number(menu.price) +
+            Number(totalMenuAmount) +
             Number(stage.price) +
             Number(party_types.price) +
             Number(tableAmount) +
             Number(chairAmount) +
+            Number(spareChairAmount) +
+            Number(spareTableAmount) +
+            Number(otherServiceAmount) +
             Number(extraServiceAmount),
         );
         if (Number(amount) !== totalAmount) {
@@ -878,6 +924,7 @@ export class BookingsService {
               : 0,
             spare_table_price: spare_table_count ? Number(spareTableAmount) : 0,
             extra_service: extra_service,
+            gift,
             fee,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
@@ -932,11 +979,14 @@ export class BookingsService {
         // Total calculation
         const totalAmount = Number(
           Number(decor.price) +
-            Number(menu.price) +
+            Number(totalMenuAmount) +
             Number(stage.price) +
             Number(party_types.price) +
             Number(tableAmount) +
-            Number(chairAmount),
+            Number(chairAmount) +
+            Number(spareChairAmount) +
+            Number(spareTableAmount) +
+            Number(otherServiceAmount),
         );
         if (Number(amount) !== totalAmount) {
           throw new HttpException(
@@ -979,8 +1029,8 @@ export class BookingsService {
               menu_id: Number(menu_id),
               decor: decorFormat,
               menu: menuFormat,
-              extra_service: null,
-              gift: null,
+              extra_service: extra_service ? extra_service : null,
+              gift,
               table_count: Number(table_count),
               chair_count: Number(chair_count),
               spare_chair_count: spare_table_count
@@ -1010,8 +1060,8 @@ export class BookingsService {
               party_types: partyTypeFormat,
               decor: decorFormat,
               menu: menuFormat,
-              extra_service: null,
-              gift: null,
+              extra_service: extra_service ? extra_service : null,
+              gift,
               fee,
               table_count: Number(table_count),
               chair_count: Number(chair_count),
@@ -1225,7 +1275,7 @@ export class BookingsService {
       // First get all confirmed bookings and calculate total amount
       const bookings = await this.prismaService.bookings.findMany({
         where: {
-          user_id: userId,
+          user_id: Number(userId),
           is_confirm: true,
           is_deposit: true,
           status: 'success',

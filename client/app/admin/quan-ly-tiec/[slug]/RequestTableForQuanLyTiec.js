@@ -21,49 +21,49 @@ import {
   TableRow,
   User,
 } from "@nextui-org/react";
-import { format, formatDate } from "date-fns";
+import { format } from "date-fns";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { BsMoon, BsSun } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
-import useApiServices from "../_hooks/useApiServices";
-import useCustomToast from "../_hooks/useCustomToast";
+import useApiServices from "../../../_hooks/useApiServices";
+import useCustomToast from "../../../_hooks/useCustomToast";
 import {
   fetchingRequestFailure,
   fetchingRequestsFailure,
   fetchRequests,
   updateRequestStatus,
   updatingRequestSuccess,
-} from "../_lib/features/requests/requestsSlice";
-import { CONFIG } from "../_utils/config";
-import { capitalize } from "../_utils/helpers";
-import { ChevronDownIcon } from "./ChevronDownIcon";
-import CustomPagination from "./CustomPagination";
-import SearchForm from "./SearchForm";
-import Loading from "../loading";
-import LoadingContent from "./LoadingContent";
+} from "../../../_lib/features/requests/requestsSlice";
+import { CONFIG } from "../../../_utils/config";
+import { capitalize } from "../../../_utils/helpers";
+import { ChevronDownIcon } from "../../../_components/ChevronDownIcon";
+import CustomPagination from "../../../_components/CustomPagination";
+import SearchForm from "../../../_components/SearchForm";
+import Loading from "../../../loading";
+import LoadingContent from "../../../_components/LoadingContent";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
-  "email",
-  "phone",
+  "total_amount",
+  "created_at",
   "status",
-  "number_of_guests",
+  "amount_booking",
   "organization_date",
-  "shift",
+  "amount_to_be_paid",
   "actions",
 ];
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "Tên", uid: "name", sortable: true },
-  { name: "Số điện thoại", uid: "phone", sortable: true },
-  { name: "Email", uid: "email" },
-  { name: "Số lượng khách", uid: "number_of_guests", sortable: true },
+  { name: "Chủ tiệc / Loại tiệc", uid: "name", sortable: true },
+  { name: "Ngày đặt", uid: "created_at", sortable: true },
+  { name: "Tổng giá trị", uid: "total_amount", sortable: true },
+  { name: "Tiền cọc", uid: "amount_booking", sortable: true },
   { name: "Ngày dự kiến", uid: "organization_date", sortable: true },
-  { name: "Buổi", uid: "shift", sortable: true },
+  { name: "Số tiền cần phải thanh toán", uid: "amount_to_be_paid", sortable: true },
   { name: "Trạng thái", uid: "status", sortable: true },
   { name: "Hành động", uid: "actions" },
 ];
@@ -79,7 +79,6 @@ function RequestTable() {
     isFetchingRequestsError,
     isUpdatingRequest,
     isUpdatingRequestError,
-    error,
   } = useSelector((store) => store.requests);
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
@@ -95,6 +94,17 @@ function RequestTable() {
       format(new Date(new Date().getFullYear(), 11, 31), "yyyy-MM-dd")
     ),
   });
+  const [branchDetail_id, setBranchDetail_id] = React.useState(null)
+
+  React.useEffect(() => {
+    if(typeof window !== 'undefined') {
+      const storeUser = JSON.parse(localStorage.getItem('user'));
+      if(storeUser?.branch_id) {
+        setBranchDetail_id(storeUser.branch_id)
+      }
+    }
+  },[])
+
   const [searchQuery, setSearchQuery] = React.useState("");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
@@ -108,37 +118,15 @@ function RequestTable() {
     setSearchQuery(query);
   }, []);
 
-  // Function to convert the custom date object to a standard Date object
-  const toStandardDate = (customDate) => {
-    return new Date(customDate.year, customDate.month - 1, customDate.day);
-  };
-
-  // Format the dates to "dd-MM-yyyy"
-  const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
-  const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
-
   React.useEffect(() => {
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-    if (!currentBranch) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
-        type: "error",
-      });
-
-      router.push("/auth/chon-chi-nhanh");
-    }
-
     const params = {
       is_confirm: false,
       is_deposit: false,
-      status: "pending",
+      // status: "pending",
       page: currentPage,
       itemsPerPage,
-      branch_id: currentBranch.id,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
+      // startDate: formatDate(date.start, "dd-MM-yyyy"),
+      // endDate: formatDate(date.end, "dd-MM-yyyy"),
     };
 
     dispatch(fetchRequests({ params }));
@@ -147,30 +135,15 @@ function RequestTable() {
   }, [currentPage, itemsPerPage]);
 
   React.useEffect(() => {
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-    if (!currentBranch) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
-        type: "error",
-      });
-
-      router.push("/auth/chon-chi-nhanh");
-    }
-
     const controller = new AbortController();
 
     const params = {
       is_confirm: false,
       is_deposit: false,
-      status: "pending",
+      // status: "pending",
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
-      branch_id: currentBranch.id,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
     };
 
     dispatch(fetchRequests({ signal: controller.signal, params }));
@@ -245,7 +218,6 @@ function RequestTable() {
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
-
       switch (columnKey) {
         case "shift":
           return cellValue === "Sáng" ? (
@@ -263,6 +235,33 @@ function RequestTable() {
               {cellValue}
             </Chip>
           );
+        case "total_amount": 
+        const totalAmount = item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0)
+        return new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        }).format(totalAmount);
+
+        case "amount_booking":
+          const amount_booking = item.booking_details?.map((detail) => detail.deposits?.amount ? `${detail.deposits.amount}` : "Chưa có tiền cọc")
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(amount_booking);
+
+        case 'amount_to_be_paid': 
+        const bookingDetails = item.booking_details?.[0];
+        const totalAmount_paid = bookingDetails?.total_amount || 0;
+        const depositAmount = bookingDetails?.deposits?.amount || 0;
+        const amountPaid = totalAmount_paid - depositAmount;
+      
+        return new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND',
+        }).format(amountPaid);
+        
+        case "deposit_amount":
+        case "created_at": return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "organization_date":
           return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "name":
@@ -431,8 +430,6 @@ function RequestTable() {
     );
   }, [currentPage, pagination.lastPage]);
 
-  // console.log(requests);
-
   return (
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
@@ -477,7 +474,7 @@ function RequestTable() {
         )}
       </TableHeader>
       <TableBody
-        emptyContent={isFetchingRequestsError ? error : "No requests found"}
+        emptyContent={"No requests found"}
         items={sortedItems}
         isLoading={isFetchingRequests || isUpdatingRequest}
         loadingContent={<LoadingContent />}

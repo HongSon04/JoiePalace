@@ -91,8 +91,8 @@ const TableGrab = ({ data, pathLink, onStatusChange }) => {
                                     />
                                 </div>
                             </th>
-                            {['Mã tiệc', 'Chủ tiệc', 'Tên tiệc', 'Ngày đặt', 'Tổng giá trị', 'Tiền cọc', 'Ngày đặt cọc', 'Còn lại phải thanh toán', 'Ngày tổ chức', 'Giờ tổ chức', 'Ngày thanh toán', 'Tình trạng thanh toán', 'Số lượng khách dự kiến', 'Số lượng bàn (chính thức + dự phòng)', 'Chi nhánh',].map((header) => (
-                                <th key={header} className="!px-8 !py-6  whitespace-nowrap">
+                            {['Mã tiệc', 'Chủ tiệc', 'Tên tiệc', 'Ngày đặt', 'Tổng giá trị', 'Tiền cọc', 'Ngày đặt cọc', 'Còn lại phải thanh toán', 'Ngày tổ chức', 'Giờ tổ chức', 'Ngày thanh toán', 'Trạng thái thanh toán', 'Số lượng khách dự kiến', 'Số lượng bàn (chính thức + dự phòng)', 'Chi nhánh',].map((header, index) => (
+                                <th key={index} className="!px-8 !py-6  whitespace-nowrap">
                                     {header}
                                 </th>
                             ))}
@@ -100,7 +100,7 @@ const TableGrab = ({ data, pathLink, onStatusChange }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentData.map((item) => (
+                        {currentData.map((item, index) => (
                             <tr key={item.id} className="">
                                 <td className="!px-8 !py-6 whitespace-nowrap">
                                     <input 
@@ -139,7 +139,7 @@ const TableGrab = ({ data, pathLink, onStatusChange }) => {
                                     <select
                                         value={item.status || "Chưa thanh toán"}
                                        onChange={(e) => handleStatusChange(item.id, e)}
-                                        className="bg-gray-100 border border-gray-300 rounded px-2 py-1"
+                                        className="bg-white text-black rounded px-2 py-1"
                                     >
                                         <option value="pending">Đang chờ thanh toán</option>
                                         <option value="processing">Đang xử lý</option>

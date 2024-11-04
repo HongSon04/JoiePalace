@@ -4,43 +4,44 @@ import { useEffect, useState, useRef } from 'react';
 import { Box, Image, Button, Text } from '@chakra-ui/react';
 
 const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialImages = [] }) => {
-  const [images, setImages] = useState(initialImages); // Khởi tạo với hình ảnh đã có
-  const imagesRef = useRef(images);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState(initialImages); 
+  const imagesRef = useRef(imagePreviews);
 
   useEffect(() => {
-    if (imagesRef.current !== images) {
-      onImagesChange(name, images);
-      imagesRef.current = images; 
+    if (imagesRef.current !== imagePreviews) {
+      onImagesChange(name, imageFiles);
+      imagesRef.current = imagePreviews;
     }
-  }, [images, onImagesChange, name]); 
+  }, [imagePreviews, onImagesChange, name, imageFiles]);
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
 
-    const newImages = files.map((file) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+    const newImagePreviews = files.map((file) => {
 
-      return new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result);
-      });
+      return URL.createObjectURL(file);
     });
 
-    Promise.all(newImages).then((urls) => {
-      setImages((prevImages) => [...prevImages, ...urls]);
-    });
+    setImagePreviews((prevImages) => [...prevImages, ...newImagePreviews]);
+    setImageFiles((prevFiles) => [...prevFiles, ...files]);
+    onImagesChange(name, [...imageFiles, ...files]);
   };
 
   const handleDeleteImage = (index) => {
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
+    const updatedFiles = imageFiles.filter((_, i) => i !== index);
+    setImageFiles(updatedFiles);
+    
+    onImagesChange(name, updatedFiles);
   };
 
   return (
     <div className="flex-1 p-4 bg-whiteAlpha-200 rounded-lg h-fit">
       <h3 className="font-bold text-white leading-6 text-base">{title}</h3>
       <div className="grid grid-cols-2 gap-5 mt-[10px] w-full">
-        {images.length > 0 ? (
-          images.map((src, index) => (
+        {imagePreviews.length > 0 ? (
+          imagePreviews.map((src, index) => (
             <Box key={index} className='relative'>
               <Image src={src} alt={`carousel-img-${index}`} className="rounded-lg object-cover w-full" h='180px' />
               <Button

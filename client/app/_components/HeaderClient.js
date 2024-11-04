@@ -63,7 +63,7 @@ const HeaderClient = () => {
   if (!listBranches) return;
   return (
     <header className={`fixed top-0 left-0 w-full z-40 text-white`}>
-      <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-primary">
+      <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-transparent">
         <div className="h-full flex items-center gap-4 flex-row-reverse">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
             <svg

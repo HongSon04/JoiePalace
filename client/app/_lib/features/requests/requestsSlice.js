@@ -11,6 +11,7 @@ const initialState = {
     nextPage: null,
     prevPage: null,
   },
+  error: null,
   selectedRequest: null,
 
   isFetchingRequests: false,
@@ -54,9 +55,10 @@ const requestsSlice = createSlice({
       state.requests = action.payload.data;
       state.pagination = action.payload.pagination;
     },
-    fetchingRequestsFailure(state) {
+    fetchingRequestsFailure(state, action) {
       state.isFetchingRequests = false;
       state.isFetchingRequestsError = true;
+      state.error = action.payload;
     },
 
     updatingRequest(state) {
@@ -77,12 +79,14 @@ const requestsSlice = createSlice({
       .addCase(fetchRequests.pending, (state) => {
         state.isFetchingRequests = true;
         state.isFetchingRequestsError = false;
+        state.error = null;
       })
       .addCase(fetchRequests.fulfilled, (state, action) => {
         state.isFetchingRequests = false;
         state.isFetchingRequestsError = false;
         state.requests = action.payload.data;
         state.pagination = action.payload.pagination;
+        state.error = null;
       })
       .addCase(fetchRequests.rejected, (state, action) => {
         state.isFetchingRequests = false;
@@ -104,8 +108,24 @@ const requestsSlice = createSlice({
       .addCase(updateRequestStatus.rejected, (state, action) => {
         state.isUpdatingRequest = false;
         state.isUpdatingRequestError = true;
-        state.error = action.payload; // Use the error message from the rejected action
-      });
+        state.error = action.payload; 
+      })
+      .addCase(fetchRequestsByBranch.pending, (state) => {
+        state.isFetchingRequests = true;
+        state.isFetchingRequestsError = false;
+      })
+      .addCase(fetchRequestsByBranch.fulfilled, (state, action) => {
+        state.isFetchingRequests = false;
+        state.isFetchingRequestsError = false;
+        state.requests = action.payload.data; 
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(fetchRequestsByBranch.rejected, (state, action) => {
+        state.isFetchingRequests = false;
+        state.isFetchingRequestsError = true;
+        state.error = action.payload;
+      })
+
   },
 });
 
@@ -122,13 +142,13 @@ export const fetchRequests = createAsyncThunk(
       { signal }
     );
 
-    // console.log("response from fetchRequests thunk -> ", response);
+    console.log("response from fetchRequests thunk -> ", response);
     if (response.success) {
       dispatch(fetchingRequestsSuccess(response));
       return response; // Return the response for further use
     } else {
-      dispatch(fetchingRequestsFailure(response));
-      return rejectWithValue(response.message);
+      dispatch(fetchingRequestsFailure(response.error.message));
+      return rejectWithValue(response.error.message);
     }
   }
 );
@@ -155,6 +175,38 @@ export const updateRequestStatus = createAsyncThunk(
       return response;
     } catch (error) {
       dispatch(updatingRequestFailure(error));
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchRequestsByBranch = createAsyncThunk(
+  "requests/fetchRequestsByBranch",
+  async ({ params, branchId, signal }, { dispatch, rejectWithValue }) => {
+    dispatch(fetchingRequests()); 
+
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.BOOKINGS.GET_ALL(params),
+        "GET",
+        null,
+        { signal }
+      );
+
+      if (response.success) {
+        const filteredBookings = branchId
+          ? response.data.filter((booking) => booking.branch_id === branchId)
+          : response.data;
+
+        dispatch(fetchingRequestsSuccess({ ...response, data: filteredBookings }));
+        return filteredBookings;
+      } else {
+        dispatch(fetchingRequestsFailure(response));
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching requests:", error); // Log any errors
+      dispatch(fetchingRequestsFailure(error));
       return rejectWithValue(error.message);
     }
   }

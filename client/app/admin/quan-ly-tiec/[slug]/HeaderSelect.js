@@ -35,9 +35,9 @@ const HeaderSelect = ({ title, slugOrID,  showBackButton = true }) => {
                     {title} <span className="font-bold">- {slugOrID}</span>
                 </h1>
             </div>
-            <div>
+            {/* <div>
                 <StatusSelect />
-            </div>
+            </div> */}
         </div>
     );
 };

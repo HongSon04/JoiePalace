@@ -9,8 +9,8 @@ export const createNewBooking = async (data) => {
   return { status: response.status, data: response.data.data };
 };
 
-export const fecthAllBooking = async () => {
-  const response = await axios.get(API_CONFIG.PARTYTYPES.GET_ALL);
+export const fetchAllPartyBookings = async (id) => {
+  const response = await axios.get(API_CONFIG.BOOKINGS.GET_ALL(id));
 
   if (response.status !== 200) {
     throw new Error("Có lỗi khi lấy dữ liệu");

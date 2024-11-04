@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import HeaderSelect from '../HeaderSelect';
 import RequestBreadcrumbsForQuanLyTiec from './RequestBreadcrumbsForQuanLyTiec';
 import InputDetailCustomer from './InputDetailCustomer';
@@ -11,6 +11,8 @@ import ButtonCustomAdmin from '@/app/_components/ButtonCustomAdmin';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import useApiServices from '@/app/_hooks/useApiServices';
+import { API_CONFIG } from '@/app/_utils/api.config';
 
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
@@ -26,7 +28,7 @@ const userSchema = z.object({
 });
 
 const organizationSchema = z.object({
-  party: z.enum(['wedding', 'birthday', 'conference'], { message: "Loại tiệc không hợp lệ" }),
+  party: z.string().nonempty({ message: "Loại tiệc không được để chống" }),
   tables: z.string().regex(/^\d+$/, { message: "Số lượng bàn chính thức là dạng số" }).min(1, { message: "Số lượng bàn chính thức phải lớn hơn 0" }),
   spareTables: z.string().regex(/^\d+$/, { message: "Số lượng bàn dự phòng là dạng số" }).min(0, { message: "Số lượng bàn dự phòng không được âm" }),
   customer: z.string().regex(/^\d+$/, { message: "Số lượng khách dự kiến là dạng số" }).min(1, { message: "Số lượng khách dự kiến phải lớn hơn 0" }),
@@ -60,7 +62,7 @@ const formSchema = userSchema.merge(organizationSchema);
 
 const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const { id } = params;
-
+    const { makeAuthorizedRequest } = useApiServices();
     const inputInfoUser = [
         {
             svg: (
@@ -104,13 +106,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 <path fillRule="evenodd" clipRule="evenodd" d="M13 9.5H18V7.5H13V9.5ZM13 16.5H18V14.5H13V16.5ZM19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21ZM6 11H11V6H6V11ZM7 7H10V10H7V7ZM6 18H11V13H6V18ZM7 14H10V17H7V14Z" fill="white" />
             </svg>),
             title: 'Loại tiệc',
-            type: 'select',
+            type: 'text',
             name: 'party',
-            options: [
-                { value: 'wedding', label: 'Tiệc cưới' },
-                { value: 'birthday', label: 'Tiệc sinh nhật' },
-                { value: 'conference', label: 'Hội thảo' },
-            ]
         },
         {
             svg: (
@@ -427,9 +424,71 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         },
     ]
 
-    const { register, handleSubmit, formState: { errors }, trigger } = useForm({
-        resolver: zodResolver(formSchema),  // Sử dụng schema đã kết hợp
+    const { control, handleSubmit, reset, formState: { errors }, trigger } = useForm({
+        resolver: zodResolver(formSchema),
+        
     });
+
+    const fetchUserID = async (userId) => {
+        try {
+            const response = await makeAuthorizedRequest(API_CONFIG.USER.GET_BY_ID(userId), "GET");
+            console.log(response)
+            return response.data[0];
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            return null; 
+        }
+    };
+
+
+    const fetchDataDetailsParty = useCallback(async () => {
+        try {
+            const response = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.GET_BY_ID(id), 'GET');
+            const partyData = response.data[0];
+            const userData = await fetchUserID(partyData.user_id);
+            const userName = userData ? userData.username : ''; 
+            console.log("Username retrieved:", userName);
+            if (response) {
+                // const userName = userData?.name || '';
+                reset({
+                    nameHost: userName  || '',
+                    email: partyData.email || '',
+                    phone: partyData.phone,
+                    party: partyData.name,
+                    tables: partyData.tables,
+                    spareTables: partyData.spareTables,
+                    customer: partyData.customer,
+                    customerAndChair: partyData.customerAndChair,
+                    partyDate: partyData.partyDate,
+                    dateOrganization: partyData.dateOrganization,
+                    timeEvent: partyData.timeEvent,
+                    menu: partyData.menu,
+                    snack: partyData.snack,
+                    tableType: partyData.tableType,
+                    chairType: partyData.chairType,
+                    decor: partyData.decor,
+                    color: partyData.color,
+                    hall: partyData.hall,
+                    danceTroupe: partyData.danceTroupe,
+                    stageAndLed: partyData.stageAndLed,
+                    cake: partyData.cake,
+                    champagne: partyData.champagne,
+                    namePayer: partyData.namePayer,
+                    amountPayable: partyData.amountPayable,
+                    depositAmount: partyData.depositAmount,
+                    depositDate: partyData.depositDate,
+                    remainingAmountPaid: partyData.remainingAmountPaid,
+                    dataPay: partyData.dataPay,
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching party details:', error);
+        }
+    }, [id, reset]);
+    
+    useEffect(()=>{
+        fetchDataDetailsParty()
+    },[fetchDataDetailsParty])
 
     const onSubmit = (data) => {
         console.log('Dữ liệu form hợp lệ:', data);
@@ -443,7 +502,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 <div className='ml-auto flex gap-[10px]'>
                     {buttons.map((button, index) => (
                         <ButtonCustomAdmin key={index} title={button.title} svg={button.svg} bgColor={button.bg} textColor={button.textColor}></ButtonCustomAdmin>
-
                     ))}
                 </div>
             </div>
@@ -459,9 +517,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 type={detail.type}
                                 name={detail.name}
                                 placeholder={detail.placeholder}
-                                register={register}
                                 error={errors[detail.name]}
                                 trigger={trigger}
+                                control={control}
                             />
                         ))}
                     </div>
@@ -478,9 +536,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 name={detail.name}
                                 placeholder={detail.placeholder}
                                 options={detail.options}
-                                register={register}
                                 error={errors[detail.name]}
-                        trigger={trigger}
+                                trigger={trigger}
+                                control={control}
                             />
                         ))}
                         <div className='flex flex-col gap-2'>
@@ -520,9 +578,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 name={detail.name}
                                 placeholder={detail.placeholder}
                                 options={detail.options}
-                                register={register}
                                 error={errors[detail.name]}
                                 trigger={trigger}
+                                control={control}
                             />
                         ))}
                     </div>
