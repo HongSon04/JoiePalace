@@ -94,6 +94,8 @@ export class UpdateBookingDto {
   @IsOptional()
   budget?: string;
 
+  gift?: string[];
+
   @ApiProperty({
     required: true,
     description: 'Ghi chú thêm về sự kiện',
