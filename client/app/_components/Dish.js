@@ -16,6 +16,7 @@ function Dish(props) {
     mode,
     navigate = true,
     onClick,
+    onContextMenu,
     children,
   } = props;
 
@@ -23,14 +24,10 @@ function Dish(props) {
 
   const [image, setImage] = React.useState(dish.images[0]);
 
-  const { onOpen } = useDisclosure();
-
   const dispatch = useDispatch();
 
   const handleClick = () => {
     dispatch(setSelectedDish(dish));
-
-    onOpen();
   };
 
   const href = navigate ? props.link || `/admin/mon-an?id=${dish.id}` : "#";
@@ -43,6 +40,7 @@ function Dish(props) {
             mode === "dark" ? "bg-zinc-100" : "bg-whiteAlpha-100"
           } w-full p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-full ${className}`}
           onClick={onClick || handleClick}
+          onContextMenu={onContextMenu}
         >
           {children}
           <div className="w-14 h-14 mr-3 relative group-hover:scale-125 transition-transform shrink-0">

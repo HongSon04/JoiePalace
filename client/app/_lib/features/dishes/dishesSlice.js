@@ -35,6 +35,7 @@ const dishesSlice = createSlice({
     setSelectedDish: (state, action) => {
       state.selectedDish = action.payload;
     },
+
     addingDishCategory: (state, action) => {
       state.isAddingDishCategory = true;
     },
@@ -45,6 +46,7 @@ const dishesSlice = createSlice({
       state.isAddingDishCategory = false;
       state.isAddingDishCategoryError = true;
     },
+
     fetchingSelectedDish: (state, action) => {
       state.isLoading = true;
     },
@@ -55,8 +57,10 @@ const dishesSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
     },
+
     fetchingCategoryDishes: (state, action) => {
       state.isLoading = true;
+      state.isError = false;
     },
     fetchingCategoryDishesSuccess: (state, action) => {
       state.isLoading = false;
@@ -68,13 +72,15 @@ const dishesSlice = createSlice({
       state.isLoading = false;
       state.isError = true;
     },
+
     addingDish: (state, action) => {
       state.isAddingDish = true;
+      state.isAddingDishError = false;
     },
     addingDishSuccess: (state, action) => {
       state.isAddingDish = false;
-      state.dishes = [
-        ...state.dishes.filter((dish) => dish.id !== action.payload.id),
+      state.categoryDishes = [
+        ...state.categoryDishes.filter((dish) => dish.id !== action.payload.id),
         action.payload,
       ];
       state.isAddingDishError = false;
@@ -83,13 +89,14 @@ const dishesSlice = createSlice({
       state.isAddingDish = false;
       state.isAddingDishError = true;
     },
+
     updateDishRequest: (state, action) => {
       state.isUpdatingDish = true;
     },
     updateDishSuccess: (state, action) => {
       state.isUpdatingDish = false;
-      state.dishes = [
-        ...state.dishes.filter((dish) => dish.id !== action.payload.id),
+      state.categoryDishes = [
+        ...state.categoryDishes.filter((dish) => dish.id !== action.payload.id),
         action.payload,
       ];
       state.isUpdatingDishError = false;
@@ -200,7 +207,7 @@ export const fetchCategoryDishes = createAsyncThunk(
     // console.log("response from fetchCategoryDishes thunk -> ", response);
     if (response.success) {
       dispatch(fetchingCategoryDishesSuccess(response));
-      return response; // Return the response for further use
+      return response;
     } else {
       dispatch(fetchingCategoryDishesFailure(response));
       return rejectWithValue(response.message);
@@ -213,22 +220,20 @@ export const addDish = createAsyncThunk(
   "dishes/addDish",
   async (dishData, { dispatch, rejectWithValue }) => {
     dispatch(addingDish());
-    try {
-      const response = await makeAuthorizedRequest(
-        API_CONFIG.PRODUCTS.CREATE,
-        "POST",
-        dishData
-      );
-      if (response.success) {
-        dispatch(addingDishSuccess(response.data));
-        return response.data; // Return the added dish
-      } else {
-        dispatch(addingDishFailure(response.message));
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      dispatch(addingDishFailure(error));
-      return rejectWithValue(error.message);
+    const response = await makeAuthorizedRequest(
+      API_CONFIG.PRODUCTS.CREATE,
+      "POST",
+      dishData
+    );
+
+    // console.log("response from addDish thunk -> ", response);
+
+    if (response.success) {
+      dispatch(addingDishSuccess(response.data.at(0)));
+      return response.data;
+    } else {
+      dispatch(addingDishFailure(response.error.message));
+      return rejectWithValue(response.error.message);
     }
   }
 );

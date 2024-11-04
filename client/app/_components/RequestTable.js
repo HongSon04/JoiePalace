@@ -21,7 +21,7 @@ import {
   TableRow,
   User,
 } from "@nextui-org/react";
-import { format } from "date-fns";
+import { format, formatDate } from "date-fns";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
@@ -79,6 +79,7 @@ function RequestTable() {
     isFetchingRequestsError,
     isUpdatingRequest,
     isUpdatingRequestError,
+    error,
   } = useSelector((store) => store.requests);
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
@@ -107,15 +108,37 @@ function RequestTable() {
     setSearchQuery(query);
   }, []);
 
+  // Function to convert the custom date object to a standard Date object
+  const toStandardDate = (customDate) => {
+    return new Date(customDate.year, customDate.month - 1, customDate.day);
+  };
+
+  // Format the dates to "dd-MM-yyyy"
+  const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
+  const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
+
   React.useEffect(() => {
+    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+
+    if (!currentBranch) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
+        type: "error",
+      });
+
+      router.push("/auth/chon-chi-nhanh");
+    }
+
     const params = {
       is_confirm: false,
       is_deposit: false,
       status: "pending",
       page: currentPage,
       itemsPerPage,
-      // startDate: formatDate(date.start, "dd-MM-yyyy"),
-      // endDate: formatDate(date.end, "dd-MM-yyyy"),
+      branch_id: currentBranch.id,
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
     };
 
     dispatch(fetchRequests({ params }));
@@ -124,6 +147,18 @@ function RequestTable() {
   }, [currentPage, itemsPerPage]);
 
   React.useEffect(() => {
+    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+
+    if (!currentBranch) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
+        type: "error",
+      });
+
+      router.push("/auth/chon-chi-nhanh");
+    }
+
     const controller = new AbortController();
 
     const params = {
@@ -133,6 +168,9 @@ function RequestTable() {
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
+      branch_id: currentBranch.id,
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
     };
 
     dispatch(fetchRequests({ signal: controller.signal, params }));
@@ -393,6 +431,8 @@ function RequestTable() {
     );
   }, [currentPage, pagination.lastPage]);
 
+  // console.log(requests);
+
   return (
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
@@ -437,7 +477,7 @@ function RequestTable() {
         )}
       </TableHeader>
       <TableBody
-        emptyContent={"No requests found"}
+        emptyContent={isFetchingRequestsError ? error : "No requests found"}
         items={sortedItems}
         isLoading={isFetchingRequests || isUpdatingRequest}
         loadingContent={<LoadingContent />}
