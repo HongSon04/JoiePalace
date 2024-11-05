@@ -32,6 +32,7 @@ const HeaderClient = () => {
   useEffect(() => {
     setScreenWidth(window.innerWidth);
   }, []);
+
   useEffect(() => {
     const fecthData = async () => {
       const branches = await fetchBranchesFromApi();
@@ -40,9 +41,9 @@ const HeaderClient = () => {
     fecthData();
 
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
+    if (user && user.name) {
       setIsLogin(true);
-      const nameParts = (user.name).split(" ");
+      const nameParts = (user?.name).split(" ");
       const firstName = nameParts[nameParts.length - 1];
       setNameUser(firstName);
     }
@@ -77,7 +78,7 @@ const HeaderClient = () => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              router.push(`/client/${!isLogin ? 'dang-ky' : 'nguoi-dung'}`);
+              router.push(`/client/${!isLogin ? "dang-ky" : "nguoi-dung"}`);
             }}
             className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl"
           >
@@ -151,8 +152,9 @@ const HeaderClient = () => {
       </div>
       {/* popup menu */}
       <div
-        className={`menu px-5 w-full h-screen bg-primary z-50 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${isShowMenu ? "showMenu" : ""
-          }`}
+        className={`menu px-5 w-full h-screen bg-primary z-50 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${
+          isShowMenu ? "showMenu" : ""
+        }`}
       >
         <div className="w-full h-[90px] flex justify-between items-center bg-transparent border-b-[1px] border-white">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer max-sm:hidden">

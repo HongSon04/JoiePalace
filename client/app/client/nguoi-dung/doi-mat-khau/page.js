@@ -58,6 +58,8 @@ const Page = () => {
         API_CONFIG.USER.CHANGE_PASSWORD,
         "PUT",
         newData,
+        null,
+        '/client/dang-nhap'
       );
 
       if (response?.success) {

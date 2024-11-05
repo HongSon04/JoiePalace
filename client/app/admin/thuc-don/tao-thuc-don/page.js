@@ -1,11 +1,10 @@
 "use client";
 
 import AdminHeader from "@/app/_components/AdminHeader";
-import CustomInput from "@/app/_components/CustomInput";
 import Dish from "@/app/_components/Dish";
+import FormInput from "@/app/_components/FormInput";
 import SaveIcon from "@/app/_components/SaveIcon";
-import FileUploadButton from "@/app/_components/Uploader";
-import { fetchMenu } from "@/app/_lib/features/menu/menuSlice";
+import Uploader from "@/app/_components/Uploader";
 import { dishCategories } from "@/app/_utils/config";
 import { formatPrice } from "@/app/_utils/formaters";
 import { capitalize } from "@/app/_utils/helpers";
@@ -15,12 +14,7 @@ import pizza from "@/public/local_pizza.svg";
 import restaurant from "@/public/restaurant.svg";
 import setMeal from "@/public/set_meal.svg";
 import textSnippet from "@/public/text_snippet.svg";
-import {
-  DocumentArrowUpIcon,
-  PlusIcon,
-  SquaresPlusIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { PlusIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
 import { Button, Chip, useDisclosure } from "@nextui-org/react";
 import { Col, Row } from "antd";
 import Image from "next/image";
@@ -31,10 +25,24 @@ import {
   useSearchParams,
 } from "next/navigation";
 import React, { useCallback } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
+import { z } from "zod";
 import DishesModal from "../[id]/DishesModal";
 import Breadcrumbs from "./Breadcrumbs";
+
+const schema = z.object({
+  name: z.string({ required_error: "Tên thực đơn không được để trống" }),
+  maxDishes: z
+    .number({
+      required_error: "Số lượng món tối đa không được để trống",
+    })
+    .min(1, { message: "Số lượng món tối thiểu là 1" })
+    .max(8, { message: "Số lượng món tối đa là 8" }),
+  maxAppetizer: z.number({
+    required_error: "Số lượng món khai vị không được để trống",
+  }),
+});
 
 function Page() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -50,6 +58,11 @@ function Page() {
     mainCourse,
     dessert,
   });
+  const [files, setFiles] = React.useState([]);
+
+  const handleFileChange = (files) => {
+    setFiles(files);
+  };
 
   const handleAddingDishes = (dishes, category) => {
     setMenuDishes((prevMenuDishes) => {
@@ -88,50 +101,31 @@ function Page() {
     });
   }, [appetizer, mainCourse, dessert]);
 
-  const methods = useForm();
-
-  const { id } = params;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+    getValues,
+  } = useForm();
 
   const { status } = useSelector((store) => store.menu);
 
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    dispatch(fetchMenu(id));
-  }, [dispatch, id]);
-
   // FORM HANDLING
-  const [formState, setFormState] = React.useState({
-    name: "",
-    maxDishes: 8,
-    maxAppetizer: 2,
-    maxMainCourse: 4,
-    maxDessert: 2,
-    description: "",
-    menuDishes,
-  });
 
   // Function to handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setValue(name, value);
   };
 
-  const handleSubmit = methods.handleSubmit((data) => {
+  // Function to handle form submission
+  const onSubmit = (data) => {
     console.log(data);
-  });
-
-  // Function to handle file upload
-  const handleFileUpload = (files) => {
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImageSrc(reader.result);
-    };
-    reader.readAsDataURL(file);
   };
 
   return (
@@ -148,256 +142,229 @@ function Page() {
 
       {/* BREADCRUMBS */}
       <Breadcrumbs></Breadcrumbs>
-
-      {/* MAIN CONTENT */}
-      {status === "loading" && <p>Loading...</p>}
-      {status === "failed" && <p>Failed to load data</p>}
-      {status === "succeeded" && (
-        <>
-          <div className="flex gap-5 mt-8 w-fit">
-            {/* IMAGE & UPLOADER */}
-            <FileUploadButton
-              size="md"
-              accept="image/*"
-              onUpload={handleFileUpload}
-              className="w-fit relative h-fit bg-whiteAlpha-200 rounded-md"
-              acceptProps={{ className: "bg-green-200" }}
-              rejectProps={{ className: "bg-red-200" }}
-            >
-              <Image
-                src={imageSrc}
-                alt="Upload the menu image here"
-                width={345}
-                height={440}
-              />
-              {/* ACTIONS */}
-              <div className="flex p-5 gap-5 bg-whiteAlpha-300 rounded-md absolute bottom-3 left-3 right-3 flex-center">
-                {/* DELETE */}
-                <Button
-                  startContent={<TrashIcon />}
-                  className="bg-red-400 text-white rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setImageSrc("");
-                  }}
-                >
-                  Xóa
-                </Button>
-                {/* UPLOADER */}
-                <Button
-                  size="md"
-                  startContent={
-                    <DocumentArrowUpIcon width={20} height={20} color="white" />
-                  }
-                  className="bg-teal-400 text-white rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    document.querySelector('input[type="file"]').click();
-                  }}
-                >
-                  Upload
-                </Button>
-              </div>
-            </FileUploadButton>
-            {/* FORM */}
-            <FormProvider {...methods}>
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                noValidate
-                className="form h-fit [&>div]:mb-5 [&>div>h4]:font-semibold [&>div>h4]:mb-3 [&>div>h4]:text-white p-5 rounded-md bg-whiteAlpha-100 min-w-[400px]"
+      <>
+        <div className="flex gap-5 mt-8 w-fit">
+          {/* IMAGE & UPLOADER */}
+          <Uploader
+            id={"menu-images"}
+            name={"menu-images"}
+            register={register}
+            files={files}
+            setFiles={setFiles}
+            onFileChange={handleFileChange}
+          />
+          {/* FORM */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="form h-fit [&>div]:mb-5 [&>div>h4]:font-semibold [&>div>h4]:mb-3 [&>div>h4]:text-white p-5 rounded-md bg-whiteAlpha-100 min-w-[400px]"
+          >
+            {/* MENU NAME */}
+            <div className="flex flex-col">
+              <h4 className="flex gap-3">
+                <Image src={docScan} width={20} height={20} alt="icon" />
+                Tên thực đơn
+              </h4>
+              <FormInput
+                register={register}
+                errors={errors}
+                theme="dark"
+                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                theme="dark"
+                name="name"
+                value={watch("name")}
+                label=""
+                type="text"
+                ariaLabel={"Tên thực đơn"}
+                onChange={handleInputChange}
+                placeholder="Ex: Thực đơn tiệc cưới"
+              ></FormInput>
+            </div>
+            {/* MAX OF DISHES */}
+            <div className="flex flex-col">
+              <h4 className="flex gap-3">
+                <SquaresPlusIcon width={20} height={20} color="white" />
+                Số lượng món tối đa
+              </h4>
+              <FormInput
+                register={register}
+                errors={errors}
+                theme="dark"
+                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                name="maxDishes"
+                value={watch("maxDishes")}
+                label=""
+                type="number"
+                onChange={handleInputChange}
+              ></FormInput>
+            </div>
+            {/* MAX OF APPETIZER */}
+            <div className="flex flex-col">
+              <h4 className="flex gap-3">
+                <Image src={pizza} width={20} height={20} alt="icon" />
+                Số lượng món khai vị
+              </h4>
+              <FormInput
+                register={register}
+                errors={errors}
+                theme="dark"
+                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                name="maxAppetizer"
+                value={watch("maxAppetizer")}
+                label=""
+                type="number"
+                ariaLabel={"Số lượng món khai vị"}
+                onChange={handleInputChange}
+              ></FormInput>
+            </div>
+            {/* MAX OF MAIN COURSE */}
+            <div className="flex flex-col">
+              <h4 className="flex gap-3">
+                <Image src={restaurant} width={20} height={20} alt="icon" />
+                Số lượng món chính
+              </h4>
+              <FormInput
+                register={register}
+                errors={errors}
+                theme="dark"
+                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                value={watch("maxMainCourse")}
+                label=""
+                type="number"
+                ariaLabel={"Số lượng món chính"}
+                onChange={handleInputChange}
+              ></FormInput>
+            </div>
+            {/* MAX OF DESSERT */}
+            <div className="flex flex-col">
+              <h4 className="flex gap-3">
+                <Image src={setMeal} width={20} height={20} alt="icon" />
+                Số lượng món tráng miệng
+              </h4>
+              <FormInput
+                register={register}
+                errors={errors}
+                theme="dark"
+                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                name="maxDessert"
+                value={watch("maxDessert")}
+                label=""
+                ariaLabel={"Số lượng món tráng miệng"}
+                onChange={handleInputChange}
+              ></FormInput>
+            </div>
+            {/* MENU DESCRIPTION */}
+            <div className="flex flex-col">
+              <h4 className="flex gap-3">
+                <Image src={textSnippet} width={20} height={20} alt="icon" />
+                Mô tả thực đơn
+              </h4>
+              <FormInput
+                register={register}
+                errors={errors}
+                theme="dark"
+                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                name="description"
+                value={watch("description")}
+                label=""
+                type="textarea"
+                ariaLabel={"Số lượng món khai vị"}
+                onChange={handleInputChange}
+                placeholder="Ex: Thực đơn giành cho chú rể Nguyễn Văn A và cô dâu Trần Thị B"
+              ></FormInput>
+            </div>
+            <footer className="flex justify-end">
+              <Button
+                className="bg-teal-400 text-white font-semibold rounded-full"
+                size="medium"
+                color="primary"
+                startContent={<SaveIcon width={20} height={20} />}
+                onClick={handleSubmit}
               >
-                {/* MENU NAME */}
-                <div className="flex flex-col">
-                  <h4 className="flex gap-3">
-                    <Image src={docScan} width={20} height={20} alt="icon" />
-                    Tên thực đơn
-                  </h4>
-                  <CustomInput
-                    name="name"
-                    value={formState.name}
-                    validation={_require}
-                    label=""
-                    ariaLabel={"Tên thực đơn"}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Thực đơn tiệc cưới"
-                  ></CustomInput>
-                </div>
-                {/* MAX OF DISHES */}
-                <div className="flex flex-col">
-                  <h4 className="flex gap-3">
-                    <SquaresPlusIcon width={20} height={20} color="white" />
-                    Số lượng món tối đa
-                  </h4>
-                  <CustomInput
-                    name="maxDishes"
-                    value={formState.maxDishes}
-                    validation={_require}
-                    label=""
-                    ariaLabel={"Tên thực đơn"}
-                    onChange={handleInputChange}
-                  ></CustomInput>
-                </div>
-                {/* MAX OF APPETIZER */}
-                <div className="flex flex-col">
-                  <h4 className="flex gap-3">
-                    <Image src={pizza} width={20} height={20} alt="icon" />
-                    Số lượng món khai vị
-                  </h4>
-                  <CustomInput
-                    name="maxAppetizer"
-                    value={formState.maxAppetizer}
-                    validation={_require}
-                    label=""
-                    ariaLabel={"Số lượng món khai vị"}
-                    onChange={handleInputChange}
-                  ></CustomInput>
-                </div>
-                {/* MAX OF MAIN COURSE */}
-                <div className="flex flex-col">
-                  <h4 className="flex gap-3">
-                    <Image src={restaurant} width={20} height={20} alt="icon" />
-                    Số lượng món chính
-                  </h4>
-                  <CustomInput
-                    name="maxMainCourse"
-                    value={formState.maxMainCourse}
-                    validation={_require}
-                    label=""
-                    ariaLabel={"Số lượng món chính"}
-                    onChange={handleInputChange}
-                  ></CustomInput>
-                </div>
-                {/* MAX OF DESSERT */}
-                <div className="flex flex-col">
-                  <h4 className="flex gap-3">
-                    <Image src={setMeal} width={20} height={20} alt="icon" />
-                    Số lượng món tráng miệng
-                  </h4>
-                  <CustomInput
-                    name="maxDessert"
-                    value={formState.maxDessert}
-                    validation={_require}
-                    label=""
-                    ariaLabel={"Số lượng món tráng miệng"}
-                    onChange={handleInputChange}
-                  ></CustomInput>
-                </div>
-                {/* MENU DESCRIPTION */}
-                <div className="flex flex-col">
-                  <h4 className="flex gap-3">
-                    <Image
-                      src={textSnippet}
-                      width={20}
-                      height={20}
-                      alt="icon"
-                    />
-                    Mô tả thực đơn
-                  </h4>
-                  <CustomInput
-                    name="description"
-                    value={formState.description}
-                    validation={_require}
-                    label=""
-                    ariaLabel={"Số lượng món khai vị"}
-                    multiLine={true}
-                    onChange={handleInputChange}
-                    placeholder="Ex: Thực đơn giành cho chú rể Nguyễn Văn A và cô dâu Trần Thị B"
-                  ></CustomInput>
-                </div>
-                <footer className="flex justify-end">
-                  <Button
-                    className="bg-teal-400 text-white font-semibold rounded-full"
-                    size="medium"
-                    color="primary"
-                    startContent={<SaveIcon width={20} height={20} />}
-                    onClick={handleSubmit}
-                  >
-                    Lưu
-                  </Button>
-                </footer>
-              </form>
-            </FormProvider>
-            {/* DISHES LIST */}
-            <Row gutter={[20, 20]}>
-              {dishCategories.map((category, index) => (
-                <Col span={24} key={index}>
-                  {/* HEADER */}
-                  <div className="flex justify-between items-center w-full p-3 rounded-xl bg-whiteAlpha-100">
-                    <div className="flex flex-col gap-1">
-                      <h4 className="text-lg leading-7 font-semibold text-white">
-                        {category.label} -{" "}
-                        {formState[`max${capitalize(category.key)}`]} món
-                      </h4>
-                      <p className="text-md leading-6 font-normal text-white">
-                        Tổng:{" "}
-                        {formatPrice(
-                          menuDishes[category.key]
-                            .filter((dish) => dish.category === category.key)
-                            .map((dish) => dish.price)
-                            .reduce((a, b) => a + b, 0)
-                        )}
-                      </p>
-                    </div>
-                    <Chip className="bg-whiteAlpha-100 text-white">
-                      {(() => {
-                        const maxDishes = Number(
-                          formState[`max${capitalize(category.key)}`]
-                        );
-                        const currentDishes = Number(
-                          menuDishes[category.key].length
-                        );
-                        const remainingDishes = maxDishes - currentDishes;
-                        return remainingDishes > 0
-                          ? `Còn ${remainingDishes}`
-                          : "Đã đủ";
-                      })()}
-                    </Chip>
+                Lưu
+              </Button>
+            </footer>
+          </form>
+          {/* DISHES LIST */}
+          <Row gutter={[20, 20]}>
+            {dishCategories.map((category, index) => (
+              <Col span={24} key={index}>
+                {/* HEADER */}
+                <div className="flex justify-between items-center w-full p-3 rounded-xl bg-whiteAlpha-100">
+                  <div className="flex flex-col gap-1">
+                    <h4 className="text-lg leading-7 font-semibold text-white">
+                      {category.label} -{" "}
+                      {getValues(`max${capitalize(category.key)}`)} món
+                    </h4>
+                    <p className="text-md leading-6 font-normal text-white">
+                      Tổng:{" "}
+                      {formatPrice(
+                        menuDishes[category.key]
+                          .filter((dish) => dish.category === category.key)
+                          .map((dish) => dish.price)
+                          .reduce((a, b) => a + b, 0)
+                      )}
+                    </p>
                   </div>
-                  {/* DISHES LIST */}
-                  {menuDishes[category.key].map((dish) => {
-                    if (dish.category === category.key) {
-                      return (
-                        <Dish
-                          key={dish.id}
-                          dish={dish}
-                          className={"mt-3 !h-fit !hover:brightness-95"}
-                        />
+                  <Chip className="bg-whiteAlpha-100 text-white">
+                    {(() => {
+                      const maxDishes = Number(
+                        getValues(`max${capitalize(category.key)}`)
                       );
-                    }
-                  })}
-                  <>
-                    <Button
-                      isIconOnly
-                      onClick={() => {
-                        router.push(
-                          pathname +
-                            "?" +
-                            createQueryString("dishesCategory", category.key)
-                        );
-                        onOpen();
-                      }}
-                      className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
-                      radius="full"
-                    >
-                      <PlusIcon className="w-5 h-5 text-white font-semibold" />
-                    </Button>
-                    <DishesModal
-                      category={dishCategory}
-                      isOpen={isOpen}
-                      onOpenChange={onOpenChange}
-                      onAddingDishes={handleAddingDishes}
-                      menuDishes={menuDishes}
-                      menuInfo={formState}
-                      selectedMenuDishes={selectedMenuDishes}
-                      setSelectedMenuDishes={setSelectedMenuDishes}
-                    />
-                  </>
-                </Col>
-              ))}
-            </Row>
-          </div>
-        </>
-      )}
+                      const currentDishes = Number(
+                        menuDishes[category.key].length
+                      );
+                      const remainingDishes = maxDishes - currentDishes;
+                      return remainingDishes > 0
+                        ? `Còn ${remainingDishes}`
+                        : "Đã đủ";
+                    })()}
+                  </Chip>
+                </div>
+                {/* DISHES LIST */}
+                {menuDishes[category.key].map((dish) => {
+                  if (dish.category === category.key) {
+                    return (
+                      <Dish
+                        key={dish.id}
+                        dish={dish}
+                        className={"mt-3 !h-fit !hover:brightness-95"}
+                      />
+                    );
+                  }
+                })}
+                <>
+                  <Button
+                    isIconOnly
+                    onClick={() => {
+                      router.push(
+                        pathname +
+                          "?" +
+                          createQueryString("dishesCategory", category.key)
+                      );
+                      onOpen();
+                    }}
+                    className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
+                    radius="full"
+                  >
+                    <PlusIcon className="w-5 h-5 text-white font-semibold" />
+                  </Button>
+                  <DishesModal
+                    category={dishCategory}
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                    onAddingDishes={handleAddingDishes}
+                    menuDishes={menuDishes}
+                    // menuInfo={formState}
+                    selectedMenuDishes={selectedMenuDishes}
+                    setSelectedMenuDishes={setSelectedMenuDishes}
+                  />
+                </>
+              </Col>
+            ))}
+          </Row>
+        </div>
+      </>
     </div>
   );
 }

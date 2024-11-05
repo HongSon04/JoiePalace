@@ -10,45 +10,9 @@ import useCustomToast from "@/app/_hooks/useCustomToast";
 import { decodeJwt } from "@/app/_utils/helpers";
 import Cookies from "js-cookie";
 import axios from "axios";
-import bronzeCrown from '@/public/bronzeCrown.svg'
-import silverCrown from '@/public/silverCrown.svg'
-import goldCrown from '@/public/goldCrown.svg'
-import platinum from '@/public/platinum.svg'
-import account_circle from '@/public/account_circle.svg'
+import { fetchAllBookingByUserId, fetchBookingById } from '@/app/_services/bookingServices';
+import rankMemberships from '@/app/_components/RankMemberships';
 
-
-const rankMemberships = [
-    {
-        id: 1,
-        title: "Khách",
-        condition: "100 000 000 000",
-        imageRank: account_circle
-    },
-    {
-        id: 2,
-        title: 'Đồng',
-        condition: '100 000 000 000',
-        imageRank: bronzeCrown
-    },
-    {
-        id: 3,
-        title: 'Bạc',
-        condition: '500 000 000 000',
-        imageRank: silverCrown
-    },
-    {
-        id: 4,
-        title: 'Vàng',
-        condition: '700 000 000 000',
-        imageRank: goldCrown
-    },
-    {
-        id: 5,
-        title: 'VIP',
-        condition: '1 000 000 000 000',
-        imageRank: platinum
-    },
-]
 
 // Define Zod schema
 export const formSchema = z.object({
@@ -79,6 +43,7 @@ const Page = () => {
     const [user, setUser] = useState();
     const toast = useCustomToast();
     const { makeAuthorizedRequest } = useApiServices();
+    const [rank, setRank] = useState([])
 
     const { register, handleSubmit, formState: { errors }, trigger, setValue } = useForm({
         resolver: zodResolver(formSchema),
@@ -96,7 +61,8 @@ const Page = () => {
                 API_CONFIG.USER.CHANGE_PROFILE,
                 "PATCH",
                 Newdata,
-                
+                null,
+                '/client/dang-nhap'
             );
 
             if (response?.success) {
@@ -143,16 +109,38 @@ const Page = () => {
                 router.push('/');
             }
             try {
-                if (getUser?.memberships_id) {
-                    const fetchedDataByMembershipId = await fetchDatabyMembershipId(getUser.memberships_id);
-                    setMembershipId(fetchedDataByMembershipId);
-                }
+                const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
+                const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
+                const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
+                    return total + item.booking_details[0].total_amount;
+                }, 0);
+                rankuser(total_amountUser)
             } catch (error) {
                 console.error('Chưa lấy được dữ liệu người dùng', error);
             }
         };
         getData();
     }, []);
+
+    const rankuser = (total_amount) => {
+        if (total_amount !== undefined && total_amount !== null) {
+            // Tìm hạng thành viên dựa trên total_amount
+            const foundRank = rankMemberships
+                .slice() 
+                .sort((a, b) => b.condition - a.condition) 
+                .find(member => total_amount >= member.condition); 
+
+            // Nếu tìm thấy hạng, cập nhật trạng thái rank
+            if (foundRank) {
+                setRank(foundRank);
+            } else {
+                setRank(rankMemberships[0]); 
+            }
+        } else {
+            setRank(null); 
+        }
+    };
+
 
     return (
         <div className='flex flex-col gap-[30px]'>
@@ -163,14 +151,14 @@ const Page = () => {
                     <div className='flex items-center gap-2'>
                         <div className="relative w-6 h-[14px]">
                             <Image
-                                src={goldCrown}
+                                src={rank?.imageRank}
                                 layout="fill"
                                 alt="rank-img"
                                 objectFit="cover"
                                 quality={100}
                             />
                         </div>
-                        <span className='text-xs text-white'>Đồng</span>
+                        <span className='text-xs text-white'>{rank?.title}</span>
                     </div>
                 </div>
             </div>
