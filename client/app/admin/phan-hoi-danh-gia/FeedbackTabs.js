@@ -472,6 +472,7 @@ function FeedbackTabs() {
             className="mt-8"
             variant={"unstyled"}
             onChange={handleTabChange}
+            position={"relative"}
           >
             <TabList width={"fit-content"} className="!w-full flex">
               {categories.map((c, i) => (
