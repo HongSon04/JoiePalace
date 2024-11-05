@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BookingStatus } from 'helper/enum/booking_status.enum';
 
 export class FilterBookingDto {
   @ApiProperty({
@@ -64,10 +63,10 @@ export class FilterBookingDto {
 
   @ApiProperty({
     required: false,
-    description: 'Trạng thái của đơn tiệc',
-    enum: BookingStatus,
+    description:
+      "Trạng thái của đơn tiệc ['pending', 'cancel', 'success', 'processing'] || 'pending' || 'cancel' || 'success' || 'processing'",
   })
-  status?: BookingStatus;
+  status?: string;
 
   @ApiProperty({
     required: false,
