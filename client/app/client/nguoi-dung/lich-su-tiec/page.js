@@ -121,7 +121,6 @@ const page = () => {
                     paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
                 };
             });
-            console.log(dataParty);
 
             setParties(dataParty);
         }

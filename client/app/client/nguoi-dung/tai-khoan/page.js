@@ -1,10 +1,54 @@
 'use client';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { API_CONFIG } from "@/app/_utils/api.config";
+import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import { decodeJwt } from "@/app/_utils/helpers";
+import Cookies from "js-cookie";
+import axios from "axios";
+import bronzeCrown from '@/public/bronzeCrown.svg'
+import silverCrown from '@/public/silverCrown.svg'
 import goldCrown from '@/public/goldCrown.svg'
+import platinum from '@/public/platinum.svg'
+import account_circle from '@/public/account_circle.svg'
+
+
+const rankMemberships = [
+    {
+        id: 1,
+        title: "Khách",
+        condition: "100 000 000 000",
+        imageRank: account_circle
+    },
+    {
+        id: 2,
+        title: 'Đồng',
+        condition: '100 000 000 000',
+        imageRank: bronzeCrown
+    },
+    {
+        id: 3,
+        title: 'Bạc',
+        condition: '500 000 000 000',
+        imageRank: silverCrown
+    },
+    {
+        id: 4,
+        title: 'Vàng',
+        condition: '700 000 000 000',
+        imageRank: goldCrown
+    },
+    {
+        id: 5,
+        title: 'VIP',
+        condition: '1 000 000 000 000',
+        imageRank: platinum
+    },
+]
 
 // Define Zod schema
 export const formSchema = z.object({
@@ -14,7 +58,7 @@ export const formSchema = z.object({
 });
 
 // InputField Component
-const InputField = ({ label, type, placeholder, name, register, error, trigger }) => (
+const InputField = ({ label, type, placeholder, name, register, error, trigger, readOnly }) => (
     <div className='flex flex-col gap-3'>
         <label className='text-base text-white'>{label}</label>
         <input
@@ -22,6 +66,7 @@ const InputField = ({ label, type, placeholder, name, register, error, trigger }
             placeholder={placeholder}
             className={`w-full px-3 py-4 rounded-md text-sm bg-whiteAlpha-100 placeholder:text-gray-400 focus:outline-none focus:border-gold focus:ring-gold focus:ring-1 transition-all ${error ? 'border-red-500' : ''}`}
             {...register(name)}
+            readOnly={readOnly}
             onBlur={() => trigger(name)}
         />
         {error && <p className="text-red-500 text-sm">{error.message}</p>}
@@ -29,14 +74,85 @@ const InputField = ({ label, type, placeholder, name, register, error, trigger }
 );
 
 const Page = () => {
-    const { register, handleSubmit, formState: { errors }, trigger } = useForm({
+
+    const [membershipId, setMembershipId] = useState();
+    const [user, setUser] = useState();
+    const toast = useCustomToast();
+    const { makeAuthorizedRequest } = useApiServices();
+
+    const { register, handleSubmit, formState: { errors }, trigger, setValue } = useForm({
         resolver: zodResolver(formSchema),
     });
 
-    // Handle form submission
-    const onSubmit = (data) => {
-        console.log('Form data:', data);
+    const onSubmit = async (data) => {
+        const Newdata = {
+            username: data.name,
+            phone: data.phone,
+            role: 'admin',
+        };
+
+        try {
+            const response = await makeAuthorizedRequest(
+                API_CONFIG.USER.CHANGE_PROFILE,
+                "PATCH",
+                Newdata,
+                
+            );
+
+            if (response?.success) {
+                toast({
+                    position: "top",
+                    type: "success",
+                    title: "Cập nhật thành công!",
+                    description: 'Tài khoản của bạn đã được cập nhật',
+                    closable: true,
+                });
+                const accessToken = Cookies.get("accessToken");
+                const response = await axios.get(API_CONFIG.USER.PROFILE, {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const user = (response.data.data)[0];
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify({ id: user.id, name: user.username, email: user.email, memberships: user.memberships, phone: user.phone, role: user.role })
+                );
+            } else {
+                toast({
+                    position: "top",
+                    type: "error",
+                    title: "Cập nhật thất bại!",
+                    description: response?.error?.message || "Vui lòng thử lại sau.",
+                    closable: true,
+                });
+            }
+        } catch (error) {
+            console.error("Error updating profile:", error);
+        }
     };
+
+    useEffect(() => {
+        const getData = async () => {
+            const getUser = JSON.parse(localStorage.getItem("user"));
+            if (getUser) {
+                setUser(getUser);
+                // Thiết lập giá trị cho các trường nhập liệu
+                setValue("name", getUser.name);
+                setValue("email", getUser.email);
+                setValue("phone", getUser.phone);
+            } else {
+                router.push('/');
+            }
+            try {
+                if (getUser?.memberships_id) {
+                    const fetchedDataByMembershipId = await fetchDatabyMembershipId(getUser.memberships_id);
+                    setMembershipId(fetchedDataByMembershipId);
+                }
+            } catch (error) {
+                console.error('Chưa lấy được dữ liệu người dùng', error);
+            }
+        };
+        getData();
+    }, []);
 
     return (
         <div className='flex flex-col gap-[30px]'>
@@ -65,7 +181,6 @@ const Page = () => {
                     <InputField
                         label="Tên đầy đủ"
                         type="text"
-                        placeholder="Hồ Duy Hoàng Giang"
                         name="name"
                         register={register}
                         error={errors.name}
@@ -76,18 +191,17 @@ const Page = () => {
                     <InputField
                         label="Email"
                         type="email"
-                        placeholder="hohoanggiang80@gmail.com"
                         name="email"
                         register={register}
                         error={errors.email}
                         trigger={trigger}
+                        readOnly={true}
                     />
 
                     {/* Phone field */}
                     <InputField
                         label="Số điện thoại"
                         type="text"
-                        placeholder="0337678852"
                         name="phone"
                         register={register}
                         error={errors.phone}
@@ -99,7 +213,7 @@ const Page = () => {
                             type="button"
                             className='flex items-center gap-[10px] px-4 py-[10px] bg-white text-black rounded-full text-sm'
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <svg xmlns="<http://www.w3.org/2000/svg>" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#4B5563" />
                             </svg>
                             Hủy
