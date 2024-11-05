@@ -64,7 +64,7 @@ const requestsSlice = createSlice({
     updatingRequest(state) {
       state.isUpdatingRequest = true;
     },
-    updatingRequestSuccess(state) {
+    updatingRequestSuccess(state, action) {
       state.isUpdatingRequest = false;
       state.isUpdatingRequestError = false;
     },
@@ -126,7 +126,7 @@ export const fetchRequests = createAsyncThunk(
       { signal }
     );
 
-    console.log("response from fetchRequests thunk -> ", response);
+    // console.log("response from fetchRequests thunk -> ", response);
     if (response.success) {
       dispatch(fetchingRequestsSuccess(response));
       return response; // Return the response for further use
@@ -149,6 +149,8 @@ export const updateRequestStatus = createAsyncThunk(
         "PATCH",
         requestData
       );
+
+      console.log(response);
 
       if (response.success) {
         dispatch(updatingRequestSuccess(response));

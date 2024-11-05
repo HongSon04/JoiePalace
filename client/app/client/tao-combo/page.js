@@ -18,6 +18,7 @@ import { z } from "zod";
 import pattern from "@/public/line-group.svg";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 
 const partySizes = [
   {
@@ -75,10 +76,21 @@ function Page() {
   const [partySize, setPartySize] = React.useState("");
   const [budget, setBudget] = React.useState("");
   const [partyType, setPartyType] = React.useState("");
-
   const { partyTypes, isFetchingPartyTypes, isFetchingPartyTypesError } =
     useSelector((store) => store.partyTypes);
   const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleNext = () => {
+    router.push({
+      pathname: "/tao-combo/#tao",
+      query: {
+        partyType,
+        partySize,
+        budget,
+      },
+    });
+  };
 
   const {
     register,

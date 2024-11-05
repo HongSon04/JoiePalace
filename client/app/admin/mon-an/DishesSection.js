@@ -35,18 +35,55 @@ import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import Loading from "../loading";
 
+// Define a schema for individual file validation
+const fileSchema = z
+  .instanceof(File)
+  .refine((file) => file.size <= 5 * 1024 * 1024, {
+    message: "Kích thước ảnh không được vượt quá 5MB",
+  })
+  .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+    message: "Chỉ chấp nhận ảnh định dạng JPEG hoặc PNG",
+  });
+
 const schema = z.object({
-  name: z.string().nonempty("Tên món không được để trống"),
+  name: z
+    .string({
+      required_error: "Tên món ăn không được để trống",
+    })
+    .min(1, { message: "Tên món không được để trống" }),
   price: z.union([
-    z.string().nonempty("Giá món không được để trống"),
-    z.number().min(1, "Giá món không được để trống"),
+    z
+      .string({
+        required_error: "Giá món ăn không được để trống",
+      })
+      .min(1, { message: "Giá món không được để trống" }),
+    z.number().min(1, { message: "Giá món không được để trống" }),
   ]),
   category: z.union([
-    z.string().nonempty("Danh mục món không được để trống"),
-    z.number().min(1, "Danh mục món không được để trống"),
+    z
+      .string({
+        required_error: "Danh mục không được để trống",
+      })
+      .min(1, { message: "Danh mục món không được để trống" }),
+    z
+      .number({
+        required_error: "Danh mục không được để trống",
+      })
+      .min(1, { message: "Danh mục món không được để trống" }),
   ]),
-  short_description: z.string().nonempty("Mô tả ngắn không được để trống"),
-  description: z.string().nonempty("Mô tả chi tiết không được để trống"),
+  short_description: z
+    .string({
+      required_error: "Mô tả ngắn không được để trống",
+    })
+    .min(1, { message: "Mô tả ngắn không được để trống" }),
+  description: z
+    .string({
+      required_error: "Mô tả chi tiết không được để trống",
+    })
+    .min(1, { message: "Mô tả chi tiết không được để trống" }),
+  images: z.array(fileSchema).refine((files) => files.length > 0, {
+    message: "Vui lòng chọn ít nhất một ảnh",
+  }),
 });
 
 function DishesSection({ dishCategory, categories }) {
@@ -258,7 +295,7 @@ function DishesSection({ dishCategory, categories }) {
             <select
               name="perPage"
               id="perPage"
-              className="select dark:bg-gray-800 dark:text-white h-fit"
+              className="select light:bg-gray-800 light:text-white h-fit"
               onChange={handleItemsPerPageChange}
               value={itemsPerPage}
             >
@@ -355,7 +392,10 @@ function DishesSection({ dishCategory, categories }) {
                         dispatch(setSelectedDish(dish));
                         openDetailModal(dish); // Pass the dish to openDetailModal
                       }}
-                      onContextMenu={() => handleDeleteDish(dish.id)}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        handleDeleteDish(dish.id);
+                      }}
                       className={"flex-1 min-w-0"}
                     ></Dish>
                   </div>
@@ -413,6 +453,13 @@ function DishesSection({ dishCategory, categories }) {
                                 onFileChange={handleFileChange}
                                 files={files}
                                 setFiles={setFiles}
+                                id={"images"}
+                                name={"images"}
+                                placeholder={
+                                  "Chọn ảnh món ăn hoặc kéo thả vào đây"
+                                }
+                                register={register}
+                                errors={errors}
                               />
                               {selectedDish && (
                                 <Image
@@ -430,7 +477,9 @@ function DishesSection({ dishCategory, categories }) {
                             </Col>
                             <Col span={12}>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"name"}
                                 name={"name"} // Must have: because you have to using it to register the input
                                 label={"Tên món"} // If empty: label won't show
@@ -445,7 +494,9 @@ function DishesSection({ dishCategory, categories }) {
                                 onChange={onInputChange}
                               ></FormInput>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"price"}
                                 name={"price"} // Must have: because you have to using it to register the input
                                 label={"Giá món"} // If empty: label won't show
@@ -460,7 +511,9 @@ function DishesSection({ dishCategory, categories }) {
                               ></FormInput>
                               <FormInput
                                 type="select"
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"category"}
                                 name={"category"} // Must have: because you have to using it to register the input
                                 label={"Danh mục món ăn"} // If empty: label won't show
@@ -481,7 +534,9 @@ function DishesSection({ dishCategory, categories }) {
                                 onChange={onInputChange}
                               ></FormInput>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"short_description"}
                                 name={"short_description"} // Must have: because you have to using it to register the input
                                 label={"Mô tả ngắn"} // If empty: label won't show
@@ -498,7 +553,9 @@ function DishesSection({ dishCategory, categories }) {
                                 onChange={onInputChange}
                               ></FormInput>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"description"}
                                 name={"description"} // Must have: because you have to using it to register the input
                                 label={"Mô tả chi tiết"} // If empty: label won't show

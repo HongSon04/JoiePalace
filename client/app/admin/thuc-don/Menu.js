@@ -51,6 +51,9 @@ function Menu({ menu }) {
             })}
           </div>
         </div>
+        <div className="p-3 rounded-lg bg-whiteAlpha-200 text-white text-base">
+          <h3 className="font-semibold">{menu.name}</h3>
+        </div>
       </Link>
     </div>
   );
