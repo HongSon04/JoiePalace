@@ -2,8 +2,11 @@
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
 import Footer from "@/app/_components/FooterClient";
 import IconButton from "@/app/_components/IconButton";
+import { API_CONFIG } from "@/app/_utils/api.config";
 import { Image } from "@chakra-ui/react";
-import React, { useState } from "react";
+import axios from "axios";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 const listSpaces = [
   {
@@ -34,7 +37,16 @@ const listSpaces = [
 ];
 
 const Page = () => {
-  const params = use
+  const { slug } = useParams();
+  console.log(API_CONFIG.PACKAGES.GET_ALL);
+
+  useEffect(() => {
+    const fecthData = async () => {
+      // const data = await axios.get(API_CONFIG.PACKAGES.GET_ALL);
+      // console.log(data.data);
+    };
+    fecthData();
+  }, []);
 
   const [optionIndex, setOptionIndex] = useState(0);
   const [spaceIndex, setSpaceIndex] = useState(0);
