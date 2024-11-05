@@ -210,6 +210,12 @@ export class BookingsController {
   @ApiQuery({ name: 'deposit_id', required: false, description: '1' })
   @ApiQuery({ name: 'deleted', required: false, description: 'true | false' })
   @ApiQuery({
+    name: 'status',
+    required: false,
+    description:
+      '["pending", "processing", "success", "cancel"] || pending || processing || success || cancel',
+  })
+  @ApiQuery({
     name: 'is_confirm',
     required: false,
     description: 'true | false',
@@ -218,11 +224,6 @@ export class BookingsController {
     name: 'is_deposit',
     required: false,
     description: 'true | false',
-  })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    description: 'pending | processing | success | cancel',
   })
   findAll(@Query() query: FilterBookingDto) {
     return this.bookingsService.findAll(query);
