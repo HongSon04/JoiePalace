@@ -16,6 +16,7 @@ const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
+const PACKAGES = `${HOST}/packages`;
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
@@ -100,17 +101,26 @@ export const API_CONFIG = {
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
     // GET_ALL_BRANCH: `${HOST}/branches/get-all`,
     GET_ALL_BOOKING: `${HOST}/bookings/get-all`,
-    GET_INFO_BY_MONTH: (id) => `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_BOOKING_STATUS: (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_BOOKING_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS: (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_INFO_BY_MONTH: (id) =>
+      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
+    GET_BOOKING_STATUS: (id) =>
+      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+    GET_BOOKING_BRANCH: (id) =>
+      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_BOOKING_STATUS: (id) =>
+      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
 
-    GET_ALL_INFO_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`, 
-    GET_BOOKING_STATUS: (id) =>`${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    
+    GET_ALL_INFO_BRANCH: (id) =>
+      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_BOOKING_STATUS: (id) =>
+      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
+
     GET_INFO_BY_MONTH: (id) =>
       `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
     GET_BOOKING_STATUS: (id) =>
@@ -225,16 +235,23 @@ export const API_CONFIG = {
     GET_ALL: `${MEMBERSHIPS}/get-all`,
     GET_ALL_DELETED: `${MEMBERSHIPS}/get-all-deleted`,
     GET_BY_ID: (membershipId) => `${MEMBERSHIPS}/get/${membershipId}`,
-    GET_BY_SLUG: (membershipSlug) => `${MEMBERSHIPS}/get-by-slug/${membershipSlug}`,
+    GET_BY_SLUG: (membershipSlug) =>
+      `${MEMBERSHIPS}/get-by-slug/${membershipSlug}`,
     UPDATE: (membershipId) => `${MEMBERSHIPS}/update/${membershipId}`,
     DELETE: (membershipId) => `${MEMBERSHIPS}/delete/${membershipId}`,
     RESTORE: (membershipId) => `${MEMBERSHIPS}/restore/${membershipId}`,
-    HARD_DELETE: (membershipId) => `${MEMBERSHIPS}/hard-delete/${membershipId}`
+    HARD_DELETE: (membershipId) => `${MEMBERSHIPS}/hard-delete/${membershipId}`,
   },
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
     // Add endpoints here if needed
+  },
+
+  // PACKAGES API
+
+  PACKAGES: {
+    GET_ALL: `${PACKAGES}/get-all`,
   },
 
   // MENU API

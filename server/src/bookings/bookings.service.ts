@@ -203,7 +203,6 @@ export class BookingsService {
             },
           }),
       };
-      console.log('whereConditions: ', whereConditions);
 
       // Add search conditions if search exists
       if (query.search) {
@@ -225,7 +224,20 @@ export class BookingsService {
       }
 
       if (query.status) {
-        whereConditions.status = query.status;
+        let statusArray: string[];
+
+        // Nếu status là string và có dạng array string (bắt đầu bằng '[')
+        if (typeof query.status === 'string' && query.status.startsWith('[')) {
+          statusArray = JSON.parse(query.status);
+        } else {
+          // Nếu là single value
+          statusArray = [query.status as string];
+        }
+
+        // Thêm vào where condition
+        whereConditions.status = {
+          in: statusArray,
+        };
       }
 
       // Add numeric ID filters with type checking

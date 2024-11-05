@@ -12,7 +12,6 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -21,7 +20,7 @@ import {
   TableRow,
   User,
 } from "@nextui-org/react";
-import { format, formatDate } from "date-fns";
+import { format } from "date-fns";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
@@ -30,19 +29,15 @@ import { useDispatch, useSelector } from "react-redux";
 import useApiServices from "../_hooks/useApiServices";
 import useCustomToast from "../_hooks/useCustomToast";
 import {
-  fetchingRequestFailure,
-  fetchingRequestsFailure,
   fetchRequests,
   updateRequestStatus,
-  updatingRequestSuccess,
 } from "../_lib/features/requests/requestsSlice";
 import { CONFIG } from "../_utils/config";
 import { capitalize } from "../_utils/helpers";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import CustomPagination from "./CustomPagination";
-import SearchForm from "./SearchForm";
-import Loading from "../loading";
 import LoadingContent from "./LoadingContent";
+import SearchForm from "./SearchForm";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
@@ -69,9 +64,9 @@ const columns = [
 ];
 
 function RequestTable() {
+  const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const {
     requests,
     pagination,
@@ -83,9 +78,7 @@ function RequestTable() {
   } = useSelector((store) => store.requests);
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
-  const [currentPage, setCurrentPage] = React.useState(
-    searchParams.get("page") || 1
-  );
+  const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
   const [date, setDate] = React.useState({
     start: parseDate(
@@ -96,17 +89,9 @@ function RequestTable() {
     ),
   });
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [requestStatus, setRequestStatus] = React.useState("pending");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
-
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const onSearchChange = React.useCallback((e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-  }, []);
 
   // Function to convert the custom date object to a standard Date object
   const toStandardDate = (customDate) => {
@@ -117,26 +102,27 @@ function RequestTable() {
   const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
   const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
 
+  const onStatusChange = (e) => {
+    const status = e.target.value;
+    setRequestStatus(status);
+  };
+
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const onSearchChange = React.useCallback((e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+  }, []);
+
   React.useEffect(() => {
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-    if (!currentBranch) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
-        type: "error",
-      });
-
-      router.push("/auth/chon-chi-nhanh");
-    }
-
     const params = {
       is_confirm: false,
       is_deposit: false,
-      status: "pending",
+      status: requestStatus,
       page: currentPage,
       itemsPerPage,
-      branch_id: currentBranch.id,
       startDate: formattedStartDate,
       endDate: formattedEndDate,
     };
@@ -144,31 +130,25 @@ function RequestTable() {
     dispatch(fetchRequests({ params }));
 
     return () => {};
-  }, [currentPage, itemsPerPage]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    requestStatus,
+    formattedEndDate,
+    formattedStartDate,
+    router,
+  ]);
 
   React.useEffect(() => {
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-    if (!currentBranch) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
-        type: "error",
-      });
-
-      router.push("/auth/chon-chi-nhanh");
-    }
-
     const controller = new AbortController();
 
     const params = {
       is_confirm: false,
       is_deposit: false,
-      status: "pending",
+      status: requestStatus,
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
-      branch_id: currentBranch.id,
       startDate: formattedStartDate,
       endDate: formattedEndDate,
     };
@@ -178,12 +158,20 @@ function RequestTable() {
     return () => {
       controller.abort();
     };
-  }, [currentPage, itemsPerPage, date, searchQuery]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    searchQuery,
+    requestStatus,
+    formattedEndDate,
+    formattedStartDate,
+    router,
+  ]);
 
   const handleUpdateStatus = React.useCallback(
     async (id) => {
       const confirm = window.confirm(
-        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id}?`
+        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Đang xử lý"?`
       );
 
       if (!confirm) return;
@@ -202,21 +190,126 @@ function RequestTable() {
 
         if (data.success) {
           toast({
-            title: "Cập nhật trạng thái thành công",
-            description: "Yêu cầu đã được xử lý",
+            title: "Cập nhật thành công",
+            description: `Yêu cầu đã được cập nhật trạng thái "Đang xử lý"`,
             type: "success",
           });
+
+          const params = {
+            is_confirm: false,
+            is_deposit: false,
+            status: requestStatus,
+            page: currentPage,
+            itemsPerPage,
+            search: searchQuery,
+            startDate: formattedStartDate,
+            endDate: formattedEndDate,
+          };
+          // Fetch the requests again to update the state
+          dispatch(fetchRequests({ params }));
         } else {
-          toast({
-            title: "Cập nhật trạng thái thất bại",
-            description: "Yêu cầu chưa được cập nhật",
-            type: "error",
-          });
+          const { statusCode, message } = data?.error;
+
+          if (statusCode == 401) {
+            toast({
+              title: "Phiên đăng nhập đã hết hạn",
+              description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
+              type: "error",
+            });
+          } else {
+            toast({
+              title: "Cập nhật thất bại",
+              description: message || "Yêu cầu chưa được cập nhật trạng thái",
+              type: "error",
+            });
+          }
         }
       }
     },
-    [dispatch, makeAuthorizedRequest, fetchRequests, toast]
+    [
+      date,
+      formattedEndDate,
+      formattedStartDate,
+      requestStatus,
+      searchQuery,
+      itemsPerPage,
+      currentPage,
+    ]
   );
+
+  const handleCancelRequest = React.useCallback(
+    async (id) => {
+      const confirm = window.confirm(
+        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Hủy"?`
+      );
+
+      if (!confirm) return;
+
+      if (confirm) {
+        const data = await dispatch(
+          updateRequestStatus({
+            requestId: id,
+            requestData: {
+              is_deposit: false,
+              is_confirm: false,
+              status: "cancel",
+            },
+          })
+        ).unwrap();
+
+        if (data.success) {
+          toast({
+            title: "Cập nhật thành công",
+            description: `Yêu cầu đã được cập nhật trạng thái "Hủy"`,
+            type: "success",
+          });
+
+          const params = {
+            is_confirm: false,
+            is_deposit: false,
+            status: requestStatus,
+            page: currentPage,
+            itemsPerPage,
+            search: searchQuery,
+            startDate: formattedStartDate,
+            endDate: formattedEndDate,
+          };
+          // Fetch the requests again to update the state
+          dispatch(
+            fetchRequests({
+              params,
+            })
+          );
+        } else {
+          const { statusCode, message } = data?.error;
+
+          if (statusCode == 401) {
+            toast({
+              title: "Phiên đăng nhập đã hết hạn",
+              description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
+              type: "error",
+            });
+          } else {
+            toast({
+              title: "Cập nhật thất bại",
+              description: message || "Yêu cầu chưa được cập nhật trạng thái",
+              type: "error",
+            });
+          }
+        }
+      }
+    },
+    [
+      date,
+      formattedEndDate,
+      formattedStartDate,
+      requestStatus,
+      searchQuery,
+      itemsPerPage,
+      currentPage,
+    ]
+  );
+
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -276,24 +369,40 @@ function RequestTable() {
             </User>
           );
         case "status":
-          return (
-            // <select
-            //   name="status"
-            //   value={cellValue}
-            //   className="select relative z-50"
-            //   onClick={(e) => e.stopPropagation()}
-            //   onMouseDown={(e) => e.stopPropagation()}
-            // >
-            //   {CONFIG.BOOKING_STATUS.map((status) => (
-            //     <option value={status.key} key={status.key} className="option">
-            //       {status.label}
-            //     </option>
-            //   ))}
-            // </select>
-            <Chip variant="flat" color="warning">
-              Chưa xử lý
-            </Chip>
-          );
+          // <select
+          //   name="status"
+          //   value={cellValue}
+          //   className="select relative z-50"
+          //   onClick={(e) => e.stopPropagation()}
+          //   onMouseDown={(e) => e.stopPropagation()}
+          // >
+          //   {CONFIG.BOOKING_STATUS.map((status) => (
+          //     <option value={status.key} key={status.key} className="option">
+          //       {status.label}
+          //     </option>
+          //   ))}
+          // </select>
+          switch (cellValue) {
+            case "pending":
+              return (
+                <Chip variant="flat" color="warning">
+                  Chưa xử lý
+                </Chip>
+              );
+
+            case "processing":
+              return (
+                <Chip variant="flat" color="primary">
+                  Đang xử lý
+                </Chip>
+              );
+            case "cancel":
+              return (
+                <Chip variant="flat" color="danger">
+                  Đã hủy
+                </Chip>
+              );
+          }
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
@@ -307,8 +416,21 @@ function RequestTable() {
                   <DropdownItem>
                     <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
                   </DropdownItem>
-                  <DropdownItem onClick={() => handleUpdateStatus(item.id)}>
-                    Cập nhật trạng thái
+                  <DropdownItem
+                    onClick={() => handleUpdateStatus(item.id)}
+                    className={`${
+                      item.status === "processing" ? "hidden" : ""
+                    }`}
+                  >
+                    {`Cập nhật trạng thái "Đang xử lý"`}
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleCancelRequest(item.id)}
+                    className={`text-red-400 ${
+                      item.status === "cancel" ? "hidden" : ""
+                    }`}
+                  >
+                    {`Cập nhật trạng thái "Hủy"`}
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -358,6 +480,7 @@ function RequestTable() {
                 <Button
                   endContent={<ChevronDownIcon className="text-small" />}
                   className="text-gray-200 bg-whiteAlpha-100"
+                  radius="full"
                 >
                   Hiển thị
                 </Button>
@@ -377,6 +500,21 @@ function RequestTable() {
                 ))}
               </DropdownMenu>
             </Dropdown>
+            <select
+              className="select rounded-full"
+              onChange={onStatusChange}
+              value={requestStatus}
+            >
+              {CONFIG.BOOKING_STATUS.map((item) => {
+                if (item.key === "success") return;
+
+                return (
+                  <option key={item.key} value={item.key} className="option">
+                    {item.label}
+                  </option>
+                );
+              })}
+            </select>
             <div className="flex-1 justify-end flex">
               <DateRangePicker
                 value={date}
@@ -384,7 +522,7 @@ function RequestTable() {
                 className="w-fit"
                 aria-label="Date Range Picker"
                 classNames={{
-                  inputWrapper: "!bg-whiteAlpha-100",
+                  inputWrapper: "!bg-whiteAlpha-100 rounded-full",
                   "start-input": "text-white *:text-white",
                   "end-input": "text-white *:text-white",
                   innerWrapper:
@@ -416,7 +554,14 @@ function RequestTable() {
         )}
       </div>
     );
-  }, [visibleColumns, isShowTips, itemsPerPage, searchQuery, date]);
+  }, [
+    visibleColumns,
+    isShowTips,
+    itemsPerPage,
+    searchQuery,
+    date,
+    requestStatus,
+  ]);
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -477,13 +622,23 @@ function RequestTable() {
         )}
       </TableHeader>
       <TableBody
-        emptyContent={isFetchingRequestsError ? error : "No requests found"}
+        emptyContent={
+          isFetchingRequestsError ? error : "Không tìm thấy yêu cầu"
+        }
         items={sortedItems}
         isLoading={isFetchingRequests || isUpdatingRequest}
         loadingContent={<LoadingContent />}
       >
         {(item) => (
-          <TableRow key={item.id}>
+          <TableRow
+            key={item.id}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              if (item.status === "cancel") return;
+
+              handleCancelRequest(item.id);
+            }}
+          >
             {(columnKey) => (
               <TableCell className="py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
                 {renderCell(item, columnKey)}

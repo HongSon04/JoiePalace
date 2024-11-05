@@ -10,6 +10,8 @@ import Cookies from "js-cookie";
 import { loginAccountUser } from "@/app/_services/accountServices";
 import { decodeJwt } from "@/app/_utils/helpers";
 import useApiServices from "@/app/_hooks/useApiServices";
+import { login } from "@/app/_lib/features/authentication/accountSlice";
+import { useDispatch } from "react-redux";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -23,7 +25,8 @@ const Page = () => {
   const toast = useCustomToast();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const { tryCatchWrapper } = useApiServices();
+  const { tryCatchWrapper, makeAuthorizedRequest } = useApiServices();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     email: "",

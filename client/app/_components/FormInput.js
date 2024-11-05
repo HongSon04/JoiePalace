@@ -75,15 +75,15 @@ function FormInput({
         startContent || endContent
           ? "bg-transparent"
           : "bg-gray-100 hover:bg-gray-200 focus:bg-gray-200"
-      } !text-white !placeholder:text-gray-400`,
-      label: "!text-white",
+      } text-white placeholder:text-gray-400`,
+      label: "text-white",
     },
     dark: {
       input: `${
         startContent || endContent
           ? "bg-transparent"
           : "bg-whiteAlpha-400 hover:bg-whiteAlpha-500 focus:bg-whiteAlpha-500"
-      } !text-white !placeholder:text-gray-400`,
+      } text-white placeholder:text-gray-400`,
       label: "text-white",
     },
   }[theme];
@@ -173,7 +173,7 @@ function FormInput({
             id={id}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 outline-none border-none text-white placeholder:text-gray-400 w-full flex-1 ${className} ${themeClassName.input}`}
+            className={`px-3 py-2 outline-none border-none text-white placeholder:text-gray-400 w-full flex-1 ${className}`}
             readOnly={readOnly}
           />
         )}
