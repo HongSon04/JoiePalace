@@ -66,9 +66,9 @@ const Page = () => {
         user = decodeJwt(result.data.access_token);
         localStorage.setItem(
           "user",
-          JSON.stringify({ id: user.id, name: user.username, role: user.role })
+          JSON.stringify({ id: user.id, name: user.username, email: user.email, memberships: user.memberships, phone: user.phone, role: user.role })
         );
-      }
+      } 
       toast({
         position: "top",
         type: result.success === false ? "error" : "success",

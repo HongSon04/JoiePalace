@@ -1,10 +1,10 @@
 // app/components/ImageUpload.js
 "use client"; // This is a client component
 
-import Image from "next/image";
-import { useState, useCallback } from "react";
-import { CONFIG } from "../_utils/config";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import React, { useCallback } from "react";
+import { CONFIG } from "../_utils/config";
 
 /**
  * USAGE: 
@@ -22,10 +22,14 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
  */
 
 const Uploader = ({ onFileChange, files, setFiles }) => {
+  const fileInputRef = React.createRef();
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
-    onFileChange(selectedFiles); // Notify parent component of the new files
+    onFileChange(selectedFiles);
+
+    // console.log("Files change from uploader", selectedFiles);
   };
 
   const handleUnsetFiles = () => {
@@ -47,7 +51,7 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
       setFiles(droppedFiles);
       onFileChange(droppedFiles); // Notify parent component of the dropped files
     },
-    [onFileChange]
+    [onFileChange, setFiles]
   );
 
   // Utility function to format file size
@@ -81,20 +85,21 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
           height={200}
         ></Image>
         <p className="text-base text-gray-400">
-          Kéo và thả ảnh của bạn tại đây, hoặc bấm vào nút chọn ảnh
+          Kéo và thả ảnh của bạn tại đây, <br /> hoặc bấm vào nút chọn ảnh
         </p>
         <input
           type="file"
           accept="image/*"
           multiple
           onChange={handleFileChange}
+          ref={fileInputRef}
           style={{ display: "none" }} // Hide the default file input
           // Register the file input with React Hook Form if needed
         />
         <button
           type="button"
           className="underline text-gold"
-          onClick={() => document.querySelector('input[type="file"]').click()}
+          onClick={() => fileInputRef.current.click()}
         >
           Chọn ảnh{" "}
         </button>
@@ -114,9 +119,8 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
-                <span>
-                  {file.name} ({formatFileSize(file.size)})
-                </span>{" "}
+                <div className="truncate w-full">{file.name}</div>
+                <div className="min-w-max">({formatFileSize(file.size)})</div>
               </li>
             ))}
           </ul>
@@ -124,7 +128,7 @@ const Uploader = ({ onFileChange, files, setFiles }) => {
             onClick={handleUnsetFiles}
             className="text-red-400 underline hover:text-red-500 mt-3"
           >
-            Delete all
+            Xóa tất cả
           </button>
         </div>
       )}

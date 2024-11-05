@@ -11,13 +11,16 @@ const useBranchAccess = (branchSlug) => {
 
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    const storedBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-    if (storedBranch) {
-      dispatch(getCurrentBranch(storedBranch));
+  if (!currentBranch) {
+    if (typeof window !== undefined) {
+      const storedBranch = localStorage.getItem("currentBranch");
+      if (storedBranch) {
+        dispatch(getCurrentBranch(JSON.parse(storedBranch)));
+      } else {
+        dispatch(getCurrentBranch(API_CONFIG.GENERAL_BRANCH));
+      }
     }
-  }, []);
+  }
 
   React.useEffect(() => {
     if (currentBranch) {
@@ -42,7 +45,7 @@ const useBranchAccess = (branchSlug) => {
         }
       }
     }
-  }, [branchSlug]);
+  }, [branchSlug, currentBranch]);
 
   return { canAccess, retryUrl };
 };

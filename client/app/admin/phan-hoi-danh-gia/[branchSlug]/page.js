@@ -13,7 +13,7 @@ function Page() {
     <div>
       <AdminHeader title="Phản hồi & đánh giá" />
       <FeedbackBreadcrumbs />
-      <FeedbackTabs />
+      <FeedbackTabs />  
     </div>
   );
 }

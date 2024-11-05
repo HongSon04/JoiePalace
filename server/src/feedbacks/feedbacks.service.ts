@@ -75,7 +75,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -108,7 +108,6 @@ export class FeedbacksService {
           : {};
 
       const whereConditions: any = {
-        is_show: true,
         ...sortRangeDate,
         ...(search && {
           OR: [
@@ -157,7 +156,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->findAllShow', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -225,7 +224,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -266,7 +265,7 @@ export class FeedbacksService {
       console.log('Lỗi từ feedbacks.service.ts->remove', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

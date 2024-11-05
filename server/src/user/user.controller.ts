@@ -30,6 +30,7 @@ import { ChangePasswordUserDto } from './dto/change-password-user.dto';
 import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @ApiTags('User - Quản lý người dùng')
 @Controller('api/user')
@@ -127,18 +128,26 @@ export class UserController {
     status: HttpStatus.OK,
     example: {
       data: {
-        id: 'number',
-        email: 'string',
-        username: 'string',
-        platform: 'string',
-        avatar: 'string',
-        phone: 'string',
-        role: 'string',
-        active: 'boolean',
-        verify_at: 'date',
-        created_at: 'string',
-        updated_at: 'string',
-        membership_id: 'number',
+        id: 14,
+        branch_id: null,
+        username: 'Võ Hồng Sơn',
+        email: 'vohongson8525@gmail.com',
+        platform: null,
+        phone: '12321312312',
+        avatar: null,
+        role: 'user',
+        active: true,
+        verify_at: null,
+        created_at: '2024-10-24T09:00:36.091Z',
+        updated_at: '2024-11-04T05:12:51.485Z',
+        memberships_id: null,
+        memberships: null,
+        totalAmount: 0,
+        totalBookingPending: 2034,
+        totalBookingSuccess: 0,
+        totalBookingCancel: 414,
+        totalBookingProcess: 1,
+        totalDepositAmount: 0,
       },
     },
   })
@@ -177,21 +186,26 @@ export class UserController {
     example: {
       data: [
         {
-          id: 'number',
-          email: 'string',
-          username: 'string',
-          platform: 'string',
-          avatar: 'string',
-          role: 'string',
-          phone: 'string',
-          active: 'boolean',
-          verify_at: 'date',
-          deleted: 'boolean',
-          deleted_at: 'date',
-          deleted_by: 'number',
-          created_at: 'string',
-          updated_at: 'string',
-          membership_id: 'number',
+          id: 14,
+          branch_id: null,
+          username: 'Võ Hồng Sơn',
+          email: 'vohongson8525@gmail.com',
+          platform: null,
+          phone: '12321312312',
+          avatar: null,
+          role: 'user',
+          active: true,
+          verify_at: null,
+          created_at: '2024-10-24T09:00:36.091Z',
+          updated_at: '2024-11-04T05:12:51.485Z',
+          memberships_id: null,
+          memberships: null,
+          totalAmount: 0,
+          totalBookingPending: 2034,
+          totalBookingSuccess: 0,
+          totalBookingCancel: 414,
+          totalBookingProcess: 1,
+          totalDepositAmount: 0,
         },
       ],
       pagination: {
@@ -235,21 +249,26 @@ export class UserController {
     example: {
       data: [
         {
-          id: 'number',
-          email: 'string',
-          username: 'string',
-          platform: 'string',
-          avatar: 'string',
-          role: 'string',
-          phone: 'string',
-          active: 'boolean',
-          verify_at: 'date',
-          deleted: 'boolean',
-          deleted_at: 'date',
-          deleted_by: 'number',
-          created_at: 'string',
-          updated_at: 'string',
-          membership_id: 'number',
+          id: 14,
+          branch_id: null,
+          username: 'Võ Hồng Sơn',
+          email: 'vohongson8525@gmail.com',
+          platform: null,
+          phone: '12321312312',
+          avatar: null,
+          role: 'user',
+          active: true,
+          verify_at: null,
+          created_at: '2024-10-24T09:00:36.091Z',
+          updated_at: '2024-11-04T05:12:51.485Z',
+          memberships_id: null,
+          memberships: null,
+          totalAmount: 0,
+          totalBookingPending: 2034,
+          totalBookingSuccess: 0,
+          totalBookingCancel: 414,
+          totalBookingProcess: 1,
+          totalDepositAmount: 0,
         },
       ],
       pagination: {
@@ -298,21 +317,26 @@ export class UserController {
     example: {
       data: [
         {
-          id: 'number',
-          email: 'string',
-          username: 'string',
-          platform: 'string',
-          avatar: 'string',
-          role: 'string',
-          phone: 'string',
-          active: 'boolean',
-          verify_at: 'date',
-          deleted: 'boolean',
-          deleted_at: 'date',
-          deleted_by: 'number',
-          created_at: 'string',
-          updated_at: 'string',
-          membership_id: 'number',
+          id: 14,
+          branch_id: null,
+          username: 'Võ Hồng Sơn',
+          email: 'vohongson8525@gmail.com',
+          platform: null,
+          phone: '12321312312',
+          avatar: null,
+          role: 'user',
+          active: true,
+          verify_at: null,
+          created_at: '2024-10-24T09:00:36.091Z',
+          updated_at: '2024-11-04T05:12:51.485Z',
+          memberships_id: null,
+          memberships: null,
+          totalAmount: 0,
+          totalBookingPending: 2034,
+          totalBookingSuccess: 0,
+          totalBookingCancel: 414,
+          totalBookingProcess: 1,
+          totalDepositAmount: 0,
         },
       ],
       pagination: {
@@ -361,18 +385,26 @@ export class UserController {
     status: HttpStatus.OK,
     example: {
       data: {
-        id: 'number',
-        email: 'string',
-        username: 'string',
-        platform: 'string',
-        avatar: 'string',
-        role: 'string',
-        phone: 'string',
-        active: 'boolean',
-        verify_at: 'date',
-        created_at: 'string',
-        updated_at: 'string',
-        membership_id: 'number',
+        id: 14,
+        branch_id: null,
+        username: 'Võ Hồng Sơn',
+        email: 'vohongson8525@gmail.com',
+        platform: null,
+        phone: '12321312312',
+        avatar: null,
+        role: 'user',
+        active: true,
+        verify_at: null,
+        created_at: '2024-10-24T09:00:36.091Z',
+        updated_at: '2024-11-04T05:12:51.485Z',
+        memberships_id: null,
+        memberships: null,
+        totalAmount: 0,
+        totalBookingPending: 2034,
+        totalBookingSuccess: 0,
+        totalBookingCancel: 414,
+        totalBookingProcess: 1,
+        totalDepositAmount: 0,
       },
     },
   })
@@ -408,18 +440,26 @@ export class UserController {
     status: HttpStatus.OK,
     example: {
       data: {
-        id: 'number',
-        email: 'string',
-        username: 'string',
-        platform: 'string',
-        avatar: 'string',
-        role: 'string',
-        phone: 'string',
-        active: 'boolean',
-        verify_at: 'date',
-        created_at: 'string',
-        updated_at: 'string',
-        membership_id: 'number',
+        id: 14,
+        branch_id: null,
+        username: 'Võ Hồng Sơn',
+        email: 'vohongson8525@gmail.com',
+        platform: null,
+        phone: '12321312312',
+        avatar: null,
+        role: 'user',
+        active: true,
+        verify_at: null,
+        created_at: '2024-10-24T09:00:36.091Z',
+        updated_at: '2024-11-04T05:12:51.485Z',
+        memberships_id: null,
+        memberships: null,
+        totalAmount: 0,
+        totalBookingPending: 2034,
+        totalBookingSuccess: 0,
+        totalBookingCancel: 414,
+        totalBookingProcess: 1,
+        totalDepositAmount: 0,
       },
     },
   })
@@ -439,6 +479,36 @@ export class UserController {
   @ApiOperation({ summary: 'Lấy thông tin tài khoản theo email' })
   getByEmail(@Param('email') email: string): Promise<any> {
     return this.userService.getByEmail(email);
+  }
+
+  // ! Forgot Password
+  @Post('forgot-password')
+  @isPublic()
+  @ApiOperation({ summary: 'Quên mật khẩu' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Thay đổi mật khẩu thành công, vui lòng đăng nhập lại!',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Email hoặc token không đúng hoặc không tồn tại',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
+      error: 'Lỗi gì đó !',
+    },
+  })
+  forgotPassword(
+    @Body()
+    body: ForgotPasswordDto,
+  ) {
+    return this.userService.forgotPassword(body);
   }
 
   // ! Change Password

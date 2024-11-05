@@ -9,15 +9,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma.service';
-import { User as UserEntity } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { CreateAuthUserDto } from './dto/create-auth-user.dto';
-import { LoginUserDto } from 'src/user/dto/login-user.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import uniqid from 'uniqid';
 import { MailService } from 'src/mail/mail.service';
-import { Cron } from '@nestjs/schedule';
+import { PrismaService } from 'src/prisma.service';
+import { LoginUserDto } from 'src/user/dto/login-user.dto';
+import { User as UserEntity } from 'src/user/entities/user.entity';
+import uniqid from 'uniqid';
+import { CreateAuthUserDto } from './dto/create-auth-user.dto';
 import { CreateUserSocialDto } from './dto/create-user-social.dto';
 import { LoginUserSocialDto } from './dto/login-user-social.dto';
 @Injectable()
@@ -95,7 +94,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> register', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -157,7 +156,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> registerSocialUser', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -205,7 +204,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> login', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -248,7 +247,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> loginSocial', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -280,7 +279,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> logout', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -315,7 +314,7 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> changeAvatar', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -456,34 +455,8 @@ export class AuthService {
       console.log('Lỗi từ auth.service.ts -> verifyEmail', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
-    }
-  }
-
-  // ! Cron Job Check Token Expired Date
-  @Cron('0 0 * * * *') // ? Run every hour
-  async checkTokenExpiredDate() {
-    try {
-      const findTokens = await this.prismaService.verify_tokens.findMany({
-        where: {
-          expired_at: {
-            lt: new Date(),
-          },
-        },
-      });
-
-      if (findTokens.length > 0) {
-        await this.prismaService.verify_tokens.deleteMany({
-          where: {
-            id: {
-              in: findTokens.map((token) => Number(token.id)),
-            },
-          },
-        });
-      }
-    } catch (error) {
-      console.log('Lỗi từ auth.service.ts -> checkTokenExpiredDate', error);
     }
   }
 

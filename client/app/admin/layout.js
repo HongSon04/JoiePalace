@@ -1,14 +1,26 @@
 "use client";
 
 import AdminSidebar from "@/app/_components/AdminSidebar";
-import { useSelector } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentBranch } from "../_lib/features/branch/branchSlice";
 
 function Layout({ children }) {
   const { isSidebarOpen, size } = useSelector((state) => state.sidebar);
+  const dispatch = useDispatch();
 
   function handleSidebar() {
     dispatch(toggleSidebar());
   }
+
+  React.useEffect(() => {
+    const storedBranch = JSON.parse(localStorage.getItem("currentBranch"));
+    // console.log(storedBranch);
+
+    if (storedBranch) {
+      dispatch(getCurrentBranch(storedBranch));
+    }
+  }, []);
 
   return (
     <div

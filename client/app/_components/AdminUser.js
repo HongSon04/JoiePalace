@@ -23,7 +23,7 @@ function AdminUser() {
     if (storedUser) {
       dispatch(getUserFromLocalStorage(storedUser));
     }
-  }, []);
+  }, [dispatch]);
 
   const { isSidebarOpen } = useSelector((store) => store.sidebar);
 

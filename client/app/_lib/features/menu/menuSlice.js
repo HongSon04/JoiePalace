@@ -8,6 +8,9 @@ const initialState = {
   error: null,
   selectedMenuId: [],
   menu: {},
+  isFetchingMenuList: false,
+  isErrorFetchingMenuList: false,
+  pagination: {},
 };
 
 const checkboxSlice = createSlice({
@@ -34,59 +37,79 @@ const checkboxSlice = createSlice({
     setSelectedMenuId: (state, action) => {
       state.selectedMenuId = action.payload;
     },
+
+    fetchMenuListRequest: (state) => {
+      state.isFetchingMenuList = true;
+      state.isErrorFetchingMenuList = false;
+    },
+    fetchMenuListSuccess: (state, action) => {
+      state.isFetchingMenuList = false;
+      state.menuList = action.payload.data;
+      state.pagination = action.payload.pagination;
+    },
+    fetchMenuListError: (state) => {
+      state.isFetchingMenuList = false;
+      state.isErrorFetchingMenuList = true;
+    },
   },
-  extraReducers: (builder) => {
-    builder
-      // fetch menu list
-      .addCase(fetchMenuItems.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchMenuItems.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.menuList = action.payload.map((item) => ({
-          ...item,
-          checked: false,
-        }));
-      })
-      .addCase(fetchMenuItems.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      // fetch menu item
-      .addCase(fetchMenu.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchMenu.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.menu = action.payload;
-      })
-      .addCase(fetchMenu.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      });
-  },
+  // extraReducers: (builder) => {
+  //   builder
+  //     // fetch menu list
+  //     .addCase(fetchMenuItems.pending, (state) => {
+  //       state.status = "loading";
+  //     })
+  //     .addCase(fetchMenuItems.fulfilled, (state, action) => {
+  //       state.status = "succeeded";
+  //       state.menuList = action.payload.map((item) => ({
+  //         ...item,
+  //         checked: false,
+  //       }));
+  //     })
+  //     .addCase(fetchMenuItems.rejected, (state, action) => {
+  //       state.status = "failed";
+  //       state.error = action.error.message;
+  //     })
+  //     // fetch menu item
+  //     .addCase(fetchMenu.pending, (state) => {
+  //       state.status = "loading";
+  //     })
+  //     .addCase(fetchMenu.fulfilled, (state, action) => {
+  //       state.status = "succeeded";
+  //       state.menu = action.payload;
+  //     })
+  //     .addCase(fetchMenu.rejected, (state, action) => {
+  //       state.status = "failed";
+  //       state.error = action.error.message;
+  //     });
+  // },
 });
 
-export const fetchMenuItems = createAsyncThunk(
-  "menu/fetchMenuItems",
-  async () => {
-    // LATER
-    // const response = await axios.get("/api/menu");
-    // return response.data;
-    return menuList;
-  }
-);
+// export const fetchMenuItems = createAsyncThunk(
+//   "menu/fetchMenuItems",
+//   async () => {
+//     // LATER
+//     // const response = await axios.get("/api/menu");
+//     // return response.data;
+//     return menuList;
+//   }
+// );
 
-export const fetchMenu = createAsyncThunk("menu/fetchMenu", async (id) => {
-  // LATER
-  // const response = await axios.get(`/api/menu/${id}`);
-  // return response.data;
+// export const fetchMenu = createAsyncThunk("menu/fetchMenu", async (id) => {
+//   // LATER
+//   // const response = await axios.get(`/api/menu/${id}`);
+//   // return response.data;
 
-  return menuList.find((item) => item.id == id);
-});
+//   return menuList.find((item) => item.id == id);
+// });
 
-export const { toggleSelectAll, toggleCheckbox, setSelectedMenuId } =
-  checkboxSlice.actions;
+export const {
+  toggleSelectAll,
+  toggleCheckbox,
+  setSelectedMenuId,
+  fetchMenuListRequest,
+  fetchMenuListSuccess,
+  fetchMenuListError,
+} = checkboxSlice.actions;
 export default checkboxSlice;
 
 const menuList = [

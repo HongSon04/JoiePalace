@@ -35,6 +35,8 @@ import { Button } from "@nextui-org/react";
 function FormInput({
   children,
   register,
+  value = "",
+  onChange,
   errors,
   label,
   ariaLabel,
@@ -60,20 +62,29 @@ function FormInput({
   // for select input
   options = [],
   required = false,
-  value,
   theme = "light",
   optionClassName = "",
+
+  // for defaultValue
+  defaultValue = "",
+  readOnly = false,
 }) {
   const themeClassName = {
     light: {
-      input:
-        "!bg-whiteAlpha-100 !hover:bg-whiteAlpha-200 !focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400",
+      input: `${
+        startContent || endContent
+          ? "bg-transparent"
+          : "bg-gray-100 hover:bg-gray-200 focus:bg-gray-200"
+      } !text-white !placeholder:text-gray-400`,
       label: "!text-white",
     },
     dark: {
-      input:
-        "!bg-blackAlpha-200 !hover:bg-blackAlpha-400 !focus:bg-blackAlpha-400 !text-gray-800 !placeholder:text-gray-600",
-      label: "!text-gray-600",
+      input: `${
+        startContent || endContent
+          ? "bg-transparent"
+          : "bg-whiteAlpha-400 hover:bg-whiteAlpha-500 focus:bg-whiteAlpha-500"
+      } !text-white !placeholder:text-gray-400`,
+      label: "text-white",
     },
   }[theme];
 
@@ -95,62 +106,75 @@ function FormInput({
       <div
         role="input-wrapper"
         className={`w-full rounded-lg overflow-hidden ${
-          type === "password"
+          type === "password" || startContent || endContent
             ? "flex items-center bg-whiteAlpha-100 hover:bg-whiteAlpha-200"
             : ""
-        }`}
+        } ${startContent || endContent ? "px-2" : ""}`}
       >
+        {startContent}
         {type === "textarea" && (
           <textarea
+            {...register(name)}
+            value={value}
+            onChange={onChange}
             ref={inputRef}
             cols={cols}
             rows={rows}
             placeholder={placeholder}
             role="input"
-            {...register(name)}
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
+            className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400 w-full ${className} ${themeClassName.input}`}
+            readOnly={readOnly}
           />
         )}
         {type === "text" && (
           <input
+            {...register(name)}
+            value={value}
+            onChange={onChange}
             ref={inputRef}
             placeholder={placeholder}
             role="input"
             type="text"
-            {...register(name)}
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
+            className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400  w-full ${className} ${themeClassName.input}`}
+            readOnly={readOnly}
           />
         )}
         {type === "number" && (
           <input
+            {...register(name)}
+            value={value}
+            onChange={onChange}
             ref={inputRef}
             placeholder={placeholder}
             role="input"
             type="number"
-            {...register(name)}
             id={id || name}
             name={name}
             aria-label={ariaLabel}
-            className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
+            className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
+            readOnly={readOnly}
           />
         )}
         {type === "password" && (
           <input
+            {...register(name)}
+            value={value}
+            onChange={onChange}
             ref={inputRef}
             placeholder={placeholder}
             role="input"
             type={isPasswordVisible ? "text" : "password"}
-            {...register(name)}
             id={id}
             name={name}
             aria-label={ariaLabel}
             className={`px-3 py-2 outline-none border-none text-white placeholder:text-gray-400 w-full flex-1 ${className} ${themeClassName.input}`}
+            readOnly={readOnly}
           />
         )}
         {type === "select" && (
@@ -159,8 +183,10 @@ function FormInput({
             name={name}
             id={id}
             value={value}
-            className={`select w-full !bg-blackAlpha-100 text-gray-600 hover:text-gray-400 ${className} ${themeClassName.input}`}
+            onChange={onChange}
+            className={`select w-full bg-blackAlpha-100 text-gray-600 hover:text-gray-400 ${className} ${themeClassName.input}`}
             required={required}
+            readOnly={readOnly}
           >
             {options.map((option, index) => (
               <option
@@ -179,17 +205,28 @@ function FormInput({
           type !== "number" &&
           type !== "select" && (
             <input
+              {...register(name)}
+              value={value}
+              onChange={onChange}
               ref={inputRef}
               placeholder={placeholder}
               role="input"
               type={type}
-              {...register(name)}
               id={id || name}
               name={name}
               aria-label={ariaLabel}
-              className={`px-3 py-2 rounded-lg bg-whiteAlpha-100 outline-none border-none text-white placeholder:text-gray-400 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400 w-full ${className} ${themeClassName.input}`}
+              className={`px-3 py-2 rounded-lg outline-none border-none text-white placeholder:text-gray-400 focus:bg-whiteAlpha-400 w-full ${className} ${
+                themeClassName.input
+              } ${
+                startContent || endContent
+                  ? "!bg-transparent px-2"
+                  : "px-3 bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-400"
+              }`}
+              readOnly={readOnly}
             />
           )}
+
+        {endContent}
         {type === "password" && (
           <Button
             role="toggle-button"

@@ -1,19 +1,22 @@
 "use client";
 
+import CustomPagination from "@/app/_components/CustomPagination";
 import Dish from "@/app/_components/Dish";
 import FormInput from "@/app/_components/FormInput";
+import SearchForm from "@/app/_components/SearchForm";
+import DishesSectionSkeleton from "@/app/_components/skeletons/DishesSectionSkeleton";
+import Uploader from "@/app/_components/Uploader";
 import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
 import {
-  addingDish,
-  addingDishFailure,
-  addingDishSuccess,
-  fetchingCategoryDishes,
-  fetchingCategoryDishesFailure,
-  fetchingCategoryDishesSuccess,
+  addDish,
+  deleteDish,
+  fetchCategoryDishes,
   setSelectedDish,
+  updateDish,
 } from "@/app/_lib/features/dishes/dishesSlice";
-import { API_CONFIG } from "@/app/_utils/api.config";
-import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { CONFIG } from "@/app/_utils/config";
+import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Modal,
@@ -21,91 +24,71 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  useDisclosure,
 } from "@nextui-org/modal";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Switch } from "@nextui-org/react";
 import { Col, Row } from "antd";
+import Image from "next/image";
 import React, { Suspense } from "react";
 import { useForm } from "react-hook-form";
+import { IoSaveOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import Loading from "../loading";
-import Uploader from "@/app/_components/Uploader";
 
 const schema = z.object({
   name: z.string().nonempty("Tên món không được để trống"),
-  price: z.string().nonempty("Giá món không được để trống"),
+  price: z.union([
+    z.string().nonempty("Giá món không được để trống"),
+    z.number().min(1, "Giá món không được để trống"),
+  ]),
+  category: z.union([
+    z.string().nonempty("Danh mục món không được để trống"),
+    z.number().min(1, "Danh mục món không được để trống"),
+  ]),
   short_description: z.string().nonempty("Mô tả ngắn không được để trống"),
   description: z.string().nonempty("Mô tả chi tiết không được để trống"),
-  category: z.string().nonempty("Danh mục món ăn không được để trống"),
 });
 
 function DishesSection({ dishCategory, categories }) {
   const dispatch = useDispatch();
-  const { makeAuthorizedRequest } = useApiServices();
-  const { selectedDish } = useSelector((store) => store.dishes);
-  const [categoryDishes, setCategoryDishes] = React.useState(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
   const [isOpenDetailModal, setIsOpenDetailModal] = React.useState(false);
-  const [defaultValue, setDefaultValue] = React.useState({
-    name: "",
-    price: "",
-    short_description: "",
-    description: "",
-    category: "",
-  });
+  const [imgSrc, setImgSrc] = React.useState(CONFIG.DISH_IMAGE_PLACEHOLDER);
+  const {
+    selectedDish,
+    pagination,
+    categoryDishes,
+    isLoading,
+    isError,
+    isAddingDish,
+    isUpdatingDish,
+  } = useSelector((store) => store.dishes);
+  const toast = useCustomToast();
+  const [itemsPerPage, setItemsPerPage] = React.useState(10);
+  const [sortByPrice, setSortByPrice] = React.useState("DESC");
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [files, setFiles] = React.useState([]);
+  const [resetAfterSubmit, setResetAfterSubmit] = React.useState(false);
 
-  const { isLoading, isError } = useSelector((store) => store.dishes);
+  const handleFileChange = (newFiles) => {
+    setFiles(newFiles);
+    console.log("Files changed -> ", newFiles);
+  };
 
-  React.useEffect(() => {
-    const fetchCategoryDishes = async (categoryId) => {
-      dispatch(fetchingCategoryDishes());
+  const handleSearch = async (e) => {
+    setSearchQuery(e.target.value);
+  };
 
-      const data = await makeAuthorizedRequest(
-        API_CONFIG.PRODUCTS.GET_BY_CATEGORY(categoryId),
-        "GET",
-        null
-      );
+  const handleSortByPrice = (e) => {
+    setSortByPrice(e.target.value);
+  };
 
-      if (data.success) {
-        dispatch(fetchingCategoryDishesSuccess());
-        setCategoryDishes(data.data);
-        return;
-      }
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(e.target.value);
+  };
 
-      if (data.error) {
-        dispatch(fetchingCategoryDishesFailure());
-        return;
-      }
-    };
-
-    fetchCategoryDishes(dishCategory.id);
-
-    return () => {};
-  }, []);
-
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-  const openDetailModal = () => {
-    if (selectedDish) {
-      // Set the form values to the selected dish data
-      setDefaultValue({
-        name: selectedDish.name,
-        price: selectedDish.price,
-        short_description: selectedDish.short_description,
-        description: selectedDish.description,
-        category: selectedDish.category_id, // Assuming category_id is part of the selectedDish
-      });
-    } else {
-      // Reset to empty values for adding a new dish
-      setDefaultValue({
-        name: "",
-        price: "",
-        short_description: "",
-        description: "",
-        category: "",
-      });
-    }
-    onOpen();
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const {
@@ -113,80 +96,247 @@ function DishesSection({ dishCategory, categories }) {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: defaultValue, // Set default values here
   });
 
-  // Call reset with the default values when opening the modal
-  const handleOnOpenChange = (isOpen) => {
-    if (isOpen) {
-      reset(defaultValue); // Reset the form with the current default values
-    }
-    onOpenChange(isOpen);
+  const openDetailModal = () => {
+    setIsOpenDetailModal(true);
   };
 
-  const [files, setFiles] = React.useState([]);
-
-  const handleFileChange = (newFiles) => {
-    setFiles(newFiles);
+  const handleAddButtonClick = () => {
+    dispatch(setSelectedDish(null));
+    setIsOpenDetailModal(true);
   };
 
-  const handleAddDish = async (data) => {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("price", data.price);
-    formData.append("short_description", data.short_description);
-    formData.append("description", data.description);
-    formData.append("category_id", dishCategory.id);
+  const onInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const inputValue = type === "checkbox" ? checked : value;
+    setValue(name, inputValue);
+  };
 
-    // Append each file to the FormData
-    if (files && files.length > 0) {
+  const handleModalClose = React.useCallback(() => {
+    dispatch(setSelectedDish(null));
+    reset();
+    setFiles([]);
+    setIsOpenDetailModal(false);
+  }, []);
+
+  const onSubmit = React.useCallback(
+    async (data) => {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("price", data.price);
+      formData.append("category_id", data.category);
+      formData.append("short_description", data.short_description);
+      formData.append("description", data.description);
       files.forEach((file) => {
-        formData.append("images", file); // Append each image to the FormData
-        console.log("Appending file:", file); // Log each file being appended
+        formData.append("images", file);
+        console.log("File appended -> ", file);
       });
-    } else {
-      console.error("No valid images to upload");
-      return; // Prevent submission if no images are valid
-    }
 
-    dispatch(addingDish());
+      console.log("Files that should be appended to form data -> ", files);
+      console.log("form data that's gonna be submit -> ", formData);
 
-    console.log("Adding dish with data:", formData);
+      // Log FormData content
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+      }
 
-    const response = await makeAuthorizedRequest(
-      API_CONFIG.PRODUCTS.CREATE,
-      "POST",
-      formData
+      try {
+        if (selectedDish) {
+          const result = await dispatch(
+            updateDish({ dishId: selectedDish.id, dishData: formData })
+          ).unwrap();
+
+          console.log("Result from updating dish -> ", result);
+
+          if (result)
+            toast({
+              title: "Cập nhật thành công",
+              description: "Món ăn đã được cập nhật",
+              type: "success",
+            });
+        } else {
+          const result = await dispatch(addDish(formData)).unwrap();
+
+          // console.log("Result from adding dish -> ", result);
+
+          if (result)
+            toast({
+              title: "Thêm thành công",
+              description: "Món ăn đã được thêm vào danh sách",
+              type: "success",
+            });
+          if (resetAfterSubmit) {
+            reset();
+            setFiles([]);
+          }
+        }
+      } catch (error) {
+        toast({
+          title: "Lỗi!",
+          description: error || "Có lỗi xảy ra khi thêm món ăn",
+          type: "error",
+        });
+      }
+    },
+    [selectedDish, files, resetAfterSubmit]
+  );
+
+  const handleDeleteDish = React.useCallback((dishId) => {
+    const confirm = window.confirm("Bạn có chắc chắn muốn xóa món ăn này?");
+
+    if (!confirm) return;
+
+    dispatch(deleteDish(dishId));
+  }, []);
+
+  React.useEffect(() => {
+    const handle = () => {
+      if (selectedDish) {
+        setImgSrc(
+          (selectedDish && selectedDish?.images[0]) ||
+            CONFIG.DISH_IMAGE_PLACEHOLDER
+        );
+        setValue("name", selectedDish.name);
+        setValue("price", selectedDish.price);
+        setValue("short_description", selectedDish.short_description);
+        setValue("description", selectedDish.description);
+        setValue("category", selectedDish.category_id);
+      } else {
+        setIsOpenDetailModal(false);
+        reset();
+      }
+    };
+
+    handle();
+
+    return () => {};
+  }, [selectedDish]);
+
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const params = {
+      page: currentPage, // or any other page you want to start with
+      itemsPerPage,
+      search: searchQuery,
+      priceSort: sortByPrice,
+    };
+    dispatch(
+      fetchCategoryDishes({ categoryId: dishCategory.id, params, signal })
     );
 
-    if (response.success) {
-      dispatch(addingDishSuccess());
-      onOpenChange();
-    } else {
-      dispatch(addingDishFailure(response.message));
-    }
-  };
+    return () => {
+      abortController.abort();
+    };
+  }, [dishCategory.id, currentPage, itemsPerPage, searchQuery, sortByPrice]);
 
-  const onSubmit = async (data) => {
-    await handleAddDish(data);
-  };
+  // useEffect for other dependencies
+  React.useEffect(() => {
+    const params = {
+      page: currentPage,
+      itemsPerPage,
+      search: searchQuery,
+      priceSort: sortByPrice,
+    };
+
+    dispatch(fetchCategoryDishes({ categoryId: dishCategory.id, params }));
+  }, [dishCategory.id, currentPage, itemsPerPage, sortByPrice]);
 
   return (
     <>
-      {isLoading && (
-        <div className="flex justify-center items-center">
-          <Spinner size="large" />
+      <div className="mb-5">
+        <div className="flex justify-between items-center">
+          {/* ITEMS PER PAGE */}
+          <label htmlFor="perPage" className="flex-center gap-3 text-gray-300">
+            Số món trên trang
+            <select
+              name="perPage"
+              id="perPage"
+              className="select dark:bg-gray-800 dark:text-white h-fit"
+              onChange={handleItemsPerPageChange}
+              value={itemsPerPage}
+            >
+              <option value="10" className="option">
+                10
+              </option>
+              <option value="20" className="option">
+                20
+              </option>
+              <option value="50" className="option">
+                50
+              </option>
+              <option value="50" className="option">
+                60
+              </option>
+              <option value="50" className="option">
+                80
+              </option>
+              <option value="50" className="option">
+                100
+              </option>
+            </select>
+          </label>
+          <div className="flex-1 flex gap-3 justify-end">
+            <SearchForm
+              classNames={{
+                input: "w-full text-white",
+              }}
+              placeholder={"Tìm kiếm món ăn..."}
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+            <select
+              name="sortByPrice"
+              id="sortByPrice"
+              className="select dark:bg-gray-800 dark:text-white h-fit !rounded-full"
+              onChange={handleSortByPrice}
+              value={sortByPrice}
+            >
+              <option value="ASC" className="option">
+                Giá tăng dần
+              </option>
+              <option value="DESC" className="option">
+                Giá giảm dần
+              </option>
+            </select>
+            <Button
+              onClick={handleAddButtonClick}
+              radius="full"
+              className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 text-white font-medium !shrink-0"
+              startContent={
+                <PlusIcon className="w-5 h-5 text-white font-semibold shrink-0" />
+              }
+            >
+              Thêm món ăn
+            </Button>
+          </div>
         </div>
-      )}
-      {isError && (
-        <div className="flex justify-center items-center">
-          <p className="text-red-500">Failed to load dishes</p>
-        </div>
-      )}
-      {!isLoading && !isError && (
-        <div className="mb-5">
+        {isLoading && <DishesSectionSkeleton />}
+        {isError && (
+          <div className="flex flex-col gap-3 justify-center items-center">
+            <p className="text-gray-400">Tải món ăn thất bại</p>
+            <button
+              className="text-gray-400 underline"
+              onClick={() =>
+                dispatch(
+                  fetchCategoryDishes({
+                    categoryId: dishCategory.id,
+                    params: { page: currentPage, itemsPerPage },
+                  })
+                )
+              }
+            >
+              Thử lại
+            </button>
+          </div>
+        )}
+        {!isLoading && !isError && (
           <Row gutter={[12, 12]} className="mt-3">
             {categoryDishes &&
               categoryDishes.map((dish, index) => (
@@ -197,16 +347,20 @@ function DishesSection({ dishCategory, categories }) {
                   }}
                   key={index}
                 >
-                  <Dish
-                    dish={dish}
-                    onClick={() => {
-                      dispatch(setSelectedDish(dish));
-                      openDetailModal();
-                    }}
-                  />
+                  <div className="w-full flex gap-2 items-center min-w-0">
+                    {/* <Checkbox /> */}
+                    <Dish
+                      dish={dish}
+                      onClick={() => {
+                        dispatch(setSelectedDish(dish));
+                        openDetailModal(dish); // Pass the dish to openDetailModal
+                      }}
+                      onContextMenu={() => handleDeleteDish(dish.id)}
+                      className={"flex-1 min-w-0"}
+                    ></Dish>
+                  </div>
                 </Col>
               ))}
-            {/* Add button */}
             <Col
               span={8}
               md={{
@@ -214,17 +368,7 @@ function DishesSection({ dishCategory, categories }) {
               }}
             >
               <Button
-                onPress={() => {
-                  // When the add button is clicked, reset to empty values
-                  setDefaultValue({
-                    name: "",
-                    price: "",
-                    short_description: "",
-                    description: "",
-                    category: "",
-                  });
-                  onOpen();
-                }}
+                onPress={handleAddButtonClick}
                 isIconOnly
                 className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-full w-full"
                 radius="full"
@@ -233,147 +377,230 @@ function DishesSection({ dishCategory, categories }) {
               </Button>
             </Col>
           </Row>
-
-          {/* MODAL */}
-          {isOpen && (
-            <Suspense fallback={<Loading />}>
-              <>
-                <Modal
-                  size="3xl"
-                  isOpen={isOpen}
-                  onOpenChange={(isOpen) => {
-                    if (isOpen) {
-                      reset(defaultValue); // Reset the form with the current default values
-                    }
-                    onOpenChange(isOpen);
-                  }}
-                  placement="top-center"
-                  scrollBehavior="outside"
-                >
-                  <ModalContent>
-                    {(onClose) => (
-                      <>
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                          <ModalHeader className="flex flex-col gap-1">
-                            Thêm món ăn
-                          </ModalHeader>
-                          <ModalBody>
-                            <Row gutter={20}>
-                              <Col span={12} className="h-full">
-                                {/* IMAGE & UPLOADER */}
-                                <Uploader
-                                  onFileChange={handleFileChange}
-                                  files={files}
-                                  setFiles={setFiles}
-                                />
-                              </Col>
-                              <Col span={12}>
-                                <FormInput
-                                  theme="dark"
-                                  id={"name"}
-                                  name={"name"} // Must have: because you have to using it to register the input
-                                  label={"Tên món"} // If empty: label won't show
-                                  ariaLabel={"Name of dish"} // Must have: for accessibility
-                                  type={"text"}
-                                  register={register}
-                                  errors={errors}
-                                  errorMessage={errors?.name?.message}
-                                  wrapperClassName="!mt-0"
-                                ></FormInput>
-                                <FormInput
-                                  theme="dark"
-                                  id={"price"}
-                                  name={"price"} // Must have: because you have to using it to register the input
-                                  label={"Giá món"} // If empty: label won't show
-                                  ariaLabel={"Price of dish"} // Must have: for accessibility
-                                  type={"number"}
-                                  register={register}
-                                  errors={errors}
-                                  errorMessage={errors?.price?.message}
-                                ></FormInput>
-                                <FormInput
-                                  type="select"
-                                  theme="dark"
-                                  id={"category"}
-                                  name={"category"} // Must have: because you have to using it to register the input
-                                  label={"Danh mục món ăn"} // If empty: label won't show
-                                  ariaLabel={"Danh mục món ăn"} // Must have: for accessibility
-                                  register={register}
-                                  errors={errors}
-                                  errorMessage={errors?.category?.message}
-                                  required={false}
-                                  options={[
-                                    {
-                                      id: "",
-                                      name: "Chọn danh mục",
-                                    },
-                                    ...categories,
-                                  ]}
-                                ></FormInput>
-                                <FormInput
-                                  theme="dark"
-                                  id={"short_description"}
-                                  name={"short_description"} // Must have: because you have to using it to register the input
-                                  label={"Mô tả ngắn"} // If empty: label won't show
-                                  ariaLabel={"Mô tả ngắn của món ăn"} // Must have: for accessibility
-                                  type={"textarea"}
-                                  register={register}
-                                  errors={errors}
-                                  errorMessage={
-                                    errors?.short_description?.message
+        )}
+        {pagination && pagination.lastPage > 1 && (
+          <CustomPagination
+            onChange={handlePageChange}
+            total={pagination.lastPage}
+            page={currentPage}
+          ></CustomPagination>
+        )}
+        {/* MODAL */}
+        {isOpenDetailModal && (
+          <Suspense fallback={<Loading />}>
+            <>
+              <Modal
+                size="3xl"
+                isOpen={isOpenDetailModal}
+                onOpenChange={handleModalClose}
+                placement="top-center"
+                scrollBehavior="outside"
+              >
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <form onSubmit={handleSubmit(onSubmit)}>
+                        <ModalHeader className="flex flex-col gap-1">
+                          {selectedDish
+                            ? `Chi tiết món ăn: ${selectedDish.name}`
+                            : "Thêm món ăn"}
+                        </ModalHeader>
+                        <ModalBody>
+                          <Row gutter={20}>
+                            <Col span={12} className="h-full">
+                              {/* IMAGE & UPLOADER */}
+                              <Uploader
+                                onFileChange={handleFileChange}
+                                files={files}
+                                setFiles={setFiles}
+                              />
+                              {selectedDish && (
+                                <Image
+                                  src={imgSrc}
+                                  onError={() =>
+                                    setImgSrc(CONFIG.DISH_IMAGE_PLACEHOLDER)
                                   }
-                                  rows={4}
-                                ></FormInput>
-                                <FormInput
-                                  theme="dark"
-                                  id={"description"}
-                                  name={"description"} // Must have: because you have to using it to register the input
-                                  label={"Mô tả chi tiết"} // If empty: label won't show
-                                  ariaLabel={"Mô tả chi tiết của món ăn"} // Must have: for accessibility
-                                  type={"textarea"}
-                                  register={register}
-                                  errors={errors}
-                                  errorMessage={errors?.description?.message}
-                                ></FormInput>
-                              </Col>
-                            </Row>
-                          </ModalBody>
-                          <ModalFooter>
-                            <Button
-                              radius="full"
-                              onPress={() => {
-                                reset();
-                                onClose();
-                              }}
-                              startContent={<XMarkIcon />}
-                              className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-                            >
-                              Hủy
-                            </Button>
+                                  alt={"image"}
+                                  sizes="200px"
+                                  width={50}
+                                  height={50}
+                                  className="rounded-lg mt-3"
+                                />
+                              )}
+                            </Col>
+                            <Col span={12}>
+                              <FormInput
+                                theme="dark"
+                                id={"name"}
+                                name={"name"} // Must have: because you have to using it to register the input
+                                label={"Tên món"} // If empty: label won't show
+                                ariaLabel={"Name of dish"} // Must have: for accessibility
+                                type={"text"}
+                                register={register}
+                                errors={errors}
+                                errorMessage={errors?.name?.message}
+                                wrapperClassName="!mt-0"
+                                // defaultValue={formData.name} // Set default value
+                                value={watch("name")}
+                                onChange={onInputChange}
+                              ></FormInput>
+                              <FormInput
+                                theme="dark"
+                                id={"price"}
+                                name={"price"} // Must have: because you have to using it to register the input
+                                label={"Giá món"} // If empty: label won't show
+                                ariaLabel={"Price of dish"} // Must have: for accessibility
+                                type={"text"}
+                                register={register}
+                                errors={errors}
+                                errorMessage={errors?.price?.message}
+                                // defaultValue={formData.price} // Set default value
+                                value={watch("price")}
+                                onChange={onInputChange}
+                              ></FormInput>
+                              <FormInput
+                                type="select"
+                                theme="dark"
+                                id={"category"}
+                                name={"category"} // Must have: because you have to using it to register the input
+                                label={"Danh mục món ăn"} // If empty: label won't show
+                                ariaLabel={"Danh mục món ăn"} // Must have: for accessibility
+                                register={register}
+                                errors={errors}
+                                errorMessage={errors?.category?.message}
+                                required={false}
+                                options={[
+                                  {
+                                    id: "",
+                                    name: "Chọn danh mục",
+                                  },
+                                  ...categories,
+                                ]}
+                                // defaultValue={formData.category} // Set default value
+                                value={watch("category")}
+                                onChange={onInputChange}
+                              ></FormInput>
+                              <FormInput
+                                theme="dark"
+                                id={"short_description"}
+                                name={"short_description"} // Must have: because you have to using it to register the input
+                                label={"Mô tả ngắn"} // If empty: label won't show
+                                ariaLabel={"Mô tả ngắn của món ăn"} // Must have: for accessibility
+                                type={"textarea"}
+                                register={register}
+                                errors={errors}
+                                errorMessage={
+                                  errors?.short_description?.message
+                                }
+                                rows={4}
+                                // defaultValue={formData.short_description} // Set default value
+                                value={watch("short_description")}
+                                onChange={onInputChange}
+                              ></FormInput>
+                              <FormInput
+                                theme="dark"
+                                id={"description"}
+                                name={"description"} // Must have: because you have to using it to register the input
+                                label={"Mô tả chi tiết"} // If empty: label won't show
+                                ariaLabel={"Mô tả chi tiết của món ăn"} // Must have: for accessibility
+                                type={"textarea"}
+                                register={register}
+                                errors={errors}
+                                errorMessage={errors?.description?.message}
+                                // defaultValue={formData.description} // Set default value
+                                value={watch("description")}
+                                onChange={onInputChange}
+                              ></FormInput>
+                            </Col>
+                          </Row>
+                        </ModalBody>
+                        <ModalFooter>
+                          <div className="flex flex-1 justify-start">
+                            {!selectedDish && (
+                              <Switch
+                                isSelected={resetAfterSubmit}
+                                onValueChange={setResetAfterSubmit}
+                                aria-label="Xóa dữ liệu sau khi thêm"
+                                size="small"
+                                classNames={{
+                                  label: "text-gray-400 text-md",
+                                }}
+                              >
+                                Xóa dữ liệu sau khi thêm
+                              </Switch>
+                            )}
+                          </div>
+                          <div className="flex gap-3 items-center">
+                            {selectedDish ? (
+                              <Button
+                                radius="full"
+                                onPress={() => {
+                                  handleDeleteDish(selectedDish.id);
+                                }}
+                                startContent={
+                                  <TrashIcon className="shrink-0 w-4 h-4" />
+                                }
+                                className="bg-red-200 hover:bg-red-300 text-red-500"
+                              >
+                                Xóa món ăn
+                              </Button>
+                            ) : (
+                              <Button
+                                radius="full"
+                                onPress={() => {
+                                  reset();
+                                  onClose();
+                                }}
+                                startContent={
+                                  <XMarkIcon className="w-4 h-4 shrink-0" />
+                                }
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+                              >
+                                Hủy
+                              </Button>
+                            )}
                             <Button
                               type="submit"
                               radius="full"
                               className="bg-teal-400 hover:bg-teal-500 text-white"
-                              startContent={
-                                isLoading ? null : (
-                                  <PlusIcon className="w-5 h-5" />
-                                )
+                              startContent={(() => {
+                                if (selectedDish) {
+                                  return isUpdatingDish ? null : (
+                                    <IoSaveOutline className="w-4 h-4 shrink-0" />
+                                  );
+                                } else {
+                                  return isAddingDish ? null : (
+                                    <PlusIcon className="w-4 h-4 shrink-0" />
+                                  );
+                                }
+                              })()}
+                              isLoading={
+                                selectedDish ? isUpdatingDish : isAddingDish
                               }
-                              isLoading={isLoading}
                             >
-                              {isLoading ? "Đang thêm món ăn" : "Thêm"}
+                              {(() => {
+                                if (selectedDish) {
+                                  return isUpdatingDish
+                                    ? "Đang cập nhật..."
+                                    : "Cập nhật món ăn";
+                                } else {
+                                  return isAddingDish
+                                    ? "Đang thêm..."
+                                    : "Thêm món ăn";
+                                }
+                              })()}
                             </Button>
-                          </ModalFooter>
-                        </form>
-                      </>
-                    )}
-                  </ModalContent>
-                </Modal>
-              </>
-            </Suspense>
-          )}
-        </div>
-      )}
+                          </div>
+                        </ModalFooter>
+                      </form>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+            </>
+          </Suspense>
+        )}
+      </div>
     </>
   );
 }

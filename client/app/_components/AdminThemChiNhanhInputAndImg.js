@@ -1,29 +1,51 @@
 "use client";
 
-import { Grid, GridItem, Heading, Image } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import { Grid, GridItem, Image } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 
-const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) => {
-    const [description, setDescription] = useState([]);
-
-    useEffect(() => {
-        console.log(description);
-    }, [description]);
+const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = true, branchData = {}, stage = [] }) => {
+    // Safeguard with fallback values
+    const initialImages = branchData.images ? branchData.images.flatMap(img => img.split(',')) : []; // Split images if they are in a comma-separated string
+    const [description, setDescription] = useState(initialImages);
+    const [names, setNames] = useState(Array(initialImages.length).fill(''));
+    const [descriptions, setDescriptions] = useState(Array(initialImages.length).fill(''));
+    const [stages, setStages] = useState(Array(initialImages.length).fill('')); // State for stages
 
     const handleAddDescription = (event) => {
         const files = Array.from(event.target.files);
-        const readFiles = files.map(file =>
-            new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = () => reject(reader.error);
-                reader.readAsDataURL(file);
-            })
-        );
+        const newImages = [];
 
-        Promise.all(readFiles)
-            .then(newImages => setDescription(prev => [...prev, ...newImages]))
-            .catch(error => console.error('Error reading files:', error));
+        files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                newImages.push(reader.result);
+                if (newImages.length === files.length) {
+                    setDescription((prev) => [...prev, ...newImages]);
+                    setNames((prev) => [...prev, ...Array(newImages.length).fill('')]);
+                    setDescriptions((prev) => [...prev, ...Array(newImages.length).fill('')]);
+                    setStages((prev) => [...prev, ...Array(newImages.length).fill('')]); // Update stages
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const handleNameChange = (index, value) => {
+        const updatedNames = [...names];
+        updatedNames[index] = value;
+        setNames(updatedNames);
+    };
+
+    const handleDescriptionChange = (index, value) => {
+        const updatedDescriptions = [...descriptions];
+        updatedDescriptions[index] = value;
+        setDescriptions(updatedDescriptions);
+    };
+
+    const handleStageChange = (index, value) => {
+        const updatedStages = [...stages];
+        updatedStages[index] = value;
+        setStages(updatedStages);
     };
 
     const renderImageItem = (item, index) => (
@@ -43,14 +65,20 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
                 </div>
                 {input && (
                     <input
-                        type='text'
-                        placeholder='Tên không gian'
+                        type="text"
+                        placeholder="Tên không gian"
+                        value={names[index]}
+                        onChange={(e) => handleNameChange(index, e.target.value)}
                         className="px-2 py-1 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
+                        name={name}
                     />
                 )}
                 <textarea
                     className="px-2 py-1 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 h-[100px] w-full"
                     placeholder="Mô tả"
+                    value={descriptions[index]}
+                    name={name}
+                    onChange={(e) => handleDescriptionChange(index, e.target.value)}
                 />
             </div>
         </GridItem>
@@ -58,9 +86,7 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
 
     return (
         <div className="flex p-4 flex-col gap-2 bg-whiteAlpha-200 rounded-lg">
-            <span className="font-bold text-white text-base">
-                {title}
-            </span>
+            <span className="font-bold text-white text-base">{title}</span>
             <Grid templateColumns="repeat(3, 1fr)" gap="20px" className="mt-2">
                 {description.map(renderImageItem)}
                 {description.length < 6 && (
@@ -76,7 +102,7 @@ const AdminThemChiNhanhInputAndImg = ({ title, height, inputId, input = true }) 
                                 id={inputId}
                                 type="file"
                                 accept="image/*"
-                                style={{ display: 'none' }}
+                                style={{ display: "none" }}
                                 onChange={handleAddDescription}
                                 multiple
                             />

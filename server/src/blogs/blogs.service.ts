@@ -131,7 +131,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -216,7 +216,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -301,7 +301,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -387,7 +387,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllByCategory', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -484,7 +484,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugCategory', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -582,7 +582,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllByTag', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -680,7 +680,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findAllBySlugTag', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -757,7 +757,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> findOneBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -887,7 +887,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -1017,7 +1017,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> updateBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -1050,7 +1050,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> delete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -1064,6 +1064,13 @@ export class BlogsService {
 
       if (!blog) {
         throw new HttpException('Bài viết không tồn tại', HttpStatus.NOT_FOUND);
+      }
+
+      if (blog.deleted === false) {
+        throw new HttpException(
+          'Bài viết chưa được xóa tạm thời, không thể khôi phục!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       await this.prismaService.blogs.update({
@@ -1083,7 +1090,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -1099,9 +1106,9 @@ export class BlogsService {
         throw new HttpException('Bài viết không tồn tại', HttpStatus.NOT_FOUND);
       }
 
-      if (blog.deleted) {
+      if (blog.deleted === false) {
         throw new HttpException(
-          'Bài viết phải được xóa mềm trước',
+          'Bài viết chưa được xóa tạm thời, không thể xóa vĩnh viễn!',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -1121,7 +1128,7 @@ export class BlogsService {
       console.log('Lỗi từ blogs.service.ts -> hardDelete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }

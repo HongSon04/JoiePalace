@@ -69,7 +69,7 @@ function AdminSidebar() {
 
       enterAnimation();
     }
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, animate, scope]);
 
   return (
     <motion.div
@@ -118,16 +118,13 @@ function AdminSidebarHeader() {
 
 function AdminSidebarNav() {
   const { currentBranch } = useSelector((state) => state.branch);
-  const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
+  // const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
 
-  const dispatch = useDispatch();
+  const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
-  React.useEffect(() => {
-    const storedBranch = JSON.parse(localStorage.getItem("currentBranch"));
-    if (storedBranch) {
-      dispatch(getCurrentBranch(storedBranch));
-    }
-  }, []);
+  if (!currentBranch) {
+    return null;
+  }
 
   const mainOptions = [
     {
@@ -137,60 +134,72 @@ function AdminSidebarNav() {
       //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
       path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
       icon: dashboardIcon,
+      className: "",
     },
     {
       title: "Chi nhánh",
       path: `/admin/chi-nhanh/${currentBranch?.slug}`,
       icon: branchIcon,
+      className: "",
     },
     {
       title: "Thống kê",
       path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
       // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
       icon: statisticIcon,
+      className: "",
     },
     {
       title: "Khách hàng",
       path: `/admin/khach-hang/${currentBranch?.slug}`,
       icon: customerIcon,
+      className: "",
     },
     {
       title: "Yêu cầu",
       path: `/admin/yeu-cau/${currentBranch?.slug}`,
       icon: requestIcon,
+      className: "",
       qty: 5,
     },
     {
       title: "Quản lý tiệc",
       path: `/admin/quan-ly-tiec/${currentBranch?.slug}`,
       icon: eventIcon,
+      className: "",
     },
     {
       title: "Thực đơn",
       path: `/admin/thuc-don/`,
       icon: menuIcon,
+      className: "",
     },
     {
       title: "Món ăn",
       path: `/admin/mon-an/`,
       icon: foodIcon,
+      className: "",
     },
     {
       title: "Đồ uống",
       path: `/admin/do-uong/`,
       icon: drinkIcon,
+      className: "",
     },
     {
       title: "Phản hồi & đánh giá",
-      path: isGeneralBranch
-        ? `/admin/phan-hoi-danh-gia`
-        : `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
+      // path: isGeneralBranch
+      //   ? `/admin/phan-hoi-danh-gia`
+      //   : `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
+      path: `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
       icon: feedbackIcon,
+      className: "",
     },
     {
       title: "Bài viết",
       path: `/admin/bai-viet/`,
       icon: blogIcon,
+      className: "",
     },
   ];
 
@@ -199,6 +208,7 @@ function AdminSidebarNav() {
       title: "Thông báo",
       path: `/admin/thong-bao/${currentBranch?.slug}`,
       icon: notificationIcon,
+      className: "",
       qty: 5,
     },
     {
@@ -208,21 +218,27 @@ function AdminSidebarNav() {
       //   : `/admin/lien-he-ho-tro/${currentBranch.slug}`,
       path: `/admin/lien-he-ho-tro/${currentBranch.slug}`,
       icon: contactIcon,
+      className: "",
     },
     {
       title: "Cài đặt",
       path: "/admin/cai-dat",
       icon: settingIcon,
+      className: "",
     },
   ];
-
-  const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   return (
     <nav className="flex justify-center flex-col gap-[20px] rounded-xl w-full">
       <ul className={`mt-5 flex-center flex-col px-3 w-full`}>
         {mainOptions.map((item, index) => {
-          return <AdminSidebarItem item={item} key={index}></AdminSidebarItem>;
+          return (
+            <AdminSidebarItem
+              item={item}
+              key={index}
+              className={item.className}
+            ></AdminSidebarItem>
+          );
         })}
       </ul>
       <Divider
@@ -239,7 +255,7 @@ function AdminSidebarNav() {
   );
 }
 
-function AdminSidebarItem({ item }) {
+function AdminSidebarItem({ item, className }) {
   const pathName = usePathname();
 
   const isActive = pathName === item.path;
@@ -251,7 +267,7 @@ function AdminSidebarItem({ item }) {
       item={item}
       className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
         isActive ? "bg-whiteAlpha-100" : ""
-      } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""}`}
+      } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""} ${className}`}
     >
       <Link
         href={item.path}

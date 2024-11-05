@@ -23,6 +23,7 @@ module.exports = {
       fontFamily: {
         gilroy: ["Gilroy", "sans-serif"],
         beautique: ['"Beautique Display"', 'sans-serif'],
+        Montserrat: ['"Montserrat Alternates"', 'sans-serif'],
       },
       screens: {
         sxs: "420px",

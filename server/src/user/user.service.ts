@@ -1,4 +1,3 @@
-import { User as UserEntity } from './entities/user.entity';
 import {
   BadRequestException,
   HttpException,
@@ -7,21 +6,23 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from 'src/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ChangePasswordUserDto } from './dto/change-password-user.dto';
-import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { FilterDto } from 'helper/dto/Filter.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Role } from 'helper/enum/role.enum';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
-import { Role } from 'helper/enum/role.enum';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { ChangePasswordUserDto } from './dto/change-password-user.dto';
+import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { User as UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -92,7 +93,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -111,7 +112,25 @@ export class UserService {
       if (!findUser) {
         throw new NotFoundException('User không tồn tại');
       }
-      const { password, refresh_token, ...user } = findUser;
+
+      const {
+        totalAmount,
+        totalBookingPending,
+        totalBookingSuccess,
+        totalBookingCancel,
+        totalBookingProcess,
+        totalDepositAmount,
+      } = await this.getBookingDashboardDataByUserId(Number(reqUser.id));
+
+      let { password, refresh_token, ...user } = findUser as any;
+
+      user.totalAmount = totalAmount;
+      user.totalBookingPending = totalBookingPending;
+      user.totalBookingSuccess = totalBookingSuccess;
+      user.totalBookingCancel = totalBookingCancel;
+      user.totalBookingProcess = totalBookingProcess;
+      user.totalDepositAmount = totalDepositAmount;
+
       throw new HttpException(
         {
           data: FormatReturnData(user, ['password', 'refresh_token']),
@@ -125,9 +144,94 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getProfile: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
+  }
+
+  // ! Forgot Password
+  async forgotPassword(body: ForgotPasswordDto) {
+    try {
+      const { confirm_password, email, new_password, token } = body;
+
+      // ? Find user
+      const findUser = await this.prismaService.users.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (!findUser) {
+        throw new NotFoundException(
+          'Email hoặc token không đúng hoặc không tồn tại!',
+        );
+      }
+
+      // ? Find token
+      const findToken = await this.prismaService.verify_tokens.findFirst({
+        where: {
+          email,
+          token,
+        },
+      });
+
+      if (!findToken) {
+        throw new NotFoundException(
+          'Email hoặc token không đúng hoặc không tồn tại',
+        );
+      }
+
+      // ? Check token expired
+      if (new Date(findToken.expired_at) < new Date()) {
+        // ? Delete token
+        await this.prismaService.verify_tokens.deleteMany({
+          where: {
+            email,
+          },
+        });
+        throw new BadRequestException('Token đã hết hạn');
+      }
+
+      // ? Check password
+      if (new_password !== confirm_password) {
+        throw new BadRequestException('Mật khẩu xác nhận không khớp');
+      }
+
+      // ? Hashed password
+      const hashedPassword = this.hashedPassword(new_password);
+
+      // ? Update password
+      await this.prismaService.users.update({
+        where: {
+          email,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+
+      // ? Delete token
+      await this.prismaService.verify_tokens.deleteMany({
+        where: {
+          email,
+        },
+      });
+
+      // ! Logout user
+      await this.prismaService.users.update({
+        where: {
+          email,
+        },
+        data: {
+          refresh_token: null,
+        },
+      });
+
+      throw new HttpException(
+        'Thay đổi mật khẩu thành công, vui lòng đăng nhập lại!',
+        HttpStatus.OK,
+      );
+    } catch (error) {}
   }
 
   // ! Change Password
@@ -180,7 +284,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changePassword: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -226,7 +330,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> changeProfile: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -246,7 +350,7 @@ export class UserService {
 
       const sortRangeDate: any =
         startDate && endDate
-          ? { created_at: { gte: new Date(startDate), lte: new Date(endDate) } }
+          ? { created_at: { gte: startDate, lte: endDate } }
           : {};
 
       const whereConditions: any = {
@@ -262,7 +366,7 @@ export class UserService {
         ];
       }
 
-      const [res, total] = await this.prismaService.$transaction([
+      const [users, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
           include: {
@@ -271,7 +375,6 @@ export class UserService {
           skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
-            created_at: 'desc',
             memberships: { booking_total_amount: 'desc' },
           },
         }),
@@ -287,9 +390,22 @@ export class UserService {
         itemsPerPage,
         total,
       };
+
+      // Lấy booking statistics cho tất cả users cùng một lúc
+      const userStatsPromises = users.map((user) =>
+        this.getBookingDashboardDataByUserId(Number(user.id)),
+      );
+      const userStats = await Promise.all(userStatsPromises);
+
+      // Kết hợp thông tin booking với user data
+      const enrichedUsers = users.map((user, index) => ({
+        ...user,
+        ...userStats[index],
+      }));
+
       throw new HttpException(
         {
-          data: FormatReturnData(res, ['password', 'refresh_token']),
+          data: FormatReturnData(enrichedUsers, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -301,7 +417,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -337,7 +453,7 @@ export class UserService {
         ];
       }
 
-      const [res, total] = await this.prismaService.$transaction([
+      const [users, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: whereConditions,
           include: {
@@ -346,7 +462,6 @@ export class UserService {
           skip: Number(skip),
           take: itemsPerPage,
           orderBy: {
-            created_at: 'desc',
             memberships: { booking_total_amount: 'desc' },
           },
         }),
@@ -362,9 +477,22 @@ export class UserService {
         itemsPerPage,
         total,
       };
+
+      // Lấy booking statistics cho tất cả users cùng một lúc
+      const userStatsPromises = users.map((user) =>
+        this.getBookingDashboardDataByUserId(Number(user.id)),
+      );
+      const userStats = await Promise.all(userStatsPromises);
+
+      // Kết hợp thông tin booking với user data
+      const enrichedUsers = users.map((user, index) => ({
+        ...user,
+        ...userStats[index],
+      }));
+
       throw new HttpException(
         {
-          data: FormatReturnData(res, ['password', 'refresh_token']),
+          data: FormatReturnData(enrichedUsers, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -376,7 +504,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAllDeleted: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -410,7 +538,7 @@ export class UserService {
         ...sortRangeDate,
       };
 
-      const [res, total] = await this.prismaService.$transaction([
+      const [users, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
           where: {
             OR: [
@@ -438,9 +566,22 @@ export class UserService {
         itemsPerPage,
         total,
       };
+
+      // Lấy booking statistics cho tất cả users cùng một lúc
+      const userStatsPromises = users.map((user) =>
+        this.getBookingDashboardDataByUserId(Number(user.id)),
+      );
+      const userStats = await Promise.all(userStatsPromises);
+
+      // Kết hợp thông tin booking với user data
+      const enrichedUsers = users.map((user, index) => ({
+        ...user,
+        ...userStats[index],
+      }));
+
       throw new HttpException(
         {
-          data: FormatReturnData(res, ['password', 'refresh_token']),
+          data: FormatReturnData(enrichedUsers, ['password', 'refresh_token']),
           pagination: paginationInfo,
         },
         HttpStatus.OK,
@@ -452,7 +593,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getAllByBranchId: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -471,9 +612,26 @@ export class UserService {
       if (!user) {
         throw new NotFoundException('User không tồn tại');
       }
+      const {
+        totalAmount,
+        totalBookingPending,
+        totalBookingSuccess,
+        totalBookingCancel,
+        totalBookingProcess,
+        totalDepositAmount,
+      } = await this.getBookingDashboardDataByUserId(Number(user.id));
+
+      let { password, refresh_token, ...userFormat } = user as any;
+
+      userFormat.totalAmount = totalAmount;
+      userFormat.totalBookingPending = totalBookingPending;
+      userFormat.totalBookingSuccess = totalBookingSuccess;
+      userFormat.totalBookingCancel = totalBookingCancel;
+      userFormat.totalBookingProcess = totalBookingProcess;
+      userFormat.totalDepositAmount = totalDepositAmount;
 
       throw new HttpException(
-        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        { data: FormatReturnData(userFormat, ['password', 'refresh_token']) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -483,7 +641,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getById: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -503,8 +661,26 @@ export class UserService {
         throw new NotFoundException('User không tồn tại');
       }
 
+      const {
+        totalAmount,
+        totalBookingPending,
+        totalBookingSuccess,
+        totalBookingCancel,
+        totalBookingProcess,
+        totalDepositAmount,
+      } = await this.getBookingDashboardDataByUserId(Number(user.id));
+
+      let { password, refresh_token, ...userFormat } = user as any;
+
+      userFormat.totalAmount = totalAmount;
+      userFormat.totalBookingPending = totalBookingPending;
+      userFormat.totalBookingSuccess = totalBookingSuccess;
+      userFormat.totalBookingCancel = totalBookingCancel;
+      userFormat.totalBookingProcess = totalBookingProcess;
+      userFormat.totalDepositAmount = totalDepositAmount;
+
       throw new HttpException(
-        { data: FormatReturnData(user, ['password', 'refresh_token']) },
+        { data: FormatReturnData(userFormat, ['password', 'refresh_token']) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -514,7 +690,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> getById: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -548,7 +724,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> softDelete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -564,6 +740,13 @@ export class UserService {
       if (!user) {
         throw new NotFoundException('User không tồn tại');
       }
+
+      if (!user.deleted) {
+        throw new BadRequestException(
+          'User chưa bị xóa tạm thời, không thể khôi phục!',
+        );
+      }
+
       await this.prismaService.users.update({
         where: {
           id: Number(id),
@@ -582,7 +765,7 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> restore: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -597,6 +780,12 @@ export class UserService {
       });
       if (!user) {
         throw new NotFoundException('User không tồn tại');
+      }
+
+      if (!user.deleted) {
+        throw new BadRequestException(
+          'User chưa bị xóa tạm thời, không thể xóa vĩnh viễn!',
+        );
       }
       // ? Delete Image
       if (user.avatar) {
@@ -615,9 +804,61 @@ export class UserService {
       console.log('Lỗi từ user.service.ts -> hardDelete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
+        error: error,
       });
     }
+  }
+
+  // ? Get Booking Dashboard Data by User ID
+  async getBookingDashboardDataByUserId(user_id: number) {
+    const bookings = await this.prismaService.bookings.findMany({
+      where: {
+        user_id: Number(user_id),
+      },
+      include: {
+        booking_details: {
+          include: {
+            deposits: true,
+          },
+        },
+      },
+    });
+
+    // Khởi tạo object để theo dõi các metrics
+    const metrics = {
+      totalAmount: 0,
+      totalBookingPending: 0,
+      totalBookingSuccess: 0,
+      totalBookingCancel: 0,
+      totalBookingProcess: 0,
+      totalDepositAmount: 0,
+    };
+
+    // Sử dụng reduce thay vì forEach để tính toán metrics
+    return bookings.reduce((acc, booking) => {
+      if (
+        booking.status === 'success' &&
+        booking.is_deposit == true &&
+        booking.is_confirm == true
+      ) {
+        acc.totalBookingSuccess++;
+        acc.totalDepositAmount += booking.booking_details.reduce(
+          (total, detail) => total + detail.deposits.amount,
+          0,
+        );
+        acc.totalAmount += booking.booking_details.reduce(
+          (total, detail) => total + detail.total_amount,
+          0,
+        );
+      } else if (booking.status === 'pending') {
+        acc.totalBookingPending++;
+      } else if (booking.status === 'cancel') {
+        acc.totalBookingCancel++;
+      } else if (booking.status === 'processing') {
+        acc.totalBookingProcess++;
+      }
+      return acc;
+    }, metrics);
   }
 
   // ! Generate Token
