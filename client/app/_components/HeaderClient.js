@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchBranchesFromApi } from "../_services/branchesServices";
 import { useRouter } from "next/navigation";
 import { IoPersonOutline } from "react-icons/io5";
+import { useSelector } from "react-redux";
 const listMenu = [
   { id: 1, name: "Địa điểm", categories: "dia-diem", href: "/#" },
   { id: 2, name: "Sự kiện", categories: "su-kien", href: "su-kien" },
@@ -30,6 +31,7 @@ const HeaderClient = () => {
   useEffect(() => {
     setScreenWidth(window.innerWidth);
   }, []);
+
   useEffect(() => {
     const fecthData = async () => {
       const branches = await fetchBranchesFromApi();
@@ -38,9 +40,11 @@ const HeaderClient = () => {
     fecthData();
 
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
+    if (user && user.name) {
       setIsLogin(true);
-      setNameUser(user.name);
+      const nameParts = (user?.name).split(" ");
+      const firstName = nameParts[nameParts.length - 1];
+      setNameUser(firstName);
     }
   }, []);
 
@@ -62,7 +66,7 @@ const HeaderClient = () => {
   return (
     <header className={`fixed top-0 left-0 w-full z-40 text-white`}>
       <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-transparent">
-        <div className="h-full flex items-center gap-14 flex-row-reverse">
+        <div className="h-full flex items-center gap-4 flex-row-reverse">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +85,7 @@ const HeaderClient = () => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              router.push("/client/dang-ky");
+              router.push(`/client/${!isLogin ? "dang-ky" : "nguoi-dung"}`);
             }}
             className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl"
           >
@@ -108,7 +112,7 @@ const HeaderClient = () => {
               <>
                 <IoPersonOutline stroke="black" />
                 <span className="text-sm font-semibold text-black">
-                  {nameUser}
+                  Hi! {nameUser}
                 </span>
               </>
             )}
@@ -122,7 +126,7 @@ const HeaderClient = () => {
             JOIE PALACE
           </span>
         </div>
-        <div className="h-full flex items-center gap-14 flex-row-reverse">
+        <div className="h-full flex items-center gap-4 flex-row-reverse">
           <div className="flex items-center gap-2 max-lg:hidden">
             <span className="px-2 text-white h-6 flex justify-center items-center rounded-md cursor-pointer">
               en
@@ -145,7 +149,7 @@ const HeaderClient = () => {
               viewBox="0 0 16 16"
               fill="none"
             >
-              <path 
+              <path
                 d="M2.40039 4.00001C2.40039 3.78784 2.48468 3.58436 2.63471 3.43433C2.78473 3.2843 2.98822 3.20001 3.20039 3.20001H12.8004C13.0126 3.20001 13.216 3.2843 13.3661 3.43433C13.5161 3.58436 13.6004 3.78784 13.6004 4.00001C13.6004 4.21219 13.5161 4.41567 13.3661 4.5657C13.216 4.71573 13.0126 4.80001 12.8004 4.80001H3.20039C2.98822 4.80001 2.78473 4.71573 2.63471 4.5657C2.48468 4.41567 2.40039 4.21219 2.40039 4.00001ZM2.40039 8.00001C2.40039 7.78784 2.48468 7.58436 2.63471 7.43433C2.78473 7.2843 2.98822 7.20001 3.20039 7.20001H12.8004C13.0126 7.20001 13.216 7.2843 13.3661 7.43433C13.5161 7.58436 13.6004 7.78784 13.6004 8.00001C13.6004 8.21219 13.5161 8.41567 13.3661 8.5657C13.216 8.71573 13.0126 8.80001 12.8004 8.80001H3.20039C2.98822 8.80001 2.78473 8.71573 2.63471 8.5657C2.48468 8.41567 2.40039 8.21219 2.40039 8.00001ZM2.40039 12C2.40039 11.7878 2.48468 11.5844 2.63471 11.4343C2.78473 11.2843 2.98822 11.2 3.20039 11.2H8.00039C8.21256 11.2 8.41605 11.2843 8.56608 11.4343C8.71611 11.5844 8.80039 11.7878 8.80039 12C8.80039 12.2122 8.71611 12.4157 8.56608 12.5657C8.41605 12.7157 8.21256 12.8 8.00039 12.8H3.20039C2.98822 12.8 2.78473 12.7157 2.63471 12.5657C2.48468 12.4157 2.40039 12.2122 2.40039 12Z"
                 fill="white"
               />

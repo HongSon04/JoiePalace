@@ -207,6 +207,9 @@ function RequestDetail({ id }) {
                 <option className="option" value="processing">
                   Đang xử lý
                 </option>
+                <option className="option" value="cancel">
+                  Hủy bỏ
+                </option>
               </select>
             </label>
           </div>
@@ -273,6 +276,8 @@ function RequestDetail({ id }) {
             <Row gutter={[20, 20]} className="w-full">
               <Col span={8}>
                 <FormInput
+                  theme={"light"}
+                  className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400"
                   name={"partyType"}
                   id={"partyType"}
                   register={register}
@@ -306,13 +311,14 @@ function RequestDetail({ id }) {
               </Col>
               <Col span={8}>
                 <FormInput
+                  theme={"light"}
+                  className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400"
                   id={"mainTable"}
                   register={register}
                   errors={errors}
                   name={"mainTable"}
                   label="Số lượng bàn chính thức"
                   value={selectedRequest.number_of_guests / 10}
-                  className={"text-white"}
                   readOnly
                   wrapperClassName="!mt-0"
                   OnChange={() => {}}
@@ -320,6 +326,8 @@ function RequestDetail({ id }) {
               </Col>
               <Col span={8}>
                 <FormInput
+                  theme={"light"}
+                  className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400"
                   name={"subTable"}
                   id={"subTable"}
                   register={register}
@@ -333,6 +341,8 @@ function RequestDetail({ id }) {
               </Col>
               <Col span={8}>
                 <FormInput
+                  theme={"light"}
+                  className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400"
                   id={"number_of_guests"}
                   register={register}
                   errors={errors}
@@ -347,6 +357,8 @@ function RequestDetail({ id }) {
               </Col>
               <Col span={8} className="flex flex-col">
                 <FormInput
+                  theme={"light"}
+                  className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400"
                   register={register}
                   errors={errors}
                   id={"created_at"}
@@ -365,6 +377,8 @@ function RequestDetail({ id }) {
               </Col>
               <Col span={8} className="flex flex-col">
                 <FormInput
+                  theme={"light"}
+                  className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200 !text-white !placeholder:text-gray-400"
                   register={register}
                   errors={errors}
                   id={"organization_date"}

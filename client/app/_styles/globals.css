@@ -163,6 +163,90 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-ExtraBoldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat Alternates';
+  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+}
+
 /* Add more font weights and styles as needed */
 
 
@@ -585,4 +669,11 @@ select {
   width: 150px;
   background-image: url(/line-group.svg);
   z-index: 1;
+}
+.notificationFeedback{
+  right: -430px;
+  transition: right 0.5s ease;
+}
+.notificationFeedback.show {
+  right: 20px; 
 }
