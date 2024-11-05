@@ -52,7 +52,7 @@ const Page = () => {
       const postToAPI = async () => {
         const response = await loginAccountUser(formData);
         Cookies.set("accessToken", response.data.data.access_token, {
-          expires: 1 / (60 * 24),
+          expires: 1,
         });
         localStorage.setItem("refreshToken", response.data.data.refresh_token);
         return response.data;
@@ -64,7 +64,6 @@ const Page = () => {
       let user = null;
       if (result.success !== false) {
         user = decodeJwt(result.data.access_token);
-        dispatch(login({ user }));
         localStorage.setItem(
           "user",
           JSON.stringify({ id: user.id, name: user.username, role: user.role })
