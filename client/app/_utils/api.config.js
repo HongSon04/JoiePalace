@@ -15,6 +15,7 @@ const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
+const DECORS = `${HOST}/decors`;
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
@@ -202,6 +203,10 @@ export const API_CONFIG = {
   BLOGS: {
     GET_ALL: (params) => constructUrlWithParams(`${BLOGS_API}/get-all`, params),
     GET_BY_ID: (id) => `${BLOGS_API}/get/${id}`,
+  },
+  DECORS: {
+    GET_ALL: (params) => constructUrlWithParams(`${DECORS}/get-all`, params),
+    GET_BY_ID: (id) => `${DECORS}/get/${id}`,
   },
 
   // NOTIFICATIONS API

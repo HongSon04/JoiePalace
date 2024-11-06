@@ -1,7 +1,4 @@
-'use client';
-
 import React from 'react';
-import { Image } from '@chakra-ui/react';
 import { Controller } from 'react-hook-form';
 
 const InputDetailCustomer = ({
@@ -11,10 +8,9 @@ const InputDetailCustomer = ({
     placeholder,
     options = [],
     name,
-    control, 
+    control,
     error,
 }) => {
-
     return (
         <div className="flex flex-col gap-2">
             <div className="flex gap-2 items-center">
@@ -26,11 +22,16 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
+                    defaultValue={options[0]?.value || ''} // Giá trị mặc định để tránh undefined
                     render={({ field }) => (
                         <select
                             className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
                             {...field}
+                            value={field.value || ''} // Đảm bảo `value` luôn có giá trị
                         >
+                            <option value="" disabled>
+                                Chọn {title}
+                            </option>
                             {options.map((option, index) => (
                                 <option className="text-black" key={index} value={option.value}>
                                     {option.label}
@@ -43,6 +44,7 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
+                    defaultValue="" // Giá trị mặc định cho các input khác
                     render={({ field }) => (
                         <input
                             {...field}
@@ -55,6 +57,7 @@ const InputDetailCustomer = ({
                     )}
                 />
             )}
+
             {error && <p className="text-red-500 text-sm">{error.message}</p>}
         </div>
     );

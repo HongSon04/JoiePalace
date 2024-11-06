@@ -1,42 +1,44 @@
 "use client";
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
-function RequestBreadcrumbsForQuanLyTiec({ requestId, nameLink }) {
-  const branch = {
-    id: 1,
-    name: "Hoàng Văn Thụ",
-    slug: "hoang-van-thu",
-  };
+function RequestBreadcrumbsForQuanLyTiec({ requestId, slugLink, nameLink }) {
+  const [currentNameLink, setCurrentNameLink] = useState(nameLink);
+
+  // Update state when nameLink changes
+  useEffect(() => {
+    setCurrentNameLink(nameLink);
+  }, [nameLink]);
 
   return (
     <Breadcrumb className="text-gray-400 mt-5">
       <BreadcrumbItem>
         <BreadcrumbLink
-          className="text-gray-400 hover:text-gray-200 "
-          href={`/admin/${nameLink}`}
+          className="text-gray-400 hover:text-gray-200"
+          href={`/admin/quan-ly-tiec`}
         >
-         Quản lý tiệc
+          Quản lý tiệc
         </BreadcrumbLink>
       </BreadcrumbItem>
 
       <BreadcrumbItem>
         <BreadcrumbLink
           className="text-gray-400 hover:text-gray-200"
-          href={`/admin/${nameLink}/${branch.slug}`}
+          href={`/admin/quan-ly-tiec/${slugLink}`}
         >
-          {branch.name}
+          {currentNameLink}
         </BreadcrumbLink>
       </BreadcrumbItem>
       <BreadcrumbItem>
         <BreadcrumbLink
           className="text-gray-400 hover:text-gray-200"
-          href={`/admin/${nameLink}/${branch.slug}/${requestId}`}
+          href={`/admin/quan-ly-tiec/${slugLink}/${requestId}`}
         >
           Chi tiết tiệc
         </BreadcrumbLink>
       </BreadcrumbItem>
-      </Breadcrumb>
+    </Breadcrumb>
   );
 }
 

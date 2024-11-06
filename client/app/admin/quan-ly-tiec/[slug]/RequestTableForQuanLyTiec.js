@@ -94,16 +94,6 @@ function RequestTable() {
       format(new Date(new Date().getFullYear(), 11, 31), "yyyy-MM-dd")
     ),
   });
-  const [branchDetail_id, setBranchDetail_id] = React.useState(null)
-
-  React.useEffect(() => {
-    if(typeof window !== 'undefined') {
-      const storeUser = JSON.parse(localStorage.getItem('user'));
-      if(storeUser?.branch_id) {
-        setBranchDetail_id(storeUser.branch_id)
-      }
-    }
-  },[])
 
   const [searchQuery, setSearchQuery] = React.useState("");
   const toast = useCustomToast();
@@ -118,32 +108,64 @@ function RequestTable() {
     setSearchQuery(query);
   }, []);
 
+  const toStandardDate = (customDate) => {
+    return new Date(customDate.year, customDate.month - 1, customDate.day);
+  };
+  const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
+  const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
+
   React.useEffect(() => {
+    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+
+    if (!currentBranch) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
+        type: "error",
+      });
+
+      router.push("/auth/chon-chi-nhanh");
+    }
     const params = {
       is_confirm: false,
       is_deposit: false,
-      // status: "pending",
+      status: "pending",
       page: currentPage,
       itemsPerPage,
-      // startDate: formatDate(date.start, "dd-MM-yyyy"),
-      // endDate: formatDate(date.end, "dd-MM-yyyy"),
+      branch_id: currentBranch.id,
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
     };
 
     dispatch(fetchRequests({ params }));
 
-    return () => {};
+    return () => { };
   }, [currentPage, itemsPerPage]);
 
   React.useEffect(() => {
+    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+
+    if (!currentBranch) {
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
+        type: "error",
+      });
+
+      router.push("/auth/chon-chi-nhanh");
+    }
     const controller = new AbortController();
 
     const params = {
       is_confirm: false,
       is_deposit: false,
-      // status: "pending",
+      status: "pending",
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
+      branch_id: currentBranch.id,
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
     };
 
     dispatch(fetchRequests({ signal: controller.signal, params }));
@@ -235,12 +257,12 @@ function RequestTable() {
               {cellValue}
             </Chip>
           );
-        case "total_amount": 
-        const totalAmount = item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0)
-        return new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND',
-        }).format(totalAmount);
+        case "total_amount":
+          const totalAmount = item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0)
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(totalAmount);
 
         case "amount_booking":
           const amount_booking = item.booking_details?.map((detail) => detail.deposits?.amount ? `${detail.deposits.amount}` : "Chưa có tiền cọc")
@@ -249,17 +271,17 @@ function RequestTable() {
             currency: 'VND',
           }).format(amount_booking);
 
-        case 'amount_to_be_paid': 
-        const bookingDetails = item.booking_details?.[0];
-        const totalAmount_paid = bookingDetails?.total_amount || 0;
-        const depositAmount = bookingDetails?.deposits?.amount || 0;
-        const amountPaid = totalAmount_paid - depositAmount;
-      
-        return new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND',
-        }).format(amountPaid);
-        
+        case 'amount_to_be_paid':
+          const bookingDetails = item.booking_details?.[0];
+          const totalAmount_paid = bookingDetails?.total_amount || 0;
+          const depositAmount = bookingDetails?.deposits?.amount || 0;
+          const amountPaid = totalAmount_paid - depositAmount;
+
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(amountPaid);
+
         case "deposit_amount":
         case "created_at": return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "organization_date":
