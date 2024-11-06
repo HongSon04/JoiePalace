@@ -1,5 +1,5 @@
 "use client";
-import "../../../../_styles/globals.css";
+import "../../../_styles/globals.css";
 import {
   ChevronDownIcon,
   ExclamationCircleIcon,
@@ -80,7 +80,7 @@ const columns = [
   { name: "Hành động", uid: "actions" },
 ];
 
-function BookingsTable({ branchId, userId }) {
+function BookingsTable({userId }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -127,34 +127,30 @@ function BookingsTable({ branchId, userId }) {
 
   const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
   const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
+  const [status, setStatus] = useState(""); 
+
   React.useEffect(() => {
     const params = {
-      is_confirm: false,
-      is_deposit: false,
-      status: "pending",
+      user_id: userId,
+      status: "",
       page: currentPage,
       itemsPerPage,
-      branch_id: branchId, 
-      ...(userId && { user_id: userId }),
       startDate: formattedStartDate,
       endDate: formattedEndDate,
     };
 
     dispatch(fetchRequests({ params }));
-  }, [currentPage, itemsPerPage, branchId, userId]);
+  }, [currentPage, itemsPerPage,  userId,status]);
 
   React.useEffect(() => {
     const controller = new AbortController();
-
     const params = {
-      branch_id: branchId,
-      is_confirm: false,
-      is_deposit: false,
-      status: "pending",
+      user_id: userId,
+      status: "",
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
-      ...(userId && { user_id: userId }),
+   
       
     };
 
@@ -163,7 +159,7 @@ function BookingsTable({ branchId, userId }) {
     return () => {
       controller.abort();
     };
-  }, [currentPage, itemsPerPage, date, searchQuery, branchId, userId]);
+  }, [currentPage, itemsPerPage, date, searchQuery,  userId, status]);
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)

@@ -101,7 +101,7 @@ const Page = ({ params }) => {
             fetchUserByBranchId(branchId),
             
         ]);
-        console.log(dataUser);
+        // console.log(dataUser);
         setDataBookingByMonth(dataBookingByMonth.data);
         setDataUser(dataUser);
         setdataTotalAdminByWeek(dataTotalAdminByWeek);

@@ -155,29 +155,32 @@ export const fetchInfoByMonth = async (branchId) => {
   }
 };
 
-export const getUserByBranchId = async (branchId) => {
+export const getUserById = async (userId) => {
   try {
-    const token = getCookie('accessToken'); 
-    const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(branchId), {
+
+    const token = getCookie('accessToken');
+    const url = API_CONFIG.USER.GET_BY_ID(userId);
+  
+
+    const response = await axios.get(url, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
     });
-    
+
     if (response.status !== 200) {
-      throw new Error("Có lỗi khi lấy dữ liệu !");
+      throw new Error("Có lỗi khi lấy dữ liệu!");
     }
-    
-    return response.data; 
+
+    return response.data;
   } catch (error) {
     if (error.response) {
       console.error("Lỗi từ server:", error.response.data);
-      console.error("Mã lỗi:", error.response.status);
-      console.error("Headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("Yêu cầu đã được gửi nhưng không nhận được phản hồi từ server:", error.request);
     } else {
-      console.error("Lỗi:", error.message);
+      console.error("Lỗi khác:", error.message);
     }
-    throw error; 
+    throw error;
   }
-  
 };
