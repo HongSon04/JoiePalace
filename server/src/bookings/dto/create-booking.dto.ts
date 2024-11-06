@@ -59,10 +59,10 @@ export class CreateBookingDto {
   company_name?: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
     description: 'Ghi chú thêm về sự kiện',
   })
-  note: string;
+  note?: string;
 
   @ApiProperty({
     required: false,

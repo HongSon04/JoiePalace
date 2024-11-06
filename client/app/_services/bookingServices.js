@@ -13,9 +13,36 @@ export const fetchAllPartyBookings = async (id) => {
   const response = await axios.get(API_CONFIG.BOOKINGS.GET_ALL(id));
 
   if (response.status !== 200) {
-    throw new Error("Có lỗi khi lấy thông tin tài khoản");
+    throw new Error("Có lỗi khi lấy dữ liệu");
   }
 
   return response.data.data;
+};
+export const fetchAllBookingByUserId = async (userId) => {
+  try {
+    const response = await axios.get(API_CONFIG.BOOKINGS.GET_ALL_BY_IDUSER(userId));
 
-}
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu");
+    }
+
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching bookings:', error); 
+    throw new Error("Có lỗi khi lấy dữ liệu");
+  }
+};
+export const fetchBookingById = async (id) => {
+  try {
+    const response = await axios.get(API_CONFIG.BOOKINGS.GET_BY_ID(id));
+
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu");
+    }
+
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching bookings:', error); 
+    throw new Error("Có lỗi khi lấy dữ liệu");
+  }
+};

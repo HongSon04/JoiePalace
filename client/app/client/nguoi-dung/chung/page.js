@@ -1,10 +1,33 @@
 'use client'
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AccountSectionClient from '@/app/_components/AccountSectionClient';
 import PartySectionClient from '@/app/_components/PartySectionClient';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
+
+
 
 const Page = () => {
+    const [user, setUser] = useState();
+
+    const data = [
+        {
+            "id": 1,
+            "branch_id": null,
+            "username": "admin",
+            "email": "admin1@gmail.com",
+            "platform": null,
+            "phone": "0315346764",
+            "avatar": null,
+            "role": "admin",
+            "active": true,
+            "verify_at": null,
+            "created_at": "2024-10-24T08:11:32.239Z",
+            "updated_at": "2024-10-31T02:38:12.031Z",
+            "memberships_id": null,
+            "memberships": null
+        }
+    ]
+
     const parties = [
         {
             id: '1',
@@ -47,12 +70,17 @@ const Page = () => {
         },
     ];
 
+    useEffect(() => {
+        setUser(data[0]);
+    }, []);
+    console.log(user);
+    
     return (
         <div className="flex flex-col gap-8">
 
             <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
-            <AccountSectionClient title="Tài khoản" nameUser={"Hồ Duy Hoàng Giang"} phoneUser={"0337678852"} emailUser={"hoduyhoanggiang08@gmail.com"} partyBooked={3} waitingParty={3} totalMoney={"500.000.000 VND"}/>
+            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} partyBooked={3} waitingParty={3} totalMoney={"500.000.000 VND"} />
 
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             <span className="text-base font-bold leading-normal text-gold">Tiệc gần nhất</span>

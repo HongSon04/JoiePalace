@@ -210,6 +210,12 @@ export class BookingsController {
   @ApiQuery({ name: 'deposit_id', required: false, description: '1' })
   @ApiQuery({ name: 'deleted', required: false, description: 'true | false' })
   @ApiQuery({
+    name: 'status',
+    required: false,
+    description:
+      '["pending", "processing", "success", "cancel"] || pending || processing || success || cancel',
+  })
+  @ApiQuery({
     name: 'is_confirm',
     required: false,
     description: 'true | false',
@@ -218,11 +224,6 @@ export class BookingsController {
     name: 'is_deposit',
     required: false,
     description: 'true | false',
-  })
-  @ApiQuery({
-    name: 'status',
-    required: false,
-    description: 'pending | processing | success | cancel',
   })
   findAll(@Query() query: FilterBookingDto) {
     return this.bookingsService.findAll(query);
@@ -415,7 +416,6 @@ export class BookingsController {
 
   // ! Update Booking
   @Patch('update/:booking_id')
-  @isPublic()
   @ApiOperation({
     summary: 'Cập nhật thông tin một đơn tiệc',
     description: `Cách tính tổng tiền tiệc:
@@ -496,7 +496,7 @@ amount sẽ gửi lên BE check trùng giá thì pass`,
   })
   update(
     @Request() req,
-    @Param('update/booking_id') id: number,
+    @Param('booking_id') id: number,
     @Body() updateBookingDto: UpdateBookingDto,
   ) {
     return this.bookingsService.update(req.user, id, updateBookingDto);

@@ -1,5 +1,51 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BookingStatus } from 'helper/enum/booking_status.enum';
+import { BookingStatus } from '@prisma/client';
+import {
+  registerDecorator,
+  ValidationArguments,
+  ValidationOptions,
+} from 'class-validator';
+
+export function IsBookingStatus(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: 'isBookingStatus',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any, args: ValidationArguments) {
+          if (value) {
+            if (typeof value === 'string') {
+              if (value.startsWith('[')) {
+                try {
+                  const arr = JSON.parse(value);
+                  return (
+                    Array.isArray(arr) &&
+                    arr.every((status) =>
+                      Object.values(BookingStatus).includes(status),
+                    )
+                  );
+                } catch {
+                  return false;
+                }
+              }
+              return Object.values(BookingStatus).includes(
+                value as BookingStatus,
+              );
+            }
+          } else {
+            return true;
+          }
+          return false;
+        },
+        defaultMessage(args: ValidationArguments) {
+          return `${args.property} must be a valid booking status or array of valid booking statuses`;
+        },
+      },
+    });
+  };
+}
 
 export class FilterBookingDto {
   @ApiProperty({
@@ -64,10 +110,14 @@ export class FilterBookingDto {
 
   @ApiProperty({
     required: false,
-    description: 'Trạng thái của đơn tiệc',
-    enum: BookingStatus,
+    description:
+      "Trạng thái của đơn tiệc ['pending', 'cancel', 'success', 'processing'] || 'pending' || 'cancel' || 'success' || 'processing'",
   })
-  status?: BookingStatus;
+  @IsBookingStatus({
+    message:
+      'Status không hợp lệ. Status phải là một trong các giá trị: pending, cancel, success, processing hoặc mảng các giá trị đó',
+  })
+  status?: string;
 
   @ApiProperty({
     required: false,

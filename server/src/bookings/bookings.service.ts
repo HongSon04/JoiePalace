@@ -1,5 +1,3 @@
-import { find } from 'rxjs';
-import { booking_details } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
   HttpException,
@@ -8,7 +6,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 import { BookingStatus } from 'helper/enum/booking_status.enum';
 import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
@@ -203,7 +200,6 @@ export class BookingsService {
             },
           }),
       };
-      console.log('whereConditions: ', whereConditions);
 
       // Add search conditions if search exists
       if (query.search) {
@@ -225,7 +221,20 @@ export class BookingsService {
       }
 
       if (query.status) {
-        whereConditions.status = query.status;
+        let statusArray: string[];
+
+        // Nếu status là string và có dạng array string (bắt đầu bằng '[')
+        if (typeof query.status === 'string' && query.status.startsWith('[')) {
+          statusArray = JSON.parse(query.status);
+        } else {
+          // Nếu là single value
+          statusArray = [query.status as string];
+        }
+
+        // Thêm vào where condition
+        whereConditions.status = {
+          in: statusArray,
+        };
       }
 
       // Add numeric ID filters with type checking
@@ -535,8 +544,8 @@ export class BookingsService {
       await this.prismaService.bookings.update({
         where: { id: Number(id) },
         data: {
-          is_confirm,
-          is_deposit,
+          is_confirm: String(is_confirm) === 'true' ? true : false,
+          is_deposit: String(is_deposit) === 'true' ? true : false,
           status: status as BookingStatus,
         },
       });
@@ -609,19 +618,14 @@ export class BookingsService {
         throw new NotFoundException('Không tìm thấy sảnh');
       }
 
-      // ? Check date_organization and shift is exist or not with another booking in the same branch and shift time and stages
-      const formattedDate = FormatDateWithShift(
-        findBooking.organization_date as any,
-        findBooking.shift,
-      );
-
       const checkDateAndShift = await this.prismaService.bookings.findMany({
         where: {
           deleted: false,
-          organization_date: { equals: formattedDate },
+          organization_date: findBooking.organization_date,
           shift: findBooking.shift,
           branch_id: findBooking.branch_id,
           stage_id: Number(stage_id),
+          NOT: { id: Number(id) },
         },
       });
 
@@ -669,8 +673,8 @@ export class BookingsService {
           email,
           note,
           number_of_guests: Number(number_of_guests),
-          is_confirm,
-          is_deposit,
+          is_confirm: String(is_confirm) === 'true' ? true : false,
+          is_deposit: String(is_deposit) === 'true' ? true : false,
           party_type_id: Number(party_type_id),
           phone,
           status: status as BookingStatus,
@@ -710,11 +714,6 @@ export class BookingsService {
         contents.type,
       );
 
-      let organization_date = FormatDateWithShift(
-        findBooking.organization_date as any,
-        findBooking.shift,
-      );
-
       if (!findBooking.is_confirm) {
         throw new BadRequestException(
           'Không thể sửa thông tin đơn đặt tiệc khi chưa xác nhận',
@@ -724,11 +723,15 @@ export class BookingsService {
       // ? Nếu mà ngày tổ chức chỉ còn 3 ngày nữa là tổ chức thì sẽ không cho sửa
       if (reqUser.role == 'user') {
         const currentDate = new Date();
-        const startDate = new Date(currentDate);
-        startDate.setDate(currentDate.getDate() + 7);
-        const endDate = new Date(currentDate);
-        endDate.setDate(currentDate.getDate() + 3);
-        if (new Date(organization_date) < endDate) {
+        const organizationDate = new Date(findBooking.organization_date);
+
+        // Sử dụng getTime() để lấy timestamp trước khi trừ
+        const daysUntilEvent = Math.ceil(
+          (organizationDate.getTime() - currentDate.getTime()) /
+            (1000 * 60 * 60 * 24),
+        );
+
+        if (daysUntilEvent <= 3) {
           throw new BadRequestException(
             'Không thể sửa thông tin đơn đặt tiệc khi còn 3 ngày nữa là tổ chức',
           );
@@ -736,38 +739,30 @@ export class BookingsService {
       }
 
       // Fetching user, branch,  stage, decor, and menu in parallel
-      const [user, branch, stage, decor, menu, party_types] = await Promise.all(
-        [
-          user_id
-            ? this.prismaService.users.findUnique({
-                where: { id: Number(user_id) },
-              })
-            : null,
-          this.prismaService.branches.findUnique({
-            where: { id: Number(branch_id) },
-          }),
-          this.prismaService.stages.findUnique({
-            where: { id: Number(stage_id) },
-          }),
-          this.prismaService.decors.findUnique({
-            where: { id: Number(decor_id) },
-            include: { products: true },
-          }),
-          this.prismaService.menus.findUnique({
-            where: { id: Number(menu_id) },
-            include: { products: true },
-          }),
-          this.prismaService.party_types.findUnique({
-            where: { id: Number(party_type_id) },
-            include: { products: true },
-          }),
-        ],
-      );
+      const [branch, stage, decor, menu, party_types] = await Promise.all([
+        this.prismaService.branches.findUnique({
+          where: { id: Number(branch_id) },
+        }),
+        this.prismaService.stages.findUnique({
+          where: { id: Number(stage_id) },
+        }),
+        this.prismaService.decors.findUnique({
+          where: { id: Number(decor_id) },
+          include: { products: true },
+        }),
+        this.prismaService.menus.findUnique({
+          where: { id: Number(menu_id) },
+          include: { products: true },
+        }),
+        this.prismaService.party_types.findUnique({
+          where: { id: Number(party_type_id) },
+          include: { products: true },
+        }),
+      ]);
       // Validate fetched data
       const validateExists = (entity: any, name: string) => {
         if (!entity) throw new NotFoundException(`Không tìm thấy ${name}`);
       };
-      validateExists(user, 'user');
       validateExists(branch, 'branch');
       validateExists(stage, 'stage');
       validateExists(decor, 'decor');
@@ -796,25 +791,38 @@ export class BookingsService {
       // ? Orther Service
       let otherServiceAmount = 0;
       // ! Fetch booking with relations
-      other_service.map(async (orther) => {
-        const findOther = await this.prismaService.products.findUnique({
-          where: { id: Number(orther.id) },
-        });
-        if (!findOther)
-          throw new HttpException(
-            'Không tìm thấy dịch vụ thêm',
-            HttpStatus.NOT_FOUND,
-          );
-        otherServiceAmount += Number(findOther.price) * Number(orther.quantity);
-        orther.name = findOther.name;
-        orther.amount = Number(findOther.price);
-        orther.total_price = Number(findOther.price) * Number(orther.quantity);
-        orther.description = findOther.description;
-        orther.short_description = findOther.short_description;
-        orther.images = findOther.images;
-        orther.quantity = Number(orther.quantity);
-        otherServiceAmount += Number(findOther.price) * Number(orther.quantity);
-      });
+      if (other_service) {
+        const jsonString = other_service
+          .replace(/;/g, ',')
+          .replace(/\s+/g, '')
+          .replace(/([{,])(\w+):/g, '$1"$2":');
+        const serviceArray = JSON.parse(jsonString);
+
+        await Promise.all(
+          serviceArray.map(async (orther) => {
+            const findOther = await this.prismaService.products.findUnique({
+              where: { id: Number(orther.id) },
+            });
+
+            if (!findOther)
+              throw new HttpException(
+                'Không tìm thấy dịch vụ thêm',
+                HttpStatus.NOT_FOUND,
+              );
+
+            otherServiceAmount +=
+              Number(findOther.price) * Number(orther.quantity);
+            orther.name = findOther.name;
+            orther.amount = Number(findOther.price);
+            orther.total_price =
+              Number(findOther.price) * Number(orther.quantity);
+            orther.description = findOther.description;
+            orther.short_description = findOther.short_description;
+            orther.images = findOther.images;
+            orther.quantity = Number(orther.quantity);
+          }),
+        );
+      }
 
       // ? Format Stage
       const {
@@ -884,7 +892,7 @@ export class BookingsService {
         );
         if (Number(amount) !== totalAmount) {
           throw new HttpException(
-            'Lỗi tính toán tổng tiền',
+            `Lỗi tính toán, tổng tiền phải là ${totalAmount}`,
             HttpStatus.BAD_REQUEST,
           );
         }
@@ -911,8 +919,10 @@ export class BookingsService {
           data: {
             decor_id: Number(decor_id),
             menu_id: Number(menu_id),
-            decor: decorFormat,
-            menu: menuFormat,
+            decor_detail: decorFormat,
+            menu_detail: menuFormat,
+            party_type_detail: partyTypeFormat,
+            stage_detail: stageFormat,
             table_count: Number(table_count),
             chair_count: Number(chair_count),
             spare_chair_count: spare_table_count
@@ -988,9 +998,10 @@ export class BookingsService {
             Number(spareTableAmount) +
             Number(otherServiceAmount),
         );
+
         if (Number(amount) !== totalAmount) {
           throw new HttpException(
-            'Lỗi tính toán tổng tiền',
+            `Lỗi tính toán, tổng tiền phải là ${totalAmount}`,
             HttpStatus.BAD_REQUEST,
           );
         }
@@ -1004,9 +1015,9 @@ export class BookingsService {
         const deposit = await this.prismaService.deposits.create({
           data: {
             transactionID: uniqid().toUpperCase(),
-            name: `Tiền cọc tiệc của ${user.username}`,
-            phone: user.phone,
-            email: user.email,
+            name: `Tiền cọc tiệc của ${findBooking.name}`,
+            phone: findBooking.phone,
+            email: findBooking.email,
             payment_method: null,
             amount: Number(depositAmount),
           },
@@ -1015,20 +1026,20 @@ export class BookingsService {
         // ! Create Or Update Booking
         const findBookingDetail =
           await this.prismaService.booking_details.findFirst({
-            where: { booking_id: Number(findBooking.id) },
+            where: { booking_id: Number(id) },
           });
+
         if (findBookingDetail) {
-          //? Delete Old Deposit
-          await this.prismaService.deposits.delete({
-            where: { id: Number(findBookingDetail.deposit_id) },
-          });
+          const oldDepositId = findBookingDetail.deposit_id;
           await this.prismaService.booking_details.update({
-            where: { booking_id: Number(findBookingDetail.id) },
+            where: { booking_id: Number(findBooking.id) },
             data: {
               decor_id: Number(decor_id),
               menu_id: Number(menu_id),
-              decor: decorFormat,
-              menu: menuFormat,
+              decor_detail: decorFormat,
+              menu_detail: menuFormat,
+              party_type_detail: partyTypeFormat,
+              stage_detail: stageFormat,
               extra_service: extra_service ? extra_service : null,
               gift,
               table_count: Number(table_count),
@@ -1051,15 +1062,20 @@ export class BookingsService {
               amount_booking: Number(bookingAmount),
             },
           });
+          //? Delete Old Deposit
+          await this.prismaService.deposits.delete({
+            where: { id: Number(oldDepositId) },
+          });
         } else {
           await this.prismaService.booking_details.create({
             data: {
               booking_id: Number(findBooking.id),
               decor_id: Number(decor_id),
               menu_id: Number(menu_id),
-              party_types: partyTypeFormat,
-              decor: decorFormat,
-              menu: menuFormat,
+              decor_detail: decorFormat,
+              menu_detail: menuFormat,
+              party_type_detail: partyTypeFormat,
+              stage_detail: stageFormat,
               extra_service: extra_service ? extra_service : null,
               gift,
               fee,
