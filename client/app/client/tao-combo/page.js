@@ -66,7 +66,7 @@ const partySizes = [
     id: "100-200",
     name: "100 - 200 khách",
   },
-  {
+  { 
     id: "200-500",
     name: "200 - 500 khách",
   },
@@ -563,7 +563,7 @@ function Page() {
         <DrawerContent className="!bg-darkGreen-primary">
           <DrawerCloseButton textColor={"white"} />
           <DrawerHeader className="!text-white">Gói tiệc của bạn</DrawerHeader>
-
+            
           <DrawerBody>
             {categories.map((category, i) => (
               <div key={category.id} className={`${i !== 0 ? "mt-5" : ""}`}>
