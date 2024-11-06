@@ -6,17 +6,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateBranchDto, ImageUploadBranchDto } from './dto/create-branch.dto';
-import { UpdateBranchDto } from './dto/update-branch.dto';
-import { PrismaService } from 'src/prisma.service';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FilterDto } from 'helper/dto/Filter.dto';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
-import { MakeSlugger } from 'helper/slug';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { MakeSlugger } from 'helper/slug';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { CreateBranchDto, ImageUploadBranchDto } from './dto/create-branch.dto';
+import { UpdateBranchDto } from './dto/update-branch.dto';
 
 @Injectable()
 export class BranchesService {

@@ -75,6 +75,7 @@ model users {
   bookings       bookings[]
   feedbacks      feedbacks[]
   notifications  notifications[]
+  menus          menus[]
 }
 
 model memberships {
@@ -199,6 +200,8 @@ model products {
 
 model menus {
   id              Int               @id @default(autoincrement())
+  user_id         Int?
+  users           users?            @relation(fields: [user_id], references: [id])
   name            String
   slug            String            @unique
   description     String

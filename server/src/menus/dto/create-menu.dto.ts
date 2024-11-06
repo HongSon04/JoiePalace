@@ -28,7 +28,7 @@ export class CreateMenuDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })
-  price: number;
+  price: string;
 
   @ApiProperty({
     description: 'Menu có hiển thị cho khách hàng hay không',

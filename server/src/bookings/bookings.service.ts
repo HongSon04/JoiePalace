@@ -618,23 +618,6 @@ export class BookingsService {
         throw new NotFoundException('Không tìm thấy sảnh');
       }
 
-      const checkDateAndShift = await this.prismaService.bookings.findMany({
-        where: {
-          deleted: false,
-          organization_date: findBooking.organization_date,
-          shift: findBooking.shift,
-          branch_id: findBooking.branch_id,
-          stage_id: Number(stage_id),
-          NOT: { id: Number(id) },
-        },
-      });
-
-      if (checkDateAndShift.length > 0) {
-        throw new BadRequestException(
-          'Đã có sự kiện tổ chức vào thời gian này',
-        );
-      }
-
       // Status = true =? Check Rank User
       if (status === BookingStatus.SUCCESS) {
         this.updateMembershipBooking(findBooking.user_id);
@@ -658,6 +641,24 @@ export class BookingsService {
         }
       }
 
+      // ? Nếu mà ngày tổ chức chỉ còn 3 ngày nữa là tổ chức thì sẽ không cho sửa
+      if (reqUser.role == 'user') {
+        const currentDate = new Date();
+        const organizationDate = new Date(findBooking.organization_date);
+
+        // Sử dụng getTime() để lấy timestamp trước khi trừ
+        const daysUntilEvent = Math.ceil(
+          (organizationDate.getTime() - currentDate.getTime()) /
+            (1000 * 60 * 60 * 24),
+        );
+
+        if (daysUntilEvent <= 3) {
+          throw new BadRequestException(
+            'Không thể sửa thông tin đơn đặt tiệc khi còn 3 ngày nữa là tổ chức',
+          );
+        }
+      }
+
       // ! Update Booking
       await this.prismaService.bookings.update({
         where: { id: Number(id) },
@@ -669,6 +670,7 @@ export class BookingsService {
               : null,
           branch_id: Number(branch_id),
           name,
+          phone,
           company_name: company_name ? company_name : null,
           email,
           note,
@@ -676,7 +678,6 @@ export class BookingsService {
           is_confirm: String(is_confirm) === 'true' ? true : false,
           is_deposit: String(is_deposit) === 'true' ? true : false,
           party_type_id: Number(party_type_id),
-          phone,
           status: status as BookingStatus,
         },
       });
@@ -720,24 +721,6 @@ export class BookingsService {
         );
       }
 
-      // ? Nếu mà ngày tổ chức chỉ còn 3 ngày nữa là tổ chức thì sẽ không cho sửa
-      if (reqUser.role == 'user') {
-        const currentDate = new Date();
-        const organizationDate = new Date(findBooking.organization_date);
-
-        // Sử dụng getTime() để lấy timestamp trước khi trừ
-        const daysUntilEvent = Math.ceil(
-          (organizationDate.getTime() - currentDate.getTime()) /
-            (1000 * 60 * 60 * 24),
-        );
-
-        if (daysUntilEvent <= 3) {
-          throw new BadRequestException(
-            'Không thể sửa thông tin đơn đặt tiệc khi còn 3 ngày nữa là tổ chức',
-          );
-        }
-      }
-
       // Fetching user, branch,  stage, decor, and menu in parallel
       const [branch, stage, decor, menu, party_types] = await Promise.all([
         this.prismaService.branches.findUnique({
@@ -770,19 +753,19 @@ export class BookingsService {
       // ? Calculate accessory amounts
       let tableAmount = Number(table_count) * 200000;
       let spareTableAmount = Number(spare_table_count) * 200000;
-      let chair_count = table_count * 10;
-      let spare_chair_count = spare_table_count * 10;
+      let chair_count = Number(table_count) * 10;
+      let spare_chair_count = Number(spare_table_count) * 10;
       let chairAmount = chair_count * 50000;
       let spareChairAmount = spare_chair_count * 50000;
       let totalMenuAmount = Number(menu.price) * Number(table_count);
 
-      if (table_count > findStages.capacity_max) {
+      if (Number(table_count) > Number(findStages.capacity_max)) {
         throw new BadRequestException(
           'Số lượng bàn vượt quá sức chứa của sảnh',
         );
       }
 
-      if (table_count < findStages.capacity_min) {
+      if (Number(table_count) < Number(findStages.capacity_min)) {
         throw new BadRequestException(
           'Số lượng bàn quá ít so với sức chứa tối thiểu của sảnh',
         );
@@ -856,27 +839,38 @@ export class BookingsService {
       if (findBooking.is_deposit === true) {
         let extraServiceAmount = 0;
         // ! Fetch booking with relations
-        extra_service.map(async (extra) => {
-          const findExtra = await this.prismaService.products.findUnique({
-            where: { id: Number(extra.id) },
-          });
-          if (!findExtra)
-            throw new HttpException(
-              'Không tìm thấy dịch vụ thêm',
-              HttpStatus.NOT_FOUND,
-            );
-          extraServiceAmount +=
-            Number(findExtra.price) * Number(extra.quantity);
-          extra.name = findExtra.name;
-          extra.amount = Number(findExtra.price);
-          extra.total_price = Number(findExtra.price) * Number(extra.quantity);
-          extra.description = findExtra.description;
-          extra.short_description = findExtra.short_description;
-          extra.images = findExtra.images;
-          extra.quantity = Number(extra.quantity);
-          extraServiceAmount +=
-            Number(findExtra.price) * Number(extra.quantity);
-        });
+
+        if (extra_service) {
+          const jsonString = extra_service
+            .replace(/;/g, ',')
+            .replace(/\s+/g, '')
+            .replace(/([{,])(\w+):/g, '$1"$2":');
+          const serviceArray = JSON.parse(jsonString);
+
+          await Promise.all(
+            serviceArray.map(async (extra) => {
+              const findOther = await this.prismaService.products.findUnique({
+                where: { id: Number(extra.id) },
+              });
+
+              if (!findOther)
+                throw new HttpException(
+                  'Không tìm thấy dịch vụ thêm',
+                  HttpStatus.NOT_FOUND,
+                );
+              extraServiceAmount +=
+                Number(findOther.price) * Number(extra.quantity);
+              extra.name = findOther.name;
+              extra.amount = Number(findOther.price);
+              extra.total_price =
+                Number(findOther.price) * Number(extra.quantity);
+              extra.description = findOther.description;
+              extra.short_description = findOther.short_description;
+              extra.images = findOther.images;
+              extra.quantity = Number(extra.quantity);
+            }),
+          );
+        }
         // Total calculation
         const totalAmount = Number(
           Number(decor.price) +

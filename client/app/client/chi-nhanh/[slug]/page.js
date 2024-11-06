@@ -45,7 +45,73 @@ const textContainerVariants = {
     },
   },
 };
-
+const spaces = [
+  {
+    id: 1,
+    name: "Kiểu lớp học",
+    description:
+      "Dãy bàn, ghế hội nghị hướng lên sân khấu, thường có diễn giả, không gian thuận tiện cho việc ghi chép, đọc tài liệu. Thích hợp cho những sự kiện có ghi chép hoặc có phát tài liệu để người tham dự tham khảo hoặc dùng máy tính xách tay. Đây là giải pháp sắp xếp thoải mái nhất cho những cuộc họp dài và có không gian cho khách mời để vật dụng hoặc gác tay.",
+    url: [
+      "/HVT-CLASSROOM-1-260x420.jpg",
+      "/HVT-CLASSROOM-2-260x420.jpg",
+      "/HVT-CLASSROOM-3-260x420.jpg",
+    ],
+  },
+  {
+    id: 2,
+    name: "Kiểu bán nguyệt",
+    description:
+      "Sắp xếp ghế một nửa bàn để người tham gia có thể hướng về sân khấu hoặc diễn giả. Thích hợp với các buổi đào tạo, workshop cần có nhiều đóng góp ý kiến, thảo luận và tương tác của người tham gia.",
+    url: [
+      "/HVT-SEMI-CIRCLE-1-260x420.jpg",
+      "/HVT-SEMI-CIRCLE-2-260x420.jpg",
+      "/HVT-SEMI-CIRCLE-3-260x420.jpg",
+      "/HVT-SEMI-CIRCLE-4-260x420.jpg",
+    ],
+  },
+  {
+    id: 3,
+    name: "kiểu rạp hát",
+    description:
+      "Chỗ ngồi thường đối diện với sân khấu, với bàn họp hay các diễn giả và đặc biệt không có bàn kèm theo. Thích hợp cho những sự kiện người tham dự là khán giả, không phù hợp cho các sự kiện ăn uống hoặc ghi chép.",
+    url: [
+      "/WP-HVT-THEATER-1-260x420 (1).jpg",
+      "/WP-HVT-THEATER-2-260x420 (1).jpg",
+      "/WP-HVT-THEATER-3-260x420.jpg",
+      "/WP-HVT-THEATER-4-260x420 (1).jpg",
+    ],
+  },
+];
+const designs = [
+  {
+    id: 1,
+    name: "DIWA",
+    url: "/images-client/branch/hoang-van-thu/DIWA-2.jpg",
+    description:
+      "Lấy cảm hứng từ lễ hội đèn trời nổi tiếng, các kiến trúc sư đã kiến tạo nên không gian lãng mạn, huyền ảo tại Diwa. Sở hữu công năng linh hoạt với sức chứa từ 300 đến 1.200 khách, sảnh Diwa có thể đáp ứng đa dạng các loại hình sự kiện, từ tiệc sinh nhật, sự kiện cưới đến các buổi hội nghị, hội thảo, tiệc tất niên, gala dinner,…",
+  },
+  {
+    id: 2,
+    name: "SOULIX",
+    url: "/images-client/branch/hoang-van-thu/SOULIX-2-1.jpg",
+    description:
+      "Sở hữu thiết kế trần gỗ đan xen độc đáo kết hợp cùng hạt ánh sáng lung linh, Soulix mang đến không gian thanh lịch, ấm cúng cho các sự kiện quy mô nhỏ, các buổi tiệc thân mật dành cho gia đình, bạn bè như tiệc sinh nhật, thôi nôi, lễ đính hôn, kỷ niệm ngày cưới,…",
+  },
+  {
+    id: 3,
+    name: "ALPAS",
+    url: "/images-client/branch/hoang-van-thu/ALPAS-4.jpg",
+    description:
+      "Kiến trúc mang đậm dấu ấn nghệ thuật với chuỗi hạt ánh sáng tỏa lung tinh từ trần gỗ đã kiến tạo nên không gian thanh lịch và ấm áp tại Alpas. Là đại sảnh lớn nhất với sức chứa lên đến 2.000 khách, Alpas là sự lựa chọn tối ưu cho các sự kiện giải trí, triển lãm nghệ thuật hay hội nghị thương mại quy mô lớn.",
+  },
+  {
+    id: 4,
+    name: "CHILLAX",
+    url: "/images-client/branch/hoang-van-thu/CHILLAX-2.jpg",
+    description:
+      "Lan tỏa cảm hứng sáng tạo với thiết kế gỗ đan xen đầy cá tính, Chillax là sự lựa chọn lý tưởng cho các sự kiện đề cao tính gắn kết có quy mô dưới 100 khách như workshop giao lưu, hội thảo, họp báo,…",
+  },
+];
 const PageLocation = () => {
   const [branch, setBranch] = useState(null);
   const carouselRef = useRef();
@@ -53,6 +119,8 @@ const PageLocation = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselMapRef1 = useRef(null);
   const carouselMapRef2 = useRef(null);
+  const [currentSpace, setCurrentSpace] = useState(spaces[0]);
+  const [currentDesign, setCurrentDesign] = useState(designs[0]);
   const { slug } = useParams();
   useEffect(() => {
     const handleResize = () => {
@@ -100,8 +168,6 @@ const PageLocation = () => {
   };
 
   const spans = splitIntoSpans(branch.slogan);
-  console.log(branch);
-
   const JsxContent = (
     <>
       {/* banner */}
@@ -513,23 +579,22 @@ const PageLocation = () => {
           >
             <div className="w-full flex flex-col gap-6 lg:gap-12">
               <div className="w-full flex justify-between lg:justify-normal lg:flex-col gap-12">
-                <span className="w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50 space-active">
-                  Kiểu lớp học
-                </span>
-                <span className="w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50">
-                  Kiểu bán nguyệt
-                </span>
-                <span className="w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium opacity-50">
-                  Kiểu rạp hát
-                </span>
+                {spaces.map((space, index) => (
+                  <span
+                    onClick={(e) => setCurrentSpace(spaces[index])}
+                    key={space.id}
+                    className={`w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium space-active cursor-pointer ${
+                      currentSpace.id === index + 1
+                        ? "opacity-100"
+                        : "!opacity-50"
+                    }`}
+                  >
+                    {space.name}
+                  </span>
+                ))}
               </div>
               <div className="text-white text-xs sm:text-sm lg:text-base w-full">
-                Dãy bàn, ghế hội nghị hướng lên sân khấu, thường có diễn giả,
-                không gian thuận tiện cho việc ghi chép, đọc tài liệu. Thích hợp
-                cho những sự kiện có ghi chép hoặc có phát tài liệu để người
-                tham dự tham khảo hoặc dùng máy tính xách tay. Đây là giải pháp
-                sắp xếp thoải mái nhất cho những cuộc họp dài và có không gian
-                cho khách mời để vật dụng hoặc gác tay.
+                {currentSpace?.description}
               </div>
             </div>
           </TextFade>
@@ -561,30 +626,11 @@ const PageLocation = () => {
               removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
               containerClass="w-full h-full"
             >
-              <div className="w-full h-full p-2">
-                <Image
-                  src="https://whitepalace.com.vn/wp-content/uploads/2024/06/HVT-CLASSROOM-1-260x420.jpg"
-                  w={"100%"}
-                  h={"100%"}
-                  alt=""
-                />
-              </div>
-              <div className="w-full h-full p-2">
-                <Image
-                  src="https://whitepalace.com.vn/wp-content/uploads/2024/06/HVT-CLASSROOM-2-260x420.jpg"
-                  w={"100%"}
-                  h={"100%"}
-                  alt=""
-                />
-              </div>
-              <div className="w-full h-full p-2">
-                <Image
-                  src="https://whitepalace.com.vn/wp-content/uploads/2024/06/HVT-CLASSROOM-3-260x420.jpg"
-                  w={"100%"}
-                  h={"100%"}
-                  alt=""
-                />
-              </div>
+              {currentSpace?.url?.map((imageUrl, index) => (
+                <div key={index} className="w-full h-full p-2">
+                  <Image src={imageUrl} w={"100%"} h={"100%"} alt="" />
+                </div>
+              ))}
             </Carousel>
           </div>
         </div>
@@ -593,13 +639,16 @@ const PageLocation = () => {
         <div className="w-screen h-screen relative top-0 left-0">
           <div className="w-screen h-screen absolute top-0 left-0 overflow-hidden">
             <Image
-              src="https://whitepalace.com.vn/wp-content/uploads/2024/06/Hall-A-Background_page-0001.jpg"
+              src={currentDesign.url}
               w={"100%"}
               h={"100%"}
               className="object-cover"
               alt=""
             />
-            <div className="w-full h-full absolute top-0 left-0 bg-whiteAlpha-50"></div>
+            <div
+              className="w-full h-full absolute top-0 left-0 !bg-[rgb(88 79 79 / 46%)]"
+              id="bg_fill"
+            ></div>
           </div>
           <div className="w-screen h-screen flex flex-col justify-center items-center gap-9 absolute top-0 left-0 px-[12%] lg:px-44">
             <div className="w-full h-auto flex justify-end">
@@ -632,14 +681,11 @@ const PageLocation = () => {
             </div>
             <div className="w-full h-auto flex flex-col lg:flex-row gap-6">
               <div className="w-full lg:w-1/2 h-auto flex flex-col gap-4 lg:gap-8">
-                <span className="uppercase text-5xl font-semibold">diwa</span>
-                <span className="text-xs sm:text-sm lg:text-base font-normal leading-4 lg:leading-7">
-                  Lấy cảm hứng từ lễ hội đèn trời nổi tiếng, các kiến trúc sư đã
-                  kiến tạo nên không gian lãng mạn, huyền ảo tại Diwa. Sở hữu
-                  công năng linh hoạt với sức chứa từ 300 đến 1.200 khách, sảnh
-                  Diwa có thể đáp ứng đa dạng các loại hình sự kiện, từ tiệc
-                  sinh nhật, sự kiện cưới đến các buổi hội nghị, hội thảo, tiệc
-                  tất niên, gala dinner,…
+                <span className="uppercase text-5xl font-semibold">
+                  {currentDesign.name}
+                </span>
+                <span className="text-xs sm:text-sm lg:text-base font-normal leading-4 lg:leading-7 ">
+                  {currentDesign.description}
                 </span>
                 <div className="lg:mt-9">
                   <ButtonDiscover className="px-4" />
@@ -676,20 +722,21 @@ const PageLocation = () => {
                   removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
                   containerClass="w-full h-full"
                 >
-                  {section6.map((item) => (
+                  {designs.map((design, index) => (
                     <div
-                      key={item.id}
-                      className="w-full h-full px-2 flex justify-center items-center relative"
+                      onClick={() => setCurrentDesign(designs[index])}
+                      key={design.id}
+                      className="w-full h-full px-2 flex justify-center items-center relative cursor-pointer"
                     >
                       <div className="w-full h-full overflow-hidden">
                         <Image
-                          src={item.url}
+                          src={design.url}
                           className="w-full h-full object-cover"
                           alt=""
                         />
                       </div>
                       <span className="absolute uppercase bottom-4 text-lg md:xl font-bold lg:text-2xl">
-                        {item.name}
+                        {design.name}
                       </span>
                     </div>
                   ))}

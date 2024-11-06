@@ -41,7 +41,7 @@ export class CreatePartyTypeDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })
-  price: number;
+  price: string;
 }
 
 export class ImagePartyTypesDto {
