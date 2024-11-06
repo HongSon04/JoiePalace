@@ -3,6 +3,7 @@ import React from "react";
 import { IoIosLogOut } from "react-icons/io";
 import { FiUpload } from "react-icons/fi";
 import { RiDeleteBin2Line } from "react-icons/ri";
+import Image from "next/image";
 const page = () => {
   return (
     <main className="grid gap-6 p-4 text-white">
@@ -15,9 +16,14 @@ const page = () => {
         <p>/</p>
         <p>Thêm tài khoản khách hàng</p>
       </div>
-      <div className="p-5 bg-whiteAlpha-100 rounded-lg grid gap-[22px]">
+      <div className="p-5 bg-whiteAlpha-100 rounded-lg grid gap-4">
         <div className="flex gap-3 items-center">
-          <Image className="rounded-full w-[70px]" src="/image/user.jpg" />
+          <Image
+            className="rounded-full"
+            src="/image/user.jpg"
+            width={90}   
+            height={90}  
+          />
           <div className="flex gap-[5px] items-center"></div>
         </div>
         <div className="w-full">
@@ -28,23 +34,25 @@ const page = () => {
                 <input
                   className="w-full p-3 rounded-lg bg-whiteAlpha-100"
                   type="text"
-                  value="rubysayhi"
+                  placeholder="rubysayhi"
+                  value=""
                 ></input>
               </div>
               <div className="w-1/3">
                 <p className="mb-3">Email</p>
                 <input
                   className="w-full p-3 rounded-lg bg-whiteAlpha-100"
-                  type="text"
-                  value="rubysayhi@gmail.com"
+                  type="email"
+                  placeholder="rubysayhi@gmail.com"
+                  value=""
                 ></input>
               </div>
               <div className="w-1/3">
-                <p className="mb-3">Số điện thoại</p>
+                <p className="mb-3">Mật khẩu</p>
                 <input
                   className="w-full p-3 rounded-lg bg-whiteAlpha-100"
                   type="text"
-                  value="rubysayhi@gmail.com"
+                  placeholder="Mật khẩu"
                 ></input>
               </div>
             </form>

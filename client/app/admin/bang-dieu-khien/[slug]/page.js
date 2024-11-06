@@ -267,7 +267,7 @@ const Page = ({ params }) => {
               <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
             </Link>
           </div>
-          <div className="flex flex-col gap-3 h-[500px] overflow-y-auto hide-scrollbar">
+          <div className="flex flex-col gap-3 h-[580px] overflow-y-auto hide-scrollbar">
             {dataUser && dataUser.data.length > 0 ? (
                 dataUser.data.map((item, index) => (
                     <div key={index} className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
@@ -320,7 +320,7 @@ const Page = ({ params }) => {
             <p className="text-base  font-semibold">Doanh thu tổng / năm</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 h-[500px] overflow-y-auto hide-scrollbar items-start">
+          <div className="grid grid-cols-1 gap-4 h-[580px] overflow-y-auto hide-scrollbar items-start">
             {branchId === 2 ? (
               <>
                 <div className="p-2 bg-blackAlpha-100 rounded-xl">

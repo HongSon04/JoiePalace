@@ -12,6 +12,8 @@ import { fetchBranchBySlug } from "@/app/_services/branchesServices";
 import CustomPagination from "@/app/_components/CustomPagination";
 import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
 import Link from "next/link";
+import { Button } from "antd";
+import { PlusIcon } from "@heroicons/react/24/outline";
 // import { Link } from 'react-router-dom';
 const Page = ({params}) => {    
   const { slug } = params;
@@ -27,7 +29,10 @@ const Page = ({params}) => {
     const fetchData = async () => {
       try {
         const dataSlug = await fetchBranchBySlug(slug);
-        const branchId = dataSlug[0].id;
+        // const branchId = dataSlug[0].id;
+        
+        
+        
         const userData = await makeAuthorizedRequest(
           API_CONFIG.USER.GET_BY_BRANCH_ID({
             branch_id: branchId,
@@ -36,7 +41,7 @@ const Page = ({params}) => {
           "GET",
           null
         );
-        console.log(userData);
+        // console.log(userData);
         
         const topUserData = await makeAuthorizedRequest(
           API_CONFIG.USER.GET_BY_BRANCH_ID({
@@ -56,7 +61,7 @@ const Page = ({params}) => {
       }    
     };
     fetchData();
-  }, );
+  },[] );
 
   const totalItems = dataUser.length;
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -79,15 +84,24 @@ const Page = ({params}) => {
   // console.log(currentItems.id, typeof currentItems.id);
   // console.log(currentItems);
   // console.log(dataTopUser);
+  console.log(slug);
   
   return (
     <main className="grid gap-6 p-4 text-white">
-      <AdminHeader
-        title="Khách hàng"
-        showBackButton={false}
-        showSearchForm={false}
-        
-      />
+      <div className="flex items-center gap-5">
+        <AdminHeader
+          title="Khách hàng"
+          showBackButton={false}
+          showSearchForm={false}
+        />
+         <Link
+          href={`/admin/khach-hang/${slug}/them-tai-khoan`}
+          className="px-3 py-1 h-full bg-whiteAlpha-100 flex flex-center gap-3 rounded-full text-white shrink-0 hover:whiteAlpha-200"
+        >
+          <PlusIcon className="h-6 w-6 cursor-pointer text-white" />
+           Thêm tài khoản khách hàng
+        </Link>
+      </div>
       <div className="flex justify-start items-center gap-2 text-base text-gray-500">
         <p>Khách hàng</p>
       </div>
