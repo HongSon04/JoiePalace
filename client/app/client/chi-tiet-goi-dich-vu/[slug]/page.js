@@ -38,6 +38,8 @@ const listSpaces = [
 
 const Page = () => {
   const { slug } = useParams();
+  console.log(slug);
+  
   console.log(API_CONFIG.PACKAGES.GET_ALL);
 
   useEffect(() => {
