@@ -1,11 +1,27 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class FilterDto {
-  page: string;
+  @ApiProperty({ required: false, description: 'Trang hiện tại' })
+  page?: string;
 
-  itemsPerPage: string;
+  @ApiProperty({
+    required: false,
+    description: 'Số lượng sản phẩm trên 1 trang',
+  })
+  itemsPerPage?: string;
 
-  search: string;
+  @ApiProperty({ required: false, description: 'Tìm kiếm' })
+  search?: string;
 
-  startDate: string;
+  @ApiProperty({
+    required: false,
+    description: 'Ngày bắt đầu (ngày tạo sản phẩm)',
+  })
+  startDate?: string;
 
-  endDate: string;
+  @ApiProperty({
+    required: false,
+    description: 'Ngày kết thúc (ngày tạo sản phẩm)',
+  })
+  endDate?: string;
 }
