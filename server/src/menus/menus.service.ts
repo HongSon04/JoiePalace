@@ -592,7 +592,7 @@ export class MenusService {
         data: {
           name,
           description,
-          price,
+          price: Number(price),
           slug,
           products: {
             set: connectproducts,

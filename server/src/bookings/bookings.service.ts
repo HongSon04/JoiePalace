@@ -770,19 +770,19 @@ export class BookingsService {
       // ? Calculate accessory amounts
       let tableAmount = Number(table_count) * 200000;
       let spareTableAmount = Number(spare_table_count) * 200000;
-      let chair_count = table_count * 10;
-      let spare_chair_count = spare_table_count * 10;
+      let chair_count = Number(table_count) * 10;
+      let spare_chair_count = Number(spare_table_count) * 10;
       let chairAmount = chair_count * 50000;
       let spareChairAmount = spare_chair_count * 50000;
       let totalMenuAmount = Number(menu.price) * Number(table_count);
 
-      if (table_count > findStages.capacity_max) {
+      if (Number(table_count) > Number(findStages.capacity_max)) {
         throw new BadRequestException(
           'Số lượng bàn vượt quá sức chứa của sảnh',
         );
       }
 
-      if (table_count < findStages.capacity_min) {
+      if (Number(table_count) < Number(findStages.capacity_min)) {
         throw new BadRequestException(
           'Số lượng bàn quá ít so với sức chứa tối thiểu của sảnh',
         );

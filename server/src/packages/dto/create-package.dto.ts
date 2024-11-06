@@ -49,7 +49,7 @@ export class CreatePackageDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })
-  price: number;
+  price: string;
 
   @ApiProperty({
     description: 'Ảnh gói tiệc, không được để trống',

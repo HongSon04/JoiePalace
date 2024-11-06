@@ -36,7 +36,7 @@ export class ProductResDto {
     description: 'Giá của sản phẩm',
     example: 10000000,
   })
-  price: number;
+  price: string;
 
   @ApiProperty({
     description: 'Ảnh của sản phẩm',

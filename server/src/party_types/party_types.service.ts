@@ -54,10 +54,10 @@ export class PartyTypesService {
 
       // Kiểm tra giá
       const totalProductPrice = foundProducts.reduce(
-        (total, product) => total + product.price,
+        (total, product) => total + Number(product.price),
         0,
       );
-      if (totalProductPrice !== price) {
+      if (Number(totalProductPrice) !== Number(price)) {
         throw new BadRequestException('Giá loại tiệc không chính xác');
       }
 
