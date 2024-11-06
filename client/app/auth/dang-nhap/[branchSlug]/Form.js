@@ -37,14 +37,20 @@ import useCustomToast from "@/app/_hooks/useCustomToast";
 
 const schema = z.object({
   password: z
-    .string()
-    .nonempty("Mật khẩu không được để trống")
-    .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
-    .max(35, "Mật khẩu không được vượt quá 35 ký tự"),
+    .string({
+      required_error: "Mật khẩu không hợp lệ",
+    })
+    .min(1, { message: "Vui lòng nhập mật khẩu" })
+    .min(8, { message: "Mật khẩu phải có ít nhất 8 ký tự" })
+    .max(35, { message: "Mật khẩu không được vượt quá 35 ký tự" }),
   email: z
-    .string()
-    .nonempty("Email không được để trống")
-    .email("Email không hợp lệ"),
+    .string({
+      required_error: "Vui lòng nhập email",
+    })
+    .min(1, { message: "Vui lòng nhập email" })
+    .email({
+      message: "Email không hợp lệ",
+    }),
 });
 
 function Form({}) {

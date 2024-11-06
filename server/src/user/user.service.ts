@@ -540,13 +540,7 @@ export class UserService {
 
       const [users, total] = await this.prismaService.$transaction([
         this.prismaService.users.findMany({
-          where: {
-            OR: [
-              { username: { contains: search, mode: 'insensitive' } },
-              { email: { contains: search, mode: 'insensitive' } },
-              { phone: { contains: search, mode: 'insensitive' } },
-            ],
-          },
+          where: whereConditions,
           include: {
             memberships: true,
           },

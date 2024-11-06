@@ -1,15 +1,19 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import menuBg from "@/public/Alacarte-Menu-Thumbnail.png";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
 
 const initialState = {
   selectAll: false,
   menuList: [],
   status: "idle",
   error: null,
-  selectedMenuId: [],
   menu: {},
+  isFetchingMenu: false,
+  isFetchingMenuError: false,
   isFetchingMenuList: false,
-  isErrorFetchingMenuList: false,
+  isFetchingMenuListError: false,
+  isCreatingMenu: false,
+  isCreatingMenuError: false,
   pagination: {},
 };
 
@@ -34,73 +38,168 @@ const checkboxSlice = createSlice({
       }
       state.selectAll = state.menuList.every((item) => item.checked);
     },
+
     setSelectedMenuId: (state, action) => {
       state.selectedMenuId = action.payload;
     },
 
     fetchMenuListRequest: (state) => {
       state.isFetchingMenuList = true;
-      state.isErrorFetchingMenuList = false;
+      state.isFetchingMenuError = false;
     },
     fetchMenuListSuccess: (state, action) => {
       state.isFetchingMenuList = false;
       state.menuList = action.payload.data;
       state.pagination = action.payload.pagination;
+      state.isFetchingMenuError = false;
     },
     fetchMenuListError: (state) => {
       state.isFetchingMenuList = false;
-      state.isErrorFetchingMenuList = true;
+      state.isFetchingMenuError = true;
+    },
+
+    fetchMenuRequest: (state) => {
+      state.isFetchingMenu = true;
+      state.isFetchingMenuError = false;
+    },
+    fetchMenuSuccess: (state, action) => {
+      state.isFetchingMenu = false;
+      state.menu = action.payload;
+      state.isFetchingMenuError = false;
+    },
+    fetchMenuError: (state) => {
+      state.isFetchingMenu = false;
+      state.isFetchingMenuError = true;
+    },
+
+    createMenuRequest: (state) => {
+      state.isCreatingMenu = true;
+      state.isCreatingMenuError = false;
+    },
+    createMenuSuccess: (state, action) => {
+      state.isCreatingMenu = false;
+      state.menuList = [...state.menuList, action.payload];
+      state.isCreatingMenuError = false;
+    },
+    createMenuError: (state) => {
+      state.isCreatingMenu = false;
+      state.isCreatingMenuError = true;
     },
   },
-  // extraReducers: (builder) => {
-  //   builder
-  //     // fetch menu list
-  //     .addCase(fetchMenuItems.pending, (state) => {
-  //       state.status = "loading";
-  //     })
-  //     .addCase(fetchMenuItems.fulfilled, (state, action) => {
-  //       state.status = "succeeded";
-  //       state.menuList = action.payload.map((item) => ({
-  //         ...item,
-  //         checked: false,
-  //       }));
-  //     })
-  //     .addCase(fetchMenuItems.rejected, (state, action) => {
-  //       state.status = "failed";
-  //       state.error = action.error.message;
-  //     })
-  //     // fetch menu item
-  //     .addCase(fetchMenu.pending, (state) => {
-  //       state.status = "loading";
-  //     })
-  //     .addCase(fetchMenu.fulfilled, (state, action) => {
-  //       state.status = "succeeded";
-  //       state.menu = action.payload;
-  //     })
-  //     .addCase(fetchMenu.rejected, (state, action) => {
-  //       state.status = "failed";
-  //       state.error = action.error.message;
-  //     });
-  // },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getMenuList.pending, (state) => {
+        state.isFetchingMenuList = true;
+        state.isFetchingMenuError = false;
+      })
+      .addCase(getMenuList.fulfilled, (state, action) => {
+        state.isFetchingMenuList = false;
+        state.menuList = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(getMenuList.rejected, (state) => {
+        state.isFetchingMenuList = false;
+        state.isFetchingMenuError = true;
+      });
+
+    builder
+      .addCase(getMenu.pending, (state) => {
+        state.isFetchingMenu = true;
+        state.isFetchingMenuError = false;
+      })
+      .addCase(getMenu.fulfilled, (state, action) => {
+        state.isFetchingMenu = false;
+        state.menu = action.payload;
+      })
+      .addCase(getMenu.rejected, (state) => {
+        state.isFetchingMenu = false;
+        state.isFetchingMenuError = true;
+      });
+
+    builder
+      .addCase(createMenu.pending, (state) => {
+        state.isCreatingMenu = true;
+        state.isCreatingMenuError = false;
+      })
+      .addCase(createMenu.fulfilled, (state, action) => {
+        state.isCreatingMenu = false;
+        state.menuList = [...state.menuList, action.payload];
+      })
+      .addCase(createMenu.rejected, (state) => {
+        state.isCreatingMenu = false;
+        state.isCreatingMenuError = true;
+      });
+  },
 });
 
-// export const fetchMenuItems = createAsyncThunk(
-//   "menu/fetchMenuItems",
-//   async () => {
-//     // LATER
-//     // const response = await axios.get("/api/menu");
-//     // return response.data;
-//     return menuList;
-//   }
-// );
+export const createMenu = createAsyncThunk(
+  "menu/createMenu",
+  async (data, { dispatch, rejectWithValue }) => {
+    dispatch(createMenuRequest());
 
-// export const fetchMenu = createAsyncThunk("menu/fetchMenu", async (id) => {
-//   // LATER
-//   // const response = await axios.get(`/api/menu/${id}`);
-//   // return response.data;
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.CREATE(),
+        "POST",
+        data
+      );
 
-//   return menuList.find((item) => item.id == id);
-// });
+      console.log(response);
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getMenuList = createAsyncThunk(
+  "menu/fetchMenuList",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.GET_ALL({ params }),
+        "GET",
+        null,
+        { signal }
+      );
+
+      console.log(response);
+
+      if (response.success) {
+        dispatch(fetchMenuListSuccess(response.data));
+        return response.data;
+      } else {
+        dispatch(fetchMenuListError());
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getMenu = createAsyncThunk(
+  "menu/fetchMenu",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.GET_BY_ID(id),
+        "GET"
+      );
+
+      console.log(response);
+
+      if (response.success) {
+        dispatch(fetchMenuListSuccess(response.data));
+        return response.data;
+      } else {
+        dispatch(fetchMenuListError());
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 export const {
   toggleSelectAll,

@@ -251,7 +251,7 @@ export const API_CONFIG = {
   // PACKAGES API
 
   PACKAGES: {
-    GET_ALL: `${PACKAGES}/get-all`
+    GET_ALL: `${PACKAGES}/get-all`,
   },
 
   // MENU API

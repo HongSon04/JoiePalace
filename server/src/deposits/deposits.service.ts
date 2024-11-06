@@ -102,7 +102,7 @@ export class DepositsService {
 
       await this.prismaService.bookings.update({
         where: { id: Number(findBookingDetail.booking_id) },
-        data: { is_deposit: status === 'completed' ? true : false },
+        data: { is_deposit: status === 'success' ? true : false },
       });
 
       throw new HttpException(

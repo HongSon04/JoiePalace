@@ -72,14 +72,8 @@ const Page = () => {
                 router.push('/');
             }
             try {
-                // Fetch membership data if available
-                if (user?.memberships_id) {
-                    const fetchedDataByMembershipId = await fetchDatabyMembershipId(user.memberships_id);
-                    setMembershipId(fetchedDataByMembershipId);
-                }
-
                 // Fetch all bookings for the user
-                const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(1);
+                const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending');
 
@@ -155,7 +149,7 @@ const Page = () => {
 
             <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
-            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={membershipId?.booking_total_amount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} />
+            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={partyTotalAmount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} />
 
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             <div className='flex justify-between'>
