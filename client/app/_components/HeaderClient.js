@@ -27,10 +27,19 @@ const HeaderClient = () => {
   const [listBranches, setListBranches] = useState([]);
   const [isLogin, setIsLogin] = useState(false);
   const [nameUser, setNameUser] = useState("");
+  const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setScreenWidth(window.innerWidth);
+    const onScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -62,10 +71,13 @@ const HeaderClient = () => {
   const handleShowMenu = () => {
     isShowMenu ? setIsShowMenu(false) : setIsShowMenu(true);
   };
-
-  if (!listBranches) return;
+  if (!listBranches) return;  
   return (
-    <header className={`fixed top-0 left-0 w-full z-40 text-white`}>
+    <header
+      className={`fixed top-0 left-0 w-full z-40 text-white ${
+        scrolled && "backdrop-blur-xl "
+      }`}
+    >
       <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-transparent">
         <div className="h-full flex items-center gap-4 flex-row-reverse">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
