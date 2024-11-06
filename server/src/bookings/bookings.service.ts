@@ -618,23 +618,6 @@ export class BookingsService {
         throw new NotFoundException('Không tìm thấy sảnh');
       }
 
-      const checkDateAndShift = await this.prismaService.bookings.findMany({
-        where: {
-          deleted: false,
-          organization_date: findBooking.organization_date,
-          shift: findBooking.shift,
-          branch_id: findBooking.branch_id,
-          stage_id: Number(stage_id),
-          NOT: { id: Number(id) },
-        },
-      });
-
-      if (checkDateAndShift.length > 0) {
-        throw new BadRequestException(
-          'Đã có sự kiện tổ chức vào thời gian này',
-        );
-      }
-
       // Status = true =? Check Rank User
       if (status === BookingStatus.SUCCESS) {
         this.updateMembershipBooking(findBooking.user_id);
