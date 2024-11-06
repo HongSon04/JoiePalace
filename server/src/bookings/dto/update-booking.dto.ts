@@ -10,11 +10,10 @@ export class UpdateBookingDto {
   user_id?: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
     description: 'ID của đặt chỗ cần cập nhật',
   })
-  @IsNotEmpty({ message: 'ID đặt chỗ không được để trống' })
-  booking_id: string;
+  booking_id?: string;
 
   @ApiProperty({
     required: true,
@@ -74,11 +73,10 @@ export class UpdateBookingDto {
   email: string;
 
   @ApiProperty({
-    required: true,
+    required: false,
     description: 'Tên công ty (nếu có)',
   })
-  @IsNotEmpty({ message: 'Tên công ty không được để trống' })
-  company_name: string;
+  company_name?: string;
 
   @ApiProperty({
     required: false,
@@ -97,11 +95,10 @@ export class UpdateBookingDto {
   gift?: string[];
 
   @ApiProperty({
-    required: true,
+    required: false,
     description: 'Ghi chú thêm về sự kiện',
   })
-  @IsNotEmpty({ message: 'Ghi chú không được để trống' })
-  note: string;
+  note?: string;
 
   @ApiProperty({
     required: true,

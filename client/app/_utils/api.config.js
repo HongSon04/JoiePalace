@@ -181,6 +181,7 @@ export const API_CONFIG = {
     CREATE: `${FEEDBACKS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all`, params),
+    GET_ALL_USER: (`${FEEDBACKS_API}/get-all`),
     GET_ALL_SHOW: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all-show`, params),
     GET_ALL_HIDE: (params) =>
