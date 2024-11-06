@@ -132,7 +132,7 @@ function RequestTable() {
       status: "pending",
       page: currentPage,
       itemsPerPage,
-      branch_id: currentBranch.id,
+      branch_id: Number(currentBranch.id),
       startDate: formattedStartDate,
       endDate: formattedEndDate,
     };
@@ -163,7 +163,7 @@ function RequestTable() {
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
-      branch_id: currentBranch.id,
+      branch_id: Number(currentBranch.id),
       startDate: formattedStartDate,
       endDate: formattedEndDate,
     };

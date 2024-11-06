@@ -19,6 +19,7 @@ import useCustomToast from '@/app/_hooks/useCustomToast';
 import { fetchFeedbacksFailure } from '@/app/_lib/features/feedbacks/feedbacksSlice';
 import { useDispatch } from 'react-redux';
 import { fetchBranchSuccess } from '@/app/_lib/features/branch/branchSlice';
+import { formatFullDateTime } from '@/app/_utils/formaters';
 
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
@@ -68,7 +69,7 @@ const organizationSchema = z.object({
         .int({ message: "Số lượng khách / bàn phải là số nguyên" })
         .min(1, { message: "Số lượng khách / bàn phải lớn hơn 0" }),
     partyDate: z.string().nonempty({ message: "Ngày đặt tiệc là bắt buộc" }),
-    dateOrganization: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
+    organization_date: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
     shift: z.string().nonempty({ message: "Ca hoạt động là bắt buộc" }),
     amountPayable: z
         .number()
@@ -208,6 +209,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 const paymentStatusMethod = partyData.status;
                 const isDepositSuccessful = depositStatus === 'success';
                 const isDeposit = partyData.is_deposit;
+
+                
+
                 setSelectedMenu(partyData.booking_details[0].menu_id);
                 setSelectBranches(branchId);
                 setSelectedDecors(partyData.booking_details[0].decor_id);
@@ -301,25 +305,22 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     spareTables: Number(partyData.booking_details[0].spare_table_count) || 0,
                     customer: Number(partyData.number_of_guests) || 0,
                     customerAndChair: Number(partyData.booking_details[0].table_count) || 0,
-                    partyDate: partyData.created_at.slice(0, 10),
-                    dateOrganization: partyData.organization_date.slice(0, 10),
+                    partyDate: formatFullDateTime(partyData.created_at).date,
+                    organization_date: formatFullDateTime(partyData.organization_date).date,
                     shift: partyData.shift, 
                     menu: partyData.booking_details[0].menu_id,
                     decor: partyData.booking_details[0].decor_id,
                     amountPayable: bookingDetails.total_amount,
                     depositAmount: bookingDetails.deposits.amount,
-                    depositDate: bookingDetails.deposits.created_at.slice(0, 10),
+                    depositDate: formatFullDateTime(bookingDetails.deposits?.created_at).date,
                     // remainingAmountPaid: Number(Number(bookingDetails.total_amount) - Number(bookingDetails.deposits.amount)),
                     payment: bookingDetails.deposits.payment_method,
-                    dataPay: bookingDetails.deposits.created_at.slice(0, 10),
+                    dataPay: formatFullDateTime(bookingDetails.deposits.created_at).date,
                     statusDeposit: isDepositSuccessful ? 'success' : 'pending',
                     statusPayment: statusPayment,
                     foods: partyData.booking_details[0].menus.products
                 });
-
-                console.log(typeof bookingDetails.total_amount, bookingDetails.total_amount);
-console.log(typeof bookingDetails.deposits.amount, bookingDetails.deposits.amount);
-
+                console.log('organization_date:',formatFullDateTime(partyData.organization_date).date);
             }
         } catch (error) {
             console.error('Error fetching party details:', error);
