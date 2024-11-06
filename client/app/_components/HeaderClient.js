@@ -26,10 +26,19 @@ const HeaderClient = () => {
   const [listBranches, setListBranches] = useState([]);
   const [isLogin, setIsLogin] = useState(false);
   const [nameUser, setNameUser] = useState("");
+  const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setScreenWidth(window.innerWidth);
+    const onScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -42,7 +51,7 @@ const HeaderClient = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       setIsLogin(true);
-      const nameParts = (user.name).split(" ");
+      const nameParts = (user?.name).split(" ");
       const firstName = nameParts[nameParts.length - 1];
       setNameUser(firstName);
     }
@@ -61,10 +70,13 @@ const HeaderClient = () => {
   const handleShowMenu = () => {
     isShowMenu ? setIsShowMenu(false) : setIsShowMenu(true);
   };
-
-  if (!listBranches) return;
+  if (!listBranches) return;  
   return (
-    <header className={`fixed top-0 left-0 w-full z-40 text-white`}>
+    <header
+      className={`fixed top-0 left-0 w-full z-40 text-white ${
+        scrolled && "backdrop-blur-xl "
+      }`}
+    >
       <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-transparent">
         <div className="h-full flex items-center gap-4 flex-row-reverse">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
@@ -85,7 +97,7 @@ const HeaderClient = () => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              router.push(`/client/${!isLogin ? 'dang-ky' : 'nguoi-dung'}`);
+              router.push(`/client/${!isLogin ? "dang-ky" : "nguoi-dung"}`);
             }}
             className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl"
           >
@@ -159,8 +171,9 @@ const HeaderClient = () => {
       </div>
       {/* popup menu */}
       <div
-        className={`menu px-5 w-full h-screen bg-primary z-50 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${isShowMenu ? "showMenu" : ""
-          }`}
+        className={`menu px-5 w-full h-screen bg-primary z-50 absolute left-0 flex flex-col gap-4 transition duration-300 ease-in-out ${
+          isShowMenu ? "showMenu" : ""
+        }`}
       >
         <div className="w-full h-[90px] flex justify-between items-center bg-transparent border-b-[1px] border-white">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer max-sm:hidden">

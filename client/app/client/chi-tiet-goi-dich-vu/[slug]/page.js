@@ -42,8 +42,8 @@ const Page = () => {
 
   useEffect(() => {
     const fecthData = async () => {
-      // const data = await axios.get(API_CONFIG.PACKAGES.GET_ALL);
-      // console.log(data.data);
+      const data = await axios.get(API_CONFIG.PACKAGES.GET_ALL);
+      console.log(data.data);
     };
     fecthData();
   }, []);
