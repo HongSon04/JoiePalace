@@ -5,7 +5,9 @@ import Footer from "@/app/_components/FooterClient";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { API_CONFIG } from "@/app/_utils/api.config";
+import useApiServices from "@/app/_hooks/useApiServices";
 
 const menuSliderSettings = {
     dots: false,
@@ -43,6 +45,29 @@ const menuSliderSettings = {
 };
 
 function Feedback() {
+    const { makeAuthorizedRequest } = useApiServices();
+    const [listFeedback, setListFeedback] = useState([]);
+
+    useEffect(() => {
+        const getFeedbacks = async () => {
+            const data = await makeAuthorizedRequest(
+                API_CONFIG.FEEDBACKS.GET_ALL_USER,
+                'GET',
+                '',
+                null,
+                '/client/dang-nhap'
+            );
+
+            if (data.success) {
+                const feedbacksToShow = data.data.filter(feedback => feedback.is_show);                
+                setListFeedback(feedbacksToShow);
+            } else {
+                console.error("Error fetching feedbacks:", data);
+                return [];
+            }
+        };
+        getFeedbacks();
+    }, []);
 
     return (
         <section>
@@ -57,57 +82,29 @@ function Feedback() {
                 <div className="uppercase text-4xl text-center font-bold max-lg:text-2xl">Các bài đánh giá gần đây</div>
                 <div className="mt-[60px] max-lg:mt-[10px]">
                     <Slider {...menuSliderSettings}>
-                        <div className="max-lg:p-2 max-xl:p-1">
-                            <div className="w-[346px] h-[236px] max-lg:w-[100%] max-xl:w-[100%] rounded-2xl bg-whiteAlpha-200 p-3 text-gold font-gilroy m-auto">
-                                <div className="flex">
-                                    <div className="h-[32px] w-[32px] mt-2">
-                                        <Image className="rounded-full" src="/meeting-5.png" alt="" />
+                        {listFeedback.map((item) => (
+                            <div className="max-lg:p-2 max-xl:p-1" key={item.id}>
+                                <div className="w-[346px] h-[236px] max-lg:w-[100%] max-xl:w-[100%] rounded-2xl bg-whiteAlpha-200 p-3 text-gold font-gilroy m-auto">
+                                    <div className="flex">
+                                        <div className="h-[32px] w-[32px] mt-2">
+                                            <Image className="rounded-full" src="/meeting-5.png" alt="" />
+                                        </div>
+                                        <div className="ml-9 max-xl:ml-4 leading-9 max-md:leading-8 max-xl:leading-6">
+                                            <div className="font-bold text-[24px] max-md:text-[18px] max-lg:text-[18px] max-sm:text-[21px] ">
+                                                {item.name}
+                                            </div>
+                                            <div className="max-lg:text-[10px] max-md:text-[14px]">
+                                                <span>{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                <span> {new Date(item.created_at).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="ml-9 max-xl:ml-4 leading-9 max-md:leading-8 max-xl:leading-6">
-                                        <div className="font-bold text-[24px] max-md:text-[18px] max-lg:text-[18px] max-sm:text-[21px] ">Christian Bell</div>
-                                        <div className="max-lg:text-[10px] max-md:text-[14px]"><span>11:57</span> <span>22/12/2022</span></div>
+                                    <div className="leading-6 mt-4 max-md:mt-3 max-xl:mt-3 text-base max-xl:leading-5 text-justify">
+                                        {item.comments}
                                     </div>
-                                </div>
-                                <div className="leading-6 mt-4 max-md:mt-3 max-xl:mt-3 text-base max-xl:leading-5  text-justify">
-                                    Thực đơn: Đồ ăn ngon, phong phú, phù hợp với nhiều khẩu vị. Khách mời của mình đều khen ngợi về món ăn.
-                                    Giá cả: Hợp lý so với chất lượng dịch vụ và không gian đẹp.
                                 </div>
                             </div>
-                        </div>
-                        <div className="max-lg:p-2 max-xl:p-1">
-                            <div className="w-[346px] h-[236px] max-lg:w-[100%] max-xl:w-[100%] rounded-2xl bg-whiteAlpha-200 p-3 text-gold font-gilroy m-auto">
-                                <div className="flex">
-                                    <div className="h-[32px] w-[32px] mt-2">
-                                        <Image className="rounded-full" src="/meeting-5.png" alt="" />
-                                    </div>
-                                    <div className="ml-9 max-xl:ml-4 max-xl:leading-6">
-                                        <div className="font-bold text-[24px] max-md:text-[18px] max-lg:text-[18px] max-sm:text-[21px]">Christian Bell</div>
-                                        <div className="max-lg:text-[10px]"><span>11:57</span> <span>22/12/2022</span></div>
-                                    </div>
-                                </div>
-                                <div className="leading-6 mt-4 max-md:mt-3 text-base max-xl:leading-5 text-justify">
-                                    Thực đơn: Đồ ăn ngon, phong phú, phù hợp với nhiều khẩu vị. Khách mời của mình đều khen ngợi về món ăn.
-                                    Giá cả: Hợp lý so với chất lượng dịch vụ và không gian đẹp.
-                                </div>
-                            </div>
-                        </div>
-                        <div className="max-lg:p-2 max-xl:p-1">
-                            <div className="w-[346px] h-[236px] max-lg:w-[100%] max-xl:w-[100%] rounded-2xl bg-whiteAlpha-200 p-3 text-gold font-gilroy m-auto">
-                                <div className="flex">
-                                    <div className="h-[32px] w-[32px] mt-2">
-                                        <Image className="rounded-full" src="/meeting-5.png" alt="" />
-                                    </div>
-                                    <div className="ml-9 max-xl:ml-4 leading-9 max-xl:leading-6 max-md:leading-9">
-                                        <div className="font-bold text-[24px] max-md:text-[18px] max-lg:text-[18px] max-sm:text-[21px]">Christian Bell</div>
-                                        <div className="max-lg:text-[13px]"><span>11:57</span> <span>22/12/2022</span></div>
-                                    </div>
-                                </div>
-                                <div className="leading-6 mt-4 max-md:mt-3 text-base max-xl:leading-5 text-justify">
-                                    Thực đơn: Đồ ăn ngon, phong phú, phù hợp với nhiều khẩu vị. Khách mời của mình đều khen ngợi về món ăn.
-                                    Giá cả: Hợp lý so với chất lượng dịch vụ và không gian đẹp.
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </Slider>
                 </div>
             </section>

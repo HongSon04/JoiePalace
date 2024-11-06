@@ -3,7 +3,7 @@ import UserRankAndImageClient from './UserRankAndImageClient';
 import DetailUserClient from './DetailUserClient';
 import rankMemberships from '@/app/_components/RankMemberships';
 
-const AccountSectionClient = ({ title, nameUser, phoneUser, emailUser, partyBooked, waitingParty, totalMoney, imgUser, total_amount }) => {
+const AccountSectionClient = ({ title, nameUser, phoneUser, emailUser, partyBooked, waitingParty, totalMoney, imgUser, total_amount, isLoading }) => {
     const [rank, setRank] = useState()
     useEffect(() => {
         const getData = async () => {
@@ -37,8 +37,8 @@ const AccountSectionClient = ({ title, nameUser, phoneUser, emailUser, partyBook
         <div className="flex flex-col gap-7">
             <span className="text-gold font-bold text-base leading-[22px]">{title}</span>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-                <UserRankAndImageClient userImage={imgUser ? imgUser : '/userImage.png'} rankImage={rank?.imageRank} title={rank?.title} />
-                <DetailUserClient nameUser={nameUser} phoneUser={phoneUser} emailUser={emailUser} partyBooked={partyBooked} waitingParty={waitingParty} totalMoney={totalMoney} />
+                <UserRankAndImageClient userImage={imgUser ? imgUser : '/userImage.png'} rankImage={rank?.imageRank} title={rank?.title} isLoading={isLoading} />
+                <DetailUserClient nameUser={nameUser} phoneUser={phoneUser} emailUser={emailUser} partyBooked={partyBooked} waitingParty={waitingParty} totalMoney={totalMoney} isLoading={isLoading} />
             </div>
         </div>
     );

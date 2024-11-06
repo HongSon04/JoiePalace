@@ -19,6 +19,7 @@ const Page = () => {
     const [partySuccess, setPartySuccess] = useState([]);
     const [partyPending, setPartyPending] = useState([]);
     const [partyTotalAmount, setTotalAmount] = useState(0);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     // const parties = [
@@ -65,6 +66,7 @@ const Page = () => {
 
     useEffect(() => {
         const getData = async () => {
+            setLoading(true);
             const getUser = JSON.parse(localStorage.getItem("user"));
             if (getUser) {
                 setUser(getUser);
@@ -131,7 +133,7 @@ const Page = () => {
                     return total + item.booking_details[0].total_amount;
                 }, 0);
                 setTotalAmount(total_amountUser)
-
+                setLoading(false);
                 // Set successful and pending parties
                 setPartySuccess(fetchedAllBookingsSuccess);
                 setPartyPending(fetchedAllBookingsPending);
@@ -149,23 +151,54 @@ const Page = () => {
 
             <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
-            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={partyTotalAmount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} />
+            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={partyTotalAmount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} isLoading={loading} />
 
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             <div className='flex justify-between'>
                 <span className="text-base font-bold leading-normal text-gold">Tiệc gần nhất</span>
                 <Link href={'nguoi-dung/lich-su-tiec'} className='underline text-gold text-base font-medium cursor-pointer'>Tiệc của bạn</Link>
             </div>
-
-            {resonParty && resonParty.length > 0 ? (
-                resonParty.map(party => (
-                    <div key={party.id} className="cursor-pointer">
-                        <PartySectionClient showFull={false} Collapsed={false} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
+            {
+                loading ? (
+                    <div className="flex justify-center items-center">
+                        <div role="status">
+                            <svg
+                                aria-hidden="true"
+                                className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-slate-50"
+                                viewBox="0 0 100 101"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                    fill="currentColor"
+                                />
+                                <path
+                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                    fill="currentFill"
+                                />
+                            </svg>
+                            <span className="sr-only">Loading...</span>
+                        </div>
                     </div>
-                ))
-            ) : (
-                <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
-            )}
+                ) : (
+                    resonParty && resonParty.length > 0 ? (
+                        resonParty.map(party => (
+                            <div key={party.id} className="cursor-pointer">
+                                <PartySectionClient
+                                    showFull={false}
+                                    Collapsed={false}
+                                    showDetailLink={true}
+                                    data={party}
+                                    linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
+                    )
+                )
+            }
         </div>
     );
 };
