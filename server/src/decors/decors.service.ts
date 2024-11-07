@@ -461,7 +461,7 @@ export class DecorsService {
       }
 
       const findDecorByName = await this.prismaService.decors.findFirst({
-        where: { name, NOT: { id: Number(id) } },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (findDecorByName) {

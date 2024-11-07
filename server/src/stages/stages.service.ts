@@ -138,6 +138,7 @@ export class StagesService {
     files: { images?: Express.Multer.File[] },
   ) {
     try {
+      const { name, description, capacity_min, capacity_max } = body;
       const findStage = await this.prismaService.stages.findUnique({
         where: { id: Number(stage_id) },
       });
@@ -147,7 +148,9 @@ export class StagesService {
       }
 
       const findStageByName = await this.prismaService.stages.findFirst({
-        where: { name: body.name, id: { not: Number(stage_id) } },
+        where: {
+          AND: [{ name: body.name }, { id: { not: Number(stage_id) } }],
+        },
       });
 
       if (findStageByName) {

@@ -258,12 +258,7 @@ export class MembershipsService {
 
       const findMembershipName = await this.prismaService.memberships.findFirst(
         {
-          where: {
-            OR: [{ name }, { slug }],
-            NOT: {
-              id: Number(id),
-            },
-          },
+          where: { AND: [{ name }, { id: { not: Number(id) } }] },
         },
       );
 

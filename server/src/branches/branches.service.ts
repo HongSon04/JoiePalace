@@ -459,9 +459,20 @@ export class BranchesService {
       // Tạo slug mới nếu cần
       const slug = name ? MakeSlugger(name) : undefined;
 
-      // Kiểm tra tên địa điểm đã tồn tại
+      // Kiểm tra tên địa điểm đã tồn tại và không phải id hiện tại
       const checkNamebranch = await this.prismaService.branches.findFirst({
-        where: { name, NOT: { id: Number(id) } },
+        where: {
+          AND: [
+            {
+              name,
+            },
+            {
+              id: {
+                not: Number(id),
+              },
+            },
+          ],
+        },
       });
 
       if (checkNamebranch) {

@@ -180,7 +180,7 @@ export class TagsService {
         throw new NotFoundException({ message: 'Tag không tồn tại' });
       }
       const findTagByName = await this.prismaService.tags.findFirst({
-        where: { name, id: { not: Number(id) } },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
       if (findTagByName) {
         throw new BadRequestException({ message: 'Tag đã tồn tại' });

@@ -340,10 +340,7 @@ export class PartyTypesService {
 
       // Kiểm tra tên loại tiệc
       const existingPartyType = await this.prismaService.party_types.findFirst({
-        where: {
-          name,
-          NOT: { id: Number(id) },
-        },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (existingPartyType) {

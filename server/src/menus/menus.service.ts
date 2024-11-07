@@ -531,12 +531,7 @@ export class MenusService {
     try {
       const slug = MakeSlugger(name);
       const findMenuByname = await this.prismaService.menus.findFirst({
-        where: {
-          name,
-          id: {
-            not: Number(id),
-          },
-        },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (findMenuByname) {
