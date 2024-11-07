@@ -58,7 +58,7 @@ export class MailService {
           name,
           email,
           date: dayjs().format('DD/MM/YYYY'),
-          confirmationLink: `${this.configService.get<string>('FRONTEND_URL')}confirm-register?token=${token}`,
+          confirmationLink: `${this.configService.get<string>('BACKEND_URL')}confirm-register?token=${token}?email=${email}`,
         },
       });
     } catch (error) {
