@@ -118,7 +118,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> createbranch', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -216,7 +216,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getAllbranchs', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -314,7 +314,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getAllDeletedbranchs', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -356,7 +356,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getbranchById', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -387,7 +387,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> getbranchBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -501,7 +501,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> updatebranch', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -536,7 +536,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> softDeletebranch', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -578,7 +578,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> restorebranch', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -645,7 +645,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> hardDeletebranch', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -714,7 +714,7 @@ export class BranchesService {
       console.log('Lỗi từ branches.service.ts -> deleteImageByUrl', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
