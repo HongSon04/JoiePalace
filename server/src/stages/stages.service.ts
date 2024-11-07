@@ -148,9 +148,7 @@ export class StagesService {
       }
 
       const findStageByName = await this.prismaService.stages.findFirst({
-        where: {
-          AND: [{ name: body.name }, { id: { not: Number(stage_id) } }],
-        },
+        where: { AND: [{ name }, { id: { not: Number(stage_id) } }] },
       });
 
       if (findStageByName) {

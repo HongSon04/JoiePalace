@@ -461,18 +461,7 @@ export class BranchesService {
 
       // Kiểm tra tên địa điểm đã tồn tại và không phải id hiện tại
       const checkNamebranch = await this.prismaService.branches.findFirst({
-        where: {
-          AND: [
-            {
-              name,
-            },
-            {
-              id: {
-                not: Number(id),
-              },
-            },
-          ],
-        },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (checkNamebranch) {
