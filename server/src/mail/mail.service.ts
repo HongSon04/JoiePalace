@@ -58,7 +58,7 @@ export class MailService {
           name,
           email,
           date: dayjs().format('DD/MM/YYYY'),
-          confirmationLink: `${this.configService.get<string>('FRONTEND_URL')}/confirm-register?token=${token}`,
+          confirmationLink: `${this.configService.get<string>('FRONTEND_URL')}confirm-register?token=${token}`,
         },
       });
     } catch (error) {
@@ -226,7 +226,7 @@ export class MailService {
           email,
           name: user.username,
           date: dayjs().format('DD/MM/YYYY'),
-          resetLink: `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${token}`,
+          resetLink: `${this.configService.get<string>('FRONTEND_URL')}reset-password?token=${token}`,
         },
       });
 
