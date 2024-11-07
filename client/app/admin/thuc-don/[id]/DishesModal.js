@@ -1,5 +1,10 @@
+"use client";
+
 import Dish from "@/app/_components/Dish";
-import { getDishes } from "@/app/_lib/features/dishes/dishesSlice";
+import {
+  fetchingCategoryDishes,
+  getDishes,
+} from "@/app/_lib/features/dishes/dishesSlice";
 import { capitalize } from "@/app/_utils/helpers";
 import {
   Button,
@@ -51,20 +56,14 @@ function DishesModal({
   };
 
   React.useEffect(() => {
-    dispatch(getDishes());
-  }, [dispatch]);
+    dispatch(fetchingCategoryDishes());
+  }, []);
 
   React.useEffect(() => {
     if (isOpen) {
       setSelectedMenuDishes(menuDishes[category]);
     }
   }, [isOpen, menuDishes, menuInfo, category, setSelectedMenuDishes]);
-
-  React.useEffect(() => {
-    if (selectedMenuDishes && selectedMenuDishes.length === 0)
-      setIsUnCheckAll(false);
-    else setIsUnCheckAll(true);
-  }, [selectedMenuDishes]);
 
   return (
     <Modal scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange}>

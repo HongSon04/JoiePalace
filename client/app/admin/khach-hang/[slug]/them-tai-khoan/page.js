@@ -37,6 +37,9 @@ const page = () => {
                   placeholder="rubysayhi"
                   value=""
                 ></input>
+                <span className="text-sm text-red-600">
+                  {messageError}
+                </span>
               </div>
               <div className="w-1/3">
                 <p className="mb-3">Email</p>
@@ -46,6 +49,10 @@ const page = () => {
                   placeholder="rubysayhi@gmail.com"
                   value=""
                 ></input>
+                <span className="text-sm text-red-600">
+                  {messageError}
+                </span>
+                
               </div>
               <div className="w-1/3">
                 <p className="mb-3">Mật khẩu</p>
@@ -54,6 +61,9 @@ const page = () => {
                   type="text"
                   placeholder="Mật khẩu"
                 ></input>
+                  <span className="text-sm text-red-600">
+                    {messageError}
+                  </span>
               </div>
             </form>
           </div>

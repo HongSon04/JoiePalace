@@ -32,12 +32,12 @@ const HeaderSelect = ({ title, slugOrID,  showBackButton = true }) => {
                     <ArrowLeftIcon width={20} height={20} color='white' />
                 </IconButton>
                 <h1 className="text-2xl w-fit font-bold leading-8 flex-1 text-left text-white">
-                    {title} <span className="font-bold">- {slugOrID}</span>
+                    {title} <span className="font-bold">- #{slugOrID}</span>
                 </h1>
             </div>
-            <div>
+            {/* <div>
                 <StatusSelect />
-            </div>
+            </div> */}
         </div>
     );
 };

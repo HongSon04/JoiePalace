@@ -40,7 +40,7 @@ export class CreateBranchDto {
     required: false,
     description: 'ID của chi nhánh (nếu có)',
   })
-  branch_id?: number;
+  branch_id?: string;
 
   @ApiProperty({
     required: true,

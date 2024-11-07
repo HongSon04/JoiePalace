@@ -1,5 +1,6 @@
 // HOST URL
 const HOST = `https://joieplace.live/api`;
+const MEMBERSHIPS = `https://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
@@ -15,6 +16,8 @@ const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
+const PACKAGES = `${HOST}/packages`;
+const DECORS = `${HOST}/decors`;
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
@@ -121,6 +124,7 @@ export const API_CONFIG = {
     CREATE: `${FEEDBACKS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all`, params),
+    GET_ALL_USER: (`${FEEDBACKS_API}/get-all`),
     GET_ALL_SHOW: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all-show`, params),
     GET_ALL_HIDE: (params) =>
@@ -158,17 +162,44 @@ export const API_CONFIG = {
     UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
     GET_BY_ID: (id) => `${BOOKING_API}/get/${id}`,
     UPDATE: (id) => `${BOOKING_API}/update/${id}`,
+    UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
+    GET_ALL_BY_IDUSER: (userId) => `${BOOKING_API}/get-all?user_id=${userId}`,
   },
 
   // BLOGS API
   BLOGS: {
-    GET_ALL: (params) => constructUrlWithParams(`${BLOGS_API}/get-all`, params),
-    GET_BY_ID: (id) => `${BLOGS_API}/get/${id}`,
+    // CREATE: `${BLOGS_API}/create`,
+    GET_ALL: `${BLOGS_API}/get-all`,
+    GET_BY_SLUG: (slug) => `${BLOGS_API}/get-by-slug/${slug}`,
+  },
+
+  //MEMBERSHIPS
+  MEMBERSHIPS: {
+    CREATE: `${MEMBERSHIPS}/create`,
+    GET_ALL: `${MEMBERSHIPS}/get-all`,
+    GET_ALL_DELETED: `${MEMBERSHIPS}/get-all-deleted`,
+    GET_BY_ID: (membershipId) => `${MEMBERSHIPS}/get/${membershipId}`,
+    GET_BY_SLUG: (membershipSlug) =>
+      `${MEMBERSHIPS}/get-by-slug/${membershipSlug}`,
+    UPDATE: (membershipId) => `${MEMBERSHIPS}/update/${membershipId}`,
+    DELETE: (membershipId) => `${MEMBERSHIPS}/delete/${membershipId}`,
+    RESTORE: (membershipId) => `${MEMBERSHIPS}/restore/${membershipId}`,
+    HARD_DELETE: (membershipId) => `${MEMBERSHIPS}/hard-delete/${membershipId}`,
+  },
+  DECORS: {
+    GET_ALL: (params) => constructUrlWithParams(`${DECORS}/get-all`, params),
+    GET_BY_ID: (id) => `${DECORS}/get/${id}`,
   },
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
     // Add endpoints here if needed
+  },
+
+  // PACKAGES API
+
+  PACKAGES: {
+    GET_ALL: `${PACKAGES}/get-all`,
   },
 
   // MENU API

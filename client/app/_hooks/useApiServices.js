@@ -48,7 +48,7 @@ const useApiServices = () => {
   };
 
   // Function to refresh the access token using the refresh token
-  const refreshAccessToken = async () => {
+  const refreshAccessToken = async (redirectURL) => {
     const refreshToken = localStorage.getItem("refreshToken");
 
     const result = await tryCatchWrapper(async () => {
@@ -96,7 +96,7 @@ const useApiServices = () => {
       //   result
       // );
 
-      router.push("/auth/chon-chi-nhanh?isExpired=true");
+      router.push(redirectURL);
       Cookies.remove("accessToken");
       localStorage.removeItem("refreshToken");
     }
@@ -110,7 +110,8 @@ const useApiServices = () => {
     endpoint,
     method = "GET",
     data = null,
-    signal = null // Add signal parameter
+    signal = null, // Add signal parameter
+    redirectURL = "/auth/chon-chi-nhanh?isExpired=true"
   ) => {
     // const accessToken = Cookies.get("accessToken");
     // console.log(
@@ -118,7 +119,13 @@ const useApiServices = () => {
     //   accessToken
     // );
 
-    let dataResponse = await apiRequest(endpoint, method, data, signal);
+    let dataResponse = await apiRequest(
+      endpoint,
+      method,
+      data,
+      signal,
+      redirectURL
+    );
 
     // console.log(
     //   "data response from makeAuthorizedRequest function -> ",
@@ -131,7 +138,7 @@ const useApiServices = () => {
       dataResponse.success === false &&
       dataResponse.error.error === "Unauthorized"
     ) {
-      const newAccessToken = await refreshAccessToken();
+      const newAccessToken = await refreshAccessToken(redirectURL);
 
       // console.log(
       //   "this is new access token form makeAuthorizedRequest function refresh token logic -> ",

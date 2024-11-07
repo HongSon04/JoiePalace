@@ -28,14 +28,12 @@ export class CreateMenuDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })
-  price: number;
+  price: string;
 
   @ApiProperty({
     description: 'Menu có hiển thị cho khách hàng hay không',
     required: false,
   })
-  @IsBoolean({ message: 'Hiện thị phải là một giá trị boolean' })
-  @IsEnum([true, false], { message: 'Hiện thị phải là một giá trị boolean' })
   is_show: boolean;
 
   @ApiProperty({

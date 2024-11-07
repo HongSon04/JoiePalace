@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect, useCallback } from 'react';
 import HeaderSelect from './HeaderSelect';
 import RequestBreadcrumbs from '@/app/_components/RequestBreadcrumbs';
 import TableSkeleton from '@/app/_components/skeletons/TableSkeleton';
-import RequestTable from './RequestTableCoppy';
+import RequestTable from './RequestTableForQuanLyTiec';
 import useApiServices from '@/app/_hooks/useApiServices';
 import { API_CONFIG } from '@/app/_utils/api.config';
 

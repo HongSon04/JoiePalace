@@ -46,7 +46,7 @@ const PartyDetailClient = ({
         <header className='flex justify-between'>
           <div className='flex gap-3'>
             <div className='h-full w-2 bg-gold' />
-            <span className='text-base font-medium leading-normal'>Thông tin tiệc</span>
+            <span className='text-base font-medium leading-normal'>{nameParty}</span>
           </div>
           <div className='flex gap-5 items-center'>
             {showDetailLink && (

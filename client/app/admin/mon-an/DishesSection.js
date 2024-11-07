@@ -3,25 +3,18 @@
 import CustomPagination from "@/app/_components/CustomPagination";
 import Dish from "@/app/_components/Dish";
 import FormInput from "@/app/_components/FormInput";
+import SearchForm from "@/app/_components/SearchForm";
+import DishesSectionSkeleton from "@/app/_components/skeletons/DishesSectionSkeleton";
 import Uploader from "@/app/_components/Uploader";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
 import {
-  addingDish,
-  addingDishFailure,
-  addingDishSuccess,
+  addDish,
   deleteDish,
-  deleteDishFailure,
-  deleteDishRequest,
-  deleteDishSuccess,
   fetchCategoryDishes,
-  fetchingCategoryDishes,
-  fetchingCategoryDishesFailure,
-  fetchingCategoryDishesSuccess,
   setSelectedDish,
   updateDish,
 } from "@/app/_lib/features/dishes/dishesSlice";
-import { API_CONFIG } from "@/app/_utils/api.config";
 import { CONFIG } from "@/app/_utils/config";
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,9 +24,8 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  useDisclosure,
 } from "@nextui-org/modal";
-import { Button, Checkbox, Spinner } from "@nextui-org/react";
+import { Button, Switch } from "@nextui-org/react";
 import { Col, Row } from "antd";
 import Image from "next/image";
 import React, { Suspense } from "react";
@@ -42,28 +34,61 @@ import { IoSaveOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import Loading from "../loading";
-import SearchForm from "@/app/_components/SearchForm";
-import DishesSectionSkeleton from "@/app/_components/skeletons/DishesSectionSkeleton";
-import Link from "next/link";
+
+// Define a schema for individual file validation
+const fileSchema = z
+  .instanceof(File)
+  .refine((file) => file.size <= 5 * 1024 * 1024, {
+    message: "Kích thước ảnh không được vượt quá 5MB",
+  })
+  .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+    message: "Chỉ chấp nhận ảnh định dạng JPEG hoặc PNG",
+  });
 
 const schema = z.object({
-  name: z.string().nonempty("Tên món không được để trống"),
+  name: z
+    .string({
+      required_error: "Tên món ăn không được để trống",
+    })
+    .min(1, { message: "Tên món không được để trống" }),
   price: z.union([
-    z.string().nonempty("Giá món không được để trống"),
-    z.number().min(1, "Giá món không được để trống"),
+    z
+      .string({
+        required_error: "Giá món ăn không được để trống",
+      })
+      .min(1, { message: "Giá món không được để trống" }),
+    z.number().min(1, { message: "Giá món không được để trống" }),
   ]),
   category: z.union([
-    z.string().nonempty("Danh mục món không được để trống"),
-    z.number().min(1, "Danh mục món không được để trống"),
+    z
+      .string({
+        required_error: "Danh mục không được để trống",
+      })
+      .min(1, { message: "Danh mục món không được để trống" }),
+    z
+      .number({
+        required_error: "Danh mục không được để trống",
+      })
+      .min(1, { message: "Danh mục món không được để trống" }),
   ]),
-  short_description: z.string().nonempty("Mô tả ngắn không được để trống"),
-  description: z.string().nonempty("Mô tả chi tiết không được để trống"),
+  short_description: z
+    .string({
+      required_error: "Mô tả ngắn không được để trống",
+    })
+    .min(1, { message: "Mô tả ngắn không được để trống" }),
+  description: z
+    .string({
+      required_error: "Mô tả chi tiết không được để trống",
+    })
+    .min(1, { message: "Mô tả chi tiết không được để trống" }),
+  images: z.array(fileSchema).refine((files) => files.length > 0, {
+    message: "Vui lòng chọn ít nhất một ảnh",
+  }),
 });
 
 function DishesSection({ dishCategory, categories }) {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = React.useState(1);
-  const { makeAuthorizedRequest } = useApiServices();
   const [isOpenDetailModal, setIsOpenDetailModal] = React.useState(false);
   const [imgSrc, setImgSrc] = React.useState(CONFIG.DISH_IMAGE_PLACEHOLDER);
   const {
@@ -74,13 +99,18 @@ function DishesSection({ dishCategory, categories }) {
     isError,
     isAddingDish,
     isUpdatingDish,
-    isUpdateDishError,
   } = useSelector((store) => store.dishes);
+  const toast = useCustomToast();
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
-  const [sortByPrice, setSortByPrice] = React.useState("DESC"); // ASC or DESC
+  const [sortByPrice, setSortByPrice] = React.useState("DESC");
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [files, setFiles] = React.useState([]);
+  const [resetAfterSubmit, setResetAfterSubmit] = React.useState(false);
 
-  // console.log(dishCategory);
+  const handleFileChange = (newFiles) => {
+    setFiles(newFiles);
+    console.log("Files changed -> ", newFiles);
+  };
 
   const handleSearch = async (e) => {
     setSearchQuery(e.target.value);
@@ -109,20 +139,12 @@ function DishesSection({ dishCategory, categories }) {
     resolver: zodResolver(schema),
   });
 
-  const toast = useCustomToast();
-
-  const [files, setFiles] = React.useState([]);
-
-  const handleFileChange = React.useCallback((newFiles) => {
-    setFiles(newFiles);
-  }, []);
-
   const openDetailModal = () => {
     setIsOpenDetailModal(true);
   };
 
   const handleAddButtonClick = () => {
-    reset(); // Reset the form
+    dispatch(setSelectedDish(null));
     setIsOpenDetailModal(true);
   };
 
@@ -133,58 +155,79 @@ function DishesSection({ dishCategory, categories }) {
   };
 
   const handleModalClose = React.useCallback(() => {
-    // Perform any additional actions here
-    dispatch(setSelectedDish(null)); // Reset the selected dish
-
-    // // Reset the form or any other state if needed
+    dispatch(setSelectedDish(null));
     reset();
-
-    // Finally, close the modal
+    setFiles([]);
     setIsOpenDetailModal(false);
-  }, [dispatch, reset]);
+  }, []);
 
   const onSubmit = React.useCallback(
     async (data) => {
-      if (selectedDish) {
-        const result = await dispatch(
-          updateDish({ dishId: selectedDish.id, dishData: data })
-        ).unwrap();
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("price", data.price);
+      formData.append("category_id", data.category);
+      formData.append("short_description", data.short_description);
+      formData.append("description", data.description);
+      files.forEach((file) => {
+        formData.append("images", file);
+        console.log("File appended -> ", file);
+      });
 
-        if (result.success) {
-          toast({
-            title: "Cập nhật thành công",
-            description: "Món ăn đã được cập nhật",
-            type: "success",
-          });
-        } else {
-          toast({
-            title: "Cập nhật thất bại",
-            description: "Món ăn chưa được cập nhật",
-            type: "error",
-          });
-        }
-      } else {
-        const result = await dispatch(addingDish(data)).unwrap(); // Add dish if not selected
+      console.log("Files that should be appended to form data -> ", files);
+      console.log("form data that's gonna be submit -> ", formData);
 
-        if (result.success) {
-          toast({
-            title: "Xóa thành công",
-            description: "Món ăn đã được xóa",
-            type: "success",
-          });
+      // Log FormData content
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+      }
+
+      try {
+        if (selectedDish) {
+          const result = await dispatch(
+            updateDish({ dishId: selectedDish.id, dishData: formData })
+          ).unwrap();
+
+          console.log("Result from updating dish -> ", result);
+
+          if (result)
+            toast({
+              title: "Cập nhật thành công",
+              description: "Món ăn đã được cập nhật",
+              type: "success",
+            });
         } else {
-          toast({
-            title: "Xóa thất bại",
-            description: "Món ăn chưa được xóa",
-            type: "error",
-          });
+          const result = await dispatch(addDish(formData)).unwrap();
+
+          // console.log("Result from adding dish -> ", result);
+
+          if (result)
+            toast({
+              title: "Thêm thành công",
+              description: "Món ăn đã được thêm vào danh sách",
+              type: "success",
+            });
+          if (resetAfterSubmit) {
+            reset();
+            setFiles([]);
+          }
         }
+      } catch (error) {
+        toast({
+          title: "Lỗi!",
+          description: error || "Có lỗi xảy ra khi thêm món ăn",
+          type: "error",
+        });
       }
     },
-    [selectedDish]
+    [selectedDish, files, resetAfterSubmit]
   );
 
   const handleDeleteDish = React.useCallback((dishId) => {
+    const confirm = window.confirm("Bạn có chắc chắn muốn xóa món ăn này?");
+
+    if (!confirm) return;
+
     dispatch(deleteDish(dishId));
   }, []);
 
@@ -195,8 +238,6 @@ function DishesSection({ dishCategory, categories }) {
           (selectedDish && selectedDish?.images[0]) ||
             CONFIG.DISH_IMAGE_PLACEHOLDER
         );
-
-        // Set form values
         setValue("name", selectedDish.name);
         setValue("price", selectedDish.price);
         setValue("short_description", selectedDish.short_description);
@@ -254,7 +295,7 @@ function DishesSection({ dishCategory, categories }) {
             <select
               name="perPage"
               id="perPage"
-              className="select dark:bg-gray-800 dark:text-white h-fit"
+              className="select light:bg-gray-800 light:text-white h-fit"
               onChange={handleItemsPerPageChange}
               value={itemsPerPage}
             >
@@ -290,7 +331,7 @@ function DishesSection({ dishCategory, categories }) {
             <select
               name="sortByPrice"
               id="sortByPrice"
-              className="select dark:bg-gray-800 dark:text-white h-fit"
+              className="select dark:bg-gray-800 dark:text-white h-fit !rounded-full"
               onChange={handleSortByPrice}
               value={sortByPrice}
             >
@@ -301,6 +342,16 @@ function DishesSection({ dishCategory, categories }) {
                 Giá giảm dần
               </option>
             </select>
+            <Button
+              onClick={handleAddButtonClick}
+              radius="full"
+              className="bg-whiteAlpha-100 hover:bg-whiteAlpha-200 text-white font-medium !shrink-0"
+              startContent={
+                <PlusIcon className="w-5 h-5 text-white font-semibold shrink-0" />
+              }
+            >
+              Thêm món ăn
+            </Button>
           </div>
         </div>
         {isLoading && <DishesSectionSkeleton />}
@@ -310,7 +361,12 @@ function DishesSection({ dishCategory, categories }) {
             <button
               className="text-gray-400 underline"
               onClick={() =>
-                typeof window !== undefined && window.location.reload()
+                dispatch(
+                  fetchCategoryDishes({
+                    categoryId: dishCategory.id,
+                    params: { page: currentPage, itemsPerPage },
+                  })
+                )
               }
             >
               Thử lại
@@ -335,6 +391,10 @@ function DishesSection({ dishCategory, categories }) {
                       onClick={() => {
                         dispatch(setSelectedDish(dish));
                         openDetailModal(dish); // Pass the dish to openDetailModal
+                      }}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        handleDeleteDish(dish.id);
                       }}
                       className={"flex-1 min-w-0"}
                     ></Dish>
@@ -393,6 +453,13 @@ function DishesSection({ dishCategory, categories }) {
                                 onFileChange={handleFileChange}
                                 files={files}
                                 setFiles={setFiles}
+                                id={"images"}
+                                name={"images"}
+                                placeholder={
+                                  "Chọn ảnh món ăn hoặc kéo thả vào đây"
+                                }
+                                register={register}
+                                errors={errors}
                               />
                               {selectedDish && (
                                 <Image
@@ -410,7 +477,9 @@ function DishesSection({ dishCategory, categories }) {
                             </Col>
                             <Col span={12}>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"name"}
                                 name={"name"} // Must have: because you have to using it to register the input
                                 label={"Tên món"} // If empty: label won't show
@@ -425,7 +494,9 @@ function DishesSection({ dishCategory, categories }) {
                                 onChange={onInputChange}
                               ></FormInput>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"price"}
                                 name={"price"} // Must have: because you have to using it to register the input
                                 label={"Giá món"} // If empty: label won't show
@@ -440,7 +511,9 @@ function DishesSection({ dishCategory, categories }) {
                               ></FormInput>
                               <FormInput
                                 type="select"
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"category"}
                                 name={"category"} // Must have: because you have to using it to register the input
                                 label={"Danh mục món ăn"} // If empty: label won't show
@@ -461,7 +534,9 @@ function DishesSection({ dishCategory, categories }) {
                                 onChange={onInputChange}
                               ></FormInput>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"short_description"}
                                 name={"short_description"} // Must have: because you have to using it to register the input
                                 label={"Mô tả ngắn"} // If empty: label won't show
@@ -478,7 +553,9 @@ function DishesSection({ dishCategory, categories }) {
                                 onChange={onInputChange}
                               ></FormInput>
                               <FormInput
-                                theme="dark"
+                                theme="light"
+                                className="!text-gray-800 !placeholder:text-gray-400"
+                                labelClassName="!text-gray-800"
                                 id={"description"}
                                 name={"description"} // Must have: because you have to using it to register the input
                                 label={"Mô tả chi tiết"} // If empty: label won't show
@@ -495,65 +572,82 @@ function DishesSection({ dishCategory, categories }) {
                           </Row>
                         </ModalBody>
                         <ModalFooter>
-                          {selectedDish ? (
+                          <div className="flex flex-1 justify-start">
+                            {!selectedDish && (
+                              <Switch
+                                isSelected={resetAfterSubmit}
+                                onValueChange={setResetAfterSubmit}
+                                aria-label="Xóa dữ liệu sau khi thêm"
+                                size="small"
+                                classNames={{
+                                  label: "text-gray-400 text-md",
+                                }}
+                              >
+                                Xóa dữ liệu sau khi thêm
+                              </Switch>
+                            )}
+                          </div>
+                          <div className="flex gap-3 items-center">
+                            {selectedDish ? (
+                              <Button
+                                radius="full"
+                                onPress={() => {
+                                  handleDeleteDish(selectedDish.id);
+                                }}
+                                startContent={
+                                  <TrashIcon className="shrink-0 w-4 h-4" />
+                                }
+                                className="bg-red-200 hover:bg-red-300 text-red-500"
+                              >
+                                Xóa món ăn
+                              </Button>
+                            ) : (
+                              <Button
+                                radius="full"
+                                onPress={() => {
+                                  reset();
+                                  onClose();
+                                }}
+                                startContent={
+                                  <XMarkIcon className="w-4 h-4 shrink-0" />
+                                }
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+                              >
+                                Hủy
+                              </Button>
+                            )}
                             <Button
+                              type="submit"
                               radius="full"
-                              onPress={() => {
-                                handleDeleteDish(selectedDish.id);
-                              }}
-                              startContent={
-                                <TrashIcon className="shrink-0 w-4 h-4" />
+                              className="bg-teal-400 hover:bg-teal-500 text-white"
+                              startContent={(() => {
+                                if (selectedDish) {
+                                  return isUpdatingDish ? null : (
+                                    <IoSaveOutline className="w-4 h-4 shrink-0" />
+                                  );
+                                } else {
+                                  return isAddingDish ? null : (
+                                    <PlusIcon className="w-4 h-4 shrink-0" />
+                                  );
+                                }
+                              })()}
+                              isLoading={
+                                selectedDish ? isUpdatingDish : isAddingDish
                               }
-                              className="bg-red-200 hover:bg-red-300 text-red-500"
                             >
-                              Xóa món ăn
+                              {(() => {
+                                if (selectedDish) {
+                                  return isUpdatingDish
+                                    ? "Đang cập nhật..."
+                                    : "Cập nhật món ăn";
+                                } else {
+                                  return isAddingDish
+                                    ? "Đang thêm..."
+                                    : "Thêm món ăn";
+                                }
+                              })()}
                             </Button>
-                          ) : (
-                            <Button
-                              radius="full"
-                              onPress={() => {
-                                reset();
-                                onClose();
-                              }}
-                              startContent={
-                                <XMarkIcon className="w-4 h-4 shrink-0" />
-                              }
-                              className="bg-gray-200 hover:bg-gray-300 text-gray-800"
-                            >
-                              Hủy
-                            </Button>
-                          )}
-                          <Button
-                            type="submit"
-                            radius="full"
-                            className="bg-teal-400 hover:bg-teal-500 text-white"
-                            startContent={(() => {
-                              if (selectedDish) {
-                                return isUpdatingDish ? null : (
-                                  <IoSaveOutline className="w-4 h-4 shrink-0" />
-                                );
-                              } else {
-                                return isAddingDish ? null : (
-                                  <PlusIcon className="w-4 h-4 shrink-0" />
-                                );
-                              }
-                            })()}
-                            isLoading={
-                              selectedDish ? isUpdatingDish : isAddingDish
-                            }
-                          >
-                            {(() => {
-                              if (selectedDish) {
-                                return isUpdatingDish
-                                  ? "Đang cập nhật..."
-                                  : "Cập nhật món ăn";
-                              } else {
-                                return isAddingDish
-                                  ? "Đang thêm..."
-                                  : "Thêm món ăn";
-                              }
-                            })()}
-                          </Button>
+                          </div>
                         </ModalFooter>
                       </form>
                     </>

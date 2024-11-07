@@ -14,6 +14,7 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -25,9 +26,9 @@ import {
 import { isPublic } from 'decorator/auth.decorator';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { CreateMenuDto } from './dto/create-menu.dto';
+import { FilterMenuDto } from './dto/FilterMenu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { MenusService } from './menus.service';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Menus - Quản lý thực đơn')
 @Controller('api/menus')
@@ -36,7 +37,14 @@ export class MenusController {
 
   // ! Create Menu
   @Post('create')
-  @isPublic()
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
   @ApiResponse({
     status: HttpStatus.CREATED,
     example: {
@@ -100,10 +108,11 @@ export class MenusController {
   )
   @ApiOperation({ summary: 'Thêm mới menu' })
   create(
+    @Request() req,
     @Body() createMenuDto: CreateMenuDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
-    return this.menusService.create(createMenuDto, files);
+    return this.menusService.create(req.user, createMenuDto, files);
   }
 
   // ! Get All Menu
@@ -146,7 +155,8 @@ export class MenusController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAll(@Query() query: FilterPriceDto) {
+  @ApiQuery({ name: 'user_id', required: false, description: '1' })
+  findAll(@Query() query: FilterMenuDto) {
     return this.menusService.findAll(query);
   }
 

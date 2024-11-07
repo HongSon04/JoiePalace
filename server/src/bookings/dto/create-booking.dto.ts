@@ -11,16 +11,16 @@ export class CreateBookingDto {
 
   @ApiProperty({
     required: true,
-    description: 'ID của chi nhánh nơi tổ chức sự kiện',
+    description: 'ID của chi nhánh nơi tổ chức tiệc',
   })
-  @IsNotEmpty({ message: 'Địa chỉ không được để trống' })
+  @IsNotEmpty({ message: 'Chi nhánh không được để trống' })
   branch_id: string;
 
   @ApiProperty({
     required: true,
-    description: 'ID của loại sự kiện',
+    description: 'ID của loại tiệc',
   })
-  @IsNotEmpty({ message: 'Vui lòng chọn loại sự kiện' })
+  @IsNotEmpty({ message: 'Vui lòng chọn loại tiệc' })
   party_type_id: string;
 
   @ApiProperty({
@@ -59,10 +59,10 @@ export class CreateBookingDto {
   company_name?: string;
 
   @ApiProperty({
-    required: true,
-    description: 'Ghi chú thêm về sự kiện',
+    required: false,
+    description: 'Ghi chú thêm về tiệc',
   })
-  note: string;
+  note?: string;
 
   @ApiProperty({
     required: false,
@@ -72,13 +72,13 @@ export class CreateBookingDto {
 
   @ApiProperty({
     required: false,
-    description: 'Ngân sách dự kiến cho sự kiện',
+    description: 'Ngân sách dự kiến cho tiệc',
   })
   budget?: string;
 
   @ApiProperty({
     required: true,
-    description: 'Ca tổ chức sự kiện',
+    description: 'Ca tổ chức tiệc',
     enum: ShiftEnum,
   })
   @IsNotEmpty({ message: 'Vui lòng chọn ca' })
@@ -89,8 +89,8 @@ export class CreateBookingDto {
 
   @ApiProperty({
     required: true,
-    description: 'Ngày tổ chức sự kiện (định dạng: DD-MM-YYYY)',
+    description: 'Ngày tổ chức tiệc (định dạng: DD-MM-YYYY)',
   })
-  @IsNotEmpty({ message: 'Vui lòng chọn ngày tổ chức sự kiện' })
+  @IsNotEmpty({ message: 'Vui lòng chọn ngày tổ chức tiệc' })
   organization_date: string;
 }

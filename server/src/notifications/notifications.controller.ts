@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -27,7 +27,10 @@ export class NotificationsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiOperation({ summary: 'Lấy thông báo theo user_id' })
-  async getNotifications(@Param('user_id') user_id: string, query: FilterDto) {
+  async getNotifications(
+    @Param('user_id') user_id: string,
+    @Query() query: FilterDto,
+  ) {
     return this.notificationsService.getNotifications(+user_id, query);
   }
 
@@ -46,7 +49,7 @@ export class NotificationsController {
   @ApiQuery({ name: 'itemsPerPage', required: false })
   async getNotificationsByEmail(
     @Param('email_user') email_user: string,
-    query: FilterDto,
+    @Query() query: FilterDto,
   ) {
     return this.notificationsService.getNotificationsByEmail(email_user, query);
   }

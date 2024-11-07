@@ -158,7 +158,7 @@ const Page = () => {
             <span className="flex w-full justify-center font-light">Hoặc</span>
             <button className="w-fit rounded-full bg-white text-black flex items-center gap-2 py-3 px-5 m-auto">
               <Image w={"auto"} h={"auto"} src="/googeIcon.svg" alt="" />
-              <span className="font-medium text-black">Đăng ký bằng Google</span>
+              <span className="font-medium !text-black">Đăng ký bằng Google</span>
             </button>
           </form>
         </div>

@@ -10,5 +10,3 @@ export const fecthAllPartyTypes = async () => {
 
   return response.data.data;
 };
-
-

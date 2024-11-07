@@ -17,6 +17,7 @@ import {
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FilterMenuDto } from './dto/FilterMenu.dto';
 
 @Injectable()
 export class MenusService {
@@ -27,6 +28,7 @@ export class MenusService {
 
   // ! Create Menu
   async create(
+    reqUser,
     createMenuDto: CreateMenuDto,
     files: { images?: Express.Multer.File[] },
   ) {
@@ -83,6 +85,7 @@ export class MenusService {
       const menus = await this.prismaService.menus.create({
         data: {
           name,
+          user_id: Number(reqUser.id),
           description,
           price: Number(price),
           slug,
@@ -95,6 +98,7 @@ export class MenusService {
         include: {
           products: {
             include: {
+              categories: true,
               tags: true,
             },
           },
@@ -118,7 +122,7 @@ export class MenusService {
   }
 
   // ! Get All Menu
-  async findAll(query: FilterPriceDto) {
+  async findAll(query: FilterMenuDto) {
     const page = Number(query.page) || 1;
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
@@ -199,6 +203,18 @@ export class MenusService {
       ];
     }
 
+    if (query.user_id) {
+      const findUser = await this.prismaService.users.findUnique({
+        where: { id: Number(query.user_id) },
+      });
+
+      if (!findUser) {
+        throw new NotFoundException('Người dùng không tồn tại');
+      }
+
+      whereConditions.user_id = Number(query.user_id);
+    }
+
     // Sắp xếp theo giá
     let orderByConditions: any = {};
     if (priceSort === 'asc' || priceSort === 'desc') {
@@ -212,6 +228,13 @@ export class MenusService {
           include: {
             products: {
               include: {
+                categories: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                  },
+                },
                 tags: true,
               },
             },
@@ -226,6 +249,12 @@ export class MenusService {
           where: whereConditions,
         }),
       ]);
+
+      res.forEach((menu) => {
+        return (menu.products = this.groupProductsByCategory(
+          menu.products,
+        ) as any);
+      });
 
       const lastPage = Math.ceil(total / itemsPerPage);
       const nextPage = page >= lastPage ? null : page + 1;
@@ -352,6 +381,13 @@ export class MenusService {
           include: {
             products: {
               include: {
+                categories: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                  },
+                },
                 tags: true,
               },
             },
@@ -366,6 +402,12 @@ export class MenusService {
           where: whereConditions,
         }),
       ]);
+
+      res.forEach((menu) => {
+        return (menu.products = this.groupProductsByCategory(
+          menu.products,
+        ) as any);
+      });
 
       const lastPage = Math.ceil(total / itemsPerPage);
       const nextPage = page >= lastPage ? null : page + 1;
@@ -405,6 +447,7 @@ export class MenusService {
         include: {
           products: {
             include: {
+              categories: true,
               tags: true,
             },
           },
@@ -414,6 +457,8 @@ export class MenusService {
       if (!menu) {
         throw new NotFoundException('Menu không tồn tại');
       }
+
+      menu.products = this.groupProductsByCategory(menu.products) as any;
 
       throw new HttpException(
         { data: FormatReturnData(menu, []) },
@@ -441,6 +486,13 @@ export class MenusService {
         include: {
           products: {
             include: {
+              categories: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
               tags: true,
             },
           },
@@ -450,6 +502,8 @@ export class MenusService {
       if (!menu) {
         throw new NotFoundException('Menu không tồn tại');
       }
+
+      menu.products = this.groupProductsByCategory(menu.products) as any;
 
       throw new HttpException(
         { data: FormatReturnData(menu, []) },
@@ -538,7 +592,7 @@ export class MenusService {
         data: {
           name,
           description,
-          price,
+          price: Number(price),
           slug,
           products: {
             set: connectproducts,
@@ -548,6 +602,7 @@ export class MenusService {
         include: {
           products: {
             include: {
+              categories: true,
               tags: true,
             },
           },
@@ -674,5 +729,18 @@ export class MenusService {
         error: error,
       });
     }
+  }
+
+  private groupProductsByCategory(products) {
+    const groupedProducts = {};
+    products.forEach((product) => {
+      const categorySlug = product.categories.slug;
+      if (!groupedProducts[categorySlug]) {
+        groupedProducts[categorySlug] = [];
+      }
+      groupedProducts[categorySlug].push(product);
+    });
+
+    return groupedProducts;
   }
 }
