@@ -248,4 +248,30 @@ export class MailService {
       });
     }
   }
+
+  // ! Gửi mail khi người dùng đăng nhập lần đầu bằng Mạng xã hội
+  async sendMailFirstLoginSocial(
+    email: string,
+    name: string,
+    password: string,
+  ) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Đăng nhập lần đầu',
+        template: 'send-password-social',
+        context: {
+          email,
+          name,
+          password,
+        },
+      });
+    } catch (error) {
+      console.log('Lỗi từ MailService->sendMailFirstLoginSocial', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
+    }
+  }
 }
