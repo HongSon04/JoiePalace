@@ -6,7 +6,6 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ButtonDiscover from "./ButtonDiscover";
-// import "@/app/_styles/index.css";
 
 const CustomSliderMenu = ({ dataSlider }) => {
   const sliderRef = useRef(null);
@@ -47,12 +46,11 @@ const CustomSliderMenu = ({ dataSlider }) => {
   };
 
   return (
-    <section className="h-screen max-sm:h-fit max-md:mt-0">
       <Slider ref={sliderRef} {...menuSliderSettings}>
         {dataSlider.map((i, index) => {
           return (
             <div key={index}>
-              <div className="flex justify-center items-end gap-10 mt-[80px] max-lg:gap-5">
+              <div className="flex justify-center items-end gap-10 mt-[80px] max-md:mt-0 max-lg:gap-5">
                 <div className="flex justify-center">
                   <div className="absolute text-left-to-right">
                     <h1 className="text-5xl relative right-[210px] top-[100px] uppercase text-gold font-bold -rotate-90 max-lg:text-4xl max-lg:right-[150px]  max-lg:top-[75px] max-sm:right-[72px] max-sm:text-xl max-sm:top-[40px] ">
@@ -75,24 +73,6 @@ const CustomSliderMenu = ({ dataSlider }) => {
                     </p>
                     <div className="flex items-center justify-between">
                         <ButtonDiscover className="w-fit px-3"/>
-                      {/* <div
-                        className="flex justify-center items-center rounded-full h-10 w-[130px] bg-yellow-400 hover:bg-gold text-right-to-left max-sm:text-[10px] "
-                        style={{ animationDelay: "0.6s" }}
-                      >
-                        {" "}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="17"
-                          viewBox="0 0 16 17"
-                          fill="none"
-                        >
-                          <path
-                            d="M7.52867 12.0286L8.47133 12.9712L12.9427 8.4999L8.47133 4.02856L7.52867 4.97123L10.3907 7.83323H4V9.16656H10.3907L7.52867 12.0286Z"
-                            fill="white"
-                          />
-                        </svg>
-                      </div>
                       <div className="flex ">
                         <div
                           onClick={prevSlide}
@@ -125,7 +105,7 @@ const CustomSliderMenu = ({ dataSlider }) => {
                             />
                           </svg>
                         </div>
-                      </div> */}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -137,7 +117,6 @@ const CustomSliderMenu = ({ dataSlider }) => {
           );
         })}
       </Slider>
-    </section>
   );
 };
 export default CustomSliderMenu;

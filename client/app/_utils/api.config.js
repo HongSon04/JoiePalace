@@ -385,5 +385,5 @@ export const fetchData = async (
   } else {
     dispatch(successAction(result));
   }
-  return result; // Return the result for further handling
+  return result; 
 };
