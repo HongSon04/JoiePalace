@@ -261,7 +261,7 @@ const booking: CreateBookingDto[] = [
     shift: 'Sáng',
   },
   {
-    user_id: 18,
+    user_id: 18 as any,
     branch_id: 1 as any,
     budget: '',
     stage_id: 1 as any,
@@ -270,7 +270,7 @@ const booking: CreateBookingDto[] = [
     phone: '123456789',
     name: 'Tiệc mừng ngày Quốc tế Lao động',
     note: 'Ghi chú',
-    number_of_guests: 350,
+    number_of_guests: 350 as any,
     organization_date: '2024-05-01T00:00:00.000Z',
     party_type_id: 1 as any,
     shift: 'Tối',
@@ -681,7 +681,7 @@ export const bookingSeed = async () => {
     console.log(i, booking.length);
     const created_booking = await prisma.bookings.create({
       data: {
-        user_id: booking[i].user_id!,
+        user_id: Number(booking[i].user_id),
         branch_id: booking[i].branch_id as any,
         stage_id: booking[i].stage_id as any,
         party_type_id: booking[i].party_type_id as any,
@@ -690,7 +690,7 @@ export const bookingSeed = async () => {
         email: booking[i].email,
         company_name: booking[i].company_name,
         note: booking[i].note,
-        number_of_guests: booking[i].number_of_guests,
+        number_of_guests: Number(booking[i].number_of_guests),
         budget: booking[i].budget,
         shift: booking[i].shift,
         organization_date: booking[i].organization_date,

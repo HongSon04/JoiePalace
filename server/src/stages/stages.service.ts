@@ -22,8 +22,10 @@ export class StagesService {
   // ! Create stage
   async create(body: StageDto, files: { images?: Express.Multer.File[] }) {
     try {
+      const { name, description, capacity_min, capacity_max, branch_id } = body;
+
       const findBranch = await this.prismaService.branches.findUnique({
-        where: { id: Number(body.branch_id) },
+        where: { id: Number(branch_id) },
       });
       if (!findBranch) {
         throw new NotFoundException('Không tìm thấy chi nhánh');
@@ -42,12 +44,12 @@ export class StagesService {
 
       const stagesRes = await this.prismaService.stages.create({
         data: {
-          branch_id: Number(body.branch_id),
-          name: body.name,
-          description: body.description,
+          branch_id: Number(branch_id),
+          name: name,
+          description: description,
           images: stagesImages as any,
-          capacity_min: Number(body.capacity_min),
-          capacity_max: Number(body.capacity_max),
+          capacity_min: Number(capacity_min),
+          capacity_max: Number(capacity_max),
         },
       });
 
@@ -138,7 +140,7 @@ export class StagesService {
     files: { images?: Express.Multer.File[] },
   ) {
     try {
-      const { name, description, capacity_min, capacity_max } = body;
+      const { name, description, capacity_min, capacity_max, branch_id } = body;
       const findStage = await this.prismaService.stages.findUnique({
         where: { id: Number(stage_id) },
       });
@@ -157,12 +159,12 @@ export class StagesService {
         );
       }
 
-      const updateData: StageUpdateDto = {
-        branch_id: Number(body.branch_id),
-        name: body.name,
-        description: body.description,
-        capacity_min: Number(body.capacity_min),
-        capacity_max: Number(body.capacity_max),
+      const updateData = {
+        branch_id: Number(branch_id),
+        name: name,
+        description: description,
+        capacity_min: Number(capacity_min),
+        capacity_max: Number(capacity_max),
         images: findStage.images,
       };
 

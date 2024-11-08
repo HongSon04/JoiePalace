@@ -239,10 +239,10 @@ export class BookingsService {
 
       // Add numeric ID filters with type checking
       const numericFilters = [
-        { field: 'branch_id', value: query.branch_id },
-        { field: 'user_id', value: query.user_id },
-        { field: 'stage_id', value: query.stage_id },
-        { field: 'party_type_id', value: query.party_type_id },
+        { field: 'branch_id', value: Number(query.branch_id) },
+        { field: 'user_id', value: Number(query.user_id) },
+        { field: 'stage_id', value: Number(query.stage_id) },
+        { field: 'party_type_id', value: Number(query.party_type_id) },
       ];
 
       numericFilters.forEach(({ field, value }) => {

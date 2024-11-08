@@ -78,7 +78,7 @@ export class MembershipsService {
           gifts: {
             connect: gifts.map((id) => ({ id })),
           },
-          booking_total_amount,
+          booking_total_amount: Number(booking_total_amount),
           images: images,
         },
       });
@@ -303,7 +303,7 @@ export class MembershipsService {
           gifts: {
             set: gifts.map((id) => ({ id })),
           },
-          booking_total_amount,
+          booking_total_amount: Number(booking_total_amount),
           images: images ? images : findMembership.images,
         },
       });
