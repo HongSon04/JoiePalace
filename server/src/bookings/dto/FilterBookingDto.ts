@@ -129,13 +129,13 @@ export class FilterBookingDto {
     required: false,
     description: 'ID của chi nhánh',
   })
-  branch_id?: number;
+  branch_id?: string;
 
   @ApiProperty({
     required: false,
     description: 'ID của khách hàng',
   })
-  user_id?: number;
+  user_id?: string;
 
   @ApiProperty({
     required: false,
@@ -153,17 +153,17 @@ export class FilterBookingDto {
     required: false,
     description: 'ID của menu',
   })
-  menu_id?: number;
+  menu_id?: string;
 
   @ApiProperty({
     required: false,
     description: 'ID của trang trí',
   })
-  decor_id?: number;
+  decor_id?: string;
 
   @ApiProperty({
     required: false,
     description: 'ID của đặt cọc',
   })
-  deposit_id?: number;
+  deposit_id?: string;
 }

@@ -247,7 +247,7 @@ export class BookingsService {
 
       numericFilters.forEach(({ field, value }) => {
         if (value) {
-          whereConditions[field] = parseInt(String(value), 10);
+          whereConditions[field] = Number(value);
         }
       });
 
@@ -256,13 +256,13 @@ export class BookingsService {
         whereConditions.booking_details = {
           some: {
             ...(query.decor_id && {
-              decor_id: parseInt(String(query.decor_id), 10),
+              decor_id: Number(query.decor_id),
             }),
             ...(query.deposit_id && {
-              deposit_id: parseInt(String(query.deposit_id), 10),
+              deposit_id: Number(query.deposit_id),
             }),
             ...(query.menu_id && {
-              menu_id: parseInt(String(query.menu_id), 10),
+              menu_id: Number(query.menu_id),
             }),
           },
         };
