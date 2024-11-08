@@ -27,6 +27,7 @@ export class CreateMembershipDto {
     required: true,
     example: [1, 2, 3],
   })
+  @IsNotEmpty({ message: 'Danh sách quà tặng không được để trống' })
   gifts: number[];
 
   @ApiProperty({

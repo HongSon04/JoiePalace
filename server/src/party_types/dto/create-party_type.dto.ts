@@ -34,7 +34,8 @@ export class CreatePartyTypeDto {
     required: false,
     example: [1, 2, 3],
   })
-  products?: number[];
+  @IsNotEmpty({ message: 'Danh sách sản phẩm không được để trống' })
+  products: number[];
 
   @ApiProperty({
     description: 'Giá của loại tiệc, không được để trống',

@@ -1,22 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseInterceptors,
-  HttpException,
+  Get,
   HttpStatus,
-  UploadedFiles,
+  Param,
+  Patch,
+  Post,
   Query,
   Request,
-  BadRequestException,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { DecorsService } from './decors.service';
-import { CreateDecorDto, ImageDecorDto } from './dto/create-decor.dto';
-import { UpdateDecorDto } from './dto/update-decor.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -25,9 +22,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
+import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { DecorsService } from './decors.service';
+import { CreateDecorDto, ImageDecorDto } from './dto/create-decor.dto';
+import { UpdateDecorDto } from './dto/update-decor.dto';
 
 @ApiTags('Decors - Quản lý trang trí')
 @Controller('api/decors')
@@ -74,7 +73,7 @@ export class DecorsController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,
@@ -278,7 +277,7 @@ export class DecorsController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,

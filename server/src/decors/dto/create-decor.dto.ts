@@ -42,7 +42,8 @@ export class CreateDecorDto {
     example: [1, 2, 3],
   })
   @IsOptional()
-  products?: number[];
+  @IsNotEmpty({ message: 'Danh sách sản phẩm không được để trống' })
+  products: number[];
 }
 
 export class ImageDecorDto {

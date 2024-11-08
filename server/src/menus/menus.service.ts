@@ -46,28 +46,32 @@ export class MenusService {
         throw new BadRequestException('Tên menu đã tồn tại');
       }
 
-      const findProducts = await this.prismaService.products.findMany({
-        where: {
-          id: {
-            in: products,
-          },
-        },
-      });
+      // ? Kiểm tra sản phẩm
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
 
-      if (findProducts.length !== products.length) {
-        throw new NotFoundException('Có món ăn không tồn tại');
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
       }
 
-      const connectproducts = products.map((foodId) => ({
-        id: Number(foodId),
-      }));
-
-      // Check Food Price (Total Amount) equal with price of menu
-      const totalAmount = findProducts.reduce(
-        (acc, curr) => acc + curr.price,
-        0,
-      );
-      if (totalAmount !== Number(price)) {
+      if (Number(totalPrice) !== Number(price)) {
         throw new BadRequestException(
           'Giá của menu không trùng với tổng giá của các món ăn',
         );
@@ -91,7 +95,7 @@ export class MenusService {
           slug,
           is_show,
           products: {
-            connect: connectproducts,
+            connect: productsTagSet,
           },
           images,
         },
@@ -546,28 +550,32 @@ export class MenusService {
         throw new NotFoundException('Menu không tồn tại');
       }
 
-      const findProducts = await this.prismaService.products.findMany({
-        where: {
-          id: {
-            in: products,
-          },
-        },
-      });
+      // ? Kiểm tra sản phẩm
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
 
-      if (findProducts.length !== products.length) {
-        throw new NotFoundException('Có món ăn không tồn tại');
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
       }
 
-      const connectproducts = products.map((foodId) => ({
-        id: foodId,
-      }));
-
-      // Check Food Price (Total Amount) equal with price of menu
-      const totalAmount = findProducts.reduce(
-        (acc, curr) => acc + curr.price,
-        0,
-      );
-      if (totalAmount !== Number(price)) {
+      if (Number(totalPrice) !== Number(price)) {
         throw new BadRequestException(
           'Giá của menu không trùng với tổng giá của các món ăn',
         );
@@ -590,7 +598,7 @@ export class MenusService {
           price: Number(price),
           slug,
           products: {
-            set: connectproducts,
+            set: productsTagSet,
           },
           images: images ? images : findMenuById.images,
         },
