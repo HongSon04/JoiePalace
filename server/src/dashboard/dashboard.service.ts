@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   HttpException,
   HttpStatus,
@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { PrismaService } from 'src/prisma.service';
@@ -15,7 +16,7 @@ import { PrismaService } from 'src/prisma.service';
 export class DashboardService {
   constructor(
     private prismaService: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     dayjs.locale('vi');
     dayjs.extend(weekOfYear);

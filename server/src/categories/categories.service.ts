@@ -2,6 +2,7 @@ import {
   BadRequestException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -17,12 +18,15 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { FilterCategoryDto } from './dto/FilterCategoryDto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     private prismaService: PrismaService,
     private cloudinaryService: CloudinaryService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // ! Create Categories
@@ -98,6 +102,9 @@ export class CategoriesService {
         },
       });
 
+      // ? Delete Cache
+      await this.cacheManager.del('categories-get-all');
+
       throw new HttpException(
         {
           message: 'Tạo danh mục thành công',
@@ -120,6 +127,16 @@ export class CategoriesService {
   // ! Get All Categories
   async findAll(query: FilterCategoryDto) {
     try {
+      const cacheCategory = await this.cacheManager.get('categories-get-all');
+      console.log('cacheCategory', cacheCategory);
+      if (cacheCategory) {
+        throw new HttpException(
+          {
+            data: cacheCategory,
+          },
+          HttpStatus.OK,
+        );
+      }
       // const page = Number(query.page) || 1;
       // const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
@@ -197,6 +214,10 @@ export class CategoriesService {
 
       let FormatData = FormatReturnData(res, []);
       const categories = this.buildCategoryTree(FormatData);
+
+      await this.cacheManager.set('categories-get-all', categories, {
+        ttl: 60 * 5,
+      } as any);
 
       throw new HttpException(
         {
@@ -533,6 +554,8 @@ export class CategoriesService {
           },
         },
       });
+
+      await this.cacheManager.del('categories-get-all');
 
       throw new HttpException(
         {

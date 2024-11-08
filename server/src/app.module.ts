@@ -31,9 +31,15 @@ import { StagesModule } from './stages/stages.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import { TagsModule } from './tags/tags.module';
 import { UserModule } from './user/user.module';
+import { CacheModule, CacheStore } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     ScheduleModule.forRoot(),
     JwtModule.registerAsync({
       global: true,
@@ -46,9 +52,23 @@ import { UserModule } from './user/user.module';
       }),
       inject: [ConfigService],
     }),
-    ConfigModule.forRoot({
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
       isGlobal: true,
-      envFilePath: '.env',
+      useFactory: async (configService: ConfigService) => {
+        const store = await redisStore({
+          socket: {
+            host: configService.get<string>('REDIS_HOST'),
+            port: configService.get<number>('REDIS_PORT'),
+          },
+          password: configService.get<string>('REDIS_PASSWORD'),
+          ttl: 60 * 3,
+        });
+        return {
+          store: store as unknown as CacheStore,
+        };
+      },
     }),
     AuthModule,
     UserModule,
