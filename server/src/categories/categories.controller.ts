@@ -24,9 +24,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
-import { FilterDto } from 'helper/dto/Filter.dto';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { FilterCategoryDto } from './dto/FilterCategoryDto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @ApiTags('Categories - Quản lý danh mục')
@@ -155,12 +155,12 @@ export class CategoriesController {
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả danh mục' })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'itemsPerPage', required: false })
+  // @ApiQuery({ name: 'page', required: false })
+  // @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAll(@Query() query: FilterDto) {
+  findAll(@Query() query: FilterCategoryDto) {
     return this.categoriesService.findAll(query);
   }
 
@@ -209,12 +209,12 @@ export class CategoriesController {
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả danh mục đã xóa tạm' })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'itemsPerPage', required: false })
+  // @ApiQuery({ name: 'page', required: false })
+  // @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAllDeleted(@Query() query: FilterDto) {
+  findAllDeleted(@Query() query: FilterCategoryDto) {
     return this.categoriesService.findAllDeleted(query);
   }
 

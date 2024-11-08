@@ -24,21 +24,24 @@ export class StagesService {
     try {
       const { name, description, capacity_min, capacity_max, branch_id } = body;
 
-      const findBranch = await this.prismaService.branches.findUnique({
-        where: { id: Number(branch_id) },
-      });
-      if (!findBranch) {
-        throw new NotFoundException('Không tìm thấy chi nhánh');
-      }
       if (!files.images) {
         throw new BadRequestException('Không được để trống ảnh');
       }
+
+      const findBranch = await this.prismaService.branches.findUnique({
+        where: { id: Number(branch_id) },
+      });
+
+      if (!findBranch) {
+        throw new NotFoundException('Không tìm thấy chi nhánh');
+      }
+
       const stagesImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/stages',
         );
-      if (!stagesImages) {
+      if (stagesImages.length === 0) {
         throw new BadRequestException('Lỗi khi upload ảnh, vui lòng thử lại');
       }
 
@@ -78,12 +81,13 @@ export class StagesService {
       if (branch_id) {
         const findBranch = await this.prismaService.branches.findUnique({
           where: { id: Number(branch_id) },
+          include: { stages: true },
         });
         if (!findBranch) {
           throw new NotFoundException('Không tìm thấy chi nhánh');
         }
         const stages = await this.prismaService.stages.findMany({
-          where: { id: Number(branch_id) },
+          where: { branch_id: Number(branch_id) },
         });
         throw new HttpException(
           { message: 'Thành công', data: stages },
@@ -175,7 +179,7 @@ export class StagesService {
             'joiepalace/stages',
           );
 
-        if (!stagesImages || stagesImages.length === 0) {
+        if (stagesImages.length === 0) {
           throw new BadRequestException('Lỗi khi upload ảnh, vui lòng thử lại');
         }
 
