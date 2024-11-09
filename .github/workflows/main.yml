@@ -19,7 +19,7 @@ jobs:
       - name: Fetch Latest Changes
         run: |
           echo "Fetching latest changes..."
-          cd /JoiePalace
+          cd /root/JoiePalace
           git fetch origin || exit 1
           git checkout main || exit 1
           git pull origin main || exit 1
