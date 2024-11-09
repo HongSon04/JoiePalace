@@ -11,7 +11,7 @@ const handler = NextAuth({
   pages: {
     signIn: "/dang-nhap",
   },
-  secret: process.env.NEXTAUTH_SECRET_KEY,
+  secret: "nguyenquocthanh-admin-secret-key",
 });
 
 export { handler as GET, handler as POST };
