@@ -264,6 +264,7 @@
   margin: 0;
   padding: 0;
   font: inherit;
+  scroll-behavior: smooth;
 }
 
 /* :root {} */
@@ -670,10 +671,32 @@ select {
   background-image: url(/line-group.svg);
   z-index: 1;
 }
-.notificationFeedback{
+
+.notificationFeedback {
   right: -430px;
   transition: right 0.5s ease;
 }
+
 .notificationFeedback.show {
-  right: 20px; 
+  right: 20px;
+}
+
+
+/* Default padding for mobile */
+.responsive-container {
+  padding: 30px 10px;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .responsive-container {
+    padding: 30px 60px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .responsive-container {
+    padding: 60px 192px;
+  }
 }

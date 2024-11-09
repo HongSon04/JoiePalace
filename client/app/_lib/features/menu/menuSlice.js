@@ -139,14 +139,21 @@ export const createMenu = createAsyncThunk(
 
     try {
       const response = await makeAuthorizedRequest(
-        API_CONFIG.MENU.CREATE(),
+        API_CONFIG.MENU.CREATE,
         "POST",
         data
       );
 
-      console.log(response);
+      if (response.success) {
+        dispatch(createMenuSuccess(response.data));
+      } else {
+        const { error } = response;
+        dispatch(createMenuError(error.message));
+      }
+      return response;
     } catch (error) {
-      return rejectWithValue(error.message);
+      dispatch(createMenuError(error));
+      return rejectWithValue(error);
     }
   }
 );
@@ -205,242 +212,13 @@ export const {
   toggleSelectAll,
   toggleCheckbox,
   setSelectedMenuId,
+
   fetchMenuListRequest,
   fetchMenuListSuccess,
   fetchMenuListError,
+
+  createMenuRequest,
+  createMenuSuccess,
+  createMenuError,
 } = checkboxSlice.actions;
 export default checkboxSlice;
-
-const menuList = [
-  {
-    id: 1,
-    background: menuBg,
-    dishes: [
-      {
-        id: 1,
-        name: "Cơm gà",
-        price: 30000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 2,
-        name: "Cơm sườn",
-        price: 25000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 3,
-        name: "Cơm chả cá",
-        price: 35000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 4,
-        name: "Cơm gà",
-        price: 30000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 5,
-        name: "Cơm sườn",
-        price: 25000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 6,
-        name: "Cơm chả cá",
-        price: 35000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 7,
-        name: "Cơm cà ri",
-        price: 30000,
-        image: menuBg,
-        category: "dessert",
-      },
-      {
-        id: 8,
-        name: "Cơm chiên",
-        price: 30000,
-        image: menuBg,
-        category: "dessert",
-      },
-    ],
-    name: "Thực đơn 1",
-    price: 100000000,
-    checked: false,
-    label: "Thực đơn 1",
-    active: false,
-    maxDishes: 7,
-    appetizer: 4000000,
-    mainCourse: 4000000,
-    dessert: 4000000,
-    total: 4000000,
-    maxAppetizer: 2,
-    maxMainCourse: 3,
-    maxDessert: 2,
-    description:
-      "Đây là thực đơn thượng hạng mang phong cách Âu - Á với các món ăn đa dạng và hấp dẫn, đầy đủ các hương vị.",
-  },
-  {
-    id: 2,
-    background: menuBg,
-    dishes: [
-      {
-        id: 1,
-        name: "Cơm gà",
-        price: 30000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 2,
-        name: "Cơm sườn",
-        price: 25000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 3,
-        name: "Cơm chả cá",
-        price: 35000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 4,
-        name: "Cơm gà",
-        price: 30000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 5,
-        name: "Cơm sườn",
-        price: 25000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 6,
-        name: "Cơm chả cá",
-        price: 35000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 7,
-        name: "Cơm cà ri",
-        price: 30000,
-        image: menuBg,
-        category: "dessert",
-      },
-      {
-        id: 8,
-        name: "Cơm chiên",
-        price: 30000,
-        image: menuBg,
-        category: "dessert",
-      },
-    ],
-    name: "Thực đơn 2",
-    price: 100000000,
-    checked: false,
-    label: "Thực đơn 2",
-    active: true,
-    maxDishes: 7,
-    appetizer: 4000000,
-    mainCourse: 4000000,
-    dessert: 4000000,
-    total: 4000000,
-    maxAppetizer: 2,
-    maxMainCourse: 3,
-    maxDessert: 2,
-    description:
-      "Đây là thực đơn thượng hạng mang phong cách Âu - Á với các món ăn đa dạng và hấp dẫn, đầy đủ các hương vị.",
-  },
-  {
-    id: 3,
-    background: menuBg,
-    dishes: [
-      {
-        id: 1,
-        name: "Cơm gà",
-        price: 30000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 2,
-        name: "Cơm sườn",
-        price: 25000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 3,
-        name: "Cơm chả cá",
-        price: 35000,
-        image: menuBg,
-        category: "appetizer",
-      },
-      {
-        id: 4,
-        name: "Cơm gà",
-        price: 30000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 5,
-        name: "Cơm sườn",
-        price: 25000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 6,
-        name: "Cơm chả cá",
-        price: 35000,
-        image: menuBg,
-        category: "mainCourse",
-      },
-      {
-        id: 7,
-        name: "Cơm cà ri",
-        price: 30000,
-        image: menuBg,
-        category: "dessert",
-      },
-      {
-        id: 8,
-        name: "Cơm chiên",
-        price: 30000,
-        image: menuBg,
-        category: "dessert",
-      },
-    ],
-    name: "Thực đơn 3",
-    price: 100000000,
-    checked: false,
-    label: "Thực đơn 3",
-    active: true,
-    maxDishes: 7,
-    appetizer: 4000000,
-    mainCourse: 4000000,
-    dessert: 4000000,
-    total: 4000000,
-    maxAppetizer: 2,
-    maxMainCourse: 3,
-    maxDessert: 2,
-    description:
-      "Đây là thực đơn thượng hạng mang phong cách Âu - Á với các món ăn đa dạng và hấp dẫn, đầy đủ các hương vị.",
-  },
-];

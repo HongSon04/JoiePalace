@@ -29,8 +29,7 @@ const constructUrlWithParams = (baseUrl, params) => {
 // API Endpoints
 export const API_CONFIG = {
   GENERAL_BRANCH: "ho-chi-minh",
-  FOOD_CATEGORY_SLUG: "thuc-an",
-  DRINK_CATEGORY_SLUG: "do-uong",
+  FOOD_CATEGORY_SLUG: "menu-products",
 
   // AUTH API
   AUTH: {
