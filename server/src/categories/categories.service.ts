@@ -2,27 +2,31 @@ import {
   BadRequestException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { PrismaService } from 'src/prisma.service';
-import { MakeSlugger } from 'helper/slug';
-import { FilterDto } from 'helper/dto/Filter.dto';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { MakeSlugger } from 'helper/slug';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { FilterCategoryDto } from './dto/FilterCategoryDto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     private prismaService: PrismaService,
     private cloudinaryService: CloudinaryService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // ! Create Categories
@@ -98,6 +102,9 @@ export class CategoriesService {
         },
       });
 
+      // ? Delete Cache
+      await this.cacheManager.del('categories-get-all');
+
       throw new HttpException(
         {
           message: 'Tạo danh mục thành công',
@@ -112,18 +119,28 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
 
   // ! Get All Categories
-  async findAll(query: FilterDto) {
+  async findAll(query: FilterCategoryDto) {
     try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      const cacheCategory = await this.cacheManager.get('categories-get-all');
+      console.log('cacheCategory', cacheCategory);
+      if (cacheCategory) {
+        throw new HttpException(
+          {
+            data: cacheCategory,
+          },
+          HttpStatus.OK,
+        );
+      }
+      // const page = Number(query.page) || 1;
+      // const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
+      // const skip = (page - 1) * itemsPerPage;
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
@@ -179,34 +196,33 @@ export class CategoriesService {
               },
             },
           },
-          skip: Number(skip),
-          take: itemsPerPage,
-          orderBy: {
-            created_at: 'desc',
-          },
         }),
         this.prismaService.categories.count({
           where: whereConditions,
         }),
       ]);
 
-      const lastPage = Math.ceil(total / itemsPerPage);
-      const paginationInfo = {
-        lastPage,
-        nextPage: page < lastPage ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
-        currentPage: page,
-        itemsPerPage,
-        total,
-      };
+      // const lastPage = Math.ceil(total / itemsPerPage);
+      // const paginationInfo = {
+      //   lastPage,
+      //   nextPage: page < lastPage ? page + 1 : null,
+      //   prevPage: page > 1 ? page - 1 : null,
+      //   currentPage: page,
+      //   itemsPerPage,
+      //   total,
+      // };
 
       let FormatData = FormatReturnData(res, []);
       const categories = this.buildCategoryTree(FormatData);
 
+      await this.cacheManager.set('categories-get-all', categories, {
+        ttl: 60 * 5,
+      } as any);
+
       throw new HttpException(
         {
-          data: FormatReturnData(categories, []),
-          pagination: paginationInfo,
+          data: categories,
+          // pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -217,18 +233,18 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
 
   // ! Get All Deleted Categories
-  async findAllDeleted(query: FilterDto) {
+  async findAllDeleted(query: FilterCategoryDto) {
     try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      // const page = Number(query.page) || 1;
+      // const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
+      // const skip = (page - 1) * itemsPerPage;
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
@@ -284,34 +300,29 @@ export class CategoriesService {
               },
             },
           },
-          skip: Number(skip),
-          take: itemsPerPage,
-          orderBy: {
-            created_at: 'desc',
-          },
         }),
         this.prismaService.categories.count({
           where: whereConditions,
         }),
       ]);
 
-      const lastPage = Math.ceil(total / itemsPerPage);
-      const paginationInfo = {
-        lastPage,
-        nextPage: page < lastPage ? page + 1 : null,
-        prevPage: page > 1 ? page - 1 : null,
-        currentPage: page,
-        itemsPerPage,
-        total,
-      };
+      // const lastPage = Math.ceil(total / itemsPerPage);
+      // const paginationInfo = {
+      //   lastPage,
+      //   nextPage: page < lastPage ? page + 1 : null,
+      //   prevPage: page > 1 ? page - 1 : null,
+      //   currentPage: page,
+      //   itemsPerPage,
+      //   total,
+      // };
 
       let FormatData = FormatReturnData(res, []);
       const categories = this.buildCategoryTree(FormatData);
 
       throw new HttpException(
         {
-          data: FormatReturnData(categories, []),
-          pagination: paginationInfo,
+          data: categories,
+          // pagination: paginationInfo,
         },
         HttpStatus.OK,
       );
@@ -322,7 +333,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -355,7 +366,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -407,7 +418,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> findOneBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -455,7 +466,7 @@ export class CategoriesService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -481,12 +492,7 @@ export class CategoriesService {
       // ? Check Name and Slug
       const findCategoriesByName =
         await this.prismaService.categories.findFirst({
-          where: {
-            OR: [{ name }, { slug }],
-            NOT: {
-              id: Number(id),
-            },
-          },
+          where: { AND: [{ name }, { id: { not: Number(id) } }] },
         });
       if (findCategoriesByName) {
         throw new BadRequestException({ message: 'Tên danh mục đã tồn tại' });
@@ -549,6 +555,8 @@ export class CategoriesService {
         },
       });
 
+      await this.cacheManager.del('categories-get-all');
+
       throw new HttpException(
         {
           message: 'Cập nhật danh mục thành công',
@@ -563,7 +571,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -600,7 +608,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> softDelete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -644,7 +652,7 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -693,25 +701,39 @@ export class CategoriesService {
       console.log('Lỗi từ categories.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
 
   // ! Đệ quy lấy danh sách danh mục
-  buildCategoryTree(categories, parentId = null) {
-    const categoryTree = [];
+  buildCategoryTree(categories) {
+    const categoryMap = new Map();
+    const usedInChildren = new Set();
 
     categories.forEach((category) => {
-      if (category.category_id === parentId) {
-        const children = this.buildCategoryTree(categories, category.id);
-        if (children.length) {
-          category.children = children;
+      categoryMap.set(category.id, {
+        ...category,
+        children: [],
+      });
+    });
+
+    const rootCategories = [];
+
+    categoryMap.forEach((node) => {
+      if (node.category_id === null) {
+        rootCategories.push(node);
+      } else {
+        const parentNode = categoryMap.get(node.category_id);
+        if (parentNode) {
+          parentNode.children.push(node);
+          usedInChildren.add(node.id);
+        } else {
+          rootCategories.push(node);
         }
-        categoryTree.push(category);
       }
     });
 
-    return categoryTree;
+    return rootCategories.filter((node) => !usedInChildren.has(node.id));
   }
 }

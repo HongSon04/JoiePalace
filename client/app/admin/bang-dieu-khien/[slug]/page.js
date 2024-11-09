@@ -173,7 +173,8 @@ const Page = ({ params }) => {
     const formattedTime = date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
     return `${formattedTime}`;
   }
-
+  // console.log(dataUser);
+  
   return (
     <main className="grid gap-6  text-white ">
       <AdminHeader

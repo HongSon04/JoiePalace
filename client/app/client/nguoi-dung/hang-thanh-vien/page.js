@@ -87,7 +87,6 @@ const Page = () => {
     return (
         <div className='flex flex-col gap-[30px] text-white '>
             <h2 className='text-2xl font-bold'>Thành viên</h2>
-
             {/* Tiers Display Section */}
             <div className='relative flex justify-between items-center'>
                 {membershipTiers.map((tier, index) => (
@@ -99,13 +98,13 @@ const Page = () => {
                         {/* Tier Icon */}
                         <div className='flex gap-2 items-center'>
                             <div className="relative w-6 h-[14px]">
-                                <Image
-                                    src={tier.imageSrc}
-                                    alt={`${tier.name} Crown`}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    quality={100}
-                                />
+                                    <Image
+                                        src={tier.imageSrc}
+                                        alt={`${tier.name} Crown`}
+                                        layout="fill"
+                                        objectFit="cover"
+                                        quality={100}
+                                    />
                             </div>
                             <span className='text-sm font-medium'>{tier.name}</span>
                         </div>

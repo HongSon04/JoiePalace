@@ -3,21 +3,99 @@ import AdminHeader from '@/app/_components/AdminHeader';
 import React, { useEffect, useState } from 'react';
 import { IoIosLogOut } from "react-icons/io";
 import { FaPhoneAlt } from "react-icons/fa";
+import { z } from "zod";
+import useCustomToast from "@/app/_hooks/useCustomToast";
 
+import { makeAuthorizedRequest } from '@/app/_utils/api.config';
+import { changePassWord } from '@/app/_services/apiServices';
+const formSchema = z.object({
+    oldPassword: z.string().min(2, "Vui lòng nhập mật khẩu cũ!"),
+    newPassword: z.string().min(8, "Mật khẩu mới phải có ít nhất 8 ký tự"),
+    confirmPassword: z.string()
+      .min(8, "Mật khẩu xác nhận phải có ít nhất 8 ký tự"),
+  });
+  
 const Page = () => {
-    const [oldPassword, setOldPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [user, setUser] = useState(null);
-
+    const toast = useCustomToast();
+    const [errors, setErrors] = useState({});
+    const [formData, setFormData] = useState({
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
     useEffect(() => {
         const userData = localStorage.getItem('user');
-        console.log(userData);
+        // console.log(userData);
         
         if (userData) {
         setUser(JSON.parse(userData));
         }
     }, []);
+    const handleChange = (e) => {
+        const { name, value, type } = e.target;
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: type === "number" ? Number(value) : value,
+        }));
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (formData.newPassword !== formData.confirmPassword) {
+            setErrors({ confirmPassword: "Mật khẩu xác nhận không khớp với mật khẩu mới" });
+            return; 
+        }
+       
+        const validationErrors = {};
+        
+        try {
+          formSchema.parse(formData);  
+          setErrors({});
+      
+          const response = await changePassWord({
+            oldPassword: formData.oldPassword,
+            newPassword: formData.newPassword,
+            confirmPassword: formData.confirmPassword,
+          });
+          
+        //   console.log(response);  
+          
+          toast({
+            position: "top",
+            type: "success",
+            title: "Đổi mật khẩu thành công!",
+            description: "Mật khẩu đã được cập nhật!",
+            closable: true,
+          });
+          
+          setFormData({
+            oldPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+          });
+        } catch (error) {
+          console.error("Error:", error);  
+          if (error.response) {
+            toast({
+              position: "top",
+              type: "error",
+              title: "Đổi mật khẩu thất bại!",
+              description: error?.response?.data?.message || "Đã có lỗi xảy ra!",
+              closable: true,
+            });
+          }
+      
+          if (error?.errors) {
+            const validationErrors = {};
+            error.errors.forEach((err) => {
+              validationErrors[err.path[0]] = err.message;
+            });
+            setErrors(validationErrors);
+          }
+        }
+      };
+      
+      
     return (
         <main className="grid gap-6 p-4 text-white">
             <AdminHeader
@@ -62,51 +140,67 @@ const Page = () => {
             </div>
             <div className='w-full'>
                 <div>
-                    <form className='w-full flex gap-6 items-center mb-3'>
-                        <div className='w-1/3'>
-                            <p className='mb-3'>Mật khẩu cũ</p>
-                            <input
-                            className='w-full p-3 rounded-lg bg-whiteAlpha-100'
-                            type="text"
-                            placeholder="Mật khẩu cũ"
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            />
+                    <form onSubmit={handleSubmit} >
+                        <div className="flex gap-4">
+                            <div className='w-1/3'>
+                                <p className='mb-3'>Mật khẩu cũ</p>
+                                <input
+                                    className='w-full p-3 rounded-lg bg-whiteAlpha-100'
+                                    type="text"
+                                    name="oldPassword" 
+                                    placeholder="Mật khẩu cũ"
+                                    value={formData.oldPassword}
+                                    onChange={handleChange}
+                                />
+                                <span className="text-sm text-red-600">
+                                    {errors.oldPassword && errors.oldPassword}
+                                </span>
+                            </div>
+                            <div className='w-1/3'>
+                                <p className='mb-3'>Mật khẩu mới</p>
+                                <input
+                                    className='w-full p-3 rounded-lg bg-whiteAlpha-100'
+                                    type="text"
+                                    name="newPassword"
+                                    placeholder="Mật khẩu mới"
+                                    value={formData.newPassword}
+                                    onChange={handleChange}
+                                />
+                                <span className="text-sm text-red-600">
+                                    {errors.newPassword && errors.newPassword}
+                                </span>
+                            </div>
+                            <div className='w-1/3'>
+                                <p className='mb-3'>Nhập lại mật khẩu mới</p>
+                                <input
+                                    className='w-full p-3 rounded-lg bg-whiteAlpha-100'
+                                    type="text"
+                                    name="confirmPassword"
+                                    placeholder="Nhập lại mật khẩu mới"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                />
+                                <span className="text-sm text-red-600">
+                                    {errors.confirmPassword && errors.confirmPassword}
+                                </span>
+                            </div>
                         </div>
-                        <div className='w-1/3'>
-                            <p className='mb-3'>Mật khẩu mới</p>
-                            <input
-                            className='w-full p-3 rounded-lg bg-whiteAlpha-100'
-                            type="text"
-                            placeholder="Mật khẩu mới"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            />
+                        <div className='flex justify-end mt-3'>
+                            <button type="submit" className='button rounded-full flex gap-[5px] items-center p-2 bg-teal-400'>
+                                Đổi mật khẩu
+                            </button>
                         </div>
-                        <div className='w-1/3'>
-                            <p className='mb-3'>Nhập lại mật khẩu mới</p>
-                            <input
-                            className='w-full p-3 rounded-lg bg-whiteAlpha-100'
-                            type="text"
-                            placeholder="Nhập lại mật khẩu mới"
-                            value={confirmNewPassword}
-                            onChange={(e) => setConfirmNewPassword(e.target.value)}
-                            />
-                        </div>
+                        
                     </form>
                 </div>
-                <div className='flex justify-end'>
-                    <button className='button rounded-full flex gap-[5px] items-center p-2 bg-teal-400'>
-                        Đổi mật khẩu
-                    </button>
-                </div>
+                
             </div>
             <div className='flex justify-start items-center gap-2 text-base '>
                 <p>Cấp lại mật khẩu</p>
             </div>
             <div className='w-full'>
                 <div className='flex justify-start'>
-                    <button className='button rounded-full flex gap-[5px] items-center p-3 bg-whiteAlpha-100 '>
+                    <button   className='button rounded-full flex gap-[5px] items-center p-3 bg-whiteAlpha-100 '>
                         <FaPhoneAlt /> 
                         Liên hệ kỹ thuật viên
                     </button>

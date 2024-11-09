@@ -7,7 +7,7 @@ export class StageUpdateDto {
     description: 'ID của chi nhánh (nếu cần cập nhật)',
   })
   @IsOptional()
-  branch_id?: number;
+  branch_id?: string;
 
   @ApiProperty({
     required: false,
@@ -27,13 +27,13 @@ export class StageUpdateDto {
     type: Number,
     description: 'Số lượng bàn tối thiểu (bắt buộc)',
   })
-  capacity_min: number;
+  capacity_min: string;
 
   @ApiProperty({
     type: Number,
     description: 'Số lượng bàn tối đa (bắt buộc)',
   })
-  capacity_max: number;
+  capacity_max: string;
 
   @ApiProperty({
     required: false,

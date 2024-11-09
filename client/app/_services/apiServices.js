@@ -121,10 +121,10 @@ export const fetchAllBranch = async () => {
       throw error; 
   }
 };
-export const fetchUserByBranchId = async (userId) => {
+export const fetchUserByBranchId = async (branchId) => {
   try {
     const token = getCookie('accessToken');
-    const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(userId), {
+    const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(branchId), {
       headers: {
         'Authorization': `Bearer ${token}`,
       }
@@ -139,6 +139,21 @@ export const fetchUserByBranchId = async (userId) => {
     throw error;
   }
 };
+export  const changePassWord = async (dataToSend) => {
+  const token = getCookie('accessToken');
+  const response = await axios.put(API_CONFIG.USER.CHANGE_PASSWORD, dataToSend, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+
+  if (response.status !== 200 && response.status !== 201) {
+    throw new Error("Có lỗi đổi mật khẩu");
+  }
+
+  return response;
+};
+
 
 
 

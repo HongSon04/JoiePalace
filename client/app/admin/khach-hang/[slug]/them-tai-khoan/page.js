@@ -1,10 +1,114 @@
+"use client"
 import AdminHeader from "@/app/_components/AdminHeader";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosLogOut } from "react-icons/io";
+import { z } from "zod";
+import useCustomToast from "@/app/_hooks/useCustomToast";
 import { FiUpload } from "react-icons/fi";
 import { RiDeleteBin2Line } from "react-icons/ri";
+import { createAccountUser } from "@/app/_services/accountServices";
 import Image from "next/image";
-const page = () => {
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const formSchema = z.object({
+  username: z.string().min(2, "Vui lòng nhập Họ và tên!"),
+  email: z.string().refine((value) => emailRegex.test(value), {
+    message: "Vui lòng nhập đúng địa chỉ Email!",
+  }),
+  password: z.string().min(8, "Tối thiểu 8 kí tự!").max(36, "Tối đa 36 kí tự!"),
+});
+
+const Page = () => {
+   
+  
+  const toast = useCustomToast();
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "number" ? Number(value) : value,
+    }));
+  };
+
+  const [branchId, setBranchId] = useState(null); 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const branch_id = user.branch_id;
+        setBranchId(branch_id); 
+      }
+    }
+  }, []); 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = {};
+   
+
+    try {
+     
+      formSchema.parse(formData);
+      setErrors({}); 
+     
+      // console.log('Dữ liệu sẽ gửi lên server:', {
+      //   username: formData.username,
+      //   email: formData.email,
+      //   password: formData.password,
+      //   phone: "null",  
+      //   branch_id: branchId,
+      // });
+      const response = await createAccountUser({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        phone: "null", 
+        branch_id : branchId
+      });
+      
+      
+      toast({
+        position: "top",
+        type: "success",
+        title: "Đăng ký thành công!",
+        description: "Tài khoản khách hàng đã được thêm thành công !",
+        closable: true,
+      });
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+      });
+     
+    } catch (error) {
+      if (error.response) {
+        toast({
+          position: "top",
+          type: "error",
+          title: "Đăng ký thất bại!",
+          description: error?.response?.data?.message,
+          closable: true,
+        });
+      }
+
+      
+      if (error?.errors) {
+        const validationErrors = {};
+        error.errors.forEach((err) => {
+          validationErrors[err.path[0]] = err.message;
+        });
+        setErrors(validationErrors); 
+      }
+    }
+  };
+
   return (
     <main className="grid gap-6 p-4 text-white">
       <AdminHeader
@@ -27,62 +131,74 @@ const page = () => {
           <div className="flex gap-[5px] items-center"></div>
         </div>
         <div className="w-full">
-          <div>
-            <form className="w-full flex gap-6 items-center mb-3">
+          <form  onSubmit={handleSubmit}>
+            <div className="flex gap-4">
               <div className="w-1/3">
                 <p className="mb-3">Tên</p>
                 <input
                   className="w-full p-3 rounded-lg bg-whiteAlpha-100"
                   type="text"
+                  name="username" 
                   placeholder="rubysayhi"
-                  value=""
-                ></input>
+                  value={formData.username} 
+                  onChange={handleChange}
+                />
                 <span className="text-sm text-red-600">
-                  {messageError}
+                  {errors.username && errors.username}
                 </span>
               </div>
+
               <div className="w-1/3">
                 <p className="mb-3">Email</p>
                 <input
                   className="w-full p-3 rounded-lg bg-whiteAlpha-100"
                   type="email"
+                  name="email" 
                   placeholder="rubysayhi@gmail.com"
-                  value=""
-                ></input>
+                  value={formData.email}
+                  onChange={handleChange}
+                />
                 <span className="text-sm text-red-600">
-                  {messageError}
+                  {errors.email && errors.email}
                 </span>
-                
               </div>
+
               <div className="w-1/3">
                 <p className="mb-3">Mật khẩu</p>
                 <input
                   className="w-full p-3 rounded-lg bg-whiteAlpha-100"
-                  type="text"
+                  type="text" 
+                  name="password" 
                   placeholder="Mật khẩu"
-                ></input>
-                  <span className="text-sm text-red-600">
-                    {messageError}
-                  </span>
+                  value={formData.password} 
+                  onChange={handleChange}
+                />
+                <span className="text-sm text-red-600">
+                  {errors.password && errors.password}
+                </span>
               </div>
-            </form>
-          </div>
-          <div className="flex justify-end">
-            <div className="flex justify-center items-center gap-[10px]">
-              <button className="button rounded-[1111px] flex gap-[5px] items-center p-3 bg-red-400">
+            </div>
+
+            <div className="flex justify-end mt-4 gap-[10px]">
+              {/* <button className="button rounded-[1111px] flex gap-[5px] items-center p-3 bg-red-400">
                 <RiDeleteBin2Line className="text-base" />
                 Xóa
-              </button>
-              <button className="button rounded-[1111px] flex gap-[5px] items-center p-3 bg-teal-400">
-                <FiUpload className="text-base" />
-                Thêm
+              </button> */}
+              <button
+                type="submit"
+                className="button rounded-[1111px] flex gap-[5px] items-center p-3 bg-teal-400"
+              >
+                  <FiUpload className="text-base" />
+                  Thêm
+                 
               </button>
             </div>
+          </form>
           </div>
+         
         </div>
-      </div>
     </main>
   );
 };
 
-export default page;
+export default Page;

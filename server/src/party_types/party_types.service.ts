@@ -44,21 +44,33 @@ export class PartyTypesService {
         throw new BadRequestException('Tên loại tiệc đã tồn tại');
       }
 
-      // Kiểm tra sản phẩm
-      const foundProducts = await this.prismaService.products.findMany({
-        where: { id: { in: products } },
-      });
-      if (foundProducts.length !== products.length) {
-        throw new NotFoundException('Sản phẩm không tồn tại');
+      // ? Kiểm tra sản phẩm
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
+
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
       }
 
-      // Kiểm tra giá
-      const totalProductPrice = foundProducts.reduce(
-        (total, product) => total + Number(product.price),
-        0,
-      );
-      if (Number(totalProductPrice) !== Number(price)) {
-        throw new BadRequestException('Giá loại tiệc không chính xác');
+      if (Number(totalPrice) < Number(price)) {
+        throw new BadRequestException('Giá loại tiệc không hợp lệ');
       }
 
       // Tải hình ảnh lên Cloudinary
@@ -72,13 +84,11 @@ export class PartyTypesService {
         data: {
           name,
           description,
-          price: Number(totalProductPrice),
+          price: Number(totalPrice),
           short_description,
           images: images as any,
           products: {
-            connect: foundProducts.map((product) => ({
-              id: Number(product.id),
-            })),
+            connect: productsTagSet,
           },
         },
         include: {
@@ -104,7 +114,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -191,7 +201,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -278,7 +288,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -315,7 +325,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findOne: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -340,33 +350,40 @@ export class PartyTypesService {
 
       // Kiểm tra tên loại tiệc
       const existingPartyType = await this.prismaService.party_types.findFirst({
-        where: {
-          name,
-          NOT: { id: Number(id) },
-        },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (existingPartyType) {
         throw new BadRequestException('Tên loại tiệc đã tồn tại');
       }
 
-      // Kiểm tra sản phẩm
-      const foundProducts = await this.prismaService.products.findMany({
-        where: { id: { in: products } },
-      });
+      // ? Kiểm tra sản phẩm
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
 
-      if (foundProducts.length !== products.length) {
-        throw new NotFoundException('Sản phẩm không tồn tại');
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
       }
 
-      // Tính toán giá
-      const totalProductPrice = foundProducts.reduce(
-        (total, product) => total + product.price,
-        0,
-      );
-
-      if (Number(totalProductPrice) !== Number(price)) {
-        throw new BadRequestException('Giá loại tiệc không chính xác');
+      if (Number(totalPrice) < Number(price)) {
+        throw new BadRequestException('Giá loại tiệc không hợp lệ');
       }
 
       // Tạo đối tượng cập nhật
@@ -374,11 +391,9 @@ export class PartyTypesService {
         name,
         description,
         short_description,
-        price: Number(totalProductPrice),
+        price: Number(totalPrice),
         products: {
-          set: foundProducts.map((product) => ({
-            id: Number(product.id),
-          })),
+          set: productsTagSet,
         },
       };
 
@@ -425,7 +440,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -461,7 +476,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> remove: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -503,7 +518,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> restore: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -543,7 +558,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> hardDelete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

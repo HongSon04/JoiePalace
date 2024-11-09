@@ -14,6 +14,7 @@ import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
 import Link from "next/link";
 import { Button } from "antd";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { formatPrice } from "@/app/_utils/formaters";
 // import { Link } from 'react-router-dom';
 const Page = ({params}) => {    
   const { slug } = params;
@@ -36,7 +37,6 @@ const Page = ({params}) => {
         const userData = await makeAuthorizedRequest(
           API_CONFIG.USER.GET_BY_BRANCH_ID({
             branch_id: branchId,
-            
           }),
           "GET",
           null
@@ -84,7 +84,7 @@ const Page = ({params}) => {
   // console.log(currentItems.id, typeof currentItems.id);
   // console.log(currentItems);
   // console.log(dataTopUser);
-  console.log(slug);
+  // console.log(slug);
   
   return (
     <main className="grid gap-6 p-4 text-white">
@@ -129,11 +129,11 @@ const Page = ({params}) => {
                 {currentItems.map((item, index) => (
                   <tr key={item.id}>
                     <td>{item.id}</td>
-                    <td>{item.username}</td>
+                    <td>{item.username  || "N/A"}</td>
                     <td>{item.memberships || "N/A"}</td>
-                    <td>{item.phone}</td>
+                    <td>{item.phone  || "N/A"}</td>
                     <td>{item.totalBookingSuccess}</td>
-                    <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalAmount)}</td>
+                    <td>{formatPrice(item.totalAmount)}</td>
                     <td>
                       {item.id ? (
                         <Link href={`/admin/khach-hang/${slug}/${item.id}`} className="text-teal-400 text-xs font-bold">
@@ -201,7 +201,7 @@ const Page = ({params}) => {
                         )}
                        
                       </div>
-                      <p className="text-sm mb-[10px] font-semibold">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalAmount)}</p>
+                      <p className="text-sm mb-[10px] font-semibold">{formatPrice(item.totalAmount)}</p>
                     </div>
                     {/* <BsThreeDots className="text-xl" /> */}
                   </div>

@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import mouseIcon from "../../../public/mouse.svg";
@@ -30,6 +30,7 @@ const dataslider = [
 ];
 
 function Event() {
+  
   return (
     <div className="m-auto h-full" id="fullpage">
       <ScrollFullPage>
@@ -134,8 +135,8 @@ function Event() {
         <section className="section">
           <Footer />
         </section>
-      </ScrollFullPage>
-    </div>
+      </ScrollFullPage >
+    </div >
   );
 }
 
