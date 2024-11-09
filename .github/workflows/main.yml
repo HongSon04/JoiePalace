@@ -1,0 +1,32 @@
+name: CICD Deploy Digital Ocean
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Connect SSH
+      uses: appleboy/ssh-action@master
+      with: 
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: 22
+        scripts: |
+          echo "Fetching latest changes..."
+          cd /JoiePalace
+          git fetch origin || exit 1
+          git checkout main || exit 1
+          git pull origin main || exit 1
+
+          # SERVER
+          cd /server
+          npm ci
+          npx prisma generate
+          npm run build
+
+          # Reload PM2
+          pm2 reload server
