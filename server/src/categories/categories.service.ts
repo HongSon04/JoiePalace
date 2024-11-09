@@ -669,7 +669,7 @@ export class CategoriesService {
     const categoryMap = new Map(
       rootCategories.map((category) => [
         category.id,
-        { ...category, children: [] },
+        { ...category, childrens: [] },
       ]),
     );
 
@@ -677,16 +677,13 @@ export class CategoriesService {
     childCategories.forEach((child) => {
       const parent = categoryMap.get(child.category_id);
       if (parent) {
-        parent.children.push(child);
-      } else {
-        parent.children = [];
+        if (!parent.childrens) {
+          parent.childrens = [];
+        }
+        parent.childrens.push(child);
       }
     });
 
     return Array.from(categoryMap.values());
-  }
-
-  private buildCategoryTree(categories: any[]) {
-    return categories;
   }
 }
