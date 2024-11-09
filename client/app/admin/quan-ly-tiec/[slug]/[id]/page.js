@@ -8,7 +8,6 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import IconButtonSave from '@/app/_components/IconButtonSave';
 import TableDetail from '@/app/_components/TableDetailCost';
 import ButtonCustomAdmin from '@/app/_components/ButtonCustomAdmin';
-import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useApiServices from '@/app/_hooks/useApiServices';
@@ -19,73 +18,13 @@ import useCustomToast from '@/app/_hooks/useCustomToast';
 import { fetchFeedbacksFailure } from '@/app/_lib/features/feedbacks/feedbacksSlice';
 import { useDispatch } from 'react-redux';
 import { fetchBranchSuccess } from '@/app/_lib/features/branch/branchSlice';
-import { formatFullDateTime } from '@/app/_utils/formaters';
+import { formatDateTime, formatFullDateTime } from '@/app/_utils/formaters';
+import { organizationSchema } from './organizationSchema';
+import { DropdownField } from './DropdownField';
 
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
 );
-
-const DropdownField = ({ label, name, options, value, onChange }) => (
-    <div className="flex flex-col gap-2">
-        <label className="font-bold leading-6 text-base text-white">{label}</label>
-        <select
-            name={name}
-            value={value || ''}
-            onChange={onChange}
-            className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
-        >
-            {options.map(option => (
-                <option key={option.value} className="text-black" value={option.value}>
-                    {option.label}
-                </option>
-            ))}
-        </select>
-    </div>
-);
-
-const organizationSchema = z.object({
-    company_name: z.string().optional(),
-    email: z.string().email({ message: "Email không hợp lệ" }),
-    phone: z
-        .string()
-        .regex(/^\d+$/, { message: "Số điện thoại phải là số" })
-        .min(10, { message: "Số điện thoại phải có ít nhất 10 ký tự" }),
-    username: z.string().min(1, { message: "Họ và Tên là bắt buộc" }),
-    party: z.string().nonempty({ message: "Loại tiệc không được để chống" }),
-    tables: z
-        .coerce.number()
-        .int({ message: "Số lượng bàn chính phải là số nguyên" })
-        .min(1, { message: "Số lượng bàn chính phải lớn hơn 0" }),
-    spareTables: z
-        .coerce.number()
-        .int({ message: "Số bàn dự phòng phải là số nguyên" })
-        .min(1, { message: "Số bàn dự phòng phải lớn hơn 0" }),
-    customer: z
-        .number()
-        .int({ message: "Số lượng khách phải là số nguyên" })
-        .refine((val) => val > 0, { message: "Số lượng khách lớn hơn 0" }),
-    customerAndChair: z
-        .coerce.number()
-        .int({ message: "Số lượng khách / bàn phải là số nguyên" })
-        .min(1, { message: "Số lượng khách / bàn phải lớn hơn 0" }),
-    partyDate: z.string().nonempty({ message: "Ngày đặt tiệc là bắt buộc" }),
-    organization_date: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
-    shift: z.string().nonempty({ message: "Ca hoạt động là bắt buộc" }),
-    amountPayable: z
-        .number()
-        .int({ message: "Số tiền phải thanh toán phải là số nguyên" })
-        .refine((val) => val > 0, { message: "Số tiền phải thanh toán lớn hơn 0" }),
-    depositAmount: z
-        .number()
-        .int({ message: "Số tiền cọc phải là số nguyên" })
-        .refine((val) => val > 0, { message: "Số tiền cọc lớn hơn 0" }),
-    depositDate: z.string().nonempty({ message: "Ngày đặt cọc là bắt buộc" }),
-    // remainingAmountPaid: z
-    //     .number()
-    //     .int({ message: "Số tiền còn lại thanh toán phải là số nguyên" })
-    //     .refine((val) => val >= 0, { message: "Số tiền còn lại thanh toán phải lớn hơn hoặc bằng 0" }),
-    dataPay: z.string().nonempty({ message: "Ngày thanh toán là bắt buộc" }),
-});
 
 const fetchOptions = async (apiConfig, setState, title, name) => {
     try {
@@ -103,8 +42,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const toast = useCustomToast();
     const showToast = (status, title, description) => {
         toast({ title, description, status });
-      };
-      const dispatch = useDispatch();
+    };
+    const dispatch = useDispatch();
     const headers = ['Dịch vụ', 'Mô tả', 'Thành tiền (VND)'];
 
     const [menus, setMenus] = useState([
@@ -116,7 +55,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             options: [],
         },
     ]);
-    const [branches, setBranches] = useState([
+    const [stages, setStages] = useState([
         {
             svg: null,
             title: 'Sảnh',
@@ -140,18 +79,24 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             title: 'Hình thức thanh toán',
             type: 'select',
             name: 'payment',
-            options: [],
+            options: [
+                { value: 'momo', label: 'Momo', selected: false },
+                { value: 'zalopay', label: 'ZaloPay', selected: false },
+            ],
         },
-    ])
+    ]);
     const [statusDeposit, setStatusDeposit] = useState([
         {
             svg: null,
             title: 'Trạng thái đặt cọc',
             type: 'select',
             name: 'is_deposit',
-            options: [],
+            options: [
+                { value: 'success', label: 'Đã thanh toán', selected: false },
+                { value: 'pending', label: 'Chưa thanh toán', selected: false },
+            ],
         },
-    ])
+    ]);
     const [statusPayment, setStatusPayment] = useState([
         {
             svg: null,
@@ -177,101 +122,132 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     ])
 
     const [selectedMenu, setSelectedMenu] = useState(menus[0]?.value || '');
-    const [selectBranches, setSelectBranches] = useState(branches[0]?.value || '');
+    const [selectStages, setSelectStages] = useState(stages[0]?.value || '');
     const [selectedDecors, setSelectedDecors] = useState(decors[0]?.value || '');
     const [selectPartyTypes, setSelectPartyTypes] = useState(partyTypes[0]?.value || '');
     const [selectedStatus, setSelectedStatus] = useState(statusPayment[0]?.value || '');
     const [selectStatusDeposit, setSelectStatusDeposit] = useState(statusDeposit[0]?.value || '');
-    
+
     const [foods, setFoods] = useState([]);
+    const [menuPrice, setMenuPrice] = useState('');
+    const [partyPrice, setPartyPrice] = useState('');
+    const [stagePrice, setStagePrice] = useState('');
+    const [decorPrice, setDecorPrice] = useState('');
+    const [limitStages, setLimitStages] = useState('');
     const [modifiedFoods, setModifiedFoods] = useState([]);
     const [detailCostTable, setDetailCostTable] = useState([]);
 
+    const [branch_id, setBranch_id] = useState();
+
+    const fetchAllStages = async (id) => {
+        try {
+            const response = await makeAuthorizedRequest(API_CONFIG.STAGES.GET_ALL(id), 'GET');
+            const stageData = response.data;
+            const options = stageData.length === 0
+                ? [{ value: '', label: 'Chưa có sảnh' }]
+                : stageData.map(item => ({ value: item.id, label: item.name }));
+            setStages([{
+                title: 'Sảnh',
+                type: 'select',
+                options
+            }]);
+            const initialStage = options.find(option => option.value === setSelectStages) || options[0];
+            setSelectStages(initialStage?.value || '');
+        } catch (error) {
+            console.log(error)
+        }
+    }
     const fetchAllMenus = () => fetchOptions(API_CONFIG.MENU.GET_ALL(), setMenus, 'Menu', 'menu');
-    const fetchAllBranches = () => fetchOptions(API_CONFIG.BRANCHES.GET_ALL(), setBranches, 'Sảnh', 'stages');
+
     const fetchAllDecors = () => fetchOptions(API_CONFIG.DECORS.GET_ALL(), setDecors, 'Decor', 'decors');
     const fetchAllPartyTypes = () => fetchOptions(API_CONFIG.PARTY_TYPES.GET_ALL(), setPartyTypes, 'Loại tiệc', 'partyTypes');
 
-    const { control, handleSubmit, reset, formState: { errors }, trigger } = useForm({
+    const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
+        defaultValues: {
+            menu: '',
+            stages: '',
+            decors: '',
+            partyTypes: '',
+            statusPayment: '',
+            statusDeposit: '',
+            payment: ''
+        },
     });
 
     const fetchDataDetailsParty = useCallback(async () => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.GET_BY_ID(id), 'GET');
             const partyData = response.data[0];
-            setFoods(partyData.booking_details[0].menus.products);
-            if (response) {
-                const depositStatus = partyData.booking_details[0].deposit_status;
-                const bookingDetails = partyData.booking_details[0];
-                const branchId = partyData.branch_id;
-                const paymentMethod = bookingDetails.deposits.payment_method;
+            fetchAllStages(partyData.stage_id)
+            if (partyData) {
+
+                const bookingDetails = partyData.booking_details[0] || {};
+                const depositStatus = bookingDetails.deposit_status;
+                setBranch_id(partyData.branch_id);
+                const paymentMethod = bookingDetails.deposits?.payment_method;
                 const paymentStatusMethod = partyData.status;
                 const isDepositSuccessful = depositStatus === 'success';
                 const isDeposit = partyData.is_deposit;
 
-                
+                setFoods(bookingDetails.menus?.products);
+                setMenuPrice(bookingDetails.menus?.price || 0);
+                setPartyPrice(partyData.party_types?.price || 0);
+                setStagePrice(partyData.stages?.price || 0);
+                setDecorPrice(bookingDetails.decors?.price || 0);
 
-                setSelectedMenu(partyData.booking_details[0].menu_id);
-                setSelectBranches(branchId);
-                setSelectedDecors(partyData.booking_details[0].decor_id);
-                setSelectPartyTypes(partyData.party_type_id)
+                setSelectedMenu(bookingDetails.menu_id);
+                setLimitStages(partyData.stages.capacity_max)
+                setSelectStages(partyData.stage_id);
+
+                setSelectedDecors(bookingDetails.decor_id);
+                setSelectPartyTypes(partyData.party_type_id);
                 setSelectedStatus(paymentStatusMethod);
                 setSelectStatusDeposit(isDeposit ? 'success' : 'pending');
                 setPayment(prevPayment => [
                     {
                         ...prevPayment[0],
-                        options: [
-                            { value: 'momo', label: 'Momo', selected: paymentMethod === 'momo' },
-                            { value: 'zalopay', label: 'ZaloPay', selected: paymentMethod === 'zalopay' },
-                        ]
-                    }
+                        options: prevPayment[0].options.map(option => ({
+                            ...option,
+                            selected: option.value === paymentMethod,
+                        })),
+                    },
                 ]);
-
                 setStatusDeposit(prevStatus => [
                     {
-                      ...prevStatus[0],
-                      options: [
-                        {
-                          value: 'success',
-                          label: 'Đã thanh toán',
-                          selected: isDeposit && isDepositSuccessful,  
-                        },
-                        {
-                          value: 'pending',
-                          label: 'Chưa thanh toán',
-                          selected: !isDeposit || (isDeposit && !isDepositSuccessful),  
-                        },
-                      ],
+                        ...prevStatus[0],
+                        options: prevStatus[0].options.map(option => ({
+                            ...option,
+                            selected: option.value === (isDepositSuccessful ? 'success' : 'pending'),
+                        })),
                     },
-                  ]);
+                ]);
 
                 setStatusPayment(prevStatus => [
                     {
                         ...prevStatus[0],
-                        options: [
-                            { value: 'pending', label: 'Đang chờ', selected: paymentStatusMethod === 'pending' },
-                            { value: 'processing', label: 'Đang xử lý', selected: paymentStatusMethod === 'processing' },
-                            { value: 'success', label: 'Thành công', selected: paymentStatusMethod === 'success' },
-                            { value: 'cancel', label: 'Hủy', selected: paymentStatusMethod === 'cancel' },
-                        ]
-                    }
+                        options: prevStatus[0].options.map(option => ({
+                            ...option,
+                            selected: option.value === paymentStatusMethod,
+                        })),
+                    },
                 ]);
+
                 setDetailCostTable([
                     {
                         service: 'Menu',
-                        description: partyData.booking_details[0].menus.products.map((product) => product.name),
-                        cost: partyData.booking_details[0].menus.price.toLocaleString('vi', { style: 'currency', currency: 'VND' })
+                        description: bookingDetails.menus?.products.map((product) => product.name),
+                        cost: bookingDetails.menus?.price.toLocaleString('vi', { style: 'currency', currency: 'VND' }) || 0
                     },
                     {
                         service: 'Decor',
-                        description: partyData.booking_details[0].decors.name,
-                        cost: partyData.booking_details[0].decors.price.toLocaleString('vi', { style: 'currency', currency: 'VND' })
+                        description: bookingDetails.decors?.name || '',
+                        cost: bookingDetails.decors?.price.toLocaleString('vi', { style: 'currency', currency: 'VND' }) || 0
                     },
                     {
                         service: 'Loại tiệc',
-                        description: partyData.party_types.name,
-                        cost: partyData.party_types.price.toLocaleString('vi', { style: 'currency', currency: 'VND' })
+                        description: partyData.party_types?.name || '',
+                        cost: partyData.party_types?.price.toLocaleString('vi', { style: 'currency', currency: 'VND' }) || 0
                     },
                     {
                         service: 'Âm thanh, ánh sáng, sân khấu, màn hình',
@@ -296,36 +272,37 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 ]);
 
                 reset({
-                    username: partyData.users.username,
+                    username: partyData.users.username || partyData.name || '',
                     company_name: partyData.company_name,
-                    email: partyData.email || partyData.users.email,
-                    phone: partyData.phone || partyData.users.phone,
-                    party: partyData.name,
-                    tables: Number(partyData.booking_details[0].table_count) || 0,
-                    spareTables: Number(partyData.booking_details[0].spare_table_count) || 0,
+                    email: partyData.email || partyData.users?.email,
+                    phone: partyData.phone || partyData.users?.phone,
+                    party: partyData.name || '',
+                    customerAndChair: 10,
+                    tables: Number(bookingDetails.table_count) || 0,
+                    spare_table_count: Number(bookingDetails.spare_table_count) || 0,
                     customer: Number(partyData.number_of_guests) || 0,
-                    customerAndChair: Number(partyData.booking_details[0].table_count) || 0,
-                    partyDate: formatFullDateTime(partyData.created_at).date,
-                    organization_date: formatFullDateTime(partyData.organization_date).date,
-                    shift: partyData.shift, 
-                    menu: partyData.booking_details[0].menu_id,
-                    decor: partyData.booking_details[0].decor_id,
-                    amountPayable: bookingDetails.total_amount,
-                    depositAmount: bookingDetails.deposits.amount,
-                    depositDate: formatFullDateTime(bookingDetails.deposits?.created_at).date,
-                    // remainingAmountPaid: Number(Number(bookingDetails.total_amount) - Number(bookingDetails.deposits.amount)),
-                    payment: bookingDetails.deposits.payment_method,
-                    dataPay: formatFullDateTime(bookingDetails.deposits.created_at).date,
+                    partyDate: partyData.created_at.slice(0, 10) || '',
+                    organization_date: partyData.organization_date.slice(0, 10) || '',
+                    shift: partyData.shift,
+                    menu: bookingDetails.menu_id || 1,
+                    decor: bookingDetails.decor_id || 1,
+                    total_amount: bookingDetails.total_amount,
+                    depositAmount: bookingDetails.deposits?.amount,
+                    amount_booking: bookingDetails.amount_booking,
+                    depositDate: bookingDetails.deposits?.created_at.slice(0, 10) || '',
+                    payment: bookingDetails.deposits?.payment_method,
+                    dataPay: bookingDetails.deposits?.created_at.slice(0, 10) || '',
                     statusDeposit: isDepositSuccessful ? 'success' : 'pending',
                     statusPayment: statusPayment,
-                    foods: partyData.booking_details[0].menus.products
+                    foods: bookingDetails.menus?.products,
+                    menus_price: bookingDetails.menus?.price || 0
                 });
-                console.log('organization_date:',formatFullDateTime(partyData.organization_date).date);
             }
         } catch (error) {
             console.error('Error fetching party details:', error);
         }
     }, [id, reset]);
+
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -338,7 +315,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
     useEffect(() => {
         fetchDataDetailsParty();
-        fetchAllBranches()
+        fetchAllStages()
         fetchAllMenus();
         fetchAllDecors();
         fetchAllPartyTypes()
@@ -346,21 +323,21 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const handleFieldChange = (fieldSetter, triggerField, resetField = null) => (event) => {
         const value = event.target.value;
         fieldSetter(value);
-    
+
         if (resetField) {
-            reset({ [resetField]: value });
+            setValue(resetField, value);
         }
-    
+
         trigger(triggerField);
     };
-    
+
     const handleMenuChange = handleFieldChange(setSelectedMenu, 'menu');
-    const handleBranchChange = handleFieldChange(setSelectBranches, 'stages');
+    const handleStageChange = handleFieldChange(setSelectStages, 'stages');
     const handleDecorsChange = handleFieldChange(setSelectedDecors, 'decor');
     const handlePartyTypesChange = handleFieldChange(setSelectPartyTypes, 'partyTypes');
-    const handlePaymentChange = handleFieldChange(() => {}, 'payment', 'payment');
+    const handlePaymentChange = handleFieldChange(() => { }, 'payment', 'payment');
     const handleStatusPaymentChange = handleFieldChange(setSelectedStatus, 'statusPayment', 'statusPayment');
-    const handleStatusDepositChange = handleFieldChange(() => {}, 'statusDeposit', 'statusDeposit');
+    const handleStatusDepositChange = handleFieldChange(() => { }, 'statusDeposit', 'statusDeposit');
 
     const handleDeleteFood = (foodId) => {
         const updatedFoods = foods.filter(food => food.id !== foodId);
@@ -368,70 +345,89 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         setModifiedFoods(prev => [...prev, foodId]);
     };
 
+    console.log(selectStages)
+
     const onSubmit = async (data) => {
         const finalFoods = foods.filter(food => !modifiedFoods.includes(food.id));
-        const formData = new FormData();
-        finalFoods.map((food, index) => {
-            formData.append(`foods[${index}][id]`, food.id);
-            formData.append(`foods[${index}][name]`, food.name);
-        });
-        
+
+        // Định nghĩa các giá trị đơn giá
+        const table_price = 200000; // Giá mỗi bàn
+        const chair_price = 50000; // Giá mỗi ghế
+
+        // Tổng tiền bàn chính
+        const total_table_price = data.tables * table_price;
+
+        // Tổng tiền bàn dự phòng
+        const total_table_price_backup = data.spare_table_count * table_price;
+
+        // Tổng tiền ghế chính
+        const total_chair_price = data.tables * data.customerAndChair * chair_price;
+
+        // Tổng tiền ghế dự phòng
+        const total_chair_price_backup = data.spare_table_count * data.customerAndChair * chair_price;
+
+        // Tổng tiền menu (cho bàn chính)
+        const total_menus = data.tables * menuPrice;
+
+        // Tính tổng tiền amount
+        const total_amount_all = total_table_price + total_table_price_backup + total_chair_price + total_chair_price_backup + decorPrice + partyPrice + stagePrice + total_menus;
+
+        console.log(total_amount_all)
+
         const dataform = {
             ...data,
-            booking_id: selectBranches,
-            branch_id: selectBranches,
-            party_type_id: selectPartyTypes,
-            decor_id: selectedDecors, 
-            stage_id: selectBranches,
-            menu_id: selectedMenu,
+            branch_id: branch_id,
+            party_type_id: selectPartyTypes || 1,
+            decor_id: Number(selectedDecors) || 1,
+            stage_id: Number(selectStages) || 1,
+            menu_id: Number(selectedMenu) || 1,
             name: data.username,
             phone: data.phone,
             email: data.email,
             company_name: data.company_name,
             number_of_guests: data.customer,
             table_count: data.tables,
-            spare_table_count: data.spareTables,
+            spare_table_count: data.spare_table_count,
             budget: null,
             note: '.',
-            amount: data.depositAmount,
+            amount: total_amount_all,
             booking_details: [
-                    {
-                        decor_id: selectedDecors, 
-                        menu_id: selectedMenu,
-                        table_count: data.tables,
-                        spare_table_count: data.spareTables,
-                        amount_booking: data.amount,
-                        decors: selectedDecors,
-                        menus: {
-                            products: finalFoods,
-                        },
-                    }
-                ],
+                {
+                    decor_id: Number(selectedDecors) || 1,
+                    menu_id: Number(selectedMenu) || 1,
+                    total_amount: data.total_amount,
+                    table_count: data.tables,
+                    spare_table_count: data.spare_table_count,
+                    decors: selectedDecors,
+                    menus: {
+                        price: data.menus_price,
+                        products: finalFoods,
+                    },
+                }
+            ],
             status: selectedStatus,
-            is_confirm: selectStatusDeposit === 'success',
-            is_deposit: selectStatusDeposit === 'success',
+            is_confirm: true,
+            is_deposit: true,
         }
-
         try {
             const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE(id), "PATCH", dataform);
 
             if (updateBranches.success) {
                 dispatch(fetchBranchSuccess(updateBranches.data));
                 showToast("success", "Tạo dữ liệu chi nhánh thành công", "Phản hồi đã được duyệt. Đang lấy dữ liệu mới");
+            } else {
+                handleError("Đã xảy ra lỗi");
             }
         } catch (error) {
             console.log(error);
-            handleError("Đã xảy ra lỗi");
+            handleError(error);
         }
-
-        console.log('Dữ liệu form hợp lệ:', dataform);
-        console.log('Dữ liệu form hợp lệ:', data);
     };
 
     const handleError = (message) => {
         dispatch(fetchFeedbacksFailure());
         showToast("error", "Tạo dữ liệu không thành công", message);
-      };
+    };
 
     return (
         <div>
@@ -444,6 +440,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     ))}
                 </div>
             </div>
+            {limitStages && (
+                <span className='text-red-400 font-medium text-base'>*Số lượng bàn chính thức của sảnh chỉ đối đa là {limitStages}</span>
+            )}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className='p-4 mt-[30px] w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
                     <TitleSpanInfo title={'Thông tin liên hệ'} />
@@ -500,14 +499,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 onChange={handleDecorsChange}
                             />
                         ))}
-                        {branches.map((branch, index) => (
+                        {stages.map((stage, index) => (
                             <DropdownField
                                 key={index}
-                                label={branch.title}
-                                name={branch.name}
-                                options={branch.options}
-                                value={selectBranches}
-                                onChange={handleBranchChange}
+                                label={stage.title}
+                                name={stage.name}
+                                options={stage.options}
+                                value={selectStages}
+                                onChange={handleStageChange}
                             />
                         ))}
                         {menus.map((menu, index) => (
@@ -534,7 +533,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                     </div>
                                 ))}
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -590,7 +588,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 label={status.title}
                                 name={status.name}
                                 options={status.options}
-                                value={selectStatusDeposit} 
+                                value={selectStatusDeposit}
                                 onChange={handleStatusDepositChange}
                             />
                         ))}

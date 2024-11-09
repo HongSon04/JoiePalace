@@ -44,11 +44,14 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue="" // Giá trị mặc định cho các input khác
+                    defaultValue={name === 'customerAndChair' ? 10 : ''} // Giá trị mặc định cho `customerAndChair`
                     render={({ field }) => (
                         <input
                             {...field}
                             type={type}
+                            value={name === 'customerAndChair' ? 10 : field.value} // Đặt giá trị cố định là 10
+                            readOnly={name === 'customerAndChair'} // Không cho phép chỉnh sửa
+                            disabled={name === 'customerAndChair'} // Vô hiệu hóa trường
                             className="p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300"
                             placeholder={placeholder}
                             min={type === 'number' ? 1 : undefined}

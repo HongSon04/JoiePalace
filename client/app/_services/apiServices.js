@@ -111,7 +111,7 @@ export const fetchTotalEachMonth = async (branchId) => {
 };
 export const fetchAllBranch = async () => {
   try {
-      const response = await axios.get(API_CONFIG.BRANCHES.GET_ALL );
+      const response = await axios.get(API_CONFIG.BRANCHES.GET_ALL() );
       if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
       }
@@ -121,58 +121,42 @@ export const fetchAllBranch = async () => {
       throw error; 
   }
 };
-// export const fetchUserById = async (userId) => {
-//   try {
-//     const token = getCookie('accessToken');
-//     const response = await axios.get(API_CONFIG.USER.GET_BY_ID(userId), {
-//       headers: {
-//         'Authorization': `Bearer ${token}`,
-//       }
-//     });
-    
-//     if (response.status !== 200) {
-//       throw new Error("Có lỗi khi lấy dữ liệu !");
-//     }
-//     return response.data;
-//   } catch (error) {
-//     console.error("Lỗi:", error);
-//     throw error;
-//   }
-// };
-
-
-// export const fetchBranchById = async (branchId) => {
-//   try {
-//     const response = await axios.get(API_CONFIG.BRANCHES.GET_BY_ID(branchId));
-    
-//     if (response.status !== 200) {
-//       throw new Error("Có lỗi khi lấy dữ liệu !");
-//       }
-//       return response.data;
-//   } catch (error) {
-//     console.error("Lỗi:", error);
-//     throw error;
-//   }
-// };
-export const fetchAllBooking = async () => {
+export const fetchUserByBranchId = async (branchId) => {
   try {
-      const token = getCookie('accessToken');
-      const response = await axios.get(API_CONFIG.DASHBOARD.GET_ALL_BOOKING, {
-          headers: {
-              'Authorization': `Bearer ${token}`,
-          }
-      });
-
-      if (response.status !== 200) {
-          throw new Error("Có lỗi khi lấy dữ liệu !");
+    const token = getCookie('accessToken');
+    const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(branchId), {
+      headers: {
+        'Authorization': `Bearer ${token}`,
       }
-      
-      return response.data;
+    });
+    
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu !");
+    }
+    return response.data;
   } catch (error) {
-      console.error("Lỗi:", error);
-      throw error; 
+    console.error("Lỗi:", error);
+    throw error;
   }
 };
+export  const changePassWord = async (dataToSend) => {
+  const token = getCookie('accessToken');
+  const response = await axios.put(API_CONFIG.USER.CHANGE_PASSWORD, dataToSend, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+
+  if (response.status !== 200 && response.status !== 201) {
+    throw new Error("Có lỗi đổi mật khẩu");
+  }
+
+  return response;
+};
+
+
+
+
 export const fetchInfoByMonth = async (branchId) => {
   try {
     const response = await axios.get(API_CONFIG.DASHBOARD.GET_INFO_BY_MONTH(branchId));
@@ -186,29 +170,32 @@ export const fetchInfoByMonth = async (branchId) => {
   }
 };
 
-export const getUserByBranchId = async (branchId) => {
+export const getUserById = async (userId) => {
   try {
-    const token = getCookie('accessToken'); 
-    const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(branchId), {
+
+    const token = getCookie('accessToken');
+    const url = API_CONFIG.USER.GET_BY_ID(userId);
+  
+
+    const response = await axios.get(url, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
     });
-    
+
     if (response.status !== 200) {
-      throw new Error("Có lỗi khi lấy dữ liệu !");
+      throw new Error("Có lỗi khi lấy dữ liệu!");
     }
-    
-    return response.data; 
+
+    return response.data;
   } catch (error) {
     if (error.response) {
       console.error("Lỗi từ server:", error.response.data);
-      console.error("Mã lỗi:", error.response.status);
-      console.error("Headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("Yêu cầu đã được gửi nhưng không nhận được phản hồi từ server:", error.request);
     } else {
-      console.error("Lỗi:", error.message);
+      console.error("Lỗi khác:", error.message);
     }
-    throw error; 
+    throw error;
   }
-  
 };
