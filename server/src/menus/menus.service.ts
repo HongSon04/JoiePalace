@@ -95,7 +95,7 @@ export class MenusService {
           description,
           price: Number(price),
           slug,
-          is_show,
+          is_show: String(is_show) === 'true' ? true : false,
           products: {
             connect: productsTagSet,
           },
@@ -533,7 +533,7 @@ export class MenusService {
     updateMenuDto: UpdateMenuDto,
     files: { images?: Express.Multer.File[] },
   ) {
-    const { name, description, products, price } = updateMenuDto;
+    const { name, description, products, price, is_show } = updateMenuDto;
     try {
       const slug = MakeSlugger(name);
       const findMenuByname = await this.prismaService.menus.findFirst({
@@ -601,6 +601,7 @@ export class MenusService {
           description,
           price: Number(price),
           slug,
+          is_show: String(is_show) === 'true' ? true : false,
           products: {
             set: productsTagSet,
           },
