@@ -19,6 +19,7 @@ jobs:
       - name: List Files in Root Directory
         run: |
           echo "Listing files in the root directory..."
+          cd /home
           ls -la /
 
       - name: Fetch Latest Changes
