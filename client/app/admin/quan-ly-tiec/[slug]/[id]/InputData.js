@@ -43,7 +43,7 @@ export const inputOrganization = [
             </svg>
         ),
         name: 'tables',
-        title: 'Số lượng bàn chính thức',
+        title: 'Số lượng bàn chính thức ',
         type: 'number',
         placeholder: 'Nhập số lượng bàn',
     },
@@ -51,7 +51,7 @@ export const inputOrganization = [
         svg: (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M21.9601 9.73L20.5301 4.73C20.4101 4.3 20.0201 4 19.5701 4H4.43009C3.98009 4 3.59009 4.3 3.47009 4.73L2.04009 9.73C1.86009 10.36 2.34009 11 3.00009 11H5.20009L4.00009 20H6.00009L6.67009 15H17.3401L18.0001 20H20.0001L18.8001 11H21.0001C21.6601 11 22.1401 10.36 21.9601 9.73ZM6.93009 13L7.20009 11H16.8001L17.0701 13H6.93009ZM4.33009 9L5.19009 6H18.8201L19.6801 9H4.33009Z" fill="white" />
         </svg>),
-        name: 'spareTables',
+        name: 'spare_table_count',
         title: 'Số lượng bàn dự phòng',
         type: 'number',
         placeholder: 'Nhập số lượng bàn dự phòng',
@@ -73,6 +73,9 @@ export const inputOrganization = [
         title: 'Số lượng khách / bàn',
         type: 'number',
         placeholder: 'Nhập số lượng khách / bàn',
+            value: 10,
+            readOnly: true,
+            disabled: true,
     },
     {
         svg: (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -80,7 +83,7 @@ export const inputOrganization = [
         </svg>),
         name: 'partyDate',
         title: 'Ngày đặt tiệc',
-        type: 'dateTime',
+        type: 'date',
         placeholder: 'dd-mm-yyyy',
     },
     {
@@ -89,7 +92,7 @@ export const inputOrganization = [
         </svg>),
         name: 'organization_date',
         title: 'Ngày tổ chức',
-        type: 'dateTime',
+        type: 'date',
         placeholder: 'dd-mm-yyyy',
     },
     {
@@ -116,7 +119,7 @@ export const inputsCost = [
         svg: null,
         title: 'Số tiền phải thanh toán',
         type: 'number',
-        name: 'amountPayable',
+        name: 'total_amount',
         placeholder: '1000000'
     },
     {
@@ -129,22 +132,22 @@ export const inputsCost = [
     {
         svg: null,
         title: 'Ngày đặt cọc',
-        type: 'dateTime',
+        type: 'date',
         name: 'depositDate',
-        placeholder: '29/12/2024'
+        placeholder: 'dd-mm-yyyy'
     },
     // {
     //     svg: null,
     //     title: 'Số tiền còn lại phải thanh toán',
     //     type: 'number',
-    //     name: 'remainingAmountPaid',
+    //     name: 'amount_booking',
     //     placeholder: '10000000000'
     // },
     {
         svg: null,
         title: 'Ngày thanh toán',
-        type: 'dateTime',
+        type: 'date',
         name: 'dataPay',
-        placeholder: '29/12/2024'
+        placeholder: 'dd-mm-yyyy'
     },
 ]
