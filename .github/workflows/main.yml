@@ -8,48 +8,55 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Connect to Server via SSH
+      - name: Connect and Find Directory
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: 22
+          script: |
+            echo "Tìm kiếm thư mục JoiePalace..."
+            FOLDER_PATH=$(find / -type d -name "JoiePalace" 2>/dev/null)
+            echo "FOLDER_PATH=$FOLDER_PATH" >> $GITHUB_ENV
+            echo "Kết quả tìm kiếm: $FOLDER_PATH"
 
-      - name: List Files in Root Directory
-        run: |
-          echo "Listing files in the root directory..."
-          ls -la /
-          #  Cd to the root directory
-          cd ../../../../
+      - name: Process Directory
+        uses: appleboy/ssh-action@master
+        if: env.FOLDER_PATH != ''
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          script: |
+            echo "Thư mục đã tìm thấy tại: $FOLDER_PATH"
+            cd $FOLDER_PATH
 
-      - name: Fetch Latest Changes
-        run: |
-          echo "Fetching latest changes..."
-          cd /home/JoiePalace
-          git fetch origin || exit 1
-          git checkout main || exit 1
-          git pull origin main || exit 1
+            echo "Pulling changes..."
+            git fetch origin
+            git checkout main
+            git pull origin main
 
-      - name: Install Server Dependencies
-        run: |
-          echo "Installing server dependencies..."
-          cd /server
-          npm ci
+      - name: Deploy Application
+        uses: appleboy/ssh-action@master
+        if: env.FOLDER_PATH != ''
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          script: |
+            cd $FOLDER_PATH/server
 
-      - name: Generate Prisma Client
-        run: |
-          echo "Generating Prisma client..."
-          cd /server
-          npx prisma generate
+            echo "Installing dependencies..."
+            npm ci
 
-      - name: Build the Application
-        run: |
-          echo "Building the application..."
-          cd /server
-          npm run build
+            echo "Generating Prisma..."
+            npx prisma generate
 
-      - name: Reload PM2
-        run: |
-          echo "Reloading PM2..."
-          pm2 reload server
+            echo "Building..."
+            npm run build
+
+            echo "Reloading PM2..."
+            pm2 reload server
