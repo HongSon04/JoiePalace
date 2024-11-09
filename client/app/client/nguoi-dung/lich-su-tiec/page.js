@@ -42,7 +42,7 @@ const page = () => {
                 // Fetch all bookings for the user
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser.id);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
-                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending');
+                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending'|| i.status === 'processing');
                 const fetchedAllBookingsCancel = fetchedAllBookingsMembershipId.filter((i) => i.status === 'cancel');
 
                 const fetchedAllBookingsOld = [...fetchedAllBookingsMembershipId].sort((a, b) => {
@@ -121,7 +121,6 @@ const page = () => {
                     paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
                 };
             });
-            console.log(dataParty);
 
             setParties(dataParty);
         }

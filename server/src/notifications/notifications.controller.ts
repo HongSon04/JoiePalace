@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
@@ -27,7 +28,10 @@ export class NotificationsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiOperation({ summary: 'Lấy thông báo theo user_id' })
-  async getNotifications(@Param('user_id') user_id: string, query: FilterDto) {
+  async getNotifications(
+    @Param('user_id') user_id: string,
+    @Query() query: FilterDto,
+  ) {
     return this.notificationsService.getNotifications(+user_id, query);
   }
 
@@ -46,13 +50,13 @@ export class NotificationsController {
   @ApiQuery({ name: 'itemsPerPage', required: false })
   async getNotificationsByEmail(
     @Param('email_user') email_user: string,
-    query: FilterDto,
+    @Query() query: FilterDto,
   ) {
     return this.notificationsService.getNotificationsByEmail(email_user, query);
   }
 
-  // ! Update Is Read Notification by ID
-  @Patch('update-is-read/:notification_id')
+  // ! Update Is Read Notification by Multiple ID
+  @Patch('update-is-read')
   @ApiHeaders([
     {
       name: 'Authorization',
@@ -62,7 +66,20 @@ export class NotificationsController {
   ])
   @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Cập nhật trạng thái đã đọc thông báo' })
-  async updateIsReadNotification(@Param('notification_id') id: string) {
-    return this.notificationsService.updateIsReadNotification(+id);
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        notify_id: {
+          type: 'array',
+          items: {
+            type: 'number',
+          },
+        },
+      },
+    },
+  })
+  async updateIsReadNotification(@Body('notify_id') notify_id: number[]) {
+    return this.notificationsService.updateIsReadNotification(notify_id);
   }
 }

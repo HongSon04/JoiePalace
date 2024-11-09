@@ -28,7 +28,7 @@ export class CreateDecorDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })
-  price: number;
+  price: string;
 
   @ApiProperty({
     description: 'Ảnh trang trí, không được để trống',
@@ -42,7 +42,8 @@ export class CreateDecorDto {
     example: [1, 2, 3],
   })
   @IsOptional()
-  products?: number[];
+  @IsNotEmpty({ message: 'Danh sách sản phẩm không được để trống' })
+  products: number[];
 }
 
 export class ImageDecorDto {

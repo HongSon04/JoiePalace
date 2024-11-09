@@ -21,11 +21,10 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { LoginUserDto } from 'src/user/dto/login-user.dto';
 import { AuthService } from './auth.service';
 import { CreateAuthUserDto } from './dto/create-auth-user.dto';
+import { LoginUserSocialDto } from './dto/login-user-social.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UploadAvatarAuthDto } from './dto/upload-avatar-auth.dto';
 import { VerifyTokenDto } from './dto/verify-token.dto';
-import { CreateUserSocialDto } from './dto/create-user-social.dto';
-import { LoginUserSocialDto } from './dto/login-user-social.dto';
 
 @ApiTags('Auth - Xác thực')
 @Controller('api/auth')
@@ -61,34 +60,6 @@ export class AuthController {
   @isPublic()
   create(@Body() createUserDto: CreateAuthUserDto) {
     return this.authService.register(createUserDto);
-  }
-
-  // ! Register Social User
-  @Post('register-social')
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    example: {
-      message: 'Đăng ký thành công',
-      data: { access_token: 'string', refresh_token: 'string' },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    example: {
-      message: 'Email đã tồn tại',
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    example: {
-      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      error: 'Lỗi gì đó !',
-    },
-  })
-  @ApiOperation({ summary: 'Người dùng tạo tài khoản qua mạng xã hội' })
-  @isPublic()
-  createSocialUser(@Body() createUserSocialDto: CreateUserSocialDto) {
-    return this.authService.registerSocialUser(createUserSocialDto);
   }
 
   // ! Login
@@ -280,7 +251,7 @@ export class AuthController {
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,
@@ -292,7 +263,7 @@ export class AuthController {
             false,
           );
         }
-       if (file.size > 1024 * 1024 * 10) {
+        if (file.size > 1024 * 1024 * 10) {
           return cb(
             new BadRequestException('Kích thước ảnh tối đa là 10MB'),
             false,

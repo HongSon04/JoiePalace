@@ -3,7 +3,7 @@ import { memo } from "react";
 const ButtonDiscover = ({ name, className, ...props }) => {
   return (
     <button
-      className={`bg-gold flex justify-center items-center gap-1 py-2 rounded-3xl cursor-pointer ${className}`}
+      className={`bg-gold flex justify-center items-center gap-1 py-2 px-3 rounded-3xl cursor-pointer ${className}`}
       {...props}
     >
       <span className="text-[1em] font-medium flex items-center h-6">

@@ -39,7 +39,7 @@ export class DepositsService {
       console.log('Lỗi từ DepositsService->findOne: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -68,7 +68,7 @@ export class DepositsService {
       console.log('Lỗi từ DepositsService->findOneByTransactionId: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -102,7 +102,7 @@ export class DepositsService {
 
       await this.prismaService.bookings.update({
         where: { id: Number(findBookingDetail.booking_id) },
-        data: { is_deposit: status === 'completed' ? true : false },
+        data: { is_deposit: status === 'success' ? true : false },
       });
 
       throw new HttpException(
@@ -119,7 +119,7 @@ export class DepositsService {
       console.log('Lỗi từ DepositsService->update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -173,7 +173,7 @@ export class DepositsService {
       console.log('Lỗi từ DepositsService->updateByTransactionID: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

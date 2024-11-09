@@ -1,22 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  HttpStatus,
-  UseInterceptors,
-  HttpException,
-  Query,
-  UploadedFiles,
-  Request,
   BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Request,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -25,9 +22,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { isPublic } from 'decorator/auth.decorator';
+import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsService } from './products.service';
 
 @ApiTags('Products - Quản lý sản phẩm')
 @Controller('api/products')
@@ -85,7 +84,7 @@ export class ProductsController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,
@@ -105,9 +104,9 @@ export class ProductsController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }
@@ -495,7 +494,7 @@ export class ProductsController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,
@@ -515,9 +514,9 @@ export class ProductsController {
               false,
             );
           }
-          if (f.size > 1024 * 1024 * 5) {
+          if (f.size > 1024 * 1024 * 10) {
             return cb(
-              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              new BadRequestException('Kích thước ảnh tối đa 10MB'),
               false,
             );
           }

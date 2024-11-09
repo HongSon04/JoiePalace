@@ -1,9 +1,14 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import {
+  ApiBody,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiTags
+} from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
 import { ConfirmBookingMailDto } from './dto/ConfirmBookingMail.dto';
-import { MailService } from './mail.service';
-import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { sendMailToSubcribeUserDto } from './dto/send-mail-to-sub-user.dto';
+import { MailService } from './mail.service';
 
 @ApiTags('Mail - Quản lý gửi Mail')
 @Controller('api/mail')
@@ -30,6 +35,14 @@ export class MailController {
 
   // ! Send Mail Forgot Password
   @ApiOperation({ summary: 'Gửi mail quên mật khẩu' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+      },
+    },
+  })
   @Post('forgot-password')
   async sendMailForgotPassword(@Body() body: { email: string }) {
     await this.mailService.sendMailForgotPassword(body);

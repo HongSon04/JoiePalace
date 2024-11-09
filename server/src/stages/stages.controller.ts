@@ -80,7 +80,7 @@ export class StagesController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,
@@ -161,8 +161,8 @@ export class StagesController {
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả sảnh theo chi nhánh' })
-  async getAll(@Query('branch_id') branch_id: number) {
-    return await this.stagesService.getAll(branch_id);
+  async getAll(@Query('branch_id') branch_id: string) {
+    return await this.stagesService.getAll(+branch_id);
   }
 
   // ! Get Stage By ID
@@ -199,8 +199,8 @@ export class StagesController {
   })
   @ApiParam({ name: 'stage_id', required: true })
   @ApiOperation({ summary: 'Lấy thông tin sảnh theo ID' })
-  async getStageById(@Param('stage_id') stage_id: number) {
-    return await this.stagesService.getStageById(stage_id);
+  async getStageById(@Param('stage_id') stage_id: string) {
+    return await this.stagesService.getStageById(+stage_id);
   }
 
   // ! Update Stage
@@ -251,7 +251,7 @@ export class StagesController {
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'images', maxCount: 6 }], {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,
@@ -283,11 +283,11 @@ export class StagesController {
     }),
   )
   async update(
-    @Param('stage_id') stage_id: number,
+    @Param('stage_id') stage_id: string,
     @Body() body: StageUpdateDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
-    return await this.stagesService.update(stage_id, body, files);
+    return await this.stagesService.update(+stage_id, body, files);
   }
 
   // ! Delete Stage
@@ -321,7 +321,7 @@ export class StagesController {
   })
   @ApiOperation({ summary: 'Xóa sảnh vĩnh viễn' })
   @ApiParam({ name: 'stage_id', required: true })
-  async delete(@Param('stage_id') stage_id: number) {
-    return await this.stagesService.delete(stage_id);
+  async delete(@Param('stage_id') stage_id: string) {
+    return await this.stagesService.delete(+stage_id);
   }
 }

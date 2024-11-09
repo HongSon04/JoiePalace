@@ -35,6 +35,7 @@ export class PackagesService {
         price,
         short_description,
         extra_service,
+        other_service,
       } = createPackageDto;
       let checkPrice = 0;
 
@@ -84,20 +85,77 @@ export class PackagesService {
       checkPrice += Number(findPartyType.price);
 
       // ? Check Extra Service
-      extra_service.forEach(async (service) => {
-        const findService = await this.prismaService.products.findUnique({
-          where: { id: Number(service.id) },
-        });
+      if (extra_service) {
+        const jsonString = extra_service
+          .replace(/;/g, ',')
+          .replace(/\s+/g, '')
+          .replace(/([{,])(\w+):/g, '$1"$2":');
+        const serviceArray = JSON.parse(jsonString);
 
-        if (!findService) {
-          throw new NotFoundException('ID Sản Phẩm không tồn tại');
-        }
-        checkPrice += findService.price * service.quantity;
-      });
+        await Promise.all(
+          serviceArray.map(async (extra) => {
+            const findOther = await this.prismaService.products.findUnique({
+              where: { id: Number(extra.id) },
+            });
+
+            if (!findOther)
+              throw new HttpException(
+                'Không tìm thấy dịch vụ thêm',
+                HttpStatus.NOT_FOUND,
+              );
+
+            checkPrice += Number(findOther.price) * Number(extra.quantity);
+
+            extra.name = findOther.name;
+            extra.amount = Number(findOther.price);
+            extra.total_price =
+              Number(findOther.price) * Number(extra.quantity);
+            extra.description = findOther.description;
+            extra.short_description = findOther.short_description;
+            extra.images = findOther.images;
+            extra.quantity = Number(extra.quantity);
+          }),
+        );
+      }
+
+      // ? Check Other Services
+      if (other_service) {
+        const jsonString = other_service
+          .replace(/;/g, ',')
+          .replace(/\s+/g, '')
+          .replace(/([{,])(\w+):/g, '$1"$2":');
+        const serviceArray = JSON.parse(jsonString);
+
+        await Promise.all(
+          serviceArray.map(async (other) => {
+            const findOther = await this.prismaService.products.findUnique({
+              where: { id: Number(other.id) },
+            });
+
+            if (!findOther)
+              throw new HttpException(
+                'Không tìm thấy dịch vụ khác',
+                HttpStatus.NOT_FOUND,
+              );
+
+            checkPrice += Number(findOther.price) * Number(other.quantity);
+            other.name = findOther.name;
+            other.amount = Number(findOther.price);
+            other.total_price =
+              Number(findOther.price) * Number(other.quantity);
+            other.description = findOther.description;
+            other.short_description = findOther.short_description;
+            other.images = findOther.images;
+            other.quantity = Number(other.quantity);
+          }),
+        );
+      }
 
       // ? Check Price
       if (Number(price) !== Number(checkPrice)) {
-        throw new BadRequestException('Giá không chính xác');
+        throw new BadRequestException(
+          `Giá không chính xác, giá thực: ${checkPrice}`,
+        );
       }
 
       // Upload images
@@ -124,6 +182,7 @@ export class PackagesService {
           short_description,
           images: uploadImages as any,
           extra_service,
+          other_service,
         },
         include: {
           menus: true,
@@ -144,10 +203,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> create', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -177,10 +236,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findAll', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -212,10 +271,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findOne', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -245,10 +304,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -280,10 +339,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -303,6 +362,7 @@ export class PackagesService {
         price,
         short_description,
         extra_service,
+        other_service,
       } = updatePackageDto;
       let checkPrice = 0;
 
@@ -356,20 +416,77 @@ export class PackagesService {
       checkPrice += Number(findPartyType.price);
 
       // ? Check Extra Service
-      extra_service.forEach(async (service) => {
-        const findService = await this.prismaService.products.findUnique({
-          where: { id: Number(service.id) },
-        });
+      if (extra_service) {
+        const jsonString = extra_service
+          .replace(/;/g, ',')
+          .replace(/\s+/g, '')
+          .replace(/([{,])(\w+):/g, '$1"$2":');
+        const serviceArray = JSON.parse(jsonString);
 
-        if (!findService) {
-          throw new NotFoundException('ID Sản Phẩm không tồn tại');
-        }
-        checkPrice += findService.price * service.quantity;
-      });
+        await Promise.all(
+          serviceArray.map(async (extra) => {
+            const findOther = await this.prismaService.products.findUnique({
+              where: { id: Number(extra.id) },
+            });
+
+            if (!findOther)
+              throw new HttpException(
+                'Không tìm thấy dịch vụ thêm',
+                HttpStatus.NOT_FOUND,
+              );
+
+            checkPrice += Number(findOther.price) * Number(extra.quantity);
+
+            extra.name = findOther.name;
+            extra.amount = Number(findOther.price);
+            extra.total_price =
+              Number(findOther.price) * Number(extra.quantity);
+            extra.description = findOther.description;
+            extra.short_description = findOther.short_description;
+            extra.images = findOther.images;
+            extra.quantity = Number(extra.quantity);
+          }),
+        );
+      }
+
+      // ? Check Other Services
+      if (other_service) {
+        const jsonString = other_service
+          .replace(/;/g, ',')
+          .replace(/\s+/g, '')
+          .replace(/([{,])(\w+):/g, '$1"$2":');
+        const serviceArray = JSON.parse(jsonString);
+
+        await Promise.all(
+          serviceArray.map(async (other) => {
+            const findOther = await this.prismaService.products.findUnique({
+              where: { id: Number(other.id) },
+            });
+
+            if (!findOther)
+              throw new HttpException(
+                'Không tìm thấy dịch vụ khác',
+                HttpStatus.NOT_FOUND,
+              );
+
+            checkPrice += Number(findOther.price) * Number(other.quantity);
+            other.name = findOther.name;
+            other.amount = Number(findOther.price);
+            other.total_price =
+              Number(findOther.price) * Number(other.quantity);
+            other.description = findOther.description;
+            other.short_description = findOther.short_description;
+            other.images = findOther.images;
+            other.quantity = Number(other.quantity);
+          }),
+        );
+      }
 
       // ? Check Price
       if (Number(price) !== Number(checkPrice)) {
-        throw new BadRequestException('Giá không chính xác');
+        throw new BadRequestException(
+          `Giá không chính xác, giá thực: ${checkPrice}`,
+        );
       }
       let uploadImages;
       // Upload images
@@ -398,6 +515,7 @@ export class PackagesService {
           short_description,
           images: uploadImages ? uploadImages : findPackage.images,
           extra_service,
+          other_service,
         },
         include: {
           menus: true,
@@ -418,10 +536,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> update', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -456,10 +574,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> remove', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -500,10 +618,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> restore', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -539,10 +657,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> delete', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 }

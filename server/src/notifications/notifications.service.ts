@@ -50,7 +50,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> sendNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -58,8 +58,10 @@ export class NotificationsService {
   // ! Get Notifications by user_id
   async getNotifications(user_id: number, query: FilterDto) {
     try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      const page = query.page ? parseInt(query.page, 10) : 1;
+      const itemsPerPage = query.itemsPerPage
+        ? parseInt(query.itemsPerPage, 10)
+        : 10;
       const skip = (page - 1) * itemsPerPage;
 
       const [res, total] = await this.prismaService.$transaction([
@@ -105,7 +107,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> getNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -172,33 +174,45 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
 
   // ! Update Is Read Notification by ID
-  async updateIsReadNotification(id: number) {
+  async updateIsReadNotification(notify_id: number[]) {
     try {
-      const findNotification =
-        await this.prismaService.notifications.findUnique({
+      // ? Kiểm tra sản phẩm
+      // Handle tags if provided
+      if (notify_id && notify_id.length > 0) {
+        let notify = [];
+        const productsArray = JSON.parse(notify_id as any);
+
+        notify = await this.prismaService.notifications.findMany({
           where: {
-            id: Number(id),
+            id: {
+              in: productsArray,
+            },
           },
         });
 
-      if (!findNotification) {
-        throw new NotFoundException('Không tìm thấy thông báo!');
-      }
+        if (!notify) {
+          throw new NotFoundException('Không tìm thấy thông báo!');
+        }
 
-      await this.prismaService.notifications.update({
-        where: {
-          id: Number(id),
-        },
-        data: {
-          is_read: true,
-        },
-      });
+        // ? Cập nhật trạng thái đã đọc
+
+        await this.prismaService.notifications.updateMany({
+          where: {
+            id: {
+              in: productsArray,
+            },
+          },
+          data: {
+            is_read: true,
+          },
+        });
+      }
 
       throw new HttpException(
         {
@@ -216,7 +230,7 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

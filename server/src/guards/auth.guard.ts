@@ -51,6 +51,16 @@ export class AuthGuard implements CanActivate {
         );
       }
 
+      // if (user.active === false) {
+      //   throw new UnauthorizedException('Tài khoản của bạn đã bị khóa');
+      // }
+
+      // if (user.verify_at === null) {
+      //   throw new UnauthorizedException(
+      //     'Tài khoản của bạn chưa được xác thực, vui lòng kiểm tra email của bạn để xác thực tài khoản',
+      //   );
+      // }
+
       request['user'] = user;
     } catch (error) {
       throw new UnauthorizedException(

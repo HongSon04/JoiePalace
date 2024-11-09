@@ -17,6 +17,7 @@ import {
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FilterMenuDto } from './dto/FilterMenu.dto';
 
 @Injectable()
 export class MenusService {
@@ -27,6 +28,7 @@ export class MenusService {
 
   // ! Create Menu
   async create(
+    reqUser,
     createMenuDto: CreateMenuDto,
     files: { images?: Express.Multer.File[] },
   ) {
@@ -44,28 +46,34 @@ export class MenusService {
         throw new BadRequestException('Tên menu đã tồn tại');
       }
 
-      const findProducts = await this.prismaService.products.findMany({
-        where: {
-          id: {
-            in: products,
-          },
-        },
-      });
+      // ? Kiểm tra sản phẩm
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
 
-      if (findProducts.length !== products.length) {
-        throw new NotFoundException('Có món ăn không tồn tại');
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
+      } else {
+        throw new BadRequestException('Menu cần ít nhất 1 sản phẩm');
       }
 
-      const connectproducts = products.map((foodId) => ({
-        id: Number(foodId),
-      }));
-
-      // Check Food Price (Total Amount) equal with price of menu
-      const totalAmount = findProducts.reduce(
-        (acc, curr) => acc + curr.price,
-        0,
-      );
-      if (totalAmount !== Number(price)) {
+      if (Number(totalPrice) !== Number(price)) {
         throw new BadRequestException(
           'Giá của menu không trùng với tổng giá của các món ăn',
         );
@@ -83,18 +91,20 @@ export class MenusService {
       const menus = await this.prismaService.menus.create({
         data: {
           name,
+          user_id: Number(reqUser.id),
           description,
           price: Number(price),
           slug,
-          is_show,
+          is_show: String(is_show) === 'true' ? true : false,
           products: {
-            connect: connectproducts,
+            connect: productsTagSet,
           },
           images,
         },
         include: {
           products: {
             include: {
+              categories: true,
               tags: true,
             },
           },
@@ -112,13 +122,13 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
 
   // ! Get All Menu
-  async findAll(query: FilterPriceDto) {
+  async findAll(query: FilterMenuDto) {
     const page = Number(query.page) || 1;
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
@@ -199,6 +209,18 @@ export class MenusService {
       ];
     }
 
+    if (query.user_id) {
+      const findUser = await this.prismaService.users.findUnique({
+        where: { id: Number(query.user_id) },
+      });
+
+      if (!findUser) {
+        throw new NotFoundException('Người dùng không tồn tại');
+      }
+
+      whereConditions.user_id = Number(query.user_id);
+    }
+
     // Sắp xếp theo giá
     let orderByConditions: any = {};
     if (priceSort === 'asc' || priceSort === 'desc') {
@@ -212,6 +234,13 @@ export class MenusService {
           include: {
             products: {
               include: {
+                categories: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                  },
+                },
                 tags: true,
               },
             },
@@ -226,6 +255,12 @@ export class MenusService {
           where: whereConditions,
         }),
       ]);
+
+      res.forEach((menu) => {
+        return (menu.products = this.groupProductsByCategory(
+          menu.products,
+        ) as any);
+      });
 
       const lastPage = Math.ceil(total / itemsPerPage);
       const nextPage = page >= lastPage ? null : page + 1;
@@ -252,7 +287,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -352,6 +387,13 @@ export class MenusService {
           include: {
             products: {
               include: {
+                categories: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                  },
+                },
                 tags: true,
               },
             },
@@ -366,6 +408,12 @@ export class MenusService {
           where: whereConditions,
         }),
       ]);
+
+      res.forEach((menu) => {
+        return (menu.products = this.groupProductsByCategory(
+          menu.products,
+        ) as any);
+      });
 
       const lastPage = Math.ceil(total / itemsPerPage);
       const nextPage = page >= lastPage ? null : page + 1;
@@ -392,7 +440,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -405,6 +453,7 @@ export class MenusService {
         include: {
           products: {
             include: {
+              categories: true,
               tags: true,
             },
           },
@@ -414,6 +463,8 @@ export class MenusService {
       if (!menu) {
         throw new NotFoundException('Menu không tồn tại');
       }
+
+      menu.products = this.groupProductsByCategory(menu.products) as any;
 
       throw new HttpException(
         { data: FormatReturnData(menu, []) },
@@ -426,7 +477,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -441,6 +492,13 @@ export class MenusService {
         include: {
           products: {
             include: {
+              categories: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
               tags: true,
             },
           },
@@ -450,6 +508,8 @@ export class MenusService {
       if (!menu) {
         throw new NotFoundException('Menu không tồn tại');
       }
+
+      menu.products = this.groupProductsByCategory(menu.products) as any;
 
       throw new HttpException(
         { data: FormatReturnData(menu, []) },
@@ -462,7 +522,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> findBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -473,16 +533,11 @@ export class MenusService {
     updateMenuDto: UpdateMenuDto,
     files: { images?: Express.Multer.File[] },
   ) {
-    const { name, description, products, price } = updateMenuDto;
+    const { name, description, products, price, is_show } = updateMenuDto;
     try {
       const slug = MakeSlugger(name);
       const findMenuByname = await this.prismaService.menus.findFirst({
-        where: {
-          name,
-          id: {
-            not: Number(id),
-          },
-        },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (findMenuByname) {
@@ -497,28 +552,34 @@ export class MenusService {
         throw new NotFoundException('Menu không tồn tại');
       }
 
-      const findProducts = await this.prismaService.products.findMany({
-        where: {
-          id: {
-            in: products,
-          },
-        },
-      });
+      // ? Kiểm tra sản phẩm
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
 
-      if (findProducts.length !== products.length) {
-        throw new NotFoundException('Có món ăn không tồn tại');
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
+      } else {
+        throw new BadRequestException('Menu cần ít nhất 1 sản phẩm');
       }
 
-      const connectproducts = products.map((foodId) => ({
-        id: foodId,
-      }));
-
-      // Check Food Price (Total Amount) equal with price of menu
-      const totalAmount = findProducts.reduce(
-        (acc, curr) => acc + curr.price,
-        0,
-      );
-      if (totalAmount !== Number(price)) {
+      if (Number(totalPrice) !== Number(price)) {
         throw new BadRequestException(
           'Giá của menu không trùng với tổng giá của các món ăn',
         );
@@ -538,16 +599,18 @@ export class MenusService {
         data: {
           name,
           description,
-          price,
+          price: Number(price),
           slug,
+          is_show: String(is_show) === 'true' ? true : false,
           products: {
-            set: connectproducts,
+            set: productsTagSet,
           },
           images: images ? images : findMenuById.images,
         },
         include: {
           products: {
             include: {
+              categories: true,
               tags: true,
             },
           },
@@ -568,7 +631,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -600,7 +663,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> remove', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -638,7 +701,7 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -671,8 +734,21 @@ export class MenusService {
       console.log('Lỗi từ menus.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
+  }
+
+  private groupProductsByCategory(products) {
+    const groupedProducts = {};
+    products.forEach((product) => {
+      const categorySlug = product.categories.slug;
+      if (!groupedProducts[categorySlug]) {
+        groupedProducts[categorySlug] = [];
+      }
+      groupedProducts[categorySlug].push(product);
+    });
+
+    return groupedProducts;
   }
 }

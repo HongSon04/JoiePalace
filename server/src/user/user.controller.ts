@@ -75,7 +75,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('avatar', {
       fileFilter: (req, file, cb) => {
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,

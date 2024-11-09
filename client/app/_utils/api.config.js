@@ -1,6 +1,7 @@
 // HOST URL
 const HOST = `https://joieplace.live/api`;
 const MEMBERSHIPS = `https://joieplace.live/memberships`;
+const HOST_NO_API = `https://joieplace.live`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
@@ -14,9 +15,11 @@ const FEEDBACKS_API = `${HOST}/feedbacks`;
 const PARTYTYPES_API = `${HOST}/party-types`;
 const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
-const NOTIFICATIONS_API = `${HOST}/notifications`;
+const NOTIFICATIONS_API = `${HOST_NO_API}/notifications`;
 const MENU_API = `${HOST}/menus`;
 const PACKAGES = `${HOST}/packages`;
+const DECORS = `${HOST}/decors`;
+const STAGES = `${HOST}/stages`;
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
@@ -71,6 +74,12 @@ export const API_CONFIG = {
     DESTROY: (id) => `${BRANCHES_API}/destroy/${id}`,
   },
 
+  STAGES: {
+    CREATE: `${STAGES}/create`,
+    GET_ALL: (params) =>
+      constructUrlWithParams(`${STAGES}/get-all`, params),
+  },
+
   // CATEGORIES API
   CATEGORIES: {
     CREATE: `${CATEGORIES_API}/create`,
@@ -88,71 +97,13 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
-    GET_ALL_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_QUARTER: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_YEAR: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
-    // GET_ALL_BRANCH: `${HOST}/branches/get-all`,
-    GET_ALL_BOOKING: `${HOST}/bookings/get-all`,
-    GET_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_BOOKING_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-
-    GET_ALL_INFO_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-
-    GET_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_ALL_INFO_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-
-    GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
-    GET_ALL_INFO_EACH_TIME: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH: `${DASHBOARD_API}/total-revenue-for-all-branch-each-month`,
-    GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_QUARTER: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_YEAR: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
-    GET_ALL_BRANCH: `${HOST}/branches/get-all`,
-    GET_ALL_BOOKING: `${HOST}/bookings/get-all`,
-    GET_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_BOOKING_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_WEEK:  (id) =>  `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_MONTH:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_QUARTER:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_YEAR:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
+    GET_INFO_BY_MONTH:  (id) => `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
+    GET_ALL_INFO_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
   },
 
   // PRODUCTS API
@@ -180,6 +131,7 @@ export const API_CONFIG = {
     CREATE: `${FEEDBACKS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all`, params),
+    GET_ALL_USER: (`${FEEDBACKS_API}/get-all`),
     GET_ALL_SHOW: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all-show`, params),
     GET_ALL_HIDE: (params) =>
@@ -241,14 +193,17 @@ export const API_CONFIG = {
     RESTORE: (membershipId) => `${MEMBERSHIPS}/restore/${membershipId}`,
     HARD_DELETE: (membershipId) => `${MEMBERSHIPS}/hard-delete/${membershipId}`,
   },
+  DECORS: {
+    GET_ALL: (params) => constructUrlWithParams(`${DECORS}/get-all`, params),
+    GET_BY_ID: (id) => `${DECORS}/get/${id}`,
+  },
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
-    // Add endpoints here if needed
+    GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
   },
 
   // PACKAGES API
-
   PACKAGES: {
     GET_ALL: `${PACKAGES}/get-all`,
   },
@@ -271,6 +226,8 @@ export const API_CONFIG = {
     DESTROY: (id) => `${MENU_API}/destroy/${id}`,
   },
 };
+
+// NOTIFICATIONS_API
 
 // apiServices.js
 import axios from "axios";
@@ -383,5 +340,5 @@ export const fetchData = async (
   } else {
     dispatch(successAction(result));
   }
-  return result; // Return the result for further handling
+  return result; 
 };

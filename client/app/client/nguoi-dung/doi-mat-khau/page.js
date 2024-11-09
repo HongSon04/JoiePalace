@@ -5,6 +5,11 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import arrow_forward from '@/public/arrow_forward.svg';
+import { API_CONFIG } from "@/app/_utils/api.config";
+import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
 
 // Define Zod schema for validation
 const formSchema = z.object({
@@ -13,7 +18,7 @@ const formSchema = z.object({
   confirmPassword: z.string().min(6, { message: 'Xác nhận mật khẩu là bắt buộc' }),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: 'Mật khẩu mới và xác nhận mật khẩu không khớp!',
-  path: ['confirmPassword'], // Set the error on confirmPassword field
+  path: ['confirmPassword'],
 });
 
 // InputField Component with error handling
@@ -31,15 +36,54 @@ const InputField = ({ label, type, placeholder, name, register, error, trigger }
 );
 
 const Page = () => {
+  const toast = useCustomToast();
+  const { makeAuthorizedRequest } = useApiServices();
+  const router = useRouter();
+
+
   // Initialize `useForm` with `zodResolver`
   const { register, handleSubmit, formState: { errors }, trigger } = useForm({
     resolver: zodResolver(formSchema),
   });
 
   // Handle form submission
-  const onSubmit = (data) => {
-    console.log('Form data:', data);
-    // Handle form submit logic
+  const onSubmit = async (data) => {
+    const newData = {
+      oldPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword
+    }
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.USER.CHANGE_PASSWORD,
+        "PUT",
+        newData,
+        null,
+        '/client/dang-nhap'
+      );
+
+      if (response?.success) {
+        toast({
+          position: "top",
+          type: "success",
+          title: "Cập nhật thành công!",
+          closable: true,
+        });
+        Cookies.remove("accessToken");
+        localStorage.removeItem("user");
+        router.push('/client/dang-nhap');
+      } else {
+        toast({
+          position: "top",
+          type: "error",
+          title: "Cập nhật thất bại!",
+          description: response?.error?.message || "Vui lòng thử lại sau.",
+          closable: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
   };
 
   return (
@@ -57,7 +101,7 @@ const Page = () => {
             error={errors.currentPassword}
             trigger={trigger}
           />
-          
+
           {/* New Password Field */}
           <InputField
             label="Mật khẩu mới"
