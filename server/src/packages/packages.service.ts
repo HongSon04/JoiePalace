@@ -144,10 +144,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> create', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -177,10 +177,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findAll', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -212,10 +212,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findOne', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -245,10 +245,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -280,10 +280,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> findBySlug', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -418,10 +418,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> update', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -456,10 +456,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> remove', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -500,10 +500,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> restore', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -539,10 +539,10 @@ export class PackagesService {
         throw error;
       }
       console.log('Lỗi từ packages.service.ts -> delete', error);
-      throw new InternalServerErrorException(
-        'Đã có lỗi xảy ra, vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 }

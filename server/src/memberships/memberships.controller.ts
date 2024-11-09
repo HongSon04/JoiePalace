@@ -79,7 +79,7 @@ export class MembershipsController {
     FileFieldsInterceptor([{ name: 'images', maxCount: 5 }], {
       fileFilter: (req, file, cb) => {
         // Kiểm tra xem file có tồn tại không
-        if (!file) {
+        if (!file || req.files.images.length === 0) {
           return cb(
             new BadRequestException('Không có tệp nào được tải lên'),
             false,

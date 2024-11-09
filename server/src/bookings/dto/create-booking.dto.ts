@@ -7,7 +7,7 @@ export class CreateBookingDto {
     required: false,
     description: 'ID của người dùng (nếu có)',
   })
-  user_id?: number;
+  user_id?: string;
 
   @ApiProperty({
     required: true,
@@ -68,7 +68,7 @@ export class CreateBookingDto {
     required: false,
     description: 'Số lượng khách dự kiến',
   })
-  number_of_guests?: number;
+  number_of_guests?: string;
 
   @ApiProperty({
     required: false,

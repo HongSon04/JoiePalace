@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   HttpException,
   HttpStatus,
@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { PrismaService } from 'src/prisma.service';
@@ -15,7 +16,7 @@ import { PrismaService } from 'src/prisma.service';
 export class DashboardService {
   constructor(
     private prismaService: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     dayjs.locale('vi');
     dayjs.extend(weekOfYear);
@@ -75,7 +76,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> getAllInfo: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -122,7 +123,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> getAllInfoByEachTime: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -227,7 +228,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -275,7 +276,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> countAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -308,7 +309,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -349,7 +350,7 @@ export class DashboardService {
 
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -391,7 +392,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -442,7 +443,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -483,7 +484,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -532,7 +533,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -572,7 +573,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -644,7 +645,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -725,7 +726,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -807,7 +808,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -891,7 +892,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -968,7 +969,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1068,7 +1069,7 @@ export class DashboardService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1132,7 +1133,7 @@ export class DashboardService {
       console.log('Lỗi từ dashboardService -> countBookingStatus: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

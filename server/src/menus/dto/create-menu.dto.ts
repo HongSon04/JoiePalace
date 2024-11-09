@@ -21,7 +21,8 @@ export class CreateMenuDto {
     required: false,
     example: [1, 2, 3],
   })
-  products?: number[];
+  @IsNotEmpty({ message: 'Danh sách sản phẩm không được để trống' })
+  products: number[];
 
   @ApiProperty({
     description: 'Giá của menu, không được để trống',
@@ -34,8 +35,6 @@ export class CreateMenuDto {
     description: 'Menu có hiển thị cho khách hàng hay không',
     required: false,
   })
-  @IsBoolean({ message: 'Hiện thị phải là một giá trị boolean' })
-  @IsEnum([true, false], { message: 'Hiện thị phải là một giá trị boolean' })
   is_show: boolean;
 
   @ApiProperty({
