@@ -17,6 +17,8 @@ const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
 const PACKAGES = `${HOST}/packages`;
+const DECORS = `${HOST}/decors`;
+const STAGES = `${HOST}/stages`;
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
@@ -71,6 +73,12 @@ export const API_CONFIG = {
     DELETE: (id) => `${BRANCHES_API}/delete/${id}`,
     RESTORE: (id) => `${BRANCHES_API}/restore/${id}`,
     DESTROY: (id) => `${BRANCHES_API}/destroy/${id}`,
+  },
+
+  STAGES: {
+    CREATE: `${STAGES}/create`,
+    GET_ALL: (params) =>
+      constructUrlWithParams(`${STAGES}/get-all`, params),
   },
 
   // CATEGORIES API
@@ -243,6 +251,10 @@ export const API_CONFIG = {
     DELETE: (membershipId) => `${MEMBERSHIPS}/delete/${membershipId}`,
     RESTORE: (membershipId) => `${MEMBERSHIPS}/restore/${membershipId}`,
     HARD_DELETE: (membershipId) => `${MEMBERSHIPS}/hard-delete/${membershipId}`,
+  },
+  DECORS: {
+    GET_ALL: (params) => constructUrlWithParams(`${DECORS}/get-all`, params),
+    GET_BY_ID: (id) => `${DECORS}/get/${id}`,
   },
 
   // NOTIFICATIONS API

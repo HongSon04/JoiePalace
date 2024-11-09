@@ -45,17 +45,22 @@ export class MembershipsService {
         throw new NotFoundException('Tên hạng thành viên đã tồn tại');
       }
 
-      // ? Find many products in gift
-      const findManyProducts = await this.prismaService.products.findMany({
-        where: {
-          id: {
-            in: gifts,
-          },
-        },
-      });
+      // ? Kiểm tra xem gifts có tồn tại không
+      let giftsTagset = [];
+      // Handle tags if provided
+      if (gifts && gifts.length > 0) {
+        const giftsArray = JSON.parse(gifts as any);
+        const existingGifts = await this.prismaService.products.findMany({
+          where: { id: { in: giftsArray } },
+        });
 
-      if (findManyProducts.length !== gifts.length) {
-        throw new NotFoundException('Sản phẩm không tồn tại');
+        if (existingGifts.length !== giftsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        giftsTagset = existingGifts.map((gifts) => ({
+          id: Number(gifts.id),
+        }));
       }
 
       const images =
@@ -76,9 +81,9 @@ export class MembershipsService {
           slug,
           description,
           gifts: {
-            connect: gifts.map((id) => ({ id })),
+            connect: giftsTagset,
           },
-          booking_total_amount,
+          booking_total_amount: Number(booking_total_amount),
           images: images,
         },
       });
@@ -95,10 +100,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> create', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -126,10 +131,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> findAll', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -157,10 +162,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> findAllWithDeleted', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -192,10 +197,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> findOne', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -227,10 +232,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> findOneBySlug', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -258,12 +263,7 @@ export class MembershipsService {
 
       const findMembershipName = await this.prismaService.memberships.findFirst(
         {
-          where: {
-            OR: [{ name }, { slug }],
-            NOT: {
-              id: Number(id),
-            },
-          },
+          where: { AND: [{ name }, { id: { not: Number(id) } }] },
         },
       );
 
@@ -271,17 +271,22 @@ export class MembershipsService {
         throw new BadRequestException('Tên hạng thành viên đã tồn tại');
       }
 
-      // ? Find many products in gift
-      const findManyProducts = await this.prismaService.products.findMany({
-        where: {
-          id: {
-            in: gifts,
-          },
-        },
-      });
+      // ? Kiểm tra xem gifts có tồn tại không
+      let giftsTagset = [];
+      // Handle tags if provided
+      if (gifts && gifts.length > 0) {
+        const giftsArray = JSON.parse(gifts as any);
+        const existingGifts = await this.prismaService.products.findMany({
+          where: { id: { in: giftsArray } },
+        });
 
-      if (findManyProducts.length !== gifts.length) {
-        throw new NotFoundException('Sản phẩm không tồn tại');
+        if (existingGifts.length !== giftsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        giftsTagset = existingGifts.map((gifts) => ({
+          id: Number(gifts.id),
+        }));
       }
 
       let images;
@@ -306,9 +311,9 @@ export class MembershipsService {
           slug,
           description,
           gifts: {
-            set: gifts.map((id) => ({ id })),
+            set: giftsTagset,
           },
-          booking_total_amount,
+          booking_total_amount: Number(booking_total_amount),
           images: images ? images : findMembership.images,
         },
       });
@@ -325,10 +330,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> update', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -367,10 +372,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> remove', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -415,10 +420,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> restore', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 
@@ -458,10 +463,10 @@ export class MembershipsService {
         throw error;
       }
       console.log('Lỗi từ memberships.service.ts -> hardDelete', error);
-      throw new InternalServerErrorException(
-        'Lỗi server vui lòng thử lại',
-        error,
-      );
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
     }
   }
 }

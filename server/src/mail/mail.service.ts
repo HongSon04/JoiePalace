@@ -42,7 +42,7 @@ export class MailService {
       console.log('Lỗi từ MailService->EmailAppointmentSuccessful', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -58,14 +58,14 @@ export class MailService {
           name,
           email,
           date: dayjs().format('DD/MM/YYYY'),
-          confirmationLink: `${this.configService.get<string>('FRONTEND_URL')}/confirm-register?token=${token}`,
+          confirmationLink: `${this.configService.get<string>('BACKEND_URL')}confirm-register?token=${token}?email=${email}`,
         },
       });
     } catch (error) {
       console.log('Lỗi từ MailService->confirmRegister', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -101,7 +101,7 @@ export class MailService {
       console.log('Lỗi từ MailService->remindDeposit', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -121,7 +121,7 @@ export class MailService {
       console.log('Lỗi từ MailService->cancelAppointment', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -167,7 +167,7 @@ export class MailService {
       console.log('Lỗi từ MailService->sendMailToSubcribeUser', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -226,7 +226,7 @@ export class MailService {
           email,
           name: user.username,
           date: dayjs().format('DD/MM/YYYY'),
-          resetLink: `${this.configService.get<string>('FRONTEND_URL')}/reset-password?token=${token}`,
+          resetLink: `${this.configService.get<string>('FRONTEND_URL')}reset-password?token=${token}`,
         },
       });
 
@@ -244,7 +244,33 @@ export class MailService {
       console.log('Lỗi từ MailService->sendMailForgotPassword', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
+      });
+    }
+  }
+
+  // ! Gửi mail khi người dùng đăng nhập lần đầu bằng Mạng xã hội
+  async sendMailFirstLoginSocial(
+    email: string,
+    name: string,
+    password: string,
+  ) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Đăng nhập lần đầu',
+        template: 'send-password-social',
+        context: {
+          email,
+          name,
+          password,
+        },
+      });
+    } catch (error) {
+      console.log('Lỗi từ MailService->sendMailFirstLoginSocial', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
       });
     }
   }

@@ -118,7 +118,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -232,7 +232,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -346,7 +346,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findAllDeleted', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -377,7 +377,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -412,7 +412,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> get10PerCategory', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -444,7 +444,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findBySlug', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -556,7 +556,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findByCategoryId', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -672,7 +672,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> findByTagId', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -695,9 +695,9 @@ export class ProductsService {
         throw new NotFoundException('Sản phẩm không tồn tại');
       }
 
-      // Check product existence by name
+      // Check product existence by name and not the same id
       const findProductByName = await this.prismaService.products.findFirst({
-        where: { name, id: { not: Number(id) } },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
       if (findProductByName) {
         throw new BadRequestException('Tên Sản phẩm đã tồn tại');
@@ -779,7 +779,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -818,7 +818,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> deleteProduct', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -859,7 +859,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> restoreproduct', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -896,7 +896,7 @@ export class ProductsService {
       console.log('Lỗi từ products.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

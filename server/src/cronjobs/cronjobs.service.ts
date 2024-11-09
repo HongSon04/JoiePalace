@@ -44,70 +44,86 @@ export class CronjobsService {
   async handleBookingExpiredCron() {
     try {
       const currentDate = new Date();
-      // ! Check booking expired_at
-      const bookings = await this.prismaService.bookings.findMany({
-        where: {
-          deleted: false,
-          expired_at: {
-            gte: currentDate,
-          },
-        },
-      });
 
-      // Xóa booking nếu hết hạn
-      bookings.map(async (booking) => {
-        // ? Xóa booking
-        await this.prismaService.bookings.update({
-          where: { id: Number(booking.id) },
-          data: {
-            deleted: true,
-            deleted_at: new Date(),
-            deleted_by: 1,
-            status: 'cancel',
-          },
-        });
-      });
+      // Thực hiện các operations song song để tăng performance
+      const [expiredBookings, expiredDeposits] = await Promise.all([
+        // Lấy và cập nhật bookings hết hạn
+        this.prismaService.$transaction(async (prisma) => {
+          const bookings = await prisma.bookings.findMany({
+            where: {
+              deleted: false,
+              status: 'pending',
+              expired_at: {
+                gte: currentDate,
+              },
+            },
+          });
 
-      // ! Check deposit expired_at
-      const deposits = await this.prismaService.deposits.findMany({
-        where: {
-          expired_at: {
-            gte: currentDate,
-          },
-        },
-      });
+          if (bookings.length > 0) {
+            await prisma.bookings.updateMany({
+              where: {
+                id: {
+                  in: bookings.map((booking) => Number(booking.id)),
+                },
+              },
+              data: {
+                deleted: true,
+                deleted_at: currentDate,
+                deleted_by: 1,
+                status: 'cancel',
+              },
+            });
+          }
 
-      // Xóa deposit nếu hết hạn
-      deposits.map(async (deposit) => {
-        // ? Xóa deposit
-        await this.prismaService.deposits.delete({
-          where: { id: Number(deposit.id) },
-        });
-      });
+          return bookings;
+        }),
 
-      // ! Send Notification
-      const contents: any = {
-        name: 'Hệ thống',
-        content: 'Đã xóa những đơn đặt tiệc hết hạn',
-        type: TypeNotifyEnum.BOOKING_CANCEL,
-      };
+        // Lấy và cập nhật deposits hết hạn
+        this.prismaService.$transaction(async (prisma) => {
+          const deposits = await prisma.deposits.findMany({
+            where: {
+              status: 'pending',
+              expired_at: {
+                gte: currentDate,
+              },
+            },
+          });
 
-      await this.notificationService.sendNotifications(
-        contents.name,
-        contents.content,
-        null,
-        contents.type,
-      );
+          if (deposits.length > 0) {
+            await prisma.deposits.updateMany({
+              where: {
+                id: {
+                  in: deposits.map((deposit) => Number(deposit.id)),
+                },
+              },
+              data: {
+                status: 'cancel',
+              },
+            });
+          }
 
-      // ! Send Email Booking if is_deposit is false
-      deposits.map(async (deposit) => {
-        // Send Mail
-        const bodyMail = {
-          name: deposit.name,
-          email: deposit.email,
-        };
-        await this.mailService.cancelAppointment(bodyMail.name, bodyMail.email);
-      });
+          return deposits;
+        }),
+      ]);
+
+      // Nếu có bất kỳ booking hoặc deposit nào bị hủy
+      if (expiredBookings.length > 0 || expiredDeposits.length > 0) {
+        // Gửi thông báo hệ thống
+        const notificationPromise = this.notificationService.sendNotifications(
+          'Hệ thống',
+          'Đã xóa những đơn đặt tiệc hết hạn',
+          null,
+          TypeNotifyEnum.BOOKING_CANCEL,
+        );
+
+        // Gửi email cho các deposit
+        const emailPromises = expiredDeposits.map((deposit) =>
+          this.mailService.cancelAppointment(deposit.name, deposit.email),
+        );
+
+        // Chờ tất cả các operations hoàn thành
+        await Promise.all([notificationPromise, ...emailPromises]);
+      }
 
       console.log('Cron Job check booking expired_at and delete it');
     } catch (error) {

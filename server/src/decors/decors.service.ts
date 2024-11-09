@@ -42,20 +42,31 @@ export class DecorsService {
         throw new BadRequestException('Tên trang trí đã tồn tại');
       }
 
-      // Kiểm tra sản phẩm
-      const foundProducts = await this.prismaService.products.findMany({
-        where: { id: { in: products } },
-      });
+      // ? Kiểm tra sản phẩm
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
 
-      if (foundProducts.length !== products.length) {
-        throw new NotFoundException('Sản phẩm không tồn tại');
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
       }
 
-      // Tính toán tổng giá
-      const totalPrice = foundProducts.reduce(
-        (total, product) => Number(total) + Number(product.price),
-        0,
-      );
       if (Number(totalPrice) < Number(price)) {
         throw new BadRequestException('Giá trang trí không hợp lệ');
       }
@@ -79,7 +90,7 @@ export class DecorsService {
           short_description,
           images: imagesDecor as any,
           products: {
-            connect: products.map((product) => ({ id: Number(product) })),
+            connect: productsTagSet,
           },
         },
         include: {
@@ -105,7 +116,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> create', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -254,7 +265,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> findAll', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -438,7 +449,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> findOne', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -461,7 +472,7 @@ export class DecorsService {
       }
 
       const findDecorByName = await this.prismaService.decors.findFirst({
-        where: { name, NOT: { id: Number(id) } },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (findDecorByName) {
@@ -469,30 +480,41 @@ export class DecorsService {
       }
 
       // ? Kiểm tra sản phẩm
-      const foundProducts = await this.prismaService.products.findMany({
-        where: { id: { in: products } },
-      });
+      let productsTagSet = [];
+      let totalPrice = 0;
+      // Handle tags if provided
+      if (products && products.length > 0) {
+        const productsArray = JSON.parse(products as any);
+        const existingProducts = await this.prismaService.products.findMany({
+          where: { id: { in: productsArray } },
+        });
 
-      if (foundProducts.length !== products.length) {
-        throw new NotFoundException('Sản phẩm không tồn tại');
+        totalPrice = existingProducts.reduce(
+          (total, product) => total + Number(product.price),
+          0,
+        );
+
+        if (existingProducts.length !== productsArray.length) {
+          throw new NotFoundException('Một hoặc nhiều sản phẩm không tồn tại');
+        }
+
+        // Set tagsSet if tags exist
+        productsTagSet = existingProducts.map((product) => ({
+          id: Number(product.id),
+        }));
       }
 
-      // ? Tính toán tổng giá
-      const totalPrice = foundProducts.reduce(
-        (total, product) => total + product.price,
-        0,
-      );
-
-      if (totalPrice < Number(price)) {
+      if (Number(totalPrice) < Number(price)) {
         throw new BadRequestException('Giá trang trí không hợp lệ');
       }
+
       const dataToUpdate: any = {
         name,
         price: Number(price),
         description,
         short_description,
         products: {
-          set: products.map((product) => ({ id: product })),
+          set: productsTagSet,
         },
       };
 
@@ -537,7 +559,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> update', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -573,7 +595,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> delete', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -611,7 +633,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> restore', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -651,7 +673,7 @@ export class DecorsService {
       console.log('Lỗi từ decors.service.ts -> destroy', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

@@ -172,7 +172,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -239,15 +239,15 @@ export class BookingsService {
 
       // Add numeric ID filters with type checking
       const numericFilters = [
-        { field: 'branch_id', value: query.branch_id },
-        { field: 'user_id', value: query.user_id },
-        { field: 'stage_id', value: query.stage_id },
-        { field: 'party_type_id', value: query.party_type_id },
+        { field: 'branch_id', value: Number(query.branch_id) },
+        { field: 'user_id', value: Number(query.user_id) },
+        { field: 'stage_id', value: Number(query.stage_id) },
+        { field: 'party_type_id', value: Number(query.party_type_id) },
       ];
 
       numericFilters.forEach(({ field, value }) => {
         if (value) {
-          whereConditions[field] = parseInt(String(value), 10);
+          whereConditions[field] = Number(value);
         }
       });
 
@@ -256,13 +256,13 @@ export class BookingsService {
         whereConditions.booking_details = {
           some: {
             ...(query.decor_id && {
-              decor_id: parseInt(String(query.decor_id), 10),
+              decor_id: Number(query.decor_id),
             }),
             ...(query.deposit_id && {
-              deposit_id: parseInt(String(query.deposit_id), 10),
+              deposit_id: Number(query.deposit_id),
             }),
             ...(query.menu_id && {
-              menu_id: parseInt(String(query.menu_id), 10),
+              menu_id: Number(query.menu_id),
             }),
           },
         };
@@ -356,7 +356,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -415,7 +415,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> findOne: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -513,7 +513,7 @@ export class BookingsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -570,7 +570,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> updateStatus: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -616,23 +616,6 @@ export class BookingsService {
       }
       if (!findStages) {
         throw new NotFoundException('Không tìm thấy sảnh');
-      }
-
-      const checkDateAndShift = await this.prismaService.bookings.findMany({
-        where: {
-          deleted: false,
-          organization_date: findBooking.organization_date,
-          shift: findBooking.shift,
-          branch_id: findBooking.branch_id,
-          stage_id: Number(stage_id),
-          NOT: { id: Number(id) },
-        },
-      });
-
-      if (checkDateAndShift.length > 0) {
-        throw new BadRequestException(
-          'Đã có sự kiện tổ chức vào thời gian này',
-        );
       }
 
       // Status = true =? Check Rank User
@@ -770,19 +753,19 @@ export class BookingsService {
       // ? Calculate accessory amounts
       let tableAmount = Number(table_count) * 200000;
       let spareTableAmount = Number(spare_table_count) * 200000;
-      let chair_count = table_count * 10;
-      let spare_chair_count = spare_table_count * 10;
+      let chair_count = Number(table_count) * 10;
+      let spare_chair_count = Number(spare_table_count) * 10;
       let chairAmount = chair_count * 50000;
       let spareChairAmount = spare_chair_count * 50000;
       let totalMenuAmount = Number(menu.price) * Number(table_count);
 
-      if (table_count > findStages.capacity_max) {
+      if (Number(table_count) > Number(findStages.capacity_max)) {
         throw new BadRequestException(
           'Số lượng bàn vượt quá sức chứa của sảnh',
         );
       }
 
-      if (table_count < findStages.capacity_min) {
+      if (Number(table_count) < Number(findStages.capacity_min)) {
         throw new BadRequestException(
           'Số lượng bàn quá ít so với sức chứa tối thiểu của sảnh',
         );
@@ -1162,7 +1145,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1194,7 +1177,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> delete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1236,7 +1219,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> restore: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -1291,7 +1274,7 @@ export class BookingsService {
       console.log('Lỗi từ booking.service.ts -> destroy: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

@@ -27,6 +27,7 @@ export class CreateMembershipDto {
     required: true,
     example: [1, 2, 3],
   })
+  @IsNotEmpty({ message: 'Danh sách quà tặng không được để trống' })
   gifts: number[];
 
   @ApiProperty({
@@ -34,5 +35,5 @@ export class CreateMembershipDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Tổng tiền đã đặt tiệc không được để trống' })
-  booking_total_amount: number;
+  booking_total_amount: string;
 }
