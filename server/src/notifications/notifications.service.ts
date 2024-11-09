@@ -182,7 +182,6 @@ export class NotificationsService {
   // ! Update Is Read Notification by ID
   async updateIsReadNotification(notify_id: number[]) {
     try {
-      console.log('notify_id: ', notify_id);
       // ? Kiểm tra sản phẩm
       // Handle tags if provided
       if (notify_id && notify_id.length > 0) {
