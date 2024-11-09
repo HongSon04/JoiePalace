@@ -15,4 +15,10 @@ export class FilterCategoryDto {
     description: 'Ngày kết thúc (ngày tạo sản phẩm)',
   })
   endDate?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Trạng thái đã xóa hay chưa',
+  })
+  deleted: boolean;
 }
