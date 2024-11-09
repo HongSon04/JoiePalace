@@ -22,32 +22,37 @@ export class StagesService {
   // ! Create stage
   async create(body: StageDto, files: { images?: Express.Multer.File[] }) {
     try {
-      const findBranch = await this.prismaService.branches.findUnique({
-        where: { id: Number(body.branch_id) },
-      });
-      if (!findBranch) {
-        throw new NotFoundException('Không tìm thấy chi nhánh');
-      }
+      const { name, description, capacity_min, capacity_max, branch_id } = body;
+
       if (!files.images) {
         throw new BadRequestException('Không được để trống ảnh');
       }
+
+      const findBranch = await this.prismaService.branches.findUnique({
+        where: { id: Number(branch_id) },
+      });
+
+      if (!findBranch) {
+        throw new NotFoundException('Không tìm thấy chi nhánh');
+      }
+
       const stagesImages =
         await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/stages',
         );
-      if (!stagesImages) {
+      if (stagesImages.length === 0) {
         throw new BadRequestException('Lỗi khi upload ảnh, vui lòng thử lại');
       }
 
       const stagesRes = await this.prismaService.stages.create({
         data: {
-          branch_id: Number(body.branch_id),
-          name: body.name,
-          description: body.description,
+          branch_id: Number(branch_id),
+          name: name,
+          description: description,
           images: stagesImages as any,
-          capacity_min: Number(body.capacity_min),
-          capacity_max: Number(body.capacity_max),
+          capacity_min: Number(capacity_min),
+          capacity_max: Number(capacity_max),
         },
       });
 
@@ -65,7 +70,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -76,12 +81,13 @@ export class StagesService {
       if (branch_id) {
         const findBranch = await this.prismaService.branches.findUnique({
           where: { id: Number(branch_id) },
+          include: { stages: true },
         });
         if (!findBranch) {
           throw new NotFoundException('Không tìm thấy chi nhánh');
         }
         const stages = await this.prismaService.stages.findMany({
-          where: { id: Number(branch_id) },
+          where: { branch_id: Number(branch_id) },
         });
         throw new HttpException(
           { message: 'Thành công', data: stages },
@@ -101,7 +107,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> getAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -126,7 +132,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> getStageById: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -138,6 +144,7 @@ export class StagesService {
     files: { images?: Express.Multer.File[] },
   ) {
     try {
+      const { name, description, capacity_min, capacity_max, branch_id } = body;
       const findStage = await this.prismaService.stages.findUnique({
         where: { id: Number(stage_id) },
       });
@@ -147,7 +154,7 @@ export class StagesService {
       }
 
       const findStageByName = await this.prismaService.stages.findFirst({
-        where: { name: body.name, id: { not: Number(stage_id) } },
+        where: { AND: [{ name }, { id: { not: Number(stage_id) } }] },
       });
 
       if (findStageByName) {
@@ -156,12 +163,12 @@ export class StagesService {
         );
       }
 
-      const updateData: StageUpdateDto = {
-        branch_id: Number(body.branch_id),
-        name: body.name,
-        description: body.description,
-        capacity_min: Number(body.capacity_min),
-        capacity_max: Number(body.capacity_max),
+      const updateData = {
+        branch_id: Number(branch_id),
+        name: name,
+        description: description,
+        capacity_min: Number(capacity_min),
+        capacity_max: Number(capacity_max),
         images: findStage.images,
       };
 
@@ -172,7 +179,7 @@ export class StagesService {
             'joiepalace/stages',
           );
 
-        if (!stagesImages || stagesImages.length === 0) {
+        if (stagesImages.length === 0) {
           throw new BadRequestException('Lỗi khi upload ảnh, vui lòng thử lại');
         }
 
@@ -203,7 +210,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -229,7 +236,7 @@ export class StagesService {
       console.log('Lỗi từ stages.service.ts -> delete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

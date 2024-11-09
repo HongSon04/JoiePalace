@@ -705,3 +705,11 @@ select {
   background-image: url(/line-group.svg);
   background-size: cover;
 }
+.affterLine::after{
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 264px;
+  background-image: url(/line-group.svg);
+  background-size: cover;
+}

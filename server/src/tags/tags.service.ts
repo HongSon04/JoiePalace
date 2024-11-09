@@ -51,7 +51,7 @@ export class TagsService {
       console.log('Lỗi từ tag.service.ts -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -109,7 +109,7 @@ export class TagsService {
       console.log('Lỗi từ tag.service.ts -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -136,7 +136,7 @@ export class TagsService {
       console.log('Lỗi từ tag.service.ts -> findOne: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -163,7 +163,7 @@ export class TagsService {
       console.log('Lỗi từ tag.service.ts -> findBySlug: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -180,7 +180,7 @@ export class TagsService {
         throw new NotFoundException({ message: 'Tag không tồn tại' });
       }
       const findTagByName = await this.prismaService.tags.findFirst({
-        where: { name, id: { not: Number(id) } },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
       if (findTagByName) {
         throw new BadRequestException({ message: 'Tag đã tồn tại' });
@@ -203,7 +203,7 @@ export class TagsService {
       console.log('Lỗi từ tag.service.ts -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -228,7 +228,7 @@ export class TagsService {
       console.log('Lỗi từ tag.service.ts -> remove: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

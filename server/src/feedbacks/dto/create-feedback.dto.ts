@@ -21,7 +21,7 @@ export class CreateFeedbackDto {
     required: false,
   })
   @IsOptional()
-  user_id?: number;
+  user_id?: string;
 
   @ApiProperty({
     description: 'Tên của người gửi phản hồi, không được để trống',
@@ -37,7 +37,7 @@ export class CreateFeedbackDto {
   @IsNotEmpty({ message: 'Đánh giá không được để trống' })
   @Min(1, { message: 'Đánh giá phải lớn hơn hoặc bằng 1' })
   @Max(5, { message: 'Đánh giá phải nhỏ hơn hoặc bằng 5' })
-  rate: number;
+  rate: string;
 
   @ApiProperty({
     description: 'Nội dung phản hồi, không được để trống',

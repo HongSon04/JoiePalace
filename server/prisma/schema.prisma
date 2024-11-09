@@ -75,6 +75,7 @@ model users {
   bookings       bookings[]
   feedbacks      feedbacks[]
   notifications  notifications[]
+  menus          menus[]
 }
 
 model memberships {
@@ -132,7 +133,7 @@ model branches {
 model stages {
   id           Int        @id @default(autoincrement())
   branch       branches   @relation(fields: [branch_id], references: [id])
-  branch_id    Int        @unique
+  branch_id    Int
   name         String
   description  String
   images       String[]
@@ -199,6 +200,8 @@ model products {
 
 model menus {
   id              Int               @id @default(autoincrement())
+  user_id         Int?
+  users           users?            @relation(fields: [user_id], references: [id])
   name            String
   slug            String            @unique
   description     String
@@ -316,9 +319,10 @@ model booking_details {
   spare_table_price Int      @default(0)
   spare_chair_count Int      @default(0)
   spare_chair_price Int      @default(0)
-  party_types       Json?
-  decor             Json?
-  menu              Json?
+  party_type_detail Json?
+  decor_detail      Json?
+  menu_detail       Json?
+  stage_detail      Json?
   other_service     Json?
   extra_service     Json?
   gift              Json?

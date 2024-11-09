@@ -22,7 +22,7 @@ export class CreateUserDto {
     description: 'ID của chi nhánh (nếu có)',
   })
   @IsOptional()
-  branch_id?: number;
+  branch_id?: string;
 
   @ApiProperty({
     required: true,

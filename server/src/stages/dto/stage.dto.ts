@@ -25,14 +25,14 @@ export class StageDto {
     description: 'Số lượng bàn tối thiểu',
   })
   @IsNotEmpty({ message: 'Số lượng bàn tối thiểu không được để trống' })
-  capacity_min: number;
+  capacity_min: string;
 
   @ApiProperty({
     type: Number,
     description: 'Số lượng bàn tối đa',
   })
   @IsNotEmpty({ message: 'Số lượng bàn tối đa không được để trống' })
-  capacity_max: number;
+  capacity_max: string;
 
   @ApiProperty({
     type: [String],

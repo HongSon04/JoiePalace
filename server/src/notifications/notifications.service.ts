@@ -50,7 +50,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> sendNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -58,8 +58,10 @@ export class NotificationsService {
   // ! Get Notifications by user_id
   async getNotifications(user_id: number, query: FilterDto) {
     try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
+      const page = query.page ? parseInt(query.page, 10) : 1;
+      const itemsPerPage = query.itemsPerPage
+        ? parseInt(query.itemsPerPage, 10)
+        : 10;
       const skip = (page - 1) * itemsPerPage;
 
       const [res, total] = await this.prismaService.$transaction([
@@ -105,7 +107,7 @@ export class NotificationsService {
       console.log('Lỗi từ NotificationsService -> getNotifications: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -172,7 +174,7 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -216,7 +218,7 @@ export class NotificationsService {
       );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

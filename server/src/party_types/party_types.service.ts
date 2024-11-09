@@ -54,10 +54,10 @@ export class PartyTypesService {
 
       // Kiểm tra giá
       const totalProductPrice = foundProducts.reduce(
-        (total, product) => total + product.price,
+        (total, product) => total + Number(product.price),
         0,
       );
-      if (totalProductPrice !== price) {
+      if (Number(totalProductPrice) !== Number(price)) {
         throw new BadRequestException('Giá loại tiệc không chính xác');
       }
 
@@ -104,7 +104,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> create: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -191,7 +191,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -278,7 +278,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findAll: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -315,7 +315,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> findOne: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -340,10 +340,7 @@ export class PartyTypesService {
 
       // Kiểm tra tên loại tiệc
       const existingPartyType = await this.prismaService.party_types.findFirst({
-        where: {
-          name,
-          NOT: { id: Number(id) },
-        },
+        where: { AND: [{ name }, { id: { not: Number(id) } }] },
       });
 
       if (existingPartyType) {
@@ -425,7 +422,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> update: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -461,7 +458,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> remove: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -503,7 +500,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> restore: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }
@@ -543,7 +540,7 @@ export class PartyTypesService {
       console.log('Lỗi từ partyTypesService -> hardDelete: ', error);
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error,
+        error: error.message,
       });
     }
   }

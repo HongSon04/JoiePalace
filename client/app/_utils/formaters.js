@@ -5,6 +5,7 @@ export function formatDateTime(dateTime) {
   return date.toLocaleString();
 }
 
+
 export function ISOStringToDateTimeString(isoString) {
   const date = new Date(isoString);
   return date.toLocaleString();

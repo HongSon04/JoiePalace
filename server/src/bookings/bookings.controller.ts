@@ -416,7 +416,6 @@ export class BookingsController {
 
   // ! Update Booking
   @Patch('update/:booking_id')
-  @isPublic()
   @ApiOperation({
     summary: 'Cập nhật thông tin một đơn tiệc',
     description: `Cách tính tổng tiền tiệc:
@@ -497,7 +496,7 @@ amount sẽ gửi lên BE check trùng giá thì pass`,
   })
   update(
     @Request() req,
-    @Param('update/booking_id') id: number,
+    @Param('booking_id') id: number,
     @Body() updateBookingDto: UpdateBookingDto,
   ) {
     return this.bookingsService.update(req.user, id, updateBookingDto);

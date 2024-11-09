@@ -1,8 +1,15 @@
+// ButtonCustomAdmin.js
 import React from 'react';
 
-const ButtonCustomAdmin = ({ id, title, svg , bgColor, textColor}) => {
+const ButtonCustomAdmin = ({ title, svg, bgColor, textColor, onClick }) => {
     return (
-            <button id={id} className={`flex gap-2 items-center px-3 py-2 ${textColor} leading-5 font-semibold ${bgColor} rounded-lg ml-auto`}>{svg}{title}</button>
+        <button
+            onClick={onClick}
+            className={`flex items-center gap-2 px-3 py-2 ${textColor} ${bgColor} rounded-lg`}
+        >
+            {svg}
+            <span>{title}</span>
+        </button>
     );
 };
 

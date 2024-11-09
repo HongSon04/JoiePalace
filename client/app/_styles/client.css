@@ -62,6 +62,9 @@
     align-items: center;
     flex: none !important;
 }
+#location__section-6 #bg_fill {
+    background-color: rgb(88 79 79 / 46%);
+}
 #location__section-5 .fp-overflow {
     display: flex;
     flex-direction: column;

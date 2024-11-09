@@ -34,5 +34,5 @@ export class CreateMembershipDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Tổng tiền đã đặt tiệc không được để trống' })
-  booking_total_amount: number;
+  booking_total_amount: string;
 }

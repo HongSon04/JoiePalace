@@ -42,7 +42,7 @@ export class CreateProductDto {
     required: true,
   })
   @IsNotEmpty({ message: 'Giá không được để trống' })
-  price: number;
+  price: string;
 
   @ApiProperty({
     description: 'Ảnh sản phẩm, không được để trống',
