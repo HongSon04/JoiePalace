@@ -161,14 +161,8 @@ export class AuthService {
         },
       });
 
-      if (user.platform !== platform && user.platform !== null) {
-        throw new BadRequestException(
-          'Tài khoản đã đăng nhập bằng mạng xã hội khác',
-        );
-      }
-
+      // ? Tạo user mới
       if (!user) {
-        // ? Tạo user mới
         const uuidPassword = uniqid().toLocaleUpperCase();
         const hashedPassword = this.hashedPassword(uuidPassword);
         const newUser = await this.prismaService.users.create({
@@ -201,6 +195,13 @@ export class AuthService {
             data: token,
           },
           HttpStatus.OK,
+        );
+      }
+
+      // Kiểm tra platform nếu user đã tồn tại
+      if (user.platform !== platform && user.platform !== null) {
+        throw new BadRequestException(
+          'Tài khoản đã đăng nhập bằng mạng xã hội khác',
         );
       }
 
