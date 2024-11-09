@@ -39,6 +39,7 @@ export const API_CONFIG = {
     LOGOUT: `${AUTH_API}/logout`,
     REFRESH_TOKEN: `${AUTH_API}/refresh-token`,
     UPLOAD_AVATAR: `${AUTH_API}/upload-avatar`,
+    LOGIN_GOOLGE: `${AUTH_API}/login-social`,
   },
 
   // USER API
@@ -181,7 +182,7 @@ export const API_CONFIG = {
     CREATE: `${FEEDBACKS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all`, params),
-    GET_ALL_USER: (`${FEEDBACKS_API}/get-all`),
+    GET_ALL_USER: `${FEEDBACKS_API}/get-all`,
     GET_ALL_SHOW: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all-show`, params),
     GET_ALL_HIDE: (params) =>

@@ -322,7 +322,7 @@ const Page = () => {
 
   useEffect(() => {
     const fecthData = async () => {
-      const data = await axios.get("https://joieplace.live/api/menus/get-all");
+      const data = await axios.get("https://joieplace.live/packages/get-all");
       setData(data);
       console.log(data);
     };

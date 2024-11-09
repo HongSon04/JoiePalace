@@ -29,4 +29,12 @@ export const loginAccountUser = async (dataToSend) => {
 
   return response;
 };
+export const loginGoogle = async (dataToSend) => {
+  const response = await axios.post(API_CONFIG.AUTH.LOGIN_GOOLGE, dataToSend);
 
+  if (response.status !== 200 && response.status !== 201) {
+    throw new Error("Có lỗi khi đăng nhập");
+  }
+
+  return response;
+};

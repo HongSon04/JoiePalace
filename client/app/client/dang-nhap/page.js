@@ -5,13 +5,14 @@ import useCustomToast from "@/app/_hooks/useCustomToast";
 import { Image } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { loginAccountUser } from "@/app/_services/accountServices";
+import { loginAccountUser, loginGoogle } from "@/app/_services/accountServices";
 import { decodeJwt } from "@/app/_utils/helpers";
 import useApiServices from "@/app/_hooks/useApiServices";
-import { login } from "@/app/_lib/features/authentication/accountSlice";
 import { useDispatch } from "react-redux";
+import { useSession, signIn } from "next-auth/react";
+import { GetPlatform, getSessionData } from "@/app/_utils/nextAuth";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -21,12 +22,15 @@ const formSchema = z.object({
   password: z.string().min(8, "Tối thiểu 8 kí tự!").max(36, "Tối đa 36 kí tự!"),
 });
 const Page = () => {
+  const { data } = useSession();
   const router = useRouter();
   const toast = useCustomToast();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { tryCatchWrapper, makeAuthorizedRequest } = useApiServices();
   const dispatch = useDispatch();
+  const platform = GetPlatform();
+  const [isLoginCalled, setIsLoginCalled] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -41,6 +45,12 @@ const Page = () => {
     }));
   };
 
+  const handleLoginGoogle = async (e) => {
+    e.preventDefault();
+    await signIn("google");
+  };
+
+  // login by account
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = {};
@@ -66,9 +76,16 @@ const Page = () => {
         user = decodeJwt(result.data.access_token);
         localStorage.setItem(
           "user",
-          JSON.stringify({ id: user.id, name: user.username, email: user.email, memberships: user.memberships, phone: user.phone, role: user.role })
+          JSON.stringify({
+            id: user.id,
+            name: user.username,
+            email: user.email,
+            memberships: user.memberships,
+            phone: user.phone,
+            role: user.role,
+          })
         );
-      } 
+      }
       toast({
         position: "top",
         type: result.success === false ? "error" : "success",
@@ -103,6 +120,62 @@ const Page = () => {
       setErrors(validationErrors);
     }
   };
+
+  console.log("data", data);
+
+  // call api login social
+  const callToApiLoginSocial = async () => {
+    if (isLoginCalled) return;
+    setIsLoginCalled(true);
+    let user = null;
+    const response = await loginGoogle({
+      email: data?.user?.email.toString(),
+      name: data?.user?.name.toString(),
+      platform: platform ? platform : "Windows",
+    });
+    if (response.status === 200) {
+      user = decodeJwt(response.data.data.access_token);
+      Cookies.set("accessToken", response.data.data.access_token, {
+        expires: 1,
+      });
+      localStorage.setItem("refreshToken", response.data.data.refresh_token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: user.id,
+          name: user.username,
+          email: user.email,
+          memberships: user.memberships,
+          phone: user.phone,
+          role: user.role,
+          avatar: data?.user?.image,
+          accountGoogle: true,
+        })
+      );
+      toast({
+        position: "top",
+        type: "success",
+        title: `"Đăng nhập thành công!"`,
+        description: `Chào mừng ${data?.user?.name} đã trở lại ✌️`,
+        closable: true,
+      });
+      router.push("/");
+    } else {
+      toast({
+        position: "top",
+        type: "error",
+        title: `"Đăng nhập thất bại!"`,
+        description: `Đã có lỗi khi đăng nhập với Google`,
+        closable: true,
+      });
+    }
+    setIsLoginCalled(false);
+  };
+  console.log("platform", platform);
+
+  if (data && platform !== null) {
+    callToApiLoginSocial();
+  }
   return (
     <div className="w-screen h-screen flex relative gap-28 items-center justify-center">
       <div className="w-1/2 h-full overflow-hidden">
@@ -117,7 +190,7 @@ const Page = () => {
       <Image className="absolute" src="/decor_cover" alt="" />
       <div className="w-1/2 h-full pr-28 flex items-center">
         <div className="p-6 flex flex-col w-full max-w-[490px] bg-blackAlpha-500 gap-4">
-          <h1 className="text-4xl font-black text-gold">Đăng ký</h1>
+          <h1 className="text-4xl font-black text-gold">Đăng nhập</h1>
           <span className="text-base">
             Nhập thông tin liên hệ để trở thành thành viên của chúng tôi
           </span>
@@ -168,10 +241,22 @@ const Page = () => {
               )}
             </IconButton>
             <span className="flex w-full justify-center font-light">Hoặc</span>
-            <button className="w-fit rounded-full bg-white text-black flex items-center gap-2 py-3 px-5 m-auto">
+            <button
+              onClick={handleLoginGoogle}
+              className="w-fit rounded-full bg-white text-black flex items-center gap-2 py-3 px-5 m-auto"
+            >
               <Image w={"auto"} h={"auto"} src="/googeIcon.svg" alt="" />
               <span className="font-medium">Đăng nhập bằng Google</span>
             </button>
+            <span className="text-center text-gold text-base font-normal">
+              Bạn chưa có tài khoản?{" "}
+              <span
+                className="cursor-pointer text-gold"
+                onClick={() => router.push("/client/dang-ky")}
+              >
+                Đăng ký ngay
+              </span>
+            </span>
           </form>
         </div>
       </div>
