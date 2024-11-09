@@ -13,6 +13,8 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import HeaderClient from "./_components/HeaderClient";
 import Contact from "./_components/Contact";
+import WeddingPackages from "@/app/_components/pakageService";
+import ToolCreactCombo from "./_components/ToolCreactCombo";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -268,7 +270,7 @@ function Home() {
             ))}
           </div>
         </section>
-        {/* events */}
+        {/* events */} 
         <section className="section relative w-screen" id="section-services">
           <TextFade
             settings={{
@@ -351,6 +353,14 @@ function Home() {
               </div>
             ))}
           </MultiCarousel>
+        </section>
+       
+        {/*WeddingPackages*/}
+        <section className="section">
+          <WeddingPackages></WeddingPackages>
+        </section>
+        <section className="section">
+          <ToolCreactCombo></ToolCreactCombo>
         </section>
         {/* services */}
         <section
