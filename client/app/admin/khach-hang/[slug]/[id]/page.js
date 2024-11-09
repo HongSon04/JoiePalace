@@ -1,396 +1,102 @@
+"use client"
 import AdminHeader from "@/app/_components/AdminHeader";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { PiMedalLight } from "react-icons/pi";
-const page = () => {
+import { login } from "@/app/_lib/features/authentication/accountSlice";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import { getUserById } from "@/app/_services/apiServices";
+import BookingsTable from "../BookingsTable";
+const Page = ({params}) => {
+  const userID = params.id;
+  // console.log(userID);
+  
+  const [dataUser, setDataUser] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // console.log(userID);
+        const userData = await getUserById(userID);
+        const dataUser = userData?.data[0]; ;
+        // console.log(dataUser);
+        setDataUser(dataUser); 
+       
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }    
+    };
+    fetchData();
+  },[] );
+  // console.log(dataUser);
+  
   return (
-    <main className="grid gap-6 p-4 ">
+    <main className="grid gap-6 p-4 text-white ">
       <AdminHeader title="Khách hàng" showSearchForm={false}></AdminHeader>
       <div className="flex justify-start items-center gap-2 text-base ">
         <p>Khách hàng</p>
         <p>/</p>
         <p>Thông tin chi tiết</p>
       </div>
-      <div className="flex justify-between gap-[30px]">
-        <div className="w-[25%] h-[345px] p-5 bg-whiteAlpha-100 rounded-lg grid gap-[22px]">
-          <div className="flex gap-3 items-center">
-            <Image className="rounded-full w-[90px]" src="/image/user.jpg" />
-            <div>
-              <p className="text-xs mb-3">Hạng thành viên</p>
-              <div className="flex gap-3 items-center text-xs ">
-                <Image src="/image/Group.svg" />
-                <p>Đồng</p>
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-[10px] w-full">
-            <div className="p-3 bg-whiteAlpha-50 rounded-lg">
-              <p>Tên</p>
-            </div>
-            <div className="p-3  bg-whiteAlpha-50 rounded-lg">
-              <p>Email</p>
-            </div>
-            <div className="p-3  bg-whiteAlpha-50 rounded-lg">
-              <p>Số điện thoại</p>
-            </div>
+       <div className="w-full  p-5 bg-whiteAlpha-100 rounded-lg grid gap-[22px]">
+          
+        <div className="flex gap-3 items-center">
+            {dataUser?.avatar ? (
+            <Image
+              width={35}
+              height={35}
+              className="rounded-full w-[90px]"
+              src={dataUser.avatar}
+              alt="User Avatar"
+            />
+          ) : (
+            <Image
+              width={35}
+              height={35}
+              className="rounded-full w-[90px]"
+              src="/image/user.jpg"
+              alt="Default User Avatar"
+            />
+          )}
+
+          <div>
+            <p className="text-sm mb-3">Hạng thành viên</p>
+              {dataUser?.memberships ? (
+                <div className="flex gap-3 items-center text-base">
+                  <Image width={24} height={24} src="/image/Group.svg" alt="Membership Group" />
+                  <p>{dataUser?.memberships}</p>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500">Chưa có hạng thành viên</p> 
+              )}
           </div>
         </div>
-        <div className="w-[75%] rounded-lg bg-whiteAlpha-100 ">
-          <div className="w-full grid gap-[20px] p-4">
+
+        <div className="flex gap-4 justify-between w-full">
+          <div className="p-3 bg-whiteAlpha-50 rounded-lg w-1/3">
+            
+            <p>{dataUser?.username || "N/A"}</p>
+          </div>
+          <div className="p-3 bg-whiteAlpha-50 rounded-lg w-1/3">
+          
+            <p>{dataUser?.email || "N/A"}</p> 
+          </div>
+          <div className="p-3 bg-whiteAlpha-50 rounded-lg w-1/3">
+           
+            <p>{dataUser?.phone || "N/A"}</p> 
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-between gap-[30px]">
+       
+        <div className="rounded-lg bg-whiteAlpha-100 ">
+          <div className="w-full grid p-4">
             <p className="text-lg font-bold">Tiệc đã hoàn thành</p>
-            <div className="overflow-x-auto overflow-y-auto max-h-[325px] max-w-[800px] ">
-              <table className="table table-chinhanh rounded-lg">
-                <thead>
-                  <tr>
-                    <th>Mã tiệc</th>
-                    <th>Chủ tiệc</th>
-                    <th>Loại tiệc</th>
-                    <th>Ngày đặt</th>
-                    <th>Tổng giá trị</th>
-                    <th>Tiền cọc</th>
-                    <th>Ngày đặt cọc</th>
-                    <th>Còn lại phải thanh toán</th>
-                    <th>Ngày tổ chức</th>
-                    <th>Giờ tổ chức</th>
-                    <th>Ngày thanh toán</th>
-                    <th>Tình trạng thanh toán</th>
-                    <th>Số lượng khách dự kiến</th>
-                    <th>Số lượng bàn (chính thức + dự phòng)</th>
-                    <th>Chi nhánh</th>
-                    <th>Sảnh</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
+              <BookingsTable user_id = {userID} status = {"success"} />
             </div>
-            <p className="text-lg font-bold">Tiệc dự kiến diễn ra</p>
-            <div className="overflow-x-auto overflow-y-auto max-h-[325px] max-w-[800px] ">
-              <table className="table table-chinhanh rounded-lg">
-                <thead>
-                  <tr>
-                    <th>Mã tiệc</th>
-                    <th>Chủ tiệc</th>
-                    <th>Loại tiệc</th>
-                    <th>Ngày đặt</th>
-                    <th>Tổng giá trị</th>
-                    <th>Tiền cọc</th>
-                    <th>Ngày đặt cọc</th>
-                    <th>Còn lại phải thanh toán</th>
-                    <th>Ngày tổ chức</th>
-                    <th>Giờ tổ chức</th>
-                    <th>Ngày thanh toán</th>
-                    <th>Tình trạng thanh toán</th>
-                    <th>Số lượng khách dự kiến</th>
-                    <th>Số lượng bàn (chính thức + dự phòng)</th>
-                    <th>Chi nhánh</th>
-                    <th>Sảnh</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>#12DKAF</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>Tiệc cưới</td>
-                    <td>22/12/2024</td>
-                    <td>200.000.000VND</td>
-                    <td>60.000.000 VND</td>
-                    <td>24/12/2024</td>
-                    <td>140.000.000 VND</td>
-                    <td>1/1/2025</td>
-                    <td>18:00</td>
-                    <td>1/1/2025</td>
-                    <td>
-                      <li className="status da-dat-coc">Đã đặt cọc</li>
-                    </td>
-                    <td>300</td>
-                    <td>50 + 2</td>
-                    <td>Phạm Văn Đồng</td>
-                    <td>Hall A</td>
-                    <td>
-                      <p className="text-teal-400 text-xs font-bold">
-                        Chi tiết
-                      </p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <p className="text-lg font-bold mt-[20px]">Tiệc dự kiến diễn ra</p>
+            <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
+              <BookingsTable user_id = {userID} status = {"pending"} />
             </div>
           </div>
         </div>
@@ -399,4 +105,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

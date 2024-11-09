@@ -61,6 +61,8 @@ export class MembershipsService {
         giftsTagset = existingGifts.map((gifts) => ({
           id: Number(gifts.id),
         }));
+      } else {
+        throw new BadRequestException('Hạng thành viên cần ít nhất 1 sản phẩm');
       }
 
       const images =
@@ -287,6 +289,8 @@ export class MembershipsService {
         giftsTagset = existingGifts.map((gifts) => ({
           id: Number(gifts.id),
         }));
+      } else {
+        throw new BadRequestException('Hạng thành viên cần ít nhất 1 sản phẩm');
       }
 
       let images;

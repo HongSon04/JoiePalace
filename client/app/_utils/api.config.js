@@ -98,71 +98,13 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
-    GET_ALL_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_QUARTER: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_YEAR: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
-    // GET_ALL_BRANCH: `${HOST}/branches/get-all`,
-    GET_ALL_BOOKING: `${HOST}/bookings/get-all`,
-    GET_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_BOOKING_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-
-    GET_ALL_INFO_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-
-    GET_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_ALL_INFO_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-
-    GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
-    GET_ALL_INFO_EACH_TIME: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_FOR_ALL_BRANCH_EACH_MONTH: `${DASHBOARD_API}/total-revenue-for-all-branch-each-month`,
-    GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_QUARTER: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_YEAR: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
-    GET_ALL_BRANCH: `${HOST}/branches/get-all`,
-    GET_ALL_BOOKING: `${HOST}/bookings/get-all`,
-    GET_INFO_BY_MONTH: (id) =>
-      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_BOOKING_STATUS: (id) =>
-      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
-    GET_BOOKING_BRANCH: (id) =>
-      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
-      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_WEEK:  (id) =>  `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_MONTH:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_QUARTER:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_YEAR:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
+    GET_INFO_BY_MONTH:  (id) => `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
+    GET_ALL_INFO_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
   },
 
   // PRODUCTS API

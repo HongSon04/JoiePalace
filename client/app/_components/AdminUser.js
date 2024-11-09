@@ -57,7 +57,7 @@ function AdminUser() {
           <li className="w-full">
             <Link
               color={"foreground"}
-              href={`/admin/profile/${user.id}`}
+              href={`/admin/thong-tin-tai-khoan/${user.id}`}
               className="text-gray-600 w-full flex items-center px-2 py-1 gap-2 hover:bg-gray-50"
             >
               <UserIcon className="w-6 h-6 text-gray-600" />
