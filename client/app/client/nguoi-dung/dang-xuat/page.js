@@ -5,6 +5,8 @@ import iconExitLogout from '@/public/iconExitLogout.svg'
 import { useRouter } from 'next/navigation';
 const Page = () => {
     const router = useRouter();
+
+    
     const logout = () => {
         localStorage.removeItem('user');
         router.push('/');

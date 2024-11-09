@@ -19,6 +19,7 @@ import RequestBreadcrumbsForQuanLyTiec from '../[slug]/[id]/RequestBreadcrumbsFo
 import InputDetailCustomer from '../[slug]/[id]/InputDetailCustomer';
 import { inputInfoUser, inputOrganization, inputsCost } from '../[slug]/[id]/InputData';
 import { buttons } from '../[slug]/[id]/buttons';
+import { formatFullDateTime } from '@/app/_utils/formaters';
 
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
@@ -42,6 +43,7 @@ const DropdownField = ({ label, name, options, value, onChange }) => (
     </div>
 );
 
+
 const organizationSchema = z.object({
     company_name: z.string().optional(),
     email: z.string().email({ message: "Email không hợp lệ" }),
@@ -50,39 +52,28 @@ const organizationSchema = z.object({
         .regex(/^\d+$/, { message: "Số điện thoại phải là số" })
         .min(10, { message: "Số điện thoại phải có ít nhất 10 ký tự" }),
     username: z.string().min(1, { message: "Họ và Tên là bắt buộc" }),
-    party: z.string().nonempty({ message: "Loại tiệc không được để chống" }),
     tables: z
         .coerce.number()
         .int({ message: "Số lượng bàn chính phải là số nguyên" })
         .min(1, { message: "Số lượng bàn chính phải lớn hơn 0" }),
-    spareTables: z
+    spare_table_count: z
         .coerce.number()
         .int({ message: "Số bàn dự phòng phải là số nguyên" })
         .min(1, { message: "Số bàn dự phòng phải lớn hơn 0" }),
     customer: z
-        .number()
-        .int({ message: "Số lượng khách phải là số nguyên" })
-        .refine((val) => val > 0, { message: "Số lượng khách lớn hơn 0" }),
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
     customerAndChair: z
-        .coerce.number()
-        .int({ message: "Số lượng khách / bàn phải là số nguyên" })
-        .min(1, { message: "Số lượng khách / bàn phải lớn hơn 0" }),
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
     partyDate: z.string().nonempty({ message: "Ngày đặt tiệc là bắt buộc" }),
-    dateOrganization: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
+    organization_date: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
     shift: z.string().nonempty({ message: "Ca hoạt động là bắt buộc" }),
-    amountPayable: z
-        .number()
-        .int({ message: "Số tiền phải thanh toán phải là số nguyên" })
-        .refine((val) => val > 0, { message: "Số tiền phải thanh toán lớn hơn 0" }),
+    total_amount: z
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
     depositAmount: z
-        .number()
-        .int({ message: "Số tiền cọc phải là số nguyên" })
-        .refine((val) => val > 0, { message: "Số tiền cọc lớn hơn 0" }),
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
+    // amount_booking: z
+    //     .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
     depositDate: z.string().nonempty({ message: "Ngày đặt cọc là bắt buộc" }),
-    remainingAmountPaid: z
-        .number()
-        .int({ message: "Số tiền còn lại thanh toán phải là số nguyên" })
-        .refine((val) => val >= 0, { message: "Số tiền còn lại thanh toán phải lớn hơn hoặc bằng 0" }),
     dataPay: z.string().nonempty({ message: "Ngày thanh toán là bắt buộc" }),
 });
 
@@ -139,8 +130,8 @@ const Page = ({ params }) => {
             type: 'select',
             name: 'payment',
             options: [
-                { value: 'momo', label: 'Momo' },
-                { value: 'zalopay', label: 'ZaloPay' },
+                { value: 'momo', label: 'Momo', selected: false },
+                { value: 'zalopay', label: 'ZaloPay', selected: false },
             ],
         },
     ]);
@@ -151,8 +142,8 @@ const Page = ({ params }) => {
             type: 'select',
             name: 'is_deposit',
             options: [
-                { value: true, label: 'Đã thanh toán' },
-                { value: false, label: 'Chưa thanh toán' },
+                { value: 'success', label: 'Đã thanh toán', selected: false },
+                { value: 'pending', label: 'Chưa thanh toán', selected: false },
             ],
         },
     ]);
@@ -176,16 +167,14 @@ const Page = ({ params }) => {
             title: 'Loại tiệc',
             type: 'select',
             name: 'partyTypes',
-            options: [
-               
-            ],
+            options: [],
         },
-    ]);
+    ])
 
-    const [selectedMenu, setSelectedMenu] = useState(menus[0]?.value || '');
-    const [selectBranches, setSelectBranches] = useState(branches[0]?.value || '');
-    const [selectedDecors, setSelectedDecors] = useState(decors[0]?.value || '');
-    const [selectPartyTypes, setSelectPartyTypes] = useState(partyTypes[0]?.value || '');
+    const [selectedMenu, setSelectedMenu] = useState(menus[0]?.value || 1);
+    const [selectBranches, setSelectBranches] = useState(branches[0]?.value || 1);
+    const [selectedDecors, setSelectedDecors] = useState(decors[0]?.value || 1);
+    const [selectPartyTypes, setSelectPartyTypes] = useState(partyTypes[0]?.value || 1);
     const [selectedStatus, setSelectedStatus] = useState(statusPayment[0]?.value || '');
     const [selectStatusDeposit, setSelectStatusDeposit] = useState(statusDeposit[0]?.value || '');
 
@@ -194,7 +183,7 @@ const Page = ({ params }) => {
     const fetchAllDecors = () => fetchOptions(API_CONFIG.DECORS.GET_ALL(), setDecors, 'Decor', 'decors');
     const fetchAllPartyTypes = () => fetchOptions(API_CONFIG.PARTY_TYPES.GET_ALL(), setPartyTypes, 'Loại tiệc', 'partyTypes');
 
-    const { control, handleSubmit, reset, formState: { errors }, trigger } = useForm({
+    const { control, handleSubmit, reset, setValue, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
     });
 
@@ -218,7 +207,7 @@ const Page = ({ params }) => {
         fieldSetter(value);
     
         if (resetField) {
-            reset({ [resetField]: value });
+            setValue(resetField , value);
         }
         trigger(triggerField);
     };
@@ -229,26 +218,92 @@ const Page = ({ params }) => {
     const handlePartyTypesChange = handleFieldChange(setSelectPartyTypes, 'partyTypes');
     const handlePaymentChange = handleFieldChange(() => {}, 'payment', 'payment');
     const handleStatusPaymentChange = handleFieldChange(setSelectedStatus, 'statusPayment', 'statusPayment');
-    const handleStatusDepositChange = handleFieldChange(() => {}, 'statusDeposit', 'statusDeposit');
+    const handleStatusDepositChange = handleFieldChange(setSelectStatusDeposit, 'statusDeposit', 'statusDeposit');
 
     const onSubmit = async (data) => {
-        const dataform = {
-            
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if(!user){
+            toast({
+                title: "Lỗi",
+                description: "Vui lòng đăng nhập",
+                type: "error",
+              });
         }
 
+        const dataform = {
+            ...data,
+            user_id: user.id,
+            menu_id: Number(selectedMenu),
+            decor_id: Number(selectedDecors),
+            party_type_id: Number(selectPartyTypes),
+            branch_id: currentBranch.id,
+            name: data.username,
+            phone: data.phone,
+            email: data.email,
+            note: '',
+            shift: data.shift,
+            number_of_guests: data.customer,
+            // before data.organization_date -> after formatFullDateTime(data.organization_date).date
+            organization_date: formatFullDateTime(data.organization_date).date,
+            company_name: data.company_name,
+            status: setStatusPayment,
+            stage_id: Number(selectBranches),
+            amount: data.total_amount,
+            booking_details: [{
+                branch_id: currentBranch.id,
+                decor_id: Number(selectedDecors),
+                menu_id: Number(selectedMenu),
+                deposit_id: Number(selectStatusDeposit),
+                deposit: data.depositAmount,
+                deposit_date: data.depositDate,
+                payment_method: data.payment,
+                created_at: data.dataPay,
+                status: data.statusPayment,
+                status_deposit: data.statusDeposit,
+                amount_booking: data.amount_booking,
+                total_amount: data.total_amount,
+                menus: {
+                    price: data.menus_price,
+                    products: data.foods?.map(item => item.id) || [],
+                },
+                decor: {
+                    decor_id: selectedDecors,
+                },
+                party_type: {
+                    party_type_id: selectPartyTypes,
+                },
+                menu: {
+                    menu_id: selectedMenu,
+                },
+                stage: {
+                    stage_id: selectBranches,
+                },
+
+            }],
+            "users": {
+                id: user.id,
+                username: data.username,
+                email: data.email,
+                phone: data.phone,
+            },
+
+        }
         try {
-            const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE(id), "PATCH", dataform);
+            const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.CREATE, "POST", dataform);
 
             if (updateBranches.success) {
                 dispatch(fetchBranchSuccess(updateBranches.data));
                 showToast("success", "Tạo dữ liệu chi nhánh thành công", "Phản hồi đã được duyệt. Đang lấy dữ liệu mới");
+            } else{
+                handleError("Đã xảy ra lỗi");
             }
         } catch (error) {
             console.log(error);
-            handleError("Đã xảy ra lỗi");
+            handleError(error);
         }
 
-        console.log('Dữ liệu form hợp lệ:', data);
+        console.log('Dữ liệu form hợp lệ:', dataform);
     };
 
     const handleError = (message) => {
