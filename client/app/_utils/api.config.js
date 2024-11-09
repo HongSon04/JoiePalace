@@ -1,6 +1,7 @@
 // HOST URL
 const HOST = `https://joieplace.live/api`;
 const MEMBERSHIPS = `https://joieplace.live/memberships`;
+const HOST_NO_API = `https://joieplace.live`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
@@ -14,7 +15,7 @@ const FEEDBACKS_API = `${HOST}/feedbacks`;
 const PARTYTYPES_API = `${HOST}/party-types`;
 const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
-const NOTIFICATIONS_API = `${HOST}/notifications`;
+const NOTIFICATIONS_API = `${HOST_NO_API}/notifications`;
 const MENU_API = `${HOST}/menus`;
 const PACKAGES = `${HOST}/packages`;
 const DECORS = `${HOST}/decors`;
@@ -200,11 +201,10 @@ export const API_CONFIG = {
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
-    // Add endpoints here if needed
+    GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
   },
 
   // PACKAGES API
-
   PACKAGES: {
     GET_ALL: `${PACKAGES}/get-all`,
   },
@@ -227,6 +227,8 @@ export const API_CONFIG = {
     DESTROY: (id) => `${MENU_API}/destroy/${id}`,
   },
 };
+
+// NOTIFICATIONS_API
 
 // apiServices.js
 import axios from "axios";

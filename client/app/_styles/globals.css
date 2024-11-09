@@ -677,8 +677,6 @@ select {
 .notificationFeedback.show {
   right: 20px; 
 }
-<<<<<<< HEAD
-=======
 .custom-dots-line {
   display: flex;
   justify-content: center;
@@ -715,4 +713,3 @@ select {
   background-image: url(/line-group.svg);
   background-size: cover;
 }
->>>>>>> d56b893b78dec109fd3b91ff41974d321c51cd68
