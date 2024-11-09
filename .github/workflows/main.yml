@@ -16,6 +16,11 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 22
 
+      - name: List Files in Root Directory
+        run: |
+          echo "Listing files in the root directory..."
+          ls -la /
+
       - name: Fetch Latest Changes
         run: |
           echo "Fetching latest changes..."
