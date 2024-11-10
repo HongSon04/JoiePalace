@@ -56,7 +56,6 @@ import Uploader from "@/app/_components/Uploader";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
-  "short_description",
   "description",
   "created_at",
   "actions",
@@ -109,7 +108,7 @@ const checkFileSize = (file) => {
   return false;
 };
 
-function CategoriesTable() {
+function CategoryDetailSection() {
   const { id } = useParams();
   const {
     categories,
@@ -362,33 +361,16 @@ function CategoriesTable() {
           </div>
         );
       default:
-        return <p className="truncate">{cellValue}</p>;
+        return <p className="truncate max-w-fit">{cellValue}</p>;
     }
-  }, []);
-
-  const onItemsPerPageChange = React.useCallback((e) => {
-    setItemsPerPage(Number(e.target.value));
-    setCurrentPage(1);
   }, []);
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4 mt-8">
+      <div className="flex flex-col gap-4">
         <div className="flex justify-between gap-3 items-center">
-          <label className="flex items-center text-default-400 text-small">
-            Dòng trên trang:
-            <select
-              className="bg-transparent outline-none text-default-400 text-small"
-              onChange={onItemsPerPageChange}
-              value={itemsPerPage}
-            >
-              {CONFIG.ITEMS_PER_PAGE.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </label>
+          <h2 className="text-lg font-semibold text-white">Danh mục con</h2>
+
           <div className="flex gap-3 items-center">
             <SearchForm
               placeholder={"Tìm kiếm theo tên"}
@@ -423,7 +405,7 @@ function CategoriesTable() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <div className="flex-1 justify-end flex">
+            {/* <div className="flex-1 justify-end flex">
               <DateRangePicker
                 value={date}
                 onChange={setDate}
@@ -439,7 +421,7 @@ function CategoriesTable() {
                     "text-white data-[editable=true]:text-white data-[editable=true]:data-[placeholder=true]:text-white",
                 }}
               />
-            </div>
+            </div> */}
             <Button
               onClick={onOpen}
               radius="full"
@@ -456,101 +438,102 @@ function CategoriesTable() {
     );
   }, [visibleColumns, isShowTips, itemsPerPage, searchQuery, date]);
 
-  const bottomContent = React.useMemo(() => {
-    return (
-      <CustomPagination
-        page={1}
-        total={1}
-        onChange={onPageChange}
-        classNames={{
-          base: "flex justify-center",
-        }}
-      />
-    );
-  }, []);
+  // const bottomContent = React.useMemo(() => {
+  //   return (
+  //     <CustomPagination
+  //       page={1}
+  //       total={1}
+  //       onChange={onPageChange}
+  //       classNames={{
+  //         base: "flex justify-center",
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
   return (
     <>
-      <div className="min-w-0 overflow-x-auto">
-        <Table
-          className="min-w-max"
-          aria-label="Example table with custom cells, pagination and sorting"
-          isHeaderSticky
-          bottomContent={bottomContent}
-          bottomContentPlacement="inside"
-          classNames={{
-            thead:
-              "has-[role=columnheader]:bg-whiteAlpha-200 [&>tr>th]:bg-whiteAlpha-200",
-            wrapper: "!bg-whiteAlpha-100",
-            root: "w-full",
-            td: "!text-white group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-100 before:bg-whiteAlpha-50 data-[hover=true]:before:bg-whiteAlpha-100",
-            row: "hover:!bg-whiteAlpha-50 !bg-whiteAlpha-100 !text-white",
-            cell: "!text-white",
-            pagination: "bg-default-100",
-            paginationControl: "bg-default-100",
-            paginationCursor: "!bg-gold",
-          }}
-          selectedKeys={selectedKeys}
-          selectionMode="single"
-          sortDescriptor={sortDescriptor}
-          topContent={topContent}
-          topContentPlacement="outside"
-          onSelectionChange={setSelectedKeys}
-          onSortChange={setSortDescriptor}
-          selectionBehavior="replace"
-        >
-          <TableHeader
-            columns={headerColumns}
-            className="!bg-whiteAlpha-100 has-[role=columnheader]:bg-whiteAlpha-200 here"
+      <Row className="mt-16">
+        <Col span={12} role="table">
+          <Table
+            className="min-w-fit"
+            aria-label="Example table with custom cells, pagination and sorting"
+            isHeaderSticky
+            // bottomContent={bottomContent}
+            // bottomContentPlacement="inside"
+            classNames={{
+              thead:
+                "has-[role=columnheader]:bg-whiteAlpha-200 [&>tr>th]:bg-whiteAlpha-200",
+              wrapper: "!bg-whiteAlpha-100",
+              root: "w-full",
+              td: "!text-white group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-100 before:bg-whiteAlpha-50 data-[hover=true]:before:bg-whiteAlpha-100",
+              row: "hover:!bg-whiteAlpha-50 !bg-whiteAlpha-100 !text-white",
+              cell: "!text-white",
+              pagination: "bg-default-100",
+              paginationControl: "bg-default-100",
+              paginationCursor: "!bg-gold",
+            }}
+            selectedKeys={selectedKeys}
+            selectionMode="single"
+            sortDescriptor={sortDescriptor}
+            topContent={topContent}
+            topContentPlacement="outside"
+            onSelectionChange={setSelectedKeys}
+            onSortChange={setSortDescriptor}
+            selectionBehavior="replace"
+            onRowAction={(item) => {
+              console.log(item);
+            }}
           >
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                align={"start"}
-                allowsSorting={column.sortable}
-                className="group px-3 h-10 align-middle bg-whiteAlpha-200 whitespace-nowrap text-white text-tiny font-semibold first:rounded-l-lg rtl:first:rounded-r-lg rtl:first:rounded-l-[unset] last:rounded-r-lg rtl:last:rounded-l-lg rtl:last:rounded-r-[unset] data-[sortable=true]:cursor-pointer data-[hover=true]:text-foreground-400 outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 text-start [& data-[selected=true]:bg-whiteAlpha-100 "
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody
-            emptyContent={
-              isError ? (
-                error
-              ) : (
-                <div className="flex flex-col gap-3 justify-center items-center">
-                  <p className="text-gray-400">Không có danh mục nào</p>
-                  <button
-                    className="text-gray-400 underline"
-                    onClick={() => dispatch(fetchParentCategory())}
-                  >
-                    Thử lại
-                  </button>
-                </div>
-              )
-            }
-            items={sortedItems}
-            isLoading={isLoading}
-            loadingContent={<LoadingContent />}
-          >
-            {(item) => (
-              <TableRow
-                key={item.id}
-                onClick={(e) => {
-                  e.preventDefault();
-                }}
-              >
-                {(columnKey) => (
-                  <TableCell className="py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100 min-w-0">
-                    {renderCell(item, columnKey)}
-                  </TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            <TableHeader
+              columns={headerColumns}
+              className="!bg-whiteAlpha-100 has-[role=columnheader]:bg-whiteAlpha-200 here"
+            >
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={"start"}
+                  allowsSorting={column.sortable}
+                  className="group px-3 h-10 align-middle bg-whiteAlpha-200 whitespace-nowrap text-white text-tiny font-semibold first:rounded-l-lg rtl:first:rounded-r-lg rtl:first:rounded-l-[unset] last:rounded-r-lg rtl:last:rounded-l-lg rtl:last:rounded-r-[unset] data-[sortable=true]:cursor-pointer data-[hover=true]:text-foreground-400 outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 text-start [& data-[selected=true]:bg-whiteAlpha-100 "
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              emptyContent={
+                isError ? (
+                  error
+                ) : (
+                  <div className="flex flex-col gap-3 justify-center items-center">
+                    <p className="text-gray-400">Không có danh mục nào</p>
+                    <button
+                      className="text-gray-400 underline"
+                      onClick={() => dispatch(fetchParentCategory())}
+                    >
+                      Thử lại
+                    </button>
+                  </div>
+                )
+              }
+              items={sortedItems}
+              isLoading={isLoading}
+              loadingContent={<LoadingContent />}
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  {(columnKey) => (
+                    <TableCell className="py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100 min-w-0 !max-w-52">
+                      {renderCell(item, columnKey)}
+                    </TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Col>
+        <Col span={12} role="products"></Col>
+      </Row>
       <Modal
         size="3xl"
         isOpen={isOpen}
@@ -707,4 +690,4 @@ function CategoriesTable() {
   );
 }
 
-export default CategoriesTable;
+export default CategoryDetailSection;
