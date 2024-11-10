@@ -1,3 +1,5 @@
+"use client";
+
 import AdminHeader from "@/app/_components/AdminHeader";
 import FormInput from "@/app/_components/FormInput";
 import { EnvelopeIcon, XMarkIcon } from "@heroicons/react/24/outline";

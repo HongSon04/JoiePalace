@@ -13,7 +13,7 @@ function Page() {
       {/* Header */}
       <div className="flex items-center">
         <AdminHeader
-          title={"Món ăn"}
+          title={"Quản lý thực phẩm"}
           showNotificationButton={false}
           showHomeButton={false}
           showSearchForm={false}

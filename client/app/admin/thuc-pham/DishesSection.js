@@ -25,9 +25,10 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@nextui-org/modal";
+import { Image } from "@nextui-org/react";
+import NextImage from "next/image";
 import { Button, Switch } from "@nextui-org/react";
 import { Col, Row } from "antd";
-import Image from "next/image";
 import React, { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { IoSaveOutline } from "react-icons/io5";
@@ -463,6 +464,7 @@ function DishesSection({ dishCategory, categories }) {
                               />
                               {selectedDish && (
                                 <Image
+                                  as={NextImage}
                                   src={imgSrc}
                                   onError={() =>
                                     setImgSrc(CONFIG.DISH_IMAGE_PLACEHOLDER)

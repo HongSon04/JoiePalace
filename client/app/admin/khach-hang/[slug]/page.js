@@ -30,13 +30,13 @@ const Page = ({params}) => {
     const fetchData = async () => {
       try {
         const dataSlug = await fetchBranchBySlug(slug);
-        // const branchId = dataSlug[0].id;
-        
-        
+        const branchId = dataSlug[0].id;
         
         const userData = await makeAuthorizedRequest(
           API_CONFIG.USER.GET_BY_BRANCH_ID({
             branch_id: branchId,
+            currentPage: currentPage,
+            itemsPerPage: 10000
           }),
           "GET",
           null

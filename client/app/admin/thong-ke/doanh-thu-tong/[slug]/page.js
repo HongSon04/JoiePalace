@@ -19,13 +19,20 @@ const Page = ({ params }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const dataSlug = await fetchBranchBySlug(slug);
-        const branchId = dataSlug[0].id;
-        const nameBranch = dataSlug[0].name;
+        let branchId = 0;
+        let nameBranch = '';
+        
+        if (slug === 'ho-chi-minh') {
+          nameBranch = 'Hồ Chí Minh';
+        } else {
+          const dataSlug = await fetchBranchBySlug(slug);  
+          branchId = dataSlug[0]?.id || 0;
+          nameBranch = dataSlug[0]?.name || '';
+        }
 
         const [dataTotalBranch, allBranch] = await Promise.all([
-          fetchAllByBranch(branchId),
-          fetchAllBranch()
+          fetchAllByBranch(branchId), 
+          fetchAllBranch() 
         ]);
 
         setDataSlug(dataSlug);
@@ -39,16 +46,15 @@ const Page = ({ params }) => {
       }
     };
     fetchData();
-  }, [slug]);
+  }, [slug]); 
 
   const dataBranch = allBranch?.data || [];
   const BranchName = (nameBranch === 'Hồ Chí Minh') ? 'tổng' : nameBranch;
-
   const fetchDataForBranch = async (branchId) => {
     try {
-      const dataTotalBranch = await fetchAllByBranch(branchId);
+      const dataTotalBranch = await fetchAllByBranch(branchId);  
       setDataTotalBranch(dataTotalBranch);
-      setSelectedBranchId(branchId); // Cập nhật ID chi nhánh đã chọn
+      setSelectedBranchId(branchId); 
     } catch (error) {
       console.error("Error fetching data for branch:", error);
     }
@@ -56,7 +62,8 @@ const Page = ({ params }) => {
 
   const handleBranchChange = (event) => {
     const newBranchId = event.target.value;
-    fetchDataForBranch(newBranchId); // Gọi hàm để lấy dữ liệu cho chi nhánh mới
+    setBranchId(newBranchId);  
+    fetchDataForBranch(newBranchId); 
   };
 
   const dataBranchChart = dataTotalBranch?.data || [];
@@ -90,10 +97,10 @@ const Page = ({ params }) => {
       <div className='w-full'>
         <div className="flex items-center justify-between gap-[10px] mb-[10px]">
           <p className="text-base font-semibold">Doanh thu {BranchName}</p>
-          {branchId === 2 && (
-            <select className='select w-[300px]' onChange={handleBranchChange}>
+          {slug === 'ho-chi-minh' && (
+            <select className='select w-[300px]' onChange={handleBranchChange} value={selectedBranchId}>
               {dataBranch.map((item) => (
-                <option key={item.id} value={item.id}>
+                <option className='option' key={item.id} value={item.id}>
                   {item.name}
                 </option>
               ))}
@@ -113,7 +120,7 @@ const Page = ({ params }) => {
             <p className="text-sm font-bold">Danh sách tiệc {BranchName}</p>
           </div>
           <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-            <BookingsTable branchId={selectedBranchId} />
+            <BookingsTable branchId={branchId} />
           </div>
         </div>
       </div>
