@@ -28,12 +28,11 @@ import { API_CONFIG } from "@/app/_utils/api.config";
 const Page = ({ params }) => {
   const { slug } = params;
   const [dataUser, setDataUser] = useState(null);
-  const [dataRevenueEachMonth, setDataRevenueEachMonth] = useState(null);
-  const [dataAllByMonth, setDataAllByMonth] = useState(null);
   const [allBooking, setAllBooking] = useState([]);
   const [dataInfo, setDataInfo] = useState(null);
   const [dataSlug, setDataSlug] = useState(null);
   const [branchId, setBranchId] = useState(null);
+  const [idBranch, setIdBranch] = useState(null);
   const [dataTotalAdminByWeek, setdataTotalAdminByWeek] = useState(null);
   const [dataTotalAdminByMonth, setDataTotalAllByMonth] = useState(null);
   const [dataTotalAdminByYear, setdataTotalAdminByYear] = useState(null);
@@ -57,14 +56,24 @@ const Page = ({ params }) => {
   useEffect(() => {
     const fetchAminData = async () => {
       try {
+        let branchId = 0;
+        let idBranch = 0;
+        
         const dataSlug = await fetchBranchBySlug(slug);
-        const branchId = dataSlug[0].id;
+        if (slug === 'ho-chi-minh') {
+          branchId = 0;
+        } else {
+          branchId = dataSlug[0]?.id || 0;
+        }
+        idBranch = dataSlug[0]?.id;
+        
+        // console.log(idBranch);
         // console.log(branchId);
         
         const { startDate, endDate } = getCurrentMonthStartAndEnd();
         const dataBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            branch_id : branchId,
+            idBranch : branchId,
             is_confirm: false,
             is_deposit: false,
             status : "pending"
@@ -77,7 +86,6 @@ const Page = ({ params }) => {
           API_CONFIG.BOOKINGS.GET_ALL({
             start_date: startDate,
             end_date: endDate,
-            itemsPerPage: 10,
             branch_id: branchId
           }),
           "GET",
@@ -98,10 +106,11 @@ const Page = ({ params }) => {
             fetchRevenueBranchByYear(0),
             fetchRevenueBranchByQuarter(0),
             fetchAllByBranch(branchId),
-            fetchUserByBranchId(branchId),
+            fetchUserByBranchId(idBranch),
             
         ]);
         // console.log(dataUser);
+        setIdBranch(idBranch);
         setDataBookingByMonth(dataBookingByMonth.data);
         setDataUser(dataUser);
         setdataTotalAdminByWeek(dataTotalAdminByWeek);
@@ -110,7 +119,7 @@ const Page = ({ params }) => {
         setdataTotalAdminByYear(dataTotalAdminByYear);
         setdataTotalBranch(dataTotalBranch);
         setDataSlug(dataSlug);
-        setBranchId(branchId);
+        setBranchId(branchId  || 0);
         setDataInfo(dataInfo);
         setAllBooking(dataBooking);
     } catch (error) {
@@ -174,7 +183,7 @@ const Page = ({ params }) => {
     const formattedTime = date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
     return `${formattedTime}`;
   }
-  // console.log(dataUser);
+  // console.log(dataBookingByMonth);
   
   return (
     <main className="grid gap-6  text-white ">
@@ -260,7 +269,7 @@ const Page = ({ params }) => {
           <p>Đang tải dữ liệu...</p>
         )}
       </div>
-
+      
       <div className="container  flex gap-4 w-full h-full  p-4">
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
@@ -324,7 +333,7 @@ const Page = ({ params }) => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 h-[580px] overflow-y-auto hide-scrollbar items-start">
-            {branchId === 2 ? (
+            {branchId === 0 ? (
               <>
                 <div className="p-2 bg-blackAlpha-100 rounded-xl">
                   <div className="flex items-center justify-between gap-[10px] mb-[10px]">
@@ -359,7 +368,7 @@ const Page = ({ params }) => {
               <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
             </Link>
           </div>
-          <div className="overflow-y-auto h-[357px]">
+          <div className="overflow-y-auto h-[377px]">
             <table className="table w-full">
               <thead>
                 <tr>
@@ -392,9 +401,9 @@ const Page = ({ params }) => {
             </table>
           </div>
         </div>
-        {branchId === 2 &&
+        {branchId === 0 &&
           <div className=" w-1/2">
-            <div className="flex items-center justify-between mb-[10px]">
+            <div className="flex items-center justify-between ">
               <p className="text-base  font-semibold">Doanh thu tổng / năm</p>
              
             </div>
@@ -407,10 +416,10 @@ const Page = ({ params }) => {
       </div>
       <div className="w-full p-4">
         <div className="flex items-center justify-between mb-[10px]">
-          <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
-          <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
+          <p className="text-base  font-semibold">Danh sách tiệc mới nhất</p>
+          {/* <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
             <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
-          </Link>
+          </Link> */}
         </div>
         <div className="overflow-y-auto max-h-72">
           <table className="table w-full table-auto rounded-lg">
@@ -462,8 +471,18 @@ const Page = ({ params }) => {
                       </li>
                     </td>
 
-                    <td>50 + 2</td>
-                    <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                    <td>
+                      {item.booking_details && item.booking_details.length > 0 ? 
+                        `${item.booking_details[0].table_count != null ? item.booking_details[0].table_count : 'N/A'} + ${item.booking_details[0].spare_table_count != null ? item.booking_details[0].spare_table_count : 'N/A'}` 
+                        : 'N/A'}
+                    </td>
+
+
+                    <td>
+                      <Link href={`/admin/quan-ly-tiec/${slug}/${item.id}`} className="text-teal-400 text-xs font-bold">
+                        Xem thêm
+                      </Link>
+                    </td>
                   </tr>
                 ))
               ) : (

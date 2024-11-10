@@ -130,9 +130,7 @@ function BookingsTable({ branchId}) {
   React.useEffect(() => {
     const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
     const params = {
-      is_confirm: false,
-      is_deposit: false,
-      status: "pending",
+      status: "success",
       page: currentPage,
       itemsPerPage,
       branch_id: currentBranch.id,
@@ -148,9 +146,7 @@ function BookingsTable({ branchId}) {
     const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
     const params = {
       branch_id: currentBranch.id,
-      is_confirm: false,
-      is_deposit: false,
-      status: "pending",
+      status: "success",
       page: currentPage,
       itemsPerPage,
       search: searchQuery

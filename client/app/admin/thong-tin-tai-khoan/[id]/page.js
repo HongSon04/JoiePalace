@@ -19,11 +19,16 @@ const formSchema = z.object({
 const Page = () => {
     const router = useRouter();
     const handleLogout = () => {
-        localStorage.removeItem('currentBranch');
-        localStorage.removeItem('user');
-        localStorage.removeItem('refreshToken');
-        router.push("/auth/chon-chi-nhanh");
+        const isConfirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
+    
+        if (isConfirmed) {
+            localStorage.removeItem('currentBranch');
+            localStorage.removeItem('user');
+            localStorage.removeItem('refreshToken');
+            router.push("/auth/chon-chi-nhanh");
+        } 
     };
+    
     const [user, setUser] = useState(null);
     const toast = useCustomToast();
     const [errors, setErrors] = useState({});
