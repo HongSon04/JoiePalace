@@ -1,16 +1,16 @@
 import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiHeaders,
   ApiOperation,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { FilterDto } from 'helper/dto/Filter.dto';
+import { UpdateStatusNotificationDto } from './dto/update-status-notification.dto';
 import { NotificationsService } from './notifications.service';
 
-@Controller('notifications')
+@Controller('api/notifications')
 @ApiTags('Notifications - Quản lý thông báo')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
@@ -66,20 +66,8 @@ export class NotificationsController {
   ])
   @ApiBearerAuth('authorization')
   @ApiOperation({ summary: 'Cập nhật trạng thái đã đọc thông báo' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        notify_id: {
-          type: 'array',
-          items: {
-            type: 'number',
-          },
-        },
-      },
-    },
-  })
-  async updateIsReadNotification(@Body('notify_id') notify_id: number[]) {
-    return this.notificationsService.updateIsReadNotification(notify_id);
+  async updateIsReadNotification(@Body() body: UpdateStatusNotificationDto) {
+    console.log('body: ', body);
+    return this.notificationsService.updateIsReadNotification(body);
   }
 }
