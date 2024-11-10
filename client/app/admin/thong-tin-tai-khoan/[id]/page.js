@@ -8,6 +8,7 @@ import useCustomToast from "@/app/_hooks/useCustomToast";
 
 import { makeAuthorizedRequest } from '@/app/_utils/api.config';
 import { changePassWord } from '@/app/_services/apiServices';
+import { useRouter } from 'next/navigation'; 
 const formSchema = z.object({
     oldPassword: z.string().min(2, "Vui lòng nhập mật khẩu cũ!"),
     newPassword: z.string().min(8, "Mật khẩu mới phải có ít nhất 8 ký tự"),
@@ -16,6 +17,13 @@ const formSchema = z.object({
   });
   
 const Page = () => {
+    const router = useRouter();
+    const handleLogout = () => {
+        localStorage.removeItem('currentBranch');
+        localStorage.removeItem('user');
+        localStorage.removeItem('refreshToken');
+        router.push("/auth/chon-chi-nhanh");
+    };
     const [user, setUser] = useState(null);
     const toast = useCustomToast();
     const [errors, setErrors] = useState({});
@@ -129,7 +137,7 @@ const Page = () => {
                    </form>
                 </div>
                 <div className='flex justify-end'>
-                    <button className='button rounded-full flex gap-[5px] items-center p-2 bg-red-400'>
+                    <button onClick={handleLogout} className='button rounded-full flex gap-[5px] items-center p-2 bg-red-400'>
                         <IoIosLogOut className='text-base' />
                         Đăng xuất
                     </button>

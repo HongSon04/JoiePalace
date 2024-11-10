@@ -121,6 +121,7 @@ const Page = ({ params }) => {
 
     fetchAminData();
   }, []);
+  // console.log(dataUser);
   
   const createChartData = (data, label) => {
     let chartData = {
@@ -264,54 +265,55 @@ const Page = ({ params }) => {
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
             <p className="text-base font-semibold ">Khách hàng</p>
-            <Link href={`/admin/khach-hang/`}>
+            <Link href={`/admin/khach-hang/${slug}`}>
               <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
             </Link>
           </div>
           <div className="flex flex-col gap-3 h-[580px] overflow-y-auto hide-scrollbar">
             {dataUser && dataUser.data.length > 0 ? (
-                dataUser.data.map((item, index) => (
-                    <div key={index} className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-                      {item.avatar ? (
-                            <Image
-                                className="rounded-full w-[48px]"
-                                src={item.avatar}
-                                alt="User profile"
-                                width={48}
-                                height={48}
-                            />
-                        ) : (
-                            <Image
-                                className="rounded-full w-[48px]"
-                                src="/image/user.jpg"
-                                alt="Default User"
-                                width={48}
-                                height={48}
-                            />
-                        )}
+              dataUser.data.map((item) => (
+                <Link key={item.id} href={`/admin/khach-hang/${slug}/${item.id}`} className="flex gap-5 items-center w-full">
+                  <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover  w-full bg-center">
+                    {item.avatar ? (
+                      <Image
+                        className="rounded-full w-[48px]"
+                        src={item.avatar}
+                        alt="User profile"
+                        width={48}
+                        height={48}
+                      />
+                    ) : (
+                      <Image
+                        className="rounded-full w-[48px]"
+                        src="/image/user.jpg"
+                        alt="Default User"
+                        width={48}
+                        height={48}
+                      />
+                    )}
 
-                        <div className="w-full flex justify-between items-center">
-                            <div>
-                                <p className="text-sm mb-[10px] font-semibold">
-                                    {item.username || "N/A"}
-                                </p>
-                                <div className="flex gap-3 items-center text-xs">
-                                    {item.membership_id ? ( 
-                                        <>
-                                            <Image src="/image/Group.svg" alt="Membership Icon" />
-                                            <p>{item.memberships}</p>
-                                        </>
-                                    ) : null}
-                                </div>
-                            </div>
-                            <BsThreeDots className="text-xl" />
+                    <div className="w-full flex justify-between items-center">
+                      <div>
+                        <p className="text-sm mb-[10px] font-semibold">
+                          {item.username || "N/A"}
+                        </p>
+                        <div className="flex gap-3 items-center text-xs">
+                          {item.membership_id ? (
+                            <>
+                              <Image src="/image/Group.svg" alt="Membership Icon" />
+                              <p>{item.memberships}</p>
+                            </>
+                          ) : null}
                         </div>
+                      </div>
                     </div>
-                ))
+                  </div>
+                </Link>
+              ))
             ) : (
-                <div className="loading-message">
-                    <p className="text-center">Đang tải dữ liệu.</p>
-                </div>
+              <div className="loading-message">
+                <p className="text-center">Đang tải dữ liệu.</p>
+              </div>
             )}
 
           </div>

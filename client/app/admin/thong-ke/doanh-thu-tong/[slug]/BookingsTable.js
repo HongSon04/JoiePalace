@@ -80,7 +80,7 @@ const columns = [
   { name: "Hành động", uid: "actions" },
 ];
 
-function BookingsTable({ branchId, userId }) {
+function BookingsTable({ branchId}) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -128,33 +128,32 @@ function BookingsTable({ branchId, userId }) {
   const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
   const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
   React.useEffect(() => {
+    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
     const params = {
       is_confirm: false,
       is_deposit: false,
       status: "pending",
       page: currentPage,
       itemsPerPage,
-      branch_id: branchId, 
-      ...(userId && { user_id: userId }),
+      branch_id: currentBranch.id,
       startDate: formattedStartDate,
       endDate: formattedEndDate,
     };
 
     dispatch(fetchRequests({ params }));
-  }, [currentPage, itemsPerPage, branchId, userId]);
+  }, [currentPage, itemsPerPage]);
 
   React.useEffect(() => {
     const controller = new AbortController();
-
+    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
     const params = {
-      branch_id: branchId,
+      branch_id: currentBranch.id,
       is_confirm: false,
       is_deposit: false,
       status: "pending",
       page: currentPage,
       itemsPerPage,
-      search: searchQuery,
-      ...(userId && { user_id: userId }),
+      search: searchQuery
       
     };
 
@@ -163,7 +162,8 @@ function BookingsTable({ branchId, userId }) {
     return () => {
       controller.abort();
     };
-  }, [currentPage, itemsPerPage, date, searchQuery, branchId, userId]);
+  }, [currentPage, itemsPerPage, date, searchQuery]);
+  
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)

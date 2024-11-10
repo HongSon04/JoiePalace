@@ -56,7 +56,7 @@ const Page = ({ params }) => {
 
   const handleBranchChange = (event) => {
     const newBranchId = event.target.value;
-    fetchDataForBranch(newBranchId); // Gọi hàm để lấy dữ liệu cho chi nhánh mới
+    fetchDataForBranch(newBranchId); 
   };
 
   const dataBranchChart = dataTotalBranch?.data || [];
@@ -93,7 +93,7 @@ const Page = ({ params }) => {
           {branchId === 2 && (
             <select className='select w-[300px]' onChange={handleBranchChange}>
               {dataBranch.map((item) => (
-                <option key={item.id} value={item.id}>
+                <option className='option' key={item.id} value={item.id}>
                   {item.name}
                 </option>
               ))}
@@ -113,7 +113,7 @@ const Page = ({ params }) => {
             <p className="text-sm font-bold">Danh sách tiệc {BranchName}</p>
           </div>
           <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-            <BookingsTable branchId={selectedBranchId} />
+            <BookingsTable />
           </div>
         </div>
       </div>
