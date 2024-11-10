@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { setSelectedDish } from "../_lib/features/dishes/dishesSlice";
 import { CONFIG } from "../_utils/config";
 import { formatPrice } from "../_utils/formaters";
+import { API_CONFIG } from "../_utils/api.config";
 
 function Dish(props) {
   const {
@@ -30,7 +31,9 @@ function Dish(props) {
     dispatch(setSelectedDish(dish));
   };
 
-  const href = navigate ? props.link || `/admin/mon-an?id=${dish.id}` : "#";
+  const href = navigate
+    ? props.link || `/admin/thuc-pham?id=${dish.id}`
+    : "#";
 
   return (
     <>

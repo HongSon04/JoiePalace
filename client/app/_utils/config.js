@@ -1,9 +1,13 @@
 import dishImagePlaceholder from "@/public/alacarte-menu-thumbnail.png";
 import imageUploaderPlaceholder from "@/public/imageUploaderPlaceholder.svg";
+import clientPattern from "@/public/line-group.svg";
+import clientDishImagePlaceholder from "@/public/clientDishPlaceholder.png";
 
 export const CONFIG = {
   DISH_IMAGE_PLACEHOLDER: dishImagePlaceholder,
   IMAGE_UPLOADER_PLACEHOLDER: imageUploaderPlaceholder,
+  CLIENT_PATTERN: clientPattern,
+  CLIENT_DISH_IMAGE_PLACEHOLDER: clientDishImagePlaceholder,
   ITEMS_PER_PAGE: [5, 10, 20, 50, 80, 100],
   BOOKING_STATUS: [
     {

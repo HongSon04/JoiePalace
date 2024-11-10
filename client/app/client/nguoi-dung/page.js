@@ -77,8 +77,9 @@ const Page = () => {
                 // Fetch all bookings for the user
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
-                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending');
-
+                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
+                console.log(fetchedAllBookingsMembershipId);
+                
                 if (fetchedAllBookingsSuccess.length > 0) {
                     const parties = fetchedAllBookingsSuccess.map((item) => {
                         const dataDetailBooking = item.booking_details;
@@ -132,6 +133,8 @@ const Page = () => {
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
                     return total + item.booking_details[0].total_amount;
                 }, 0);
+                console.log(total_amountUser);
+                
                 setTotalAmount(total_amountUser)
                 setLoading(false);
                 // Set successful and pending parties
@@ -142,10 +145,10 @@ const Page = () => {
                 console.error('Chưa lấy được dữ liệu người dùng', error);
             }
         };
-
         getData();
     }, []);
 
+    
     return (
         <div className="flex flex-col gap-8">
 

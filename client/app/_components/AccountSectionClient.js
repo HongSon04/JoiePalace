@@ -22,7 +22,7 @@ const AccountSectionClient = ({ title, nameUser, phoneUser, emailUser, partyBook
                         setRank(rankMemberships[0]); 
                     }
                 } else {
-                    setRank(null); 
+                    setRank(rankMemberships[0]); 
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);

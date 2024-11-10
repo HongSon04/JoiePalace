@@ -113,58 +113,34 @@ const useApiServices = () => {
     signal = null, // Add signal parameter
     redirectURL = "/auth/chon-chi-nhanh?isExpired=true"
   ) => {
-    // const accessToken = Cookies.get("accessToken");
-    // console.log(
-    //   "access token when making request from makeAuthoriedRequest function -> ",
-    //   accessToken
-    // );
+    let dataResponse;
+    let attempts = 0; // Track the number of attempts
+    const maxAttempts = 3; // Set a maximum number of attempts to avoid infinite loops
 
-    let dataResponse = await apiRequest(
-      endpoint,
-      method,
-      data,
-      signal,
-      redirectURL
-    );
+    while (attempts < maxAttempts) {
+      dataResponse = await apiRequest(endpoint, method, data, signal);
 
-    // console.log(
-    //   "data response from makeAuthorizedRequest function -> ",
-    //   dataResponse
-    // );
+      // Check if the response indicates an unauthorized error
+      if (
+        dataResponse &&
+        dataResponse.success === false &&
+        dataResponse.error.error === "Unauthorized"
+      ) {
+        const newAccessToken = await refreshAccessToken(redirectURL);
 
-    // Check if the response indicates an unauthorized error
-    if (
-      dataResponse &&
-      dataResponse.success === false &&
-      dataResponse.error.error === "Unauthorized"
-    ) {
-      const newAccessToken = await refreshAccessToken(redirectURL);
-
-      // console.log(
-      //   "this is new access token form makeAuthorizedRequest function refresh token logic -> ",
-      //   newAccessToken
-      // );
-
-      // If a new access token was obtained, retry the request
-      if (newAccessToken) {
-        // Update the token in your API request logic if necessary
-        // For example, if you're using local storage:
-        // localStorage.setItem('accessToken', newAccessToken);
-
-        // Retry the request with the new access token
-        dataResponse = await apiRequest(endpoint, method, data, signal);
-
-        // console.log(
-        //   "data after retrying the request with new access token -> ",
-        //   dataResponse
-        // );
+        // If a new access token was obtained, retry the request
+        if (newAccessToken) {
+          attempts++; // Increment the attempt counter
+          continue; // Retry the API request
+        } else {
+          // If the refresh token is expired or invalid, break the loop
+          break;
+        }
       }
-    }
 
-    // console.log("data response from makeAuthorizedRequest function -> ", {
-    //   ...dataResponse,
-    //   success: dataResponse?.success !== false,
-    // });
+      // If the request was successful, break the loop
+      break;
+    }
 
     return {
       ...dataResponse,

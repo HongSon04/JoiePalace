@@ -155,67 +155,12 @@ export class CategoriesController {
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả danh mục' })
-  // @ApiQuery({ name: 'page', required: false })
-  // @ApiQuery({ name: 'itemsPerPage', required: false })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  @ApiQuery({ name: 'deleted', required: false, description: 'true | false' })
   findAll(@Query() query: FilterCategoryDto) {
     return this.categoriesService.findAll(query);
-  }
-
-  // ! Get All Category Deleted
-  @Get('/get-all-deleted')
-  @ApiHeaders([
-    {
-      name: 'authorization',
-      description: 'Bearer token',
-      required: false,
-    },
-  ])
-  @ApiBearerAuth('authorization')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    example: {
-      data: [
-        {
-          id: 'number',
-          name: 'string',
-          slug: 'string',
-          description: 'string',
-          short_description: 'string',
-          deleted: 'boolean',
-          deleted_at: 'date',
-          deleted_by: 'number',
-          created_at: 'date',
-          updated_at: 'date',
-        },
-      ],
-      pagination: {
-        currentPage: 'number',
-        itemsPerPage: 'number',
-        total: 'number',
-        prevPage: 'number',
-        nextPage: 'number',
-        lastPage: 'number',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    example: {
-      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau !',
-      error: 'Lỗi gì đó !',
-    },
-  })
-  @ApiOperation({ summary: 'Lấy tất cả danh mục đã xóa tạm' })
-  // @ApiQuery({ name: 'page', required: false })
-  // @ApiQuery({ name: 'itemsPerPage', required: false })
-  @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'startDate', required: false, description: '28-10-2024' })
-  @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAllDeleted(@Query() query: FilterCategoryDto) {
-    return this.categoriesService.findAllDeleted(query);
   }
 
   // ! Get Category By Id
