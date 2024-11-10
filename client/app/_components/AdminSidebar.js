@@ -24,17 +24,19 @@ import drinkIcon from "@/public/admin-sidebar/do-uong.svg";
 import customerIcon from "@/public/admin-sidebar/khach-hang.svg";
 import contactIcon from "@/public/admin-sidebar/lien-he-ho-tro.svg";
 import menuIcon from "@/public/admin-sidebar/menu.svg";
-import foodIcon from "@/public/admin-sidebar/mon-an.svg";
+import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import feedbackIcon from "@/public/admin-sidebar/phan-hoi-danh-gia.svg";
 import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
 import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
+import categoryIcon from "@/public/admin-sidebar/danh-muc.svg";
 import logo from "@/public/logo-dark.png";
 import { useDispatch, useSelector } from "react-redux";
 import { API_CONFIG } from "../_utils/api.config";
 import AdminUser from "./AdminUser";
 import { getCurrentBranch } from "../_lib/features/branch/branchSlice";
+import { Tooltip } from "@nextui-org/react";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -122,111 +124,111 @@ function AdminSidebarNav() {
 
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
-  if (!currentBranch) {
-    return null;
-  }
+  const mainOptions = React.useMemo(() => {
+    return [
+      {
+        title: "Bảng điều khiển",
+        // path: isGeneralBranch
+        //   ? "/admin/bang-dieu-khien"
+        //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+        path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+        icon: dashboardIcon,
+        className: "",
+      },
+      {
+        title: "Chi nhánh",
+        path: `/admin/chi-nhanh/${currentBranch?.slug}`,
+        icon: branchIcon,
+        className: "",
+      },
+      {
+        title: "Thống kê",
+        path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+        // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+        icon: statisticIcon,
+        className: "",
+      },
+      {
+        title: "Khách hàng",
+        path: `/admin/khach-hang/${currentBranch?.slug}`,
+        icon: customerIcon,
+        className: "",
+      },
+      {
+        title: "Yêu cầu",
+        path: `/admin/yeu-cau/${currentBranch?.slug}`,
+        icon: requestIcon,
+        className: "",
+        qty: 5,
+      },
+      {
+        title: "Quản lý tiệc",
+        path: `/admin/quan-ly-tiec/${currentBranch?.slug}`,
+        icon: eventIcon,
+        className: "",
+      },
+      {
+        title: "Danh mục",
+        path: `/admin/quan-ly-danh-muc/`,
+        icon: categoryIcon,
+        className: "",
+      },
+      {
+        title: "Thực đơn",
+        path: `/admin/thuc-don/`,
+        icon: menuIcon,
+        className: "",
+      },
+      {
+        title: "Quản lý thực phẩm",
+        path: `/admin/thuc-pham/`,
+        icon: foodIcon,
+        className: "",
+      },
+      {
+        title: "Phản hồi & đánh giá",
+        // path: isGeneralBranch
+        //   ? `/admin/phan-hoi-danh-gia`
+        //   : `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
+        path: `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
+        icon: feedbackIcon,
+        className: "",
+      },
+      {
+        title: "Bài viết",
+        path: `/admin/bai-viet/`,
+        icon: blogIcon,
+        className: "",
+      },
+    ];
+  }, [currentBranch]);
 
-  const mainOptions = [
-    {
-      title: "Bảng điều khiển",
-      // path: isGeneralBranch
-      //   ? "/admin/bang-dieu-khien"
-      //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
-      path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
-      icon: dashboardIcon,
-      className: "",
-    },
-    {
-      title: "Chi nhánh",
-      path: `/admin/chi-nhanh/${currentBranch?.slug}`,
-      icon: branchIcon,
-      className: "",
-    },
-    {
-      title: "Thống kê",
-      path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
-      // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
-      icon: statisticIcon,
-      className: "",
-    },
-    {
-      title: "Khách hàng",
-      path: `/admin/khach-hang/${currentBranch?.slug}`,
-      icon: customerIcon,
-      className: "",
-    },
-    {
-      title: "Yêu cầu",
-      path: `/admin/yeu-cau/${currentBranch?.slug}`,
-      icon: requestIcon,
-      className: "",
-      qty: 5,
-    },
-    {
-      title: "Quản lý tiệc",
-      path: `/admin/quan-ly-tiec/${currentBranch?.slug}`,
-      icon: eventIcon,
-      className: "",
-    },
-    {
-      title: "Thực đơn",
-      path: `/admin/thuc-don/`,
-      icon: menuIcon,
-      className: "",
-    },
-    {
-      title: "Món ăn",
-      path: `/admin/mon-an/`,
-      icon: foodIcon,
-      className: "",
-    },
-    {
-      title: "Đồ uống",
-      path: `/admin/do-uong/`,
-      icon: drinkIcon,
-      className: "",
-    },
-    {
-      title: "Phản hồi & đánh giá",
-      // path: isGeneralBranch
-      //   ? `/admin/phan-hoi-danh-gia`
-      //   : `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
-      path: `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
-      icon: feedbackIcon,
-      className: "",
-    },
-    {
-      title: "Bài viết",
-      path: `/admin/bai-viet/`,
-      icon: blogIcon,
-      className: "",
-    },
-  ];
-
-  const subOptions = [
-    {
-      title: "Thông báo",
-      path: `/admin/thong-bao/${currentBranch?.slug}`,
-      icon: notificationIcon,
-      className: "",
-      qty: 5,
-    },
-    {
-      title: "Liên hệ & hỗ trợ",
-      // path: isGeneralBranch
-      //   ? `/admin/lien-he-ho-tro`
-      //   : `/admin/lien-he-ho-tro/${currentBranch.slug}`,
-      path: `/admin/lien-he-ho-tro/${currentBranch.slug}`,
-      icon: contactIcon,
-      className: "",
-    },
-    {
-      title: "Cài đặt",
-      path: "/admin/cai-dat",
-      icon: settingIcon,
-      className: "",
-    },
-  ];
+  const subOptions = React.useMemo(() => {
+    return [
+      {
+        title: "Thông báo",
+        path: `/admin/thong-bao/${currentBranch?.slug}`,
+        icon: notificationIcon,
+        className: "",
+        qty: 5,
+      },
+      {
+        title: "Liên hệ & hỗ trợ",
+        // path: isGeneralBranch
+        //   ? `/admin/lien-he-ho-tro`
+        //   : `/admin/lien-he-ho-tro/${currentBranch.slug}`,
+        path: `/admin/lien-he-ho-tro/${currentBranch.slug}`,
+        icon: contactIcon,
+        className: "",
+      },
+      {
+        title: "Cài đặt",
+        path: "/admin/cai-dat",
+        icon: settingIcon,
+        className: "",
+      },
+    ];
+  }, [currentBranch]);
 
   return (
     <nav className="flex justify-center flex-col gap-[20px] rounded-xl w-full">
@@ -263,33 +265,35 @@ function AdminSidebarItem({ item, className }) {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   return (
-    <li
-      item={item}
-      className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
-        isActive ? "bg-whiteAlpha-100" : ""
-      } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""} ${className}`}
-    >
-      <Link
-        href={item.path}
-        className={`flex items-center gap-2 p-2 flex-1 text-white !stroke-gray-600 rounded-md flex-center relative`}
+    <Tooltip content={item.title} placement="right-end">
+      <li
+        item={item}
+        className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
+          isActive ? "bg-whiteAlpha-100" : ""
+        } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""} ${className}`}
       >
-        <Image src={item.icon} alt={item.title} className={`w-6 h-6`} />
-        {isSidebarOpen && (
+        <Link
+          href={item.path}
+          className={`flex items-center gap-2 p-2 flex-1 text-white !stroke-gray-600 rounded-md flex-center relative`}
+        >
+          <Image src={item.icon} alt={item.title} className={`w-6 h-6`} />
+          {isSidebarOpen && (
+            <span
+              className={`text-white transition flex-1 min-w-max block text-base`}
+            >
+              {item.title}
+            </span>
+          )}
+        </Link>
+        {item.qty && (
           <span
-            className={`text-white transition flex-1 min-w-max block text-base`}
+            className={`shrink-0 w-5 h-5 bg-red-400 text-sm text-white rounded-full flex-center absolute -top-1 -right-1`}
           >
-            {item.title}
+            {item.qty}
           </span>
         )}
-      </Link>
-      {item.qty && (
-        <span
-          className={`shrink-0 w-5 h-5 bg-red-400 text-sm text-white rounded-full flex-center absolute -top-1 -right-1`}
-        >
-          {item.qty}
-        </span>
-      )}
-    </li>
+      </li>
+    </Tooltip>
   );
 }
 

@@ -3,13 +3,16 @@ import Image from 'next/image';
 import React from 'react';
 import iconExitLogout from '@/public/iconExitLogout.svg'
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+import Cookies from "js-cookie";
+
 const Page = () => {
     const router = useRouter();
-
-    
     const logout = () => {
+        signOut();
         localStorage.removeItem('user');
         router.push('/');
+        Cookies.remove("accessToken");
     }
     return (
         <div className='w-full'>

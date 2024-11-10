@@ -8,23 +8,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Connect to Server via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: 22
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: List Files in Root Directory
-        run: |
-          echo "Listing files in the root directory..."
-          ls -la /
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch Latest Changes
         run: |
           echo "Fetching latest changes..."
-          cd /root/JoiePalace
+          cd /JoiePalace
           git fetch origin || exit 1
           git checkout main || exit 1
           git pull origin main || exit 1
@@ -32,19 +29,19 @@ jobs:
       - name: Install Server Dependencies
         run: |
           echo "Installing server dependencies..."
-          cd /server
+          cd /JoiePalace/server
           npm ci
 
       - name: Generate Prisma Client
         run: |
           echo "Generating Prisma client..."
-          cd /server
+          cd /JoiePalace/server
           npx prisma generate
 
       - name: Build the Application
         run: |
           echo "Building the application..."
-          cd /server
+          cd /JoiePalace/server
           npm run build
 
       - name: Reload PM2

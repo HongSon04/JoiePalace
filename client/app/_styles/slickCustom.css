@@ -1,0 +1,6 @@
+.slick-active>* {
+  width: 30px;
+  height: 4px;
+  border-radius: 100px;
+  background-color: goldenrod;
+}

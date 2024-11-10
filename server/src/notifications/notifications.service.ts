@@ -180,27 +180,39 @@ export class NotificationsService {
   }
 
   // ! Update Is Read Notification by ID
-  async updateIsReadNotification(id: number) {
+  async updateIsReadNotification(notify_id: number[]) {
     try {
-      const findNotification =
-        await this.prismaService.notifications.findUnique({
+      // ? Kiểm tra sản phẩm
+      // Handle tags if provided
+      if (notify_id && notify_id.length > 0) {
+        let notify = [];
+        const productsArray = JSON.parse(notify_id as any);
+
+        notify = await this.prismaService.notifications.findMany({
           where: {
-            id: Number(id),
+            id: {
+              in: productsArray,
+            },
           },
         });
 
-      if (!findNotification) {
-        throw new NotFoundException('Không tìm thấy thông báo!');
-      }
+        if (!notify) {
+          throw new NotFoundException('Không tìm thấy thông báo!');
+        }
 
-      await this.prismaService.notifications.update({
-        where: {
-          id: Number(id),
-        },
-        data: {
-          is_read: true,
-        },
-      });
+        // ? Cập nhật trạng thái đã đọc
+
+        await this.prismaService.notifications.updateMany({
+          where: {
+            id: {
+              in: productsArray,
+            },
+          },
+          data: {
+            is_read: true,
+          },
+        });
+      }
 
       throw new HttpException(
         {

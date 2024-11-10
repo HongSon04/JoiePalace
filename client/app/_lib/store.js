@@ -10,6 +10,7 @@ import partyTypesSlice from "./features/partyTypes/partyTypesSlice";
 import requestsSlice from "./features/requests/requestsSlice";
 import sidebarSlice from "./features/sidebar/sidebarSlice";
 import themeSlice from "./features/theme/themeSlice";
+import productsSlice from "./products/productsSlice";
 
 const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ const store = configureStore({
     categories: categoriesSlice.reducer,
     feedbacks: feedbacksSlice.reducer,
     partyTypes: partyTypesSlice.reducer,
+    products: productsSlice.reducer,
   },
 });
 

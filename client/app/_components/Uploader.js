@@ -1,10 +1,11 @@
 // app/components/ImageUpload.js
 "use client"; // This is a client component
 
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { ExclamationCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { CONFIG } from "../_utils/config";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * USAGE: 
@@ -30,11 +31,10 @@ const Uploader = ({
   register,
   errors,
 }) => {
-  const fileInputRef = React.createRef();
+  const fileInputRef = useRef();
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    setFiles(selectedFiles);
     onFileChange(selectedFiles);
   };
 
@@ -54,10 +54,9 @@ const Uploader = ({
     (e) => {
       e.preventDefault();
       const droppedFiles = Array.from(e.dataTransfer.files);
-      setFiles(droppedFiles);
-      onFileChange(droppedFiles); // Notify parent component of the dropped files
+      onFileChange(droppedFiles);
     },
-    [onFileChange, setFiles]
+    [onFileChange]
   );
 
   // Utility function to format file size
@@ -91,35 +90,48 @@ const Uploader = ({
           width={300}
           height={200}
         ></Image>
-        {errors && errors[name] ? (
-          <p className="text-red-400">{errors[name].message}</p>
-        ) : (
-          <p className="text-base text-gray-400">
-            Kéo và thả ảnh của bạn tại đây, <br /> hoặc bấm vào nút chọn ảnh
-          </p>
-        )}
+        <p className="text-base text-gray-400">
+          Kéo và thả ảnh của bạn tại đây, <br /> hoặc bấm vào nút chọn ảnh
+        </p>
         <input
           type="file"
           accept="image/*"
           multiple
           onChange={handleFileChange}
           ref={fileInputRef}
-          style={{ opacity: "0" }} // Hide the default file input
+          className="hidden-input"
           id={id || name}
           name={name}
           aria-label="Chọn ảnh"
-          {...register(name)}
+          required
+          // {...register(name)}
+          // tabIndex={0}
         />
         <button
           type="button"
-          className="underline text-gold"
           onClick={() => fileInputRef.current.click()}
+          className="underline text-gold cursor-pointer"
         >
           Chọn ảnh{" "}
         </button>
       </div>
+
+      {/* <AnimatePresence>
+        {errors[name] && (
+          <motion.div
+            key={errors[name].message}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-red-400 text-sm font-normal mt-2 mb-2"
+          >
+            <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+            {errors[name].message}
+          </motion.div>
+        )}
+      </AnimatePresence> */}
       {files.length > 0 && (
-        <div>
+        <div className="mb-3">
           <h3>Ảnh tải lên:</h3>
           <ul className="flex flex-col gap-2 mt-3">
             {files.map((file, index) => (
@@ -133,8 +145,10 @@ const Uploader = ({
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
-                <div className="truncate w-full">{file.name}</div>
-                <div className="min-w-max">({formatFileSize(file.size)})</div>
+                <div className="truncate w-full text-gray-800">{file.name}</div>
+                <div className="min-w-max text-gray-800">
+                  ({formatFileSize(file.size)})
+                </div>
               </li>
             ))}
           </ul>
