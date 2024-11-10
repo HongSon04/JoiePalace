@@ -293,7 +293,7 @@ function CategoriesTable() {
   React.useEffect(() => {
     console.log("id -> ", id);
 
-    const response = dispatch(fetchCategoryById(id));
+    const response = dispatch(fetchCategoryById({ id }));
 
     console.log(response);
 
