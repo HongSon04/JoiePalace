@@ -87,7 +87,7 @@ function RequestTable() {
     ),
   });
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [requestStatus, setRequestStatus] = React.useState("pending");
+  const [requestStatus, setRequestStatus] = React.useState("processing");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
 

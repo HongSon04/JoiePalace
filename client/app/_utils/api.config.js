@@ -77,6 +77,8 @@ export const API_CONFIG = {
   STAGES: {
     CREATE: `${STAGES}/create`,
     GET_ALL: (params) => constructUrlWithParams(`${STAGES}/get-all`, params),
+    GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
+    GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
   },
 
   // CATEGORIES API
