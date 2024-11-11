@@ -250,7 +250,7 @@ const CustomerInfoPayment = ({ title, payerName, paymentMethod , amountPayable, 
         <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400">
             <TitleInfo title={'Tên người thanh toán'} info={payerName}/>
             <TitleInfo title={'Hình thức thanh toán'} info={paymentMethod}/>
-            <TitleInfo title={'Số tiền phải thanh toán'} info={amountPayable}/>
+            <TitleInfo title={'Tổng số tiền'} info={amountPayable}/>
             <TitleInfo title={'Số tiền đặt cọc (30%)'} info={depositAmount}/>
             <TitleInfo title={'Trạng thái đặt cọc'} info={depositStatus} textColor='text-cyan-400'/>
             <TitleInfo title={'Ngày đặt cọc'} info={depositDay}/>

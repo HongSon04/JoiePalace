@@ -34,15 +34,22 @@ const Page = ({ params }) => {
                         const dataStages = item.stages;
                         const dataMenus = dataDetailBooking[0]?.menus;
                         const drinksPrice = dataMenus?.products.reduce((total, item) => {
-                            if (item.category_id === 2) { // thí dụ nước categories == 2
+                            if (item.category_id === 1) { 
                                 return total + (item.price || 0);
                             }
                             return total;
                         }, 0)
                         const dataDecors = dataDetailBooking[0]?.decors;
                         const datadePosits = dataDetailBooking[0]?.deposits;
+                        const dataMenul = dataDetailBooking[0]?.menu_detail;
                         setStatusParty(item.status);
 
+                        // Nước uống
+                        const drinkShow = dataMenus?.products.filter((item) => {
+                            return item.category_id === 1;
+                        });
+
+                        
                         // Tính chi phí bàn và ghế
                         const tableCount = dataDetailBooking[0]?.table_count || 0;
                         const tablePrice = tableCount * 200000;
@@ -91,7 +98,7 @@ const Page = ({ params }) => {
                             otherServicesCost +           // Chi phí dịch vụ khác
                             extraServicesCost;
 
-
+                        
                         return {
                             id: item.id,
                             nameParty: item.name,
@@ -101,11 +108,11 @@ const Page = ({ params }) => {
                             email: getUser?.email,
                             phoneUser: getUser?.phone,
                             idParty: `P${item.id}`,
-                            partyDate: new Date(item.created_at).toISOString().split("T")[0],
-                            dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
-                            numberGuest: item.number_of_guests,
+                            partyDate: formatDate(item.created_at),
+                            dateOrganization:formatDate(item.organization_date),
+                            numberGuest: (dataDetailBooking[0]?.table_count * 10),
                             session: item.shift,
-                            tableNumber: Math.ceil(item.number_of_guests / 10),
+                            tableNumber:dataDetailBooking[0]?.table_count,
                             spareTables: 2,
                             linkTo: `/party/${item.id}`,
                             showFull: true,
@@ -118,13 +125,13 @@ const Page = ({ params }) => {
                             decorate: dataDetailBooking[0]?.decors?.name || "Không có trang trí",
                             guestTable: "10 người/bàn",
                             menu: dataMenus?.name,
-                            drinks: "Bia Tiger, Nước ngọt Pepsi",
+                            drinks: drinkShow.map( i=>(`${i.name} `)),
                             payerName: item.name,
-                            paymentMethod: `Chuyển khoản ${datadePosits?.payment_method}`,
+                            paymentMethod: `Chuyển khoản ${datadePosits?.payment_method || "chưa có"} ` ,
                             menuCostTable: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Chưa thanh toán",
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND ` : "0 VND",
                             depositAmount: datadePosits?.amount ? `${datadePosits?.amount.toLocaleString('vi-VN')} VND` : "0 VND",
-                            depositStatus: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Chưa thanh toán",
+                            depositStatus:  item.is_deposit === 'pending' ? 'Đã cọc' : "Chưa cọc",
                             depositDay: formatDate(datadePosits?.created_at),
                             remainingPaid: (dataDetailBooking[0].total_amount && datadePosits?.amount) ? `${(parseInt(dataDetailBooking[0].total_amount) - parseInt(datadePosits?.amount)).toLocaleString('vi-VN')} VND` : `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND`,
                             paymentDay: formatDate(datadePosits?.created_at),
@@ -133,17 +140,18 @@ const Page = ({ params }) => {
                             // Chi phí khác
                             costTable: `${(amount / tableCount).toLocaleString('vi-VN')} VND/bàn`,
                             decorationCost: `${dataDecors?.price.toLocaleString('vi-VN')} VND`,
-                            soundStage: 'Đã tính',
-                            hallRental: `${dataStages?.price.toLocaleString('vi-VN')} VND`,
+                            soundStage: 'Miễn phí',
+                            hallRental: `${dataStages?.price === 0 ? 'Miễn phí' : `${dataStages?.price.toLocaleString('vi-VN')} VND`}`,
                             tableRental: "200.000 VND / 1 bàn",
                             chairRental: "50.000 VND / 1 ghế",
-                            paymentStatus: `${((tablePrice + chairPrice + menuCost + drinksPrice) / tableCount).toLocaleString('vi-VN')} VND / bàn` || 0,
+                            paymentStatus: `${(dataMenul.price).toLocaleString('vi-VN')} VND / bàn` || 0,
                             snack: "Bánh ngọt, Trái cây",
                             vat: "10%",
                             drinksCost: `${drinksPrice.toLocaleString('vi-VN')} VND / bàn` || 0,
                             arise: item.is_deposit ? '' : "Không có",
                         };
                     });
+                    
                     setParty(parties);
                 }
 
@@ -233,7 +241,7 @@ const Page = ({ params }) => {
 
             <div className='flex items-center'>
                 <span className='text-cyan-400 text-base'>
-                    • {`${statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pedding' ? 'Đang chờ' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang xử lý'}`}
+                    • {`${statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pedding' ? 'chưa giải quyết' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang xử lý'}`}
                 </span>
             </div>
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>

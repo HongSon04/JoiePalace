@@ -75,11 +75,12 @@ const Page = () => {
             }
             try {
                 // Fetch all bookings for the user
+                //pending, processing, success, cancel
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
                 console.log(fetchedAllBookingsMembershipId);
-                
+
                 if (fetchedAllBookingsSuccess.length > 0) {
                     const parties = fetchedAllBookingsSuccess.map((item) => {
                         const dataDetailBooking = item.booking_details;
@@ -96,8 +97,8 @@ const Page = () => {
                             email: getUser?.email,
                             phoneUser: getUser?.phone,
                             idParty: `P${item.id}`,
-                            partyDate: new Date(item.created_at).toISOString().split("T")[0],
-                            dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
+                            partyDate: formatDate(item.created_at),
+                            dateOrganization: formatDate(item.organization_date),
                             numberGuest: item.number_of_guests,
                             session: item.shift,
                             tableNumber: Math.ceil(item.number_of_guests / 10),
@@ -129,12 +130,16 @@ const Page = () => {
                     });
                     setResonParty(parties);
                 }
+                const formatDate = (dateString) => {
+                    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+                    return new Date(dateString).toLocaleDateString('en-GB', options).replace(/\//g, '/');
+                };
 
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
                     return total + item.booking_details[0].total_amount;
                 }, 0);
                 console.log(total_amountUser);
-                
+
                 setTotalAmount(total_amountUser)
                 setLoading(false);
                 // Set successful and pending parties
@@ -148,7 +153,7 @@ const Page = () => {
         getData();
     }, []);
 
-    
+
     return (
         <div className="flex flex-col gap-8">
 
