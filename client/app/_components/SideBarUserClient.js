@@ -8,10 +8,10 @@ const SideBarUserClient = () => {
     const pathName = usePathname();
 
     const links = [
-        { title: 'Chung', links: ['/client/nguoi-dung', '/client/nguoi-dung'], color: "text-white" },
+        { title: 'Chung', links: ['/client/nguoi-dung'], color: "text-white" },
         { title: 'Tài khoản', links: '/client/nguoi-dung/tai-khoan', color: "text-white" },
         { title: 'Hạng thành viên', links: '/client/nguoi-dung/hang-thanh-vien', color: "text-white" },
-        { title: 'Tiệc của bạn', links: ['/client/nguoi-dung/lich-su-tiec', '/client/nguoi-dung/lich-su-tiec/[id]'], color: "text-white" },
+        { title: 'Tiệc của bạn', links: ['/client/nguoi-dung/lich-su-tiec'], color: "text-white" },
         { title: 'Thông báo', links: '/client/nguoi-dung/thong-bao', color: "text-white" },
         { title: 'Đổi mật khẩu', links: '/client/nguoi-dung/doi-mat-khau', color: "text-white" },
         { title: 'Đăng xuất', links: '/client/nguoi-dung/dang-xuat', color: "text-red-400" },
