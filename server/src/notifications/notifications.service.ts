@@ -9,6 +9,7 @@ import { FilterDto } from 'helper/dto/Filter.dto';
 import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
 import { FormatReturnData } from 'helper/FormatReturnData';
 import { PrismaService } from 'src/prisma.service';
+import { UpdateStatusNotificationDto } from './dto/update-status-notification.dto';
 
 @Injectable()
 export class NotificationsService {
@@ -180,13 +181,20 @@ export class NotificationsService {
   }
 
   // ! Update Is Read Notification by ID
-  async updateIsReadNotification(notify_id: number[]) {
+  async updateIsReadNotification(body: UpdateStatusNotificationDto) {
     try {
+      const { notification_ids } = body;
       // ? Kiểm tra sản phẩm
       // Handle tags if provided
-      if (notify_id && notify_id.length > 0) {
+      console.log('notification_ids: ', notification_ids);
+      console.log('type of notification_ids: ', typeof notification_ids);
+      if (notification_ids && notification_ids.length > 0) {
         let notify = [];
-        const productsArray = JSON.parse(notify_id as any);
+        console.log('type of notify_id: ', typeof notification_ids);
+        console.log('notify_id: ', notification_ids);
+        const productsArray = Array.isArray(notification_ids)
+          ? notification_ids
+          : JSON.parse(String(notification_ids));
 
         notify = await this.prismaService.notifications.findMany({
           where: {
@@ -212,14 +220,15 @@ export class NotificationsService {
             is_read: true,
           },
         });
-      }
 
-      throw new HttpException(
-        {
-          message: 'Cập nhật trạng thái thông báo thành công!',
-        },
-        HttpStatus.OK,
-      );
+        throw new HttpException(
+          {
+            message: 'Cập nhật trạng thái thông báo thành công!',
+          },
+          HttpStatus.OK,
+        );
+      } else {
+      }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

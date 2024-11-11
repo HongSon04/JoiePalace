@@ -23,7 +23,7 @@ import {
 import { FilterDto } from 'helper/dto/Filter.dto';
 import { isPublic } from 'decorator/auth.decorator';
 
-@Controller('subscribers')
+@Controller('api/subscribers')
 @ApiTags('Subscribers - Quản lý người đăng ký')
 export class SubscribersController {
   constructor(private readonly subscribersService: SubscribersService) {}

@@ -115,10 +115,27 @@ const categoriesSlice = createSlice({
       state.error = action.payload;
       state.isError = true;
     },
+
+    updatingCategory(state) {
+      state.isUpdatingCategory = true;
+      state.isUpdatingCategoryError = false;
+    },
+    updatingCategorySuccess(state, action) {
+      state.isUpdatingCategory = false;
+      state.isUpdatingCategoryError = false;
+      state.categories = state.categories.map((category) =>
+        category.id === action.payload.id ? action.payload : category
+      );
+    },
+    updatingCategoryFailure(state, action) {
+      state.isUpdatingCategory = false;
+      state.isUpdatingCategoryError = true;
+      state.error = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Fetching category categoryes
+      // Fetching category categories
       .addCase(fetchCategoriesBySlug.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
@@ -151,21 +168,22 @@ const categoriesSlice = createSlice({
         state.error = action.payload; // Use the error message from the rejected action
       });
     // // Updating a category
-    // .addCase(updateCategory.pending, (state) => {
-    //   state.isUpdatingCategory = true;
-    //   state.isUpdatingCategoryError = false;
-    // })
-    // .addCase(updateCategory.fulfilled, (state, action) => {
-    //   state.isUpdatingCategory = false;
-    //   state.categoryes = state.categoryes.map((category) =>
-    //     category.id === action.payload.id ? action.payload : category
-    //   ); // Update the category in the state
-    // })
-    // .addCase(updateCategory.rejected, (state, action) => {
-    //   state.isUpdatingCategory = false;
-    //   state.isUpdatingCategoryError = true;
-    //   state.error = action.payload; // Use the error message from the rejected action
-    // })
+    builder
+      .addCase(updateCategory.pending, (state) => {
+        state.isUpdatingCategory = true;
+        state.isUpdatingCategoryError = false;
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        state.isUpdatingCategory = false;
+        state.categories = state.categories.map((category) =>
+          category.id === action.payload.id ? action.payload : category
+        ); // Update the category in the state
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.isUpdatingCategory = false;
+        state.isUpdatingCategoryError = true;
+        state.error = action.payload; // Use the error message from the rejected action
+      });
     // Deleting a category
     builder
       .addCase(deleteCategory.pending, (state) => {
@@ -247,9 +265,11 @@ export const fetchCategoriesBySlug = createAsyncThunk(
     //   response.data.at(0).children
     // );
 
+    console.log(response);
+
     if (response.success) {
-      dispatch(fetchingCategoriesSuccess(response.data.at(0).children));
-      return response.data.at(0).children;
+      dispatch(fetchingCategoriesSuccess(response.data.at(0).childrens));
+      return response.data.at(0).childrens;
     } else {
       dispatch(fetchingCategoriesFailure(response.message));
       return rejectWithValue(response.message);
@@ -267,15 +287,13 @@ export const fetchCategoryById = createAsyncThunk(
       "GET"
     );
 
-    console.log(response);
-
     if (response.success) {
       dispatch(fetchingSelectedCategorySuccess(response.data.at(0)));
+      return response.data.at(0);
     } else {
       dispatch(fetchingSelectedCategoryFailure(response.error.message));
+      return response.error.message;
     }
-
-    return response;
   }
 );
 
@@ -326,6 +344,27 @@ export const deleteCategory = createAsyncThunk(
   }
 );
 
+export const updateCategory = createAsyncThunk(
+  "categories/updateCategory",
+  async ({ id, data }, { dispatch, rejectWithValue }) => {
+    dispatch(updatingCategory());
+
+    const response = await makeAuthorizedRequest(
+      API_CONFIG.CATEGORIES.UPDATE(id),
+      "PUT",
+      data
+    );
+
+    if (response.success) {
+      dispatch(updatingCategorySuccess(response.data.at(0)));
+      return response;
+    } else {
+      dispatch(updatingCategoryFailure(response));
+      return response;
+    }
+  }
+);
+
 export const {
   setSelectedCategory,
 
@@ -348,6 +387,10 @@ export const {
   fetchingSelectedCategory,
   fetchingSelectedCategorySuccess,
   fetchingSelectedCategoryFailure,
+
+  updatingCategory,
+  updatingCategorySuccess,
+  updatingCategoryFailure,
 } = categoriesSlice.actions;
 
 export default categoriesSlice;

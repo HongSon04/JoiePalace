@@ -29,7 +29,7 @@ const InputDetailCustomer = ({
                             {...field}
                             value={field.value || ''} // Đảm bảo `value` luôn có giá trị
                         >
-                            <option value="" disabled>
+                            <option className='option' value="" disabled>
                                 Chọn {title}
                             </option>
                             {options.map((option, index) => (

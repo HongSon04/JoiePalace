@@ -249,7 +249,7 @@ export class CategoriesService {
   async findOne(id: number) {
     try {
       const rootCategory = await this.prismaService.categories.findUnique({
-        where: { id: Number(id), category_id: null },
+        where: { id: Number(id) },
         include: {
           tags: true,
           products: {
@@ -266,7 +266,7 @@ export class CategoriesService {
 
       const childCategories = await this.prismaService.categories.findMany({
         where: {
-          category_id: Number(id),
+          deleted: false,
         },
         include: {
           tags: true,
@@ -302,7 +302,7 @@ export class CategoriesService {
   async findOneBySlug(slug: string) {
     try {
       const rootCategory = await this.prismaService.categories.findUnique({
-        where: { slug, category_id: null },
+        where: { slug },
         include: {
           tags: true,
           products: {
@@ -319,7 +319,7 @@ export class CategoriesService {
 
       const childCategories = await this.prismaService.categories.findMany({
         where: {
-          category_id: Number(rootCategory.id),
+          deleted: false,
         },
         include: {
           tags: true,
@@ -364,7 +364,6 @@ export class CategoriesService {
 
       const rootCategory = await this.prismaService.categories.findMany({
         where: {
-          category_id: null,
           tags: {
             some: {
               slug: findTag.slug,
@@ -387,9 +386,7 @@ export class CategoriesService {
 
       const childCategories = await this.prismaService.categories.findMany({
         where: {
-          category_id: {
-            in: rootCategory.map((category) => Number(category.id)),
-          },
+          deleted: false,
         },
         include: {
           tags: true,
@@ -660,30 +657,31 @@ export class CategoriesService {
     }
   }
 
-  // ! Tối ưu hàm build tree
   private buildOptimizedCategoryTree(
     rootCategories: any[],
-    childCategories: any[],
+    allCategories: any[],
   ) {
-    // Tạo map để truy cập nhanh
-    const categoryMap = new Map(
-      rootCategories.map((category) => [
-        category.id,
-        { ...category, childrens: [] },
-      ]),
-    );
+    const categoryMap = new Map();
 
-    // Thêm children vào parents
-    childCategories.forEach((child) => {
-      const parent = categoryMap.get(child.category_id);
-      if (parent) {
-        if (!parent.childrens) {
-          parent.childrens = [];
-        }
-        parent.childrens.push(child);
+    allCategories.forEach((category) => {
+      categoryMap.set(category.id, { ...category, childrens: [] });
+    });
+    rootCategories.forEach((category) => {
+      if (!categoryMap.has(category.id)) {
+        categoryMap.set(category.id, { ...category, childrens: [] });
       }
     });
 
-    return Array.from(categoryMap.values());
+    allCategories.forEach((category) => {
+      const categoryWithChildren = categoryMap.get(category.id);
+      const parent = categoryMap.get(category.category_id);
+
+      if (parent) {
+        parent.childrens.push(categoryWithChildren);
+      }
+    });
+
+    // Chỉ trả về các root category và cây con của chúng
+    return rootCategories.map((root) => categoryMap.get(root.id));
   }
 }
