@@ -25,9 +25,9 @@ export const organizationSchema = z.object({
     organization_date: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
     shift: z.string().nonempty({ message: "Ca hoạt động là bắt buộc" }),
     total_amount: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" })),
     depositAmount: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" })),
     // amount_booking: z
     //     .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
     depositDate: z.string().nonempty({ message: "Ngày đặt cọc là bắt buộc" }),
