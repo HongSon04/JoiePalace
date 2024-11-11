@@ -1,7 +1,6 @@
 // HOST URL
 const HOST = `https://joieplace.live/api`;
 const MEMBERSHIPS = `https://joieplace.live/memberships`;
-const HOST_NO_API = `https://joieplace.live`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
@@ -15,7 +14,7 @@ const FEEDBACKS_API = `${HOST}/feedbacks`;
 const PARTYTYPES_API = `${HOST}/party-types`;
 const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
-const NOTIFICATIONS_API = `${HOST_NO_API}/notifications`;
+const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
 const PACKAGES = `${HOST}/packages`;
 const DECORS = `${HOST}/decors`;
@@ -76,10 +75,9 @@ export const API_CONFIG = {
 
   STAGES: {
     CREATE: `${STAGES}/create`,
-    GET_ALL: (params) =>
-      constructUrlWithParams(`${STAGES}/get-all`, params),
-    GET_ALL_BY_BRANCH: (id) => (`${STAGES}/get-all?branch_id=${id}`),
-    GET_ALL_BY_STAGE_ID: (id) => (`${STAGES}/get/${id}`),
+    GET_ALL: (params) => constructUrlWithParams(`${STAGES}/get-all`, params),
+    GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
+    GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
   },
 
   // CATEGORIES API
@@ -99,13 +97,20 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
-    GET_TOTAL_REVENUE_BRANCH_WEEK:  (id) =>  `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_MONTH:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_QUARTER:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
-    GET_TOTAL_REVENUE_BRANCH_YEAR:  (id) =>   `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
-    GET_INFO_BY_MONTH:  (id) => `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
-    GET_ALL_INFO_BRANCH: (id) => `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
-    GET_TOTAL_REVENUE_EACH_MONTH: (id) => `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-by-month/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_QUARTER: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-by-quarter/${id}`,
+    GET_TOTAL_REVENUE_BRANCH_YEAR: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-by-year/${id}`,
+    GET_INFO_BY_MONTH: (id) =>
+      `${DASHBOARD_API}/get-dashboard-general-info-by-month/${id}`,
+    GET_ALL_INFO_BRANCH: (id) =>
+      `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
+    GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
+      `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
   },
 
   // PRODUCTS API
@@ -133,7 +138,7 @@ export const API_CONFIG = {
     CREATE: `${FEEDBACKS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all`, params),
-    GET_ALL_USER: (`${FEEDBACKS_API}/get-all`),
+    GET_ALL_USER: `${FEEDBACKS_API}/get-all`,
     GET_ALL_SHOW: (params) =>
       constructUrlWithParams(`${FEEDBACKS_API}/get-all-show`, params),
     GET_ALL_HIDE: (params) =>
@@ -203,6 +208,7 @@ export const API_CONFIG = {
   // NOTIFICATIONS API
   NOTIFICATIONS: {
     GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
+    IS_READ: `${NOTIFICATIONS_API}/update-is-read`,
   },
 
   // PACKAGES API
@@ -305,22 +311,38 @@ export const makeAuthorizedRequest = async (
   endpoint,
   method = "GET",
   data = null,
-  signal = null
+  signal = null, // Add signal parameter
+  redirectURL = "/auth/chon-chi-nhanh?isExpired=true"
 ) => {
-  let dataResponse = await apiRequest(endpoint, method, data, signal);
+  let dataResponse;
+  let attempts = 0; // Track the number of attempts
+  const maxAttempts = 3; // Set a maximum number of attempts to avoid infinite loops
 
-  // Check if the response indicates an unauthorized error
-  if (
-    dataResponse &&
-    dataResponse.success === false &&
-    dataResponse.error.error === "Unauthorized"
-  ) {
-    const newAccessToken = await refreshAccessToken();
+  while (attempts < maxAttempts) {
+    dataResponse = await apiRequest(endpoint, method, data, signal);
 
-    // If a new access token was obtained, retry the request
-    if (newAccessToken) {
-      dataResponse = await apiRequest(endpoint, method, data, signal);
+    // console.log("dataResponse", dataResponse);
+
+    // Check if the response indicates an unauthorized error
+    if (
+      dataResponse &&
+      dataResponse.success === false &&
+      dataResponse.error.error === "Unauthorized"
+    ) {
+      const newAccessToken = await refreshAccessToken(redirectURL);
+
+      // If a new access token was obtained, retry the request
+      if (newAccessToken) {
+        attempts++; // Increment the attempt counter
+        continue; // Retry the API request
+      } else {
+        // If the refresh token is expired or invalid, break the loop
+        break;
+      }
     }
+
+    // If the request was successful, break the loop
+    break;
   }
 
   return {
@@ -342,5 +364,5 @@ export const fetchData = async (
   } else {
     dispatch(successAction(result));
   }
-  return result; 
+  return result;
 };

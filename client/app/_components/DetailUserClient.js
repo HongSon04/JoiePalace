@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const DetailUserClient = ({ 
@@ -47,7 +48,9 @@ const DetailUserClient = ({
                 <>
                     <div className="flex justify-between items-center mb-3 gap-[22px]">
                         <span className="text-lg sm:text-xl font-medium text-white">{nameUser}</span>
-                        <span className="mt-auto underline text-xs sm:text-sm lg:text-base font-normal text-gold cursor-pointer">Xem thêm</span>
+                        <Link className="mt-auto underline text-xs sm:text-sm lg:text-base font-normal hover:text-gold text-gold cursor-pointer" 
+                        href={'/client/nguoi-dung/tai-khoan'}
+                        >Xem thêm</Link>
                     </div>
 
                     <div className="flex flex-col sm:flex-row justify-between text-base">

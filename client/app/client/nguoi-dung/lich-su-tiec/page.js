@@ -42,7 +42,7 @@ const page = () => {
                 // Fetch all bookings for the user
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser.id);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
-                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending'|| i.status === 'processing');
+                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
                 const fetchedAllBookingsCancel = fetchedAllBookingsMembershipId.filter((i) => i.status === 'cancel');
 
                 const fetchedAllBookingsOld = [...fetchedAllBookingsMembershipId].sort((a, b) => {
@@ -51,6 +51,7 @@ const page = () => {
                 const fetchedAllBookingsNewest = [...fetchedAllBookingsMembershipId].sort((a, b) => {
                     return new Date(b.created_at) - new Date(a.created_at);
                 });
+                
 
                 setPartyOld(fetchedAllBookingsOld)
                 setPartyNew(fetchedAllBookingsNewest)
@@ -92,11 +93,11 @@ const page = () => {
                     email: user?.email,
                     phoneUser: user?.phone,
                     idParty: `P${item.id}`,
-                    partyDate: new Date(item.created_at).toISOString().split("T")[0],
-                    dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
-                    numberGuest: item.number_of_guests,
+                    partyDate: formatDate(item.created_at),
+                    dateOrganization: formatDate(item.organization_date),
+                    numberGuest: (dataDetailBooking[0]?.table_count * 10),
                     session: item.shift,
-                    tableNumber: Math.ceil(item.number_of_guests / 10),
+                    tableNumber: dataDetailBooking[0]?.table_count,
                     spareTables: 2,
                     linkTo: `/party/${item.id}`,
                     showFull: true,
@@ -120,34 +121,51 @@ const page = () => {
                     remainingPaid: (item.total_amount && item.depositAmount) ? `${parseInt(item.total_amount) - parseInt(item.depositAmount)} VND` : "0 VND",
                     paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
                 };
-            });
-
+            });      
+                  
             setParties(dataParty);
         }
     }
 
-    const clickFilter = (e) => {
-        switch (e.target.value) {
-            case "old":
-                setParties(partyOld, user);
-                break;
-            case "near":
-                setParties(partyNew, user);
-                break;
-            case "all":
-                setParties(partyAll, user);
-                break;
-            case "happening":
-                setParties(partyPending, user);
-                break;
-            case "cancel":
-                setParties(partyCancel, user);
-                break;
-            default:
-                break;
-        }
+    const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-GB', options).replace(/\//g, '/');
     };
 
+    const clickFilter = (e) => {
+        let filteredParties;
+        switch (e.target.value) {
+            case "old":
+                filteredParties = partyOld;
+                break;
+            case "near":
+                filteredParties = partyNew;
+                break;
+            case "all":
+                filteredParties = partyAll;
+                break;
+            case "happening":
+                const today = new Date().toISOString().split('T')[0];
+                filteredParties = partyPending.filter(party => {
+                    const partyDate = new Date(party.organization_date).toISOString().split('T')[0];
+                    return partyDate === today;
+                });
+                break;
+            case "cancel":
+                filteredParties = partyCancel;
+                break;
+            default:
+                filteredParties = [];
+                break;
+        }
+
+        if (filteredParties.length > 0) {
+             pasteData(filteredParties, user);
+        } else {
+            setParties([]); 
+        }
+    };
+    
     return (
         <div className='flex flex-col gap-[30px]'>
             <TitleHistoryPartyUser title={'Lịch sử tiệc'} partyBooked={partySuccess.length} waitingParty={partyPending.length} totalMoney={`${totalAmount.toLocaleString('vi-VN')} VND`}></TitleHistoryPartyUser>

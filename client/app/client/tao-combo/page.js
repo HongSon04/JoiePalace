@@ -557,7 +557,7 @@ function Page() {
   const [budget, setBudget] = React.useState("");
   const [partyType, setPartyType] = React.useState("");
   const { partyTypes, isFetchingPartyTypes, isFetchingPartyTypesError } =
-    useSelector((store) => store.partyTypes);
+  useSelector((store) => store.partyTypes);
   const dispatch = useDispatch();
   const drawerStriggerRef = React.useRef();
   const router = useRouter();

@@ -445,18 +445,19 @@ function Page() {
                     </AnimatePresence>
                   </div>
 
-                  {categories.map((category) => (
-                    <a
-                      key={category.id}
-                      href={`#${category.slug}`}
-                      className="text-gold text-4xl underline-offset-0 hover:brightness-110 hover:text-gold flex items-center gap-2"
-                    >
-                      <FaLink />{" "}
-                      <span className="underline underline-offset-4">
-                        {category.name}
-                      </span>
-                    </a>
-                  ))}
+                  {categories &&
+                    categories.map((category) => (
+                      <a
+                        key={category.id}
+                        href={`#${category.slug}`}
+                        className="text-gold text-4xl underline-offset-0 hover:brightness-110 hover:text-gold flex items-center gap-2"
+                      >
+                        <FaLink />{" "}
+                        <span className="underline underline-offset-4">
+                          {category.name}
+                        </span>
+                      </a>
+                    ))}
                 </div>
               </Col>
               <Col xs={24} sm={24} md={12} lg={8} xl={8}>
