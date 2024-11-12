@@ -62,6 +62,7 @@ import { Col, Row } from "antd";
 import Uploader from "@/app/_components/Uploader";
 import FormInput from "@/app/_components/FormInput";
 import { IoSaveOutline } from "react-icons/io5";
+import { fetchingProducts, fetchingProductsFailure } from "@/app/_lib/products/productsSlice";
 
 const statusColorMap = {
   active: "success",
@@ -117,23 +118,25 @@ function DishesTable({ dishCategory, categories }) {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-
+  // Fetch data when categoryId or currentPage changes
   React.useEffect(() => {
     async function fetchData() {
-      await fetchCategoryDishes(dishCategory.id);
+      if (dishCategory && dishCategory.id) {
+        // Nếu có categoryId, lấy món ăn theo danh mục
+        await fetchCategoryDishes(dishCategory.id);
+      } else {
+        // Nếu không có categoryId, lấy tất cả món ăn
+        await fetchingProducts();
+      }
     }
 
     fetchData();
 
     return () => {};
-  }, [currentPage, dishCategory.id]);
+  }, [currentPage, dishCategory?.id]);  // Cập nhật khi trang hoặc category thay đổi
 
-  const fetchCategoryDishes = async (
-    categoryId,
-    params = {
-      page: currentPage,
-    }
-  ) => {
+  // Fetch dishes by categoryId
+  const fetchCategoryDishes = async (categoryId, params = { page: currentPage }) => {
     dispatch(fetchingCategoryDishes());
 
     const data = await makeAuthorizedRequest(
@@ -151,16 +154,24 @@ function DishesTable({ dishCategory, categories }) {
     }
   };
 
-  React.useEffect(() => {
-    async function fetchData() {
-      await fetchCategoryDishes(dishCategory.id);
+  // Fetch all dishes if no categoryId is passed
+  const fetchingProducts = async (params = { page: currentPage }) => {
+    dispatch(fetchingCategoryDishes());  // Có thể đổi thành `fetchingProducts` nếu cần
+
+    const data = await makeAuthorizedRequest(
+      API_CONFIG.PRODUCTS.GET_ALL(params),
+      "GET",
+      null
+    );
+
+    if (data.success) {
+      dispatch(fetchingProductsSuccess(data));  // Thay đổi thành `fetchingProductsSuccess`
     }
 
-    fetchData();
-    setIsOpenDetailModal(false);
-
-    return () => {};
-  }, []);
+    if (data.error) {
+      dispatch(fetchingProductsFailure(data));  // Thay đổi thành `fetchingProductsFailure`
+    }
+  };
 
   const {
     register,
@@ -212,15 +223,15 @@ function DishesTable({ dishCategory, categories }) {
 
       dispatch(addingDishSuccess(response.data));
       toast({
-        title: "Đã cập nhật sản phẩm",
-        description: "Sản phẩm đã được cập nhật thành công",
+        title: "Đã cập nhật món ăn",
+        description: "Món ăn đã được cập nhật thành công",
         type: "success",
       });
       setIsOpenDetailModal(false);
     } else {
       dispatch(addingDishFailure(response.message));
       toast({
-        title: "Lỗi khi cập nhật sản phẩm",
+        title: "Lỗi khi cập nhật món ăn",
         description: response.message,
         type: "error",
       });
@@ -256,8 +267,8 @@ function DishesTable({ dishCategory, categories }) {
     if (response.success) {
       dispatch(addingDishSuccess(response.data));
       toast({
-        title: "Đã thêm sản phẩm",
-        description: "sản phẩm đã được thêm vào thành công",
+        title: "Đã thêm món ăn",
+        description: "Món ăn đã được thêm vào thành công",
         type: "success",
       });
 
@@ -265,7 +276,7 @@ function DishesTable({ dishCategory, categories }) {
     } else {
       dispatch(addingDishFailure(response.message));
       toast({
-        title: "Lỗi khi thêm sản phẩm",
+        title: "Lỗi khi thêm món ăn",
         description: response.message,
         type: "error",
       });
@@ -273,7 +284,7 @@ function DishesTable({ dishCategory, categories }) {
   };
 
   const handleDeleteDish = async (dishId) => {
-    const confirm = window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?");
+    const confirm = window.confirm("Bạn có chắc chắn muốn xóa món ăn này?");
 
     if (!confirm) return;
 
@@ -287,8 +298,8 @@ function DishesTable({ dishCategory, categories }) {
     if (data.success) {
       dispatch(deleteDishSuccess(data));
       toast({
-        title: "Đã xóa sản phẩm",
-        description: "sản phẩm đã được xóa thành công",
+        title: "Đã xóa món ăn",
+        description: "Món ăn đã được xóa thành công",
         type: "success",
       });
 
@@ -296,7 +307,7 @@ function DishesTable({ dishCategory, categories }) {
     } else {
       dispatch(deleteDishFailure(data.message));
       toast({
-        title: "Lỗi khi xóa sản phẩm",
+        title: "Lỗi khi xóa món ăn",
         description: data.message,
         type: "error",
       });
@@ -377,8 +388,8 @@ function DishesTable({ dishCategory, categories }) {
   const columns = React.useMemo(
     () => [
       { name: "Ảnh", uid: "images", sortable: false },
-      { name: "Tên sản phẩm", uid: "name", sortable: true },
-      { name: "Giá sản phẩm", uid: "price", sortable: true },
+      { name: "Tên món ăn", uid: "name", sortable: true },
+      { name: "Giá món ăn", uid: "price", sortable: true },
       { name: "Mô tả ngắn", uid: "short_description" },
       { name: "Mô tả đầy đủ", uid: "description" },
       // { name: "Trạng thái", uid: "status", sortable: true },
@@ -454,16 +465,16 @@ function DishesTable({ dishCategory, categories }) {
                     openDetailModal();
                   }}
                 >
-                  Xem sản phẩm
+                  Xem món ăn
                 </DropdownItem>
                 <DropdownItem onClick={openDetailModal}>
-                  Chỉnh sửa sản phẩm
+                  Chỉnh sửa món ăn
                 </DropdownItem>
                 <DropdownItem
                   className="text-red-400"
                   onClick={() => handleDeleteDish(selectedDish.id)}
                 >
-                  Xóa sản phẩm
+                  Xóa món ăn
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -516,13 +527,13 @@ function DishesTable({ dishCategory, categories }) {
                 <PlusIcon className="w-5 h-5 text-white font-semibold shrink-0" />
               }
             >
-              Thêm sản phẩm
+              Thêm món ăn
             </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Tổng {dishes && dishes.length} sản phẩm
+            Tổng {dishes && dishes.length} món ăn
           </span>
         </div>
       </div>
@@ -622,8 +633,8 @@ function DishesTable({ dishCategory, categories }) {
                     <form onSubmit={handleSubmit(onSubmit)}>
                       <ModalHeader className="flex flex-col gap-1">
                         {selectedDish
-                          ? `Chi tiết sản phẩm: ${selectedDish.name}`
-                          : "Thêm sản phẩm"}
+                          ? `Chi tiết món ăn: ${selectedDish.name}`
+                          : "Thêm món ăn"}
                       </ModalHeader>
                       <ModalBody>
                         <Row gutter={20}>
@@ -683,8 +694,8 @@ function DishesTable({ dishCategory, categories }) {
                               theme="dark"
                               id={"category"}
                               name={"category"} // Must have: because you have to using it to register the input
-                              label={"Danh mục sản phẩm"} // If empty: label won't show
-                              ariaLabel={"Danh mục sản phẩm"} // Must have: for accessibility
+                              label={"Danh mục món ăn"} // If empty: label won't show
+                              ariaLabel={"Danh mục món ăn"} // Must have: for accessibility
                               register={register}
                               errors={errors}
                               errorMessage={errors?.category?.message}
@@ -705,7 +716,7 @@ function DishesTable({ dishCategory, categories }) {
                               id={"short_description"}
                               name={"short_description"} // Must have: because you have to using it to register the input
                               label={"Mô tả ngắn"} // If empty: label won't show
-                              ariaLabel={"Mô tả ngắn của sản phẩm"} // Must have: for accessibility
+                              ariaLabel={"Mô tả ngắn của món ăn"} // Must have: for accessibility
                               type={"textarea"}
                               register={register}
                               errors={errors}
@@ -720,7 +731,7 @@ function DishesTable({ dishCategory, categories }) {
                               id={"description"}
                               name={"description"} // Must have: because you have to using it to register the input
                               label={"Mô tả chi tiết"} // If empty: label won't show
-                              ariaLabel={"Mô tả chi tiết của sản phẩm"} // Must have: for accessibility
+                              ariaLabel={"Mô tả chi tiết của món ăn"} // Must have: for accessibility
                               type={"textarea"}
                               register={register}
                               errors={errors}
@@ -744,7 +755,7 @@ function DishesTable({ dishCategory, categories }) {
                             }
                             className="bg-red-200 hover:bg-red-300 text-red-500"
                           >
-                            Xóa sản phẩm
+                            Xóa món ăn
                           </Button>
                         ) : (
                           <Button
@@ -784,11 +795,11 @@ function DishesTable({ dishCategory, categories }) {
                             if (selectedDish) {
                               return isUpdatingDish
                                 ? "Đang cập nhật..."
-                                : "Cập nhật sản phẩm";
+                                : "Cập nhật món ăn";
                             } else {
                               return isAddingDish
                                 ? "Đang thêm..."
-                                : "Thêm sản phẩm";
+                                : "Thêm món ăn";
                             }
                           })()}
                         </Button>
