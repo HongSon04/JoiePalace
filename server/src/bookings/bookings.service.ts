@@ -550,13 +550,37 @@ export class BookingsService {
         },
       });
 
-      // Send notification
-      await this.sendBookingNotification(
-        findBooking.name,
-        findBooking.branch_id,
-        status as BookingStatus,
-        is_confirm,
-        is_deposit,
+      // ! Send Notification
+      const contents: any = {
+        name: `Đơn đặt tiệc của ${findBooking.name}`,
+        branch_id: findBooking.branch_id,
+      };
+
+      if (is_confirm === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được xác nhận!`;
+        contents.type = TypeNotifyEnum.BOOKING_CONFIRM;
+      } else if (is_deposit === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được đặt cọc!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'cancel') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã bị hủy!`;
+        contents.type = TypeNotifyEnum.BOOKING_CANCEL;
+      } else if (status === 'processing') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đang được tổ chức!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'success') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được tiến hành!`;
+        contents.type = TypeNotifyEnum.BOOKING_SUCCESS;
+      } else {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã cập nhật!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      }
+
+      await this.notificationService.sendNotifications(
+        contents.name,
+        contents.contents,
+        contents.branch_id,
+        contents.type,
       );
 
       throw new HttpException(
