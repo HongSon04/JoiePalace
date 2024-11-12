@@ -259,7 +259,11 @@ const Page = () => {
 
             if (updateBranches.success) {
                 dispatch(fetchBranchSuccess(updateBranches.data));
-                toast("success", "Tạo dữ liệu chi nhánh thành công", "Phản hồi đã được duyệt. Đang lấy dữ liệu mới");
+                toast({
+                    title: "Tạo dữ liệu thành công",
+                    description: "Đã xử lý thành công dữ liệu",
+                    type: "success",
+                    });
             } else{
                 const { statusCode, message } = updateBranches.error || {};
                 if (statusCode == 401) {

@@ -408,7 +408,7 @@ function RequestTable() {
           return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND',
-          }).format(item.booking_details.total_amount);
+          }).format(item.booking_details.total_amount || 0);
 
           // return item.booking_details.total_amount
         case "amount_booking":
