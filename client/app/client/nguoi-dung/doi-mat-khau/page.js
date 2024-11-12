@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,6 +39,8 @@ const Page = () => {
   const toast = useCustomToast();
   const { makeAuthorizedRequest } = useApiServices();
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState(null);
 
 
   // Initialize `useForm` with `zodResolver`
@@ -46,23 +48,30 @@ const Page = () => {
     resolver: zodResolver(formSchema),
   });
 
-  // Handle form submission
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     const newData = {
       oldPassword: data.currentPassword,
       newPassword: data.newPassword,
       confirmPassword: data.confirmPassword
     }
+    setFormData(newData);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirm = async () => {
+    setIsModalOpen(true);
+
     try {
       const response = await makeAuthorizedRequest(
         API_CONFIG.USER.CHANGE_PASSWORD,
         "PUT",
-        newData,
+        formData,
         null,
         '/client/dang-nhap'
       );
 
       if (response?.success) {
+        setIsModalOpen(false);
         toast({
           position: "top",
           type: "success",
@@ -71,7 +80,9 @@ const Page = () => {
         });
         Cookies.remove("accessToken");
         localStorage.removeItem("user");
-        router.push('/client/dang-nhap');
+        setTimeout(() => {
+          router.push('/client/dang-nhap');
+        }, 1000)
       } else {
         toast({
           position: "top",
@@ -83,7 +94,12 @@ const Page = () => {
       }
     } catch (error) {
       console.error("Error updating profile:", error);
+    } finally {
+      setIsModalOpen(false);
     }
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -125,7 +141,7 @@ const Page = () => {
           />
 
           <div className='flex gap-[20px] justify-end w-full'>
-            <button
+            {/* <button
               type="button"
               className='flex items-center gap-[10px] px-4 py-[10px] bg-gray-200 text-black rounded-full text-sm hover:bg-gray-300 transition-all duration-300'
             >
@@ -133,7 +149,7 @@ const Page = () => {
                 <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="#4B5563" />
               </svg>
               Hủy
-            </button>
+            </button> */}
             <button
               type="submit"
               className='flex items-center gap-[10px] px-4 py-[10px] bg-gold text-white rounded-full text-sm hover:bg-gold/80 transition-all duration-300'
@@ -144,6 +160,28 @@ const Page = () => {
           </div>
         </div>
       </form>
+      {isModalOpen && (
+        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
+          <div className='bg-white rounded-lg p-6 w-1/3'>
+            <h2 className='text-lg font-bold mb-4 text-black'>Xác nhận đổi mật khẩu</h2>
+            <p className='text-black'>Bạn có chắc chắn muốn đổi mật khẩu không?</p>
+            <div className='flex justify-end mt-4'>
+              <button
+                onClick={handleCancel}
+                className='mr-2 px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400'
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirm}
+                className='px-4 py-2 bg-gold text-white rounded-md hover:bg-gold/80'
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

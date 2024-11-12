@@ -62,8 +62,24 @@ export class CreatePackageDto {
       { id: 1, quantity: 2 },
       { id: 2, quantity: 1 },
     ],
+    description: 'Danh sách các dịch vụ khác (ví dụ nước uống, bánh kem, ...)',
+  })
+  other_service?: [{ id: string; quantity: number }] | any;
+
+  @ApiProperty({
+    example: [
+      { id: 1, quantity: 2 },
+      { id: 2, quantity: 1 },
+    ],
     description:
       'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
   })
-  extra_service: [{ id: string; quantity: number }] | any;
+  extra_service?: [{ id: string; quantity: number }] | any;
+
+  @ApiProperty({
+    description: 'Ghi chú',
+    required: false,
+  })
+  @IsOptional()
+  note?: string;
 }

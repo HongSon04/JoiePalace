@@ -65,6 +65,8 @@ export class DecorsService {
         productsTagSet = existingProducts.map((product) => ({
           id: Number(product.id),
         }));
+      } else {
+        throw new BadRequestException('Menu cần ít nhất 1 sản phẩm');
       }
 
       if (Number(totalPrice) < Number(price)) {
@@ -502,6 +504,8 @@ export class DecorsService {
         productsTagSet = existingProducts.map((product) => ({
           id: Number(product.id),
         }));
+      } else {
+        throw new BadRequestException('Menu cần ít nhất 1 sản phẩm');
       }
 
       if (Number(totalPrice) < Number(price)) {

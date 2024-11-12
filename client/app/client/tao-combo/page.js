@@ -1,7 +1,8 @@
 "use client";
 
+import ClientServiceCard from "@/app/_components/ClientServiceCard";
+import Footer from "@/app/_components/FooterClient";
 import FormInput from "@/app/_components/FormInput";
-import SaveIcon from "@/app/_components/SaveIcon";
 import SelectedProduct from "@/app/_components/SelectedProduct";
 import {
   fetchingPartyTypesFailure,
@@ -13,42 +14,36 @@ import Loading from "@/app/loading";
 import pattern from "@/public/line-group.svg";
 import {
   Button,
+  Divider,
+  // drawer
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-
-  // drawer
-  Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  useDisclosure,
   Tooltip,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   ArrowRightIcon,
   Bars3Icon,
+  CheckIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Col, Row } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { HiSaveAs } from "react-icons/hi";
 import { IoSaveOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
@@ -360,29 +355,244 @@ const categories = [
   },
 ];
 
+const listSpaces = [
+  {
+    id: 0,
+    name: "Space 1",
+    url: "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+    price: 1000000,
+  },
+  {
+    id: 1,
+    name: "Space 1",
+    url: "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+    price: 2000000,
+  },
+  {
+    id: 2,
+    name: "Space 1",
+    url: "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+    price: 3000000,
+  },
+  {
+    id: 3,
+    name: "Space 1",
+    url: "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+    price: 4000000,
+  },
+  {
+    id: 4,
+    name: "Space 1",
+    url: "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+    price: 5000000,
+  },
+];
+
+const colors = [
+  {
+    id: "c1",
+    name: "Trắng",
+    color: "#fff",
+  },
+  {
+    id: "c2",
+    name: "Vàng gold",
+    color: "#B5905B",
+  },
+  {
+    id: "c3",
+    name: "Xanh lá",
+    color: "#4ADD80",
+  },
+  {
+    id: "c4",
+    name: "Teal",
+    color: "#2DD3BE",
+  },
+];
+
+const flowers = [
+  {
+    id: "fl1",
+    name: "Hoa hồng",
+    products: [
+      {
+        id: "hh1",
+        name: "Hoa hồng đỏ",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh2",
+        name: "Hoa hồng trắng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh3",
+        name: "Hoa hồng phấn",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh1",
+        name: "Hoa hồng đỏ",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh2",
+        name: "Hoa hồng trắng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh3",
+        name: "Hoa hồng phấn",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh1",
+        name: "Hoa hồng đỏ",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh2",
+        name: "Hoa hồng trắng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "hh3",
+        name: "Hoa hồng phấn",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+    ],
+  },
+  {
+    id: "fl2",
+    name: "Cẩm tú cầu",
+    products: [
+      {
+        id: "ctc1",
+        name: "Cẩm tú cầu tím",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc2",
+        name: "Cẩm tú cầu trắng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc3",
+        name: "Cẩm tú cầu hồng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc1",
+        name: "Cẩm tú cầu tím",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc2",
+        name: "Cẩm tú cầu trắng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc3",
+        name: "Cẩm tú cầu hồng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc1",
+        name: "Cẩm tú cầu tím",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc2",
+        name: "Cẩm tú cầu trắng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+      {
+        id: "ctc3",
+        name: "Cẩm tú cầu hồng",
+        image:
+          "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
+        price: 2000000,
+      },
+    ],
+  },
+];
+
 function Page() {
   const [partySize, setPartySize] = React.useState("");
   const [budget, setBudget] = React.useState("");
   const [partyType, setPartyType] = React.useState("");
   const { partyTypes, isFetchingPartyTypes, isFetchingPartyTypesError } =
-    useSelector((store) => store.partyTypes);
+  useSelector((store) => store.partyTypes);
   const dispatch = useDispatch();
   const drawerStriggerRef = React.useRef();
   const router = useRouter();
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [spaceId, setSpaceId] = React.useState(null);
+  const [colorId, setColorId] = React.useState(null);
+  const [flowerId, setFlowerId] = React.useState(null);
+  const [tabIndex, setTabIndex] = React.useState(0);
+  const [note, setNote] = React.useState("");
+
+  const handleFlowerChange = (e) => {
+    setFlowerId(e.target.value);
+  };
+
+  const handleColorIdChange = (e) => {
+    setTabIndex(e.target.value);
+  };
+
+  const handleTabChange = (tabIndex) => {
+    setTabIndex(tabIndex);
+  };
+
+  const handleNextTab = () => {
+    setTabIndex(tabIndex + 1);
+  };
+
+  const handleSpaceIndexChange = (e) => {
+    setSpaceId(e.target.value);
+  };
 
   // Drawer
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleNext = () => {
-    router.push({
-      pathname: "/tao-combo/#tao",
-      query: {
-        partyType,
-        partySize,
-        budget,
-      },
-    });
+    router.push("/client/tao-combo#creator");
   };
 
   const {
@@ -410,6 +620,23 @@ function Page() {
 
     return () => {};
   }, [dispatch]);
+
+  const renderNoteArea = () => {
+    return (
+      <div className="bg-whiteAlpha-50 flex flex-col gap-4 p-5 rounded-2xl w-1/3 h-[70vh]">
+        <span className="text-sm font-semibold leading-5 text-left">
+          Ghi chú
+        </span>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          name="comboNote"
+          id="comboNote"
+          className="rounded-2xl border border-whiteAlpha-200 outline-none resize-none w-full h-full p-2"
+        ></textarea>
+      </div>
+    );
+  };
 
   if (isFetchingPartyTypes) {
     return <Loading></Loading>;
@@ -462,6 +689,9 @@ function Page() {
                   ]}
                   onChange={(e) => setPartyType(e.target.value)}
                   value={partyType}
+                  className={
+                    "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
+                  }
                 ></FormInput>
               )}
               <FormInput
@@ -483,6 +713,9 @@ function Page() {
                 ]}
                 onChange={(e) => setPartySize(e.target.value)}
                 value={partySize}
+                className={
+                  "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
+                }
               ></FormInput>
               <FormInput
                 register={register}
@@ -503,11 +736,14 @@ function Page() {
                 ]}
                 onChange={(e) => setBudget(e.target.value)}
                 value={budget}
+                className={
+                  "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
+                }
               ></FormInput>
 
               {partyType && partySize && budget && (
                 <AnimatePresence mode="wait" initial={false}>
-                  <NextButton />
+                  <NextButton onClick={handleNext} />
                 </AnimatePresence>
               )}
             </form>
@@ -516,8 +752,14 @@ function Page() {
       </section>
 
       {/* COMBO SECTION */}
-      <section className="px-48 py-16 relative !font-gilroy">
-        <Tabs variant={"unstyled"} position={"relative"} align="center">
+      <section id="creator" className="px-48 py-16 relative !font-gilroy">
+        <Tabs
+          variant={"unstyled"}
+          position={"relative"}
+          align="center"
+          index={tabIndex}
+          onChange={handleTabChange}
+        >
           <TabList className="p-2 rounded-full bg-whiteAlpha-100 w-fit items-center gap-3">
             {categories.map((category) => (
               <Tab
@@ -537,19 +779,709 @@ function Page() {
               <Bars3Icon className="w-6 h-6"></Bars3Icon>
             </Button>
           </TabList>
-          <TabPanels>
+          <TabPanels className="mt-6">
+            {/* SẢNH PANEL */}
             <TabPanel>
-              <p>one!</p>
+              <div className="w-full flex gap-5">
+                {/* NOTE AREA */}
+                {renderNoteArea()}
+
+                {/* PANEL MAIN */}
+                <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                  <div className="flex gap-3 items-center h-full relative">
+                    <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                    <span className="text-xl font-bold ml-4">Sảnh tiệc</span>
+                  </div>
+                  <span className="text-sm font-normal text-left">
+                    Sảnh tiệc có sức chứa cho khoảng 100 khách
+                  </span>
+                  <div className="w-full flex flex-wrap gap-4">
+                    {listSpaces.map((space, index) => (
+                      <label
+                        key={space.id}
+                        className={`flex flex-col items-center gap-3 cursor-pointer p-3 rounded-lg ${
+                          spaceId == space.id ? "bg-whiteAlpha-400" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name={"space"}
+                          value={space.id}
+                          checked={spaceId == space.id}
+                          onChange={handleSpaceIndexChange}
+                          className="hidden"
+                        />
+                        <div className="w-[110px] h-[100px] relative overflow-hidden rounded-lg">
+                          <Image
+                            fill
+                            sizes="100px"
+                            src={space.url}
+                            alt={space.name}
+                            className="object-cover"
+                          />
+                        </div>
+                        <span className="text-white text-start w-full text-sm ">
+                          {space.name}
+                        </span>
+                        <span className="text-white text-start w-full text-sm ">
+                          {space.price.toLocaleString()} VNĐ
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="w-full mt-6 flex justify-end">
+                    <Button
+                      onClick={handleNextTab}
+                      variant={"unstyled"}
+                      className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M2.91797 10H16.943"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm leading-5 font-medium ">
+                        Tiếp tục
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </TabPanel>
+
+            {/* TRANG TRÍ PANEL */}
             <TabPanel>
-              <p>two!</p>
+              <div className="w-full flex gap-5">
+                {/* NOTE AREA */}
+                {renderNoteArea()}
+
+                <div className="w-2/3 h-full flex flex-col gap-5 relative">
+                  {/* COLOR */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">
+                        Màu sắc chủ đạo
+                      </span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Joie Palace sẽ dựa trên màu sắc do quý khách chọn, để tạo
+                      nên không gian ưng ý nhất
+                    </span>
+                    <div className="w-full flex flex-wrap gap-4">
+                      {colors.map((color, index) => (
+                        <label
+                          key={color.id}
+                          className={`flex flex-col items-center border-4 border-transparent gap-3 cursor-pointer rounded-lg`}
+                        >
+                          <div
+                            className={`w-11 h-11 rounded-md`}
+                            style={{
+                              backgroundColor: color.color,
+                              borderColor:
+                                colorId == color.id ? "border-[#006FEE]" : "",
+                            }}
+                          ></div>
+                          {colorId == color.id && (
+                            <div className="flex flex-center rounded-[4px] absolute top-0 right-0">
+                              <CheckIcon className="w-1 h-1 text-white" />
+                            </div>
+                          )}
+                          <input
+                            type="radio"
+                            name={"color"}
+                            value={color.id}
+                            checked={colorId == color.id}
+                            onChange={handleColorIdChange}
+                            className="hidden"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </>
+
+                  <Divider className="bg-whiteAlpha-50" />
+
+                  {/* HOA */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">HOA</span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Chọn một loại hoa chủ đạo
+                    </span>
+                    {flowers.map((flower, index) => (
+                      <div className="w-full flex flex-col" key={index}>
+                        <h4 className="text-base text-left">
+                          {index + 1}.{flower.name}
+                        </h4>
+                        <div className="overflow-x-auto w-full flex">
+                          {flower.products.map((p) => (
+                            <ClientServiceCard
+                              name={"flower"}
+                              service={p}
+                              key={p.id}
+                              state={flowerId}
+                              onChange={handleFlowerChange}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </>
+
+                  {/* BUTTON */}
+                  <div className="w-full mt-6 flex justify-end">
+                    <Button
+                      onClick={handleNextTab}
+                      variant={"unstyled"}
+                      className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M2.91797 10H16.943"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm leading-5 font-medium ">
+                        Tiếp tục
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </TabPanel>
+
+            {/* SÂN KHẤU PANEL */}
             <TabPanel>
-              <p>three!</p>
+              <div className="w-full flex gap-5">
+                {/* NOTE AREA */}
+                {renderNoteArea()}
+
+                <div className="w-2/3 h-full flex flex-col gap-5 relative">
+                  {/* COLOR */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">
+                        Màu sắc chủ đạo
+                      </span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Joie Palace sẽ dựa trên màu sắc do quý khách chọn, để tạo
+                      nên không gian ưng ý nhất
+                    </span>
+                    <div className="w-full flex flex-wrap gap-4">
+                      {colors.map((color, index) => (
+                        <label
+                          key={color.id}
+                          className={`flex flex-col items-center border-4 border-transparent gap-3 cursor-pointer rounded-lg`}
+                        >
+                          <div
+                            className={`w-11 h-11 rounded-md`}
+                            style={{
+                              backgroundColor: color.color,
+                              borderColor:
+                                colorId == color.id ? "border-[#006FEE]" : "",
+                            }}
+                          ></div>
+                          {colorId == color.id && (
+                            <div className="flex flex-center rounded-[4px] absolute top-0 right-0">
+                              <CheckIcon className="w-1 h-1 text-white" />
+                            </div>
+                          )}
+                          <input
+                            type="radio"
+                            name={"color"}
+                            value={color.id}
+                            checked={colorId == color.id}
+                            onChange={handleColorIdChange}
+                            className="hidden"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </>
+
+                  <Divider className="bg-whiteAlpha-50" />
+
+                  {/* HOA */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">HOA</span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Chọn một loại hoa chủ đạo
+                    </span>
+                    {flowers.map((flower, index) => (
+                      <div className="w-full flex flex-col" key={index}>
+                        <h4 className="text-base text-left">
+                          {index + 1}.{flower.name}
+                        </h4>
+                        <div className="overflow-x-auto w-full flex">
+                          {flower.products.map((p) => (
+                            <ClientServiceCard
+                              name={"flower"}
+                              service={p}
+                              key={p.id}
+                              state={flowerId}
+                              onChange={handleFlowerChange}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </>
+
+                  {/* BUTTON */}
+                  <div className="w-full mt-6 flex justify-end">
+                    <Button
+                      onClick={handleNextTab}
+                      variant={"unstyled"}
+                      className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M2.91797 10H16.943"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm leading-5 font-medium ">
+                        Tiếp tục
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+
+            {/* BÁNH CƯỚI PANEL */}
+            <TabPanel>
+              <div className="w-full flex gap-5">
+                {/* NOTE AREA */}
+                {renderNoteArea()}
+
+                <div className="w-2/3 h-full flex flex-col gap-5 relative">
+                  {/* COLOR */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">
+                        Màu sắc chủ đạo
+                      </span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Joie Palace sẽ dựa trên màu sắc do quý khách chọn, để tạo
+                      nên không gian ưng ý nhất
+                    </span>
+                    <div className="w-full flex flex-wrap gap-4">
+                      {colors.map((color, index) => (
+                        <label
+                          key={color.id}
+                          className={`flex flex-col items-center border-4 border-transparent gap-3 cursor-pointer rounded-lg`}
+                        >
+                          <div
+                            className={`w-11 h-11 rounded-md`}
+                            style={{
+                              backgroundColor: color.color,
+                              borderColor:
+                                colorId == color.id ? "border-[#006FEE]" : "",
+                            }}
+                          ></div>
+                          {colorId == color.id && (
+                            <div className="flex flex-center rounded-[4px] absolute top-0 right-0">
+                              <CheckIcon className="w-1 h-1 text-white" />
+                            </div>
+                          )}
+                          <input
+                            type="radio"
+                            name={"color"}
+                            value={color.id}
+                            checked={colorId == color.id}
+                            onChange={handleColorIdChange}
+                            className="hidden"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </>
+
+                  <Divider className="bg-whiteAlpha-50" />
+
+                  {/* HOA */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">HOA</span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Chọn một loại hoa chủ đạo
+                    </span>
+                    {flowers.map((flower, index) => (
+                      <div className="w-full flex flex-col" key={index}>
+                        <h4 className="text-base text-left">
+                          {index + 1}.{flower.name}
+                        </h4>
+                        <div className="overflow-x-auto w-full flex">
+                          {flower.products.map((p) => (
+                            <ClientServiceCard
+                              name={"flower"}
+                              service={p}
+                              key={p.id}
+                              state={flowerId}
+                              onChange={handleFlowerChange}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </>
+
+                  {/* BUTTON */}
+                  <div className="w-full mt-6 flex justify-end">
+                    <Button
+                      onClick={handleNextTab}
+                      variant={"unstyled"}
+                      className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M2.91797 10H16.943"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm leading-5 font-medium ">
+                        Tiếp tục
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+
+            {/* THỰC ĐƠN PANEL */}
+            <TabPanel>
+              <div className="w-full flex gap-5">
+                {/* NOTE AREA */}
+                {renderNoteArea()}
+
+                <div className="w-2/3 h-full flex flex-col gap-5 relative">
+                  {/* COLOR */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">
+                        Màu sắc chủ đạo
+                      </span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Joie Palace sẽ dựa trên màu sắc do quý khách chọn, để tạo
+                      nên không gian ưng ý nhất
+                    </span>
+                    <div className="w-full flex flex-wrap gap-4">
+                      {colors.map((color, index) => (
+                        <label
+                          key={color.id}
+                          className={`flex flex-col items-center border-4 border-transparent gap-3 cursor-pointer rounded-lg`}
+                        >
+                          <div
+                            className={`w-11 h-11 rounded-md`}
+                            style={{
+                              backgroundColor: color.color,
+                              borderColor:
+                                colorId == color.id ? "border-[#006FEE]" : "",
+                            }}
+                          ></div>
+                          {colorId == color.id && (
+                            <div className="flex flex-center rounded-[4px] absolute top-0 right-0">
+                              <CheckIcon className="w-1 h-1 text-white" />
+                            </div>
+                          )}
+                          <input
+                            type="radio"
+                            name={"color"}
+                            value={color.id}
+                            checked={colorId == color.id}
+                            onChange={handleColorIdChange}
+                            className="hidden"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </>
+
+                  <Divider className="bg-whiteAlpha-50" />
+
+                  {/* HOA */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">HOA</span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Chọn một loại hoa chủ đạo
+                    </span>
+                    {flowers.map((flower, index) => (
+                      <div className="w-full flex flex-col" key={index}>
+                        <h4 className="text-base text-left">
+                          {index + 1}.{flower.name}
+                        </h4>
+                        <div className="overflow-x-auto w-full flex">
+                          {flower.products.map((p) => (
+                            <ClientServiceCard
+                              name={"flower"}
+                              service={p}
+                              key={p.id}
+                              state={flowerId}
+                              onChange={handleFlowerChange}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </>
+
+                  {/* BUTTON */}
+                  <div className="w-full mt-6 flex justify-end">
+                    <Button
+                      onClick={handleNextTab}
+                      variant={"unstyled"}
+                      className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M2.91797 10H16.943"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm leading-5 font-medium ">
+                        Tiếp tục
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+
+            {/* EXTRA SERVICES PANEL */}
+            <TabPanel>
+              <div className="w-full flex gap-5">
+                {/* NOTE AREA */}
+                {renderNoteArea()}
+
+                <div className="w-2/3 h-full flex flex-col gap-5 relative">
+                  {/* COLOR */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">
+                        Màu sắc chủ đạo
+                      </span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Joie Palace sẽ dựa trên màu sắc do quý khách chọn, để tạo
+                      nên không gian ưng ý nhất
+                    </span>
+                    <div className="w-full flex flex-wrap gap-4">
+                      {colors.map((color, index) => (
+                        <label
+                          key={color.id}
+                          className={`flex flex-col items-center border-4 border-transparent gap-3 cursor-pointer rounded-lg`}
+                        >
+                          <div
+                            className={`w-11 h-11 rounded-md`}
+                            style={{
+                              backgroundColor: color.color,
+                              borderColor:
+                                colorId == color.id ? "border-[#006FEE]" : "",
+                            }}
+                          ></div>
+                          {colorId == color.id && (
+                            <div className="flex flex-center rounded-[4px] absolute top-0 right-0">
+                              <CheckIcon className="w-1 h-1 text-white" />
+                            </div>
+                          )}
+                          <input
+                            type="radio"
+                            name={"color"}
+                            value={color.id}
+                            checked={colorId == color.id}
+                            onChange={handleColorIdChange}
+                            className="hidden"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </>
+
+                  <Divider className="bg-whiteAlpha-50" />
+
+                  {/* HOA */}
+                  <>
+                    <div className="flex gap-3 items-center h-full relative">
+                      <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                      <span className="text-xl font-bold ml-4">HOA</span>
+                    </div>
+                    <span className="text-sm font-normal text-left">
+                      Chọn một loại hoa chủ đạo
+                    </span>
+                    {flowers.map((flower, index) => (
+                      <div className="w-full flex flex-col" key={index}>
+                        <h4 className="text-base text-left">
+                          {index + 1}.{flower.name}
+                        </h4>
+                        <div className="overflow-x-auto w-full flex">
+                          {flower.products.map((p) => (
+                            <ClientServiceCard
+                              name={"flower"}
+                              service={p}
+                              key={p.id}
+                              state={flowerId}
+                              onChange={handleFlowerChange}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </>
+
+                  {/* BUTTON */}
+                  <div className="w-full mt-6 flex justify-end">
+                    <Button
+                      onClick={handleNextTab}
+                      variant={"unstyled"}
+                      className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M2.91797 10H16.943"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span className="text-sm leading-5 font-medium ">
+                        Tiếp tục
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </TabPanel>
           </TabPanels>
         </Tabs>
       </section>
+
+      <Footer></Footer>
 
       <Drawer
         size={"sm"}
@@ -570,10 +1502,17 @@ function Page() {
                 <h2 className="text-white font-semibold text-xl">
                   {category.name}
                 </h2>
-                <div className="flex flex-col gap-3 mt-3">
+                <div className="flex flex-col gap-5 mt-5">
                   {category.products.map((product) => (
                     <SelectedProduct product={product} key={product.id} />
                   ))}
+                </div>
+                <Divider className="mt-5" />
+                <div className="text-base font-semibold text-end text-white mt-3">
+                  {category.products
+                    .reduce((acc, cur) => acc + cur.price, 0)
+                    .toLocaleString("vn-VN")}{" "}
+                  VNĐ
                 </div>
               </div>
             ))}
@@ -688,12 +1627,15 @@ function Page() {
   );
 }
 
-const NextButton = () => {
+const NextButton = ({ onClick }) => {
   return (
     <motion.button
       {...framer_button}
       className="flex items-center gap-3 flex-center bg-gold text-white px-8 py-2 rounded-full mt-5 w-full"
-      onClick={() => {}}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
     >
       <ArrowRightIcon className="w-5 h-5 text-white"></ArrowRightIcon>
       Tiếp tục

@@ -11,6 +11,9 @@ const InputDetailCustomer = ({
     control,
     error,
 }) => {
+    // Check if the field should be read-only based on `name`
+    const isReadOnlyField = name === 'customerAndChair' || name === 'total_amount' || name === 'depositAmount';
+
     return (
         <div className="flex flex-col gap-2">
             <div className="flex gap-2 items-center">
@@ -22,14 +25,14 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue={options[0]?.value || ''} // Giá trị mặc định để tránh undefined
+                    defaultValue={options[0]?.value || ''} // Đảm bảo không phải null
                     render={({ field }) => (
                         <select
                             className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
                             {...field}
-                            value={field.value || ''} // Đảm bảo `value` luôn có giá trị
+                            value={field.value || ''} // Đảm bảo không phải null
                         >
-                            <option value="" disabled>
+                            <option className="option" value="" disabled>
                                 Chọn {title}
                             </option>
                             {options.map((option, index) => (
@@ -44,18 +47,22 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue={name === 'customerAndChair' ? 10 : ''} // Giá trị mặc định cho `customerAndChair`
+                    defaultValue={name === 'customerAndChair' ? 10 : ''} // Đảm bảo không phải null
                     render={({ field }) => (
                         <input
                             {...field}
                             type={type}
-                            value={name === 'customerAndChair' ? 10 : field.value} // Đặt giá trị cố định là 10
-                            readOnly={name === 'customerAndChair'} // Không cho phép chỉnh sửa
-                            disabled={name === 'customerAndChair'} // Vô hiệu hóa trường
-                            className="p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300"
+                            value={
+                                name === 'customerAndChair'
+                                    ? 10 // Giá trị cố định cho `customerAndChair`
+                                    : field.value || '' // Đảm bảo không phải null
+                            }
+                            readOnly={isReadOnlyField} // Disable editing for specific fields
+                            disabled={isReadOnlyField} // Disable focus and modification for specific fields
+                            className="p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300 "
                             placeholder={placeholder}
                             min={type === 'number' ? 1 : undefined}
-                            onWheel={(e) => (type === 'number' || name === 'phone') && e.currentTarget.blur()}
+                            onWheel={(e) => (type === 'number') && e.currentTarget.blur()}
                         />
                     )}
                 />

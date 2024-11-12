@@ -87,7 +87,7 @@ function RequestTable() {
     ),
   });
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [requestStatus, setRequestStatus] = React.useState("pending");
+  const [requestStatus, setRequestStatus] = React.useState("processing");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
 
@@ -408,7 +408,7 @@ function RequestTable() {
           return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND',
-          }).format(item.booking_details.total_amount);
+          }).format(item.booking_details.total_amount || 0);
 
           // return item.booking_details.total_amount
         case "amount_booking":

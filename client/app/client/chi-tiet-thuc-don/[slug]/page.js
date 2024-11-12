@@ -35,12 +35,10 @@ function Conference() {
             try {
                 const menuData = await fetchMenuBySlug(slug);
                 const getProductsMenu = menuData[0].products;
-                const getFoodsMenu = getProductsMenu["thuc-an"];
-                const getDrinksMenu = getProductsMenu["nuoc-uong"];
-                const mainCourse = getFoodsMenu.filter(i => i.categories.slug === 'thuc-an') || [];
-                const appetizer = getFoodsMenu.filter(i => i.categories.slug === 'mon-khai-vi') || [];
-                const dessert = getFoodsMenu.filter(i => i.categories.slug === 'mon-trang-mieng') || [];
-                const beverages = getProductsMenu["nuoc-uong"] || [];
+                const mainCourse = getProductsMenu['mon-chinh'];                
+                const appetizer = getProductsMenu['mon-khai-vi'];
+                const dessert = getProductsMenu['mon-trang-mieng'];
+                const beverages = getProductsMenu['do-uong'];
                 setMainCourse(mainCourse);
                 setAppetizer(appetizer);
                 setDessert(dessert);
@@ -91,6 +89,7 @@ function Conference() {
             countDishes: beverages?.length || 0,
         },
     ];
+
     // const dataDishes = [{
     //     id: 1, name: "Gỏi Củ Hủ Dừa Tôm Thịt", price: "400.000 VND / 10 người", description: "Khai vị là một trong những món quyết định đến trải nghiệm của quý thực khách, chúng tôi mang đến một món ăn hoàn hảo để khởi động vị giác.", image: "dish1.png", link: "/explore-dish"
     // }, {
@@ -104,7 +103,7 @@ function Conference() {
         name: dish.name,
         price: `${dish.price.toLocaleString()} VND / 10 người`,
         description: dish.description,
-        image: 'dish1.png',
+        image:  dish.images,
         link: `/explore-dish/${dish.slug}`,
     }));
     const dataAppetizer = appetizer.map((dish) => ({
@@ -112,7 +111,7 @@ function Conference() {
         name: dish.name,
         price: `${dish.price.toLocaleString()} VND / 10 người`,
         description: dish.description,
-        image: 'dish1.png',
+        image:  dish.images,
         link: `/explore-dish/${dish.slug}`,
     }));
     const dataDessert = dessert.map((dish) => ({
@@ -120,7 +119,7 @@ function Conference() {
         name: dish.name,
         price: `${dish.price.toLocaleString()} VND / 10 người`,
         description: dish.description,
-        image: 'dish1.png',
+        image:  dish.images,
         link: `/explore-dish/${dish.slug}`,
     }));
     const dataDrink = beverages.map((dish) => ({
@@ -128,10 +127,10 @@ function Conference() {
         name: dish.name,
         price: `${dish.price.toLocaleString()} VND / 10 người`,
         description: dish.description,
-        image: 'watter.png',
+        image:  dish.images,
         link: `/explore-dish/${dish.slug}`,
     }));
-
+    
     const calculateTimeAgo = (date) => {
         const seconds = Math.floor((new Date() - new Date(date)) / 1000);
         let interval = Math.floor(seconds / 31536000);
@@ -205,7 +204,6 @@ function Conference() {
     //     }
     // ]
 
-
     return (
         <div className="m-auto h-full" id="fullpage">
             <div className="section pt-[100px]">
@@ -233,7 +231,7 @@ function Conference() {
                                 className=" bg-white p-4 max-sm:p-2"
                                 src="/Alacarte-Menu-Thumbnail.png"
                                 alt="A la carte menu thumbnail"
-                            />
+                            />a
                         </div>
                     </div>
                 </section>

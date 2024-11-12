@@ -1,40 +1,112 @@
+'use client'
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { API_CONFIG } from "@/app/_utils/api.config";
+import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
 
 const NotificationsPage = () => {
-    const notifications = [
-        {
-            message: 'Chúc mừng quý đã đặt tiệc thành công. Mã tiệc FKAO-E23-FEAO. Mong quý sẽ có được trải nghiệm tốt nhất tại Joie Palace!',
-            time: '1 tiếng trước',
-            status: 'Đặt tiệc',
-            avatar: '/userImage.png',
-        },
-        {
-            message: 'Thanh toán thành công mã tiệc FAPD-39J-KWEF, số tiền 150.000.000 VND. Cảm ơn quý khách đã tin tưởng sử dụng dịch vụ của Joie Palace.',
-            time: '1 tiếng trước',
-            status: 'Thanh toán',
-            avatar: '/userImage.png',
-        },
-        {
-            message: 'Mã tiệc FKFD-93K-KFPI đã được đặt thành công, quý khách vui lòng thanh toán số tiền đặt cọc theo thông tin trong email.',
-            time: '1 tiếng trước',
-            status: 'Thanh toán cọc',
-            avatar: '/userImage.png',
-        },
-        {
-            message: 'Mã tiệc FKAO-E23-FEAO đã hủy thành công. Hẹn gặp lại quý khách trong dịp gần nhất.',
-            time: '1 tiếng trước',
-            status: 'Hủy tiệc',
-            avatar: '/userImage.png',
-        },
-        {
-            message: 'Mã tiệc KFAS-392-AEPC sẽ diễn ra vào ngày 29/12/2025. Kính mời quý khách đến vào lúc 9:30 sáng để hoàn tất giai đoạn chuẩn bị và bàn giao. Nhân viên hỗ trợ của chúng tôi sẽ sớm liên hệ. Trân trọng.',
-            time: '1 tiếng trước',
-            status: 'Tiệc sắp diễn ra',
-            avatar: '/userImage.png',
-        },
-    ];
+    const { makeAuthorizedRequest } = useApiServices();
+    const [user, setUser] = useState();
+    const [listIdNotification, setListIdNotification] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+    const toast = useCustomToast();
 
+    useEffect(() => {
+        const getFeedbacks = async () => {
+            const getUser = JSON.parse(localStorage.getItem("user"));
+            if (getUser) {
+                setUser(getUser);
+            } else {
+                router.push('/');
+            }
+            const data = await makeAuthorizedRequest(
+                API_CONFIG.NOTIFICATIONS.GET_BY_ID(getUser.id),
+                'GET',
+                '',
+                null,
+                '/client/dang-nhap'
+            );
+
+            if (data.success) {
+                // setNotifications(data.data);
+                const datanotifications = data.data;
+                const notifications = datanotifications.map(notification => {
+                    const data = {
+                        message: notification.content,
+                        time: calculateTimeAgo(notification.created_at),
+                        status: getStatusFromType(notification.type),
+                        avatar: '/userImage.png',
+                    };
+                    return data;
+                });
+
+                const notificationIs_read = datanotifications
+                    .filter(notification => notification.is_read == false)
+                    .map(notification => notification.id);
+                setListIdNotification(notificationIs_read);
+                setNotifications(notifications);
+
+            } else {
+                console.error("Error fetching feedbacks:", data);
+                return [];
+            }
+        };
+        getFeedbacks();
+    }, []);
+
+    const is_read = async () => {
+        try {
+            const response = await makeAuthorizedRequest(
+                API_CONFIG.NOTIFICATIONS.IS_READ,
+                'PATCH',
+                {
+                    "notification_ids": listIdNotification,
+                },
+                null,
+                '/client/dang-nhap'
+            );
+            console.log(response);
+
+            if (response?.success) {
+                toast({
+                    position: "top",
+                    type: "success",
+                    title: "Cập nhật thành công!",
+                    description: 'Đã đánh dấu đọc thành công',
+                    closable: true,
+                });
+            } else {
+                toast({
+                    position: "top",
+                    type: "error",
+                    title: "Cập nhật thất bại!",
+                    description: response?.error?.message || "Vui lòng thử lại sau.",
+                    closable: true,
+                });
+            }
+        } catch (error) {
+            console.error("Error updating notification status:", error);
+        }
+    };
+
+
+
+    const calculateTimeAgo = (date) => {
+        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+        let interval = Math.floor(seconds / 31536000);
+
+        if (interval > 1) return `${interval} năm trước`;
+        interval = Math.floor(seconds / 2592000);
+        if (interval > 1) return `${interval} tháng trước`;
+        interval = Math.floor(seconds / 86400);
+        if (interval > 1) return `${interval} ngày trước`;
+        interval = Math.floor(seconds / 3600);
+        if (interval > 1) return `${interval} giờ trước`;
+        interval = Math.floor(seconds / 60);
+        if (interval > 1) return `${interval} phút trước`;
+        return `${seconds} giây trước`;
+    };
     // Hàm xác định màu sắc chữ theo trạng thái
     const getStatusColor = (status) => {
         switch (status) {
@@ -53,12 +125,31 @@ const NotificationsPage = () => {
         }
     };
 
+    const getStatusFromType = (type) => {
+        switch (type) {
+            case 'booking_confirm':
+                return 'Đặt tiệc';
+            case 'booking_updated':
+                return 'Cập nhật';
+            case 'payment_confirmed':
+                return 'Thanh toán';
+            case 'deposit_payment':
+                return 'Thanh toán cọc';
+            case 'booking_canceled':
+                return 'Hủy tiệc';
+            case 'event_upcoming':
+                return 'Tiệc sắp diễn ra';
+            default:
+                return 'Không xác định';
+        }
+    };
+
     return (
         <div className="flex flex-col gap-8 p-5 min-h-screen ">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-white">Thông báo</h1>
-                <button className="text-xs text-gold">Đánh dấu đã đọc</button>
+                <button className="text-xs text-gold" onClick={is_read} >Đánh dấu đã đọc</button>
             </div>
 
             {/* Notifications */}

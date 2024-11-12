@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -20,6 +24,11 @@ const nextConfig = {
         protocol: "https",
         hostname: "whitepalace.com.vn",
         pathname: "/wp-content/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
+        pathname: "/736x/**",
       },
     ],
   },

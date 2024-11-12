@@ -122,7 +122,7 @@ const Contact = () => {
           position: "top",
           type: "error",
           title: "Thất bại!",
-          description: error.response.data.message,
+          description: error.response?.data.message,
           closable: true,
         });
       }

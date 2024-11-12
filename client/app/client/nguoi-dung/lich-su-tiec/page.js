@@ -22,7 +22,9 @@ const page = () => {
     const [partyOld, setPartyOld] = useState([]);
     const [partyNew, setPartyNew] = useState([]);
     const [totalAmount, setTotalAmount] = useState([]);
+    const [reloadPage, setloadPage] = useState(false);
     const router = useRouter();
+    const [ branch_id, setBranch_id] = useState(0);
 
     useEffect(() => {
         const getData = async () => {
@@ -42,7 +44,7 @@ const page = () => {
                 // Fetch all bookings for the user
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser.id);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
-                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending'|| i.status === 'processing');
+                const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
                 const fetchedAllBookingsCancel = fetchedAllBookingsMembershipId.filter((i) => i.status === 'cancel');
 
                 const fetchedAllBookingsOld = [...fetchedAllBookingsMembershipId].sort((a, b) => {
@@ -51,6 +53,7 @@ const page = () => {
                 const fetchedAllBookingsNewest = [...fetchedAllBookingsMembershipId].sort((a, b) => {
                     return new Date(b.created_at) - new Date(a.created_at);
                 });
+
 
                 setPartyOld(fetchedAllBookingsOld)
                 setPartyNew(fetchedAllBookingsNewest)
@@ -71,9 +74,12 @@ const page = () => {
                 console.error('Chưa lấy được dữ liệu người dùng', error);
             }
         };
-
         getData();
-    }, []);
+    }, [reloadPage]);
+
+    const handleDataFromChild = (data) => {
+        setloadPage(data);
+    };
 
     const pasteData = (data, user) => {
         if (data.length > 0) {
@@ -82,7 +88,8 @@ const page = () => {
                 const dataStages = item.stages;
                 const dataMenus = dataDetailBooking[0]?.menus;
                 const datadePosits = dataDetailBooking[0]?.deposits;
-
+                setBranch_id((item.branches).id);
+                
                 return {
                     id: item.id,
                     nameParty: item.name,
@@ -92,17 +99,17 @@ const page = () => {
                     email: user?.email,
                     phoneUser: user?.phone,
                     idParty: `P${item.id}`,
-                    partyDate: new Date(item.created_at).toISOString().split("T")[0],
-                    dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
-                    numberGuest: item.number_of_guests,
+                    partyDate: formatDate(item.created_at),
+                    dateOrganization: formatDate(item.organization_date),
+                    numberGuest: (dataDetailBooking[0]?.table_count * 10) || 'Đang chờ xử lý',
                     session: item.shift,
-                    tableNumber: Math.ceil(item.number_of_guests / 10),
-                    spareTables: 2,
+                    tableNumber: dataDetailBooking[0]?.table_count || 'Đang chờ xử lý',
+                    spareTables: dataDetailBooking[0]?.spare_table_count || 'Đang chờ xử lý',
                     linkTo: `/party/${item.id}`,
                     showFull: true,
                     showDetailLink: true,
                     Collapsed: false,
-                    hall: dataStages.name,
+                    hall: dataStages?.name || 'Đang chờ xử lý',
                     typeParty: item.name,
                     liveOrOnline: "Trực tiếp",
                     space: 1,
@@ -119,6 +126,7 @@ const page = () => {
                     depositDay: item.is_deposit ? new Date(datadePosits?.created_at).toISOString().split("T")[0] : "",
                     remainingPaid: (item.total_amount && item.depositAmount) ? `${parseInt(item.total_amount) - parseInt(item.depositAmount)} VND` : "0 VND",
                     paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
+                    statusParty: item.status
                 };
             });
 
@@ -126,25 +134,42 @@ const page = () => {
         }
     }
 
+    const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-GB', options).replace(/\//g, '/');
+    };
+
     const clickFilter = (e) => {
+        let filteredParties;
         switch (e.target.value) {
             case "old":
-                setParties(partyOld, user);
+                filteredParties = partyOld;
                 break;
             case "near":
-                setParties(partyNew, user);
+                filteredParties = partyNew;
                 break;
             case "all":
-                setParties(partyAll, user);
+                filteredParties = partyAll;
                 break;
             case "happening":
-                setParties(partyPending, user);
+                const today = new Date().toISOString().split('T')[0];
+                filteredParties = partyPending.filter(party => {
+                    const partyDate = new Date(party.organization_date).toISOString().split('T')[0];
+                    return partyDate === today;
+                });
                 break;
             case "cancel":
-                setParties(partyCancel, user);
+                filteredParties = partyCancel;
                 break;
             default:
+                filteredParties = [];
                 break;
+        }
+
+        if (filteredParties.length > 0) {
+            pasteData(filteredParties, user);
+        } else {
+            setParties([]);
         }
     };
 
@@ -178,7 +203,7 @@ const page = () => {
             {parties && parties.length > 0 ? (
                 parties.map(party => (
                     <div key={party.id} className="cursor-pointer">
-                        <PartySectionClient showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
+                        <PartySectionClient branch_id={branch_id} reloadPage={handleDataFromChild} showFull={false} Collapsed={true} showDetailLink={true} data={party} linkTo={`/client/nguoi-dung/lich-su-tiec/${party.id}`} />
                     </div>
                 ))
             ) : (

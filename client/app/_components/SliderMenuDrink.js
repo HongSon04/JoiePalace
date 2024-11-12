@@ -108,15 +108,14 @@ const SliderMenuDrink = ({ title, dataSlider, logo }) => {
                 </div>
                 <div className="">
                     <Slider ref={sliderRef} {...menuSliderSettings}>
-                        {dataSlider.map((item) => (
+                        {dataSlider.map((item, index) => (
                             <div key={item.id} className="!flex items-center justify-center gap-6 max-sm:flex-col">
                                 <div className="flex justify-center items-center w-fit h-fit p-[10px]">
-                                    <p className="text-2xl"> 1.</p>
+                                    <p className="text-2xl"> {index+1}.</p>
                                     <Image
-                                        className="object-cover "
-                                        src={`/${item.image}`}
+                                        className="object-cover h-full w-full"
+                                        src={`${item.image}`}
                                         alt={item.name}
-
                                     />
                                 </div>
                                 <div className="flex flex-col gap-6">

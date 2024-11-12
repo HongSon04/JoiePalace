@@ -127,20 +127,13 @@ export class CategoriesService {
   // ! Get All Categories
   async findAll(query: FilterCategoryDto) {
     try {
-      const cacheCategory = await this.cacheManager.get('categories-get-all');
-      console.log('cacheCategory', cacheCategory);
-      if (cacheCategory) {
-        throw new HttpException(
-          {
-            data: cacheCategory,
-          },
-          HttpStatus.OK,
-        );
+      const cacheKey = `categories-${JSON.stringify(query)}`;
+      const cachedData = await this.cacheManager.get(cacheKey);
+
+      if (cachedData) {
+        throw new HttpException({ data: cachedData }, HttpStatus.OK);
       }
-      // const page = Number(query.page) || 1;
-      // const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
-      // const skip = (page - 1) * itemsPerPage;
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
@@ -185,44 +178,58 @@ export class CategoriesService {
         ];
       }
 
-      const [res, total] = await this.prismaService.$transaction([
-        this.prismaService.categories.findMany({
-          where: whereConditions,
-          include: {
-            tags: true,
-            products: {
-              include: {
-                tags: true,
+      if (query.deleted) {
+        whereConditions.deleted = String(query.deleted) === 'true';
+      }
+
+      const [rootCategories, childCategories, total] =
+        await this.prismaService.$transaction([
+          this.prismaService.categories.findMany({
+            where: {
+              ...whereConditions,
+              category_id: null,
+            },
+            include: {
+              tags: true,
+              products: {
+                include: { tags: true },
               },
             },
-          },
-        }),
-        this.prismaService.categories.count({
-          where: whereConditions,
-        }),
-      ]);
+          }),
+          this.prismaService.categories.findMany({
+            where: {
+              ...whereConditions,
+              category_id: {
+                not: null,
+              },
+            },
+            include: {
+              tags: true,
+              products: {
+                include: { tags: true },
+              },
+            },
+          }),
+          this.prismaService.categories.count({
+            where: whereConditions,
+          }),
+        ]);
 
-      // const lastPage = Math.ceil(total / itemsPerPage);
-      // const paginationInfo = {
-      //   lastPage,
-      //   nextPage: page < lastPage ? page + 1 : null,
-      //   prevPage: page > 1 ? page - 1 : null,
-      //   currentPage: page,
-      //   itemsPerPage,
-      //   total,
-      // };
+      // 4. Build tree structure
+      const categoriesTree = this.buildOptimizedCategoryTree(
+        rootCategories,
+        childCategories,
+      );
 
-      let FormatData = FormatReturnData(res, []);
-      const categories = this.buildCategoryTree(FormatData);
-
-      await this.cacheManager.set('categories-get-all', categories, {
+      // 5. Cache kết quả
+      await this.cacheManager.set(cacheKey, categoriesTree, {
         ttl: 60 * 5,
       } as any);
 
       throw new HttpException(
         {
-          data: categories,
-          // pagination: paginationInfo,
+          data: categoriesTree,
+          total,
         },
         HttpStatus.OK,
       );
@@ -238,110 +245,10 @@ export class CategoriesService {
     }
   }
 
-  // ! Get All Deleted Categories
-  async findAllDeleted(query: FilterCategoryDto) {
-    try {
-      // const page = Number(query.page) || 1;
-      // const itemsPerPage = Number(query.itemsPerPage) || 10;
-      const search = query.search || '';
-      // const skip = (page - 1) * itemsPerPage;
-
-      const startDate = query.startDate
-        ? FormatDateToStartOfDay(query.startDate)
-        : '';
-      const endDate = query.endDate ? FormatDateToEndOfDay(query.endDate) : '';
-
-      const sortRangeDate: any =
-        startDate && endDate
-          ? {
-              created_at: {
-                gte: new Date(startDate),
-                lte: new Date(endDate),
-              },
-            }
-          : {};
-
-      const whereConditions: any = {
-        deleted: true,
-        ...sortRangeDate,
-      };
-
-      if (search) {
-        whereConditions.OR = [
-          {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            description: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            short_description: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-        ];
-      }
-
-      const [res, total] = await this.prismaService.$transaction([
-        this.prismaService.categories.findMany({
-          where: whereConditions,
-          include: {
-            tags: true,
-            products: {
-              include: {
-                tags: true,
-              },
-            },
-          },
-        }),
-        this.prismaService.categories.count({
-          where: whereConditions,
-        }),
-      ]);
-
-      // const lastPage = Math.ceil(total / itemsPerPage);
-      // const paginationInfo = {
-      //   lastPage,
-      //   nextPage: page < lastPage ? page + 1 : null,
-      //   prevPage: page > 1 ? page - 1 : null,
-      //   currentPage: page,
-      //   itemsPerPage,
-      //   total,
-      // };
-
-      let FormatData = FormatReturnData(res, []);
-      const categories = this.buildCategoryTree(FormatData);
-
-      throw new HttpException(
-        {
-          data: categories,
-          // pagination: paginationInfo,
-        },
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ categories.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException({
-        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
-      });
-    }
-  }
-
   // ! Get One Category
   async findOne(id: number) {
     try {
-      const category = await this.prismaService.categories.findUnique({
+      const rootCategory = await this.prismaService.categories.findUnique({
         where: { id: Number(id) },
         include: {
           tags: true,
@@ -352,11 +259,31 @@ export class CategoriesService {
           },
         },
       });
-      if (!category) {
+
+      if (!rootCategory) {
         throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
       }
+
+      const childCategories = await this.prismaService.categories.findMany({
+        where: {
+          deleted: false,
+        },
+        include: {
+          tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
+      });
+
+      const categoriesTree = this.buildOptimizedCategoryTree(
+        [...[rootCategory]],
+        FormatReturnData(childCategories, []),
+      );
       throw new HttpException(
-        { data: FormatReturnData(category, []) },
+        { data: FormatReturnData(categoriesTree, []) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -374,10 +301,8 @@ export class CategoriesService {
   // ! Get One Category By Slug
   async findOneBySlug(slug: string) {
     try {
-      const category = (await this.prismaService.categories.findUnique({
-        where: {
-          slug,
-        },
+      const rootCategory = await this.prismaService.categories.findUnique({
+        where: { slug },
         include: {
           tags: true,
           products: {
@@ -386,11 +311,15 @@ export class CategoriesService {
             },
           },
         },
-      })) as any;
-      // ? Find Children Categories
-      const childrenCategories = await this.prismaService.categories.findMany({
+      });
+
+      if (!rootCategory) {
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
+      }
+
+      const childCategories = await this.prismaService.categories.findMany({
         where: {
-          category_id: Number(category.id),
+          deleted: false,
         },
         include: {
           tags: true,
@@ -401,14 +330,13 @@ export class CategoriesService {
           },
         },
       });
-      if (childrenCategories.length > 0) {
-        category.children = FormatReturnData(childrenCategories, []);
-      }
-      if (!category) {
-        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
-      }
+
+      const categoriesTree = this.buildOptimizedCategoryTree(
+        [...[rootCategory]],
+        FormatReturnData(childCategories, []),
+      );
       throw new HttpException(
-        { data: FormatReturnData(category, []) },
+        { data: FormatReturnData(categoriesTree, []) },
         HttpStatus.OK,
       );
     } catch (error) {
@@ -434,11 +362,11 @@ export class CategoriesService {
         throw new NotFoundException({ message: 'Không tìm thấy tag' });
       }
 
-      const categories = await this.prismaService.categories.findMany({
+      const rootCategory = await this.prismaService.categories.findMany({
         where: {
           tags: {
             some: {
-              slug: tag_slug,
+              slug: findTag.slug,
             },
           },
         },
@@ -452,10 +380,33 @@ export class CategoriesService {
         },
       });
 
-      let FormatData = FormatReturnData(categories, []);
-      const data = this.buildCategoryTree(FormatData);
+      if (!rootCategory) {
+        throw new NotFoundException({ message: 'Không tìm thấy danh mục' });
+      }
 
-      throw new HttpException({ data: data }, HttpStatus.OK);
+      const childCategories = await this.prismaService.categories.findMany({
+        where: {
+          deleted: false,
+        },
+        include: {
+          tags: true,
+          products: {
+            include: {
+              tags: true,
+            },
+          },
+        },
+      });
+
+      const categoriesTree = this.buildOptimizedCategoryTree(
+        [...[rootCategory]],
+        FormatReturnData(childCategories, []),
+      );
+
+      throw new HttpException(
+        { data: FormatReturnData(categoriesTree, []) },
+        HttpStatus.OK,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -706,34 +657,31 @@ export class CategoriesService {
     }
   }
 
-  // ! Đệ quy lấy danh sách danh mục
-  buildCategoryTree(categories) {
+  private buildOptimizedCategoryTree(
+    rootCategories: any[],
+    allCategories: any[],
+  ) {
     const categoryMap = new Map();
-    const usedInChildren = new Set();
 
-    categories.forEach((category) => {
-      categoryMap.set(category.id, {
-        ...category,
-        children: [],
-      });
+    allCategories.forEach((category) => {
+      categoryMap.set(category.id, { ...category, childrens: [] });
     });
-
-    const rootCategories = [];
-
-    categoryMap.forEach((node) => {
-      if (node.category_id === null) {
-        rootCategories.push(node);
-      } else {
-        const parentNode = categoryMap.get(node.category_id);
-        if (parentNode) {
-          parentNode.children.push(node);
-          usedInChildren.add(node.id);
-        } else {
-          rootCategories.push(node);
-        }
+    rootCategories.forEach((category) => {
+      if (!categoryMap.has(category.id)) {
+        categoryMap.set(category.id, { ...category, childrens: [] });
       }
     });
 
-    return rootCategories.filter((node) => !usedInChildren.has(node.id));
+    allCategories.forEach((category) => {
+      const categoryWithChildren = categoryMap.get(category.id);
+      const parent = categoryMap.get(category.category_id);
+
+      if (parent) {
+        parent.childrens.push(categoryWithChildren);
+      }
+    });
+
+    // Chỉ trả về các root category và cây con của chúng
+    return rootCategories.map((root) => categoryMap.get(root.id));
   }
 }

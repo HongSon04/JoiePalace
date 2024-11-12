@@ -16,7 +16,6 @@ const Page = ({ params }) => {
     const [statusParty, setStatusParty] = useState();
     const router = useRouter();
 
-
     useEffect(() => {
         const getData = async () => {
             const getUser = JSON.parse(localStorage.getItem("user"));
@@ -27,21 +26,34 @@ const Page = ({ params }) => {
             }
             try {
                 const fetchData = await fetchBookingById(id);
+                // console.log('fetchData',fetchData);
+                
                 setPartyDetails(fetchData)
                 if (fetchData.length > 0) {
                     const parties = fetchData.map((item) => {
                         const dataDetailBooking = item.booking_details;
-                        const dataStages = item.stages;
+                        const dataStages = item.stages || dataDetailBooking[0]?.stage_detail;
                         const dataMenus = dataDetailBooking[0]?.menus;
                         const drinksPrice = dataMenus?.products.reduce((total, item) => {
-                            if (item.category_id === 2) { // thí dụ nước categories == 2
+                            if (item.category_id == 1) {
                                 return total + (item.price || 0);
                             }
                             return total;
                         }, 0)
                         const dataDecors = dataDetailBooking[0]?.decors;
                         const datadePosits = dataDetailBooking[0]?.deposits;
+                        const dataMenu = dataDetailBooking[0]?.menu_detail;
+                        console.log('dataMenu',dataMenus.price);
+                        
+                        
                         setStatusParty(item.status);
+
+                        // Nước uống
+                        const drinkShow = dataMenus?.products.filter((item) => {
+                            return item.category_id === 1;
+                        });
+                        console.log(drinkShow);
+                        
 
                         // Tính chi phí bàn và ghế
                         const tableCount = dataDetailBooking[0]?.table_count || 0;
@@ -52,7 +64,7 @@ const Page = ({ params }) => {
                         const menuCost = dataMenus?.price || 0;
 
                         // Chi phí bàn và ghế dự phòng
-                        const spareTableCount = 2;
+                        const spareTableCount = dataDetailBooking[0]?.spare_table_count;
                         const spareTableCost = spareTableCount * 200000;
                         const spareChairCost = spareTableCount * 10 * 50000;
 
@@ -90,41 +102,52 @@ const Page = ({ params }) => {
                             additionalServiceCost +       // Chi phí dịch vụ bổ sung
                             otherServicesCost +           // Chi phí dịch vụ khác
                             extraServicesCost;
-
-
+                            console.log('amount',amount);
+                            console.log("tablePrice",tablePrice);
+                            console.log("chairPrice",chairPrice);
+                            console.log("decorCost",decorCost);
+                            console.log("partyTypeCost",partyTypeCost);
+                            console.log("stageCost",stageCost);
+                            console.log("menuCost",menuCost);
+                            console.log("drinksPrice",drinksPrice);
+                            console.log("spareTableCost",spareTableCost);
+                            console.log("additionalServiceCost",additionalServiceCost);
+                            console.log("otherServicesCost",otherServicesCost);
+                            console.log("extraServicesCost",extraServicesCost);
+                            
                         return {
                             id: item.id,
-                            nameParty: item.name,
+                            nameParty: item?.name,
                             address: item.company_name,
                             phoneAddress: item.phone,
-                            hostName: getUser?.name,
+                            hostName: item.company_name,
                             email: getUser?.email,
                             phoneUser: getUser?.phone,
                             idParty: `P${item.id}`,
-                            partyDate: new Date(item.created_at).toISOString().split("T")[0],
-                            dateOrganization: new Date(item.organization_date).toISOString().split("T")[0],
-                            numberGuest: item.number_of_guests,
+                            partyDate: formatDate(item.created_at),
+                            dateOrganization: formatDate(item.organization_date),
+                            numberGuest: (dataDetailBooking[0]?.table_count * 10),
                             session: item.shift,
-                            tableNumber: Math.ceil(item.number_of_guests / 10),
-                            spareTables: 2,
+                            tableNumber: dataDetailBooking[0]?.table_count,
+                            spareTables: spareTableCount,
                             linkTo: `/party/${item.id}`,
                             showFull: true,
                             showDetailLink: true,
                             Collapsed: false,
-                            hall: dataStages.name,
+                            hall: dataStages?.name,
                             typeParty: item.name,
                             liveOrOnline: "Trực tiếp",
                             space: dataStages.name,
                             decorate: dataDetailBooking[0]?.decors?.name || "Không có trang trí",
                             guestTable: "10 người/bàn",
                             menu: dataMenus?.name,
-                            drinks: "Bia Tiger, Nước ngọt Pepsi",
+                            drinks: drinkShow.map(i => (`${i.name} `)),
                             payerName: item.name,
-                            paymentMethod: `Chuyển khoản ${datadePosits?.payment_method}`,
+                            paymentMethod: `Chuyển khoản ${datadePosits?.payment_method || "chưa có"} `,
                             menuCostTable: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Chưa thanh toán",
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND ` : "0 VND",
                             depositAmount: datadePosits?.amount ? `${datadePosits?.amount.toLocaleString('vi-VN')} VND` : "0 VND",
-                            depositStatus: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Chưa thanh toán",
+                            depositStatus: item.is_deposit === 'pending' ? 'Đã cọc' : "Chưa cọc",
                             depositDay: formatDate(datadePosits?.created_at),
                             remainingPaid: (dataDetailBooking[0].total_amount && datadePosits?.amount) ? `${(parseInt(dataDetailBooking[0].total_amount) - parseInt(datadePosits?.amount)).toLocaleString('vi-VN')} VND` : `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND`,
                             paymentDay: formatDate(datadePosits?.created_at),
@@ -133,17 +156,18 @@ const Page = ({ params }) => {
                             // Chi phí khác
                             costTable: `${(amount / tableCount).toLocaleString('vi-VN')} VND/bàn`,
                             decorationCost: `${dataDecors?.price.toLocaleString('vi-VN')} VND`,
-                            soundStage: 'Đã tính',
-                            hallRental: `${dataStages?.price.toLocaleString('vi-VN')} VND`,
+                            soundStage: 'Miễn phí',
+                            hallRental: `${dataStages?.price === 0 ? 'Miễn phí' : `${dataStages?.price.toLocaleString('vi-VN')} VND`}`,
                             tableRental: "200.000 VND / 1 bàn",
                             chairRental: "50.000 VND / 1 ghế",
-                            paymentStatus: `${((tablePrice + chairPrice + menuCost + drinksPrice) / tableCount).toLocaleString('vi-VN')} VND / bàn` || 0,
+                            paymentStatus: `${(dataMenu.price).toLocaleString('vi-VN')} VND / bàn` || 0,
                             snack: "Bánh ngọt, Trái cây",
                             vat: "10%",
                             drinksCost: `${drinksPrice.toLocaleString('vi-VN')} VND / bàn` || 0,
                             arise: item.is_deposit ? '' : "Không có",
                         };
                     });
+
                     setParty(parties);
                 }
 
@@ -233,7 +257,7 @@ const Page = ({ params }) => {
 
             <div className='flex items-center'>
                 <span className='text-cyan-400 text-base'>
-                    • {`${statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pedding' ? 'Đang chờ' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang xử lý'}`}
+                    • {`${statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pedding' ? 'chưa giải quyết' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang xử lý'}`}
                 </span>
             </div>
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
@@ -244,7 +268,7 @@ const Page = ({ params }) => {
                     </div>
                 ))
             ) : (
-                <p className="text-white leading-6 text-xl font-medium">Không có tiệc đã đặt.</p>
+                <p className="text-white leading-6 text-xl font-medium">Tiệc của bạn đang được chúng tôi xử lý.</p>
             )}
         </div>
     );

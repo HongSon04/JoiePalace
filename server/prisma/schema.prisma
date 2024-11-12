@@ -410,6 +410,8 @@ model packages {
   price             Int
   images            String[]
   extra_service     Json?
+  other_service     Json?
+  note              String?
   deleted           Boolean     @default(false)
   deleted_at        DateTime?
   deleted_by        Int?

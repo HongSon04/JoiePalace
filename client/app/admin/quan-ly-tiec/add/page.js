@@ -3,79 +3,27 @@ import React, { useCallback, useEffect, useState } from 'react';
 import IconButton from '@/app/_components/IconButton';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import IconButtonSave from '@/app/_components/IconButtonSave';
-import TableDetail from '@/app/_components/TableDetailCost';
 import ButtonCustomAdmin from '@/app/_components/ButtonCustomAdmin';
-import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useApiServices from '@/app/_hooks/useApiServices';
 import { API_CONFIG, makeAuthorizedRequest } from '@/app/_utils/api.config';
-import useCustomToast from '@/app/_hooks/useCustomToast';
-import { fetchFeedbacksFailure } from '@/app/_lib/features/feedbacks/feedbacksSlice';
 import { useDispatch } from 'react-redux';
 import { fetchBranchSuccess } from '@/app/_lib/features/branch/branchSlice';
 import HeaderSelect from '../[slug]/HeaderSelect';
 import RequestBreadcrumbsForQuanLyTiec from '../[slug]/[id]/RequestBreadcrumbsForQuanLyTiec';
 import InputDetailCustomer from '../[slug]/[id]/InputDetailCustomer';
-import { inputInfoUser, inputOrganization, inputsCost } from '../[slug]/[id]/InputData';
+
 import { buttons } from '../[slug]/[id]/buttons';
 import { formatFullDateTime } from '@/app/_utils/formaters';
+import { organizationSchema } from '../[slug]/[id]/organizationSchema';
+import { DropdownField } from '../[slug]/[id]/DropdownField';
+import { inputInfoUser, inputOrganization, inputsCost } from './InputDataADD';
+import useCustomToast from '@/app/_hooks/useCustomToast';
 
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
 );
-
-const DropdownField = ({ label, name, options, value, onChange }) => (
-    <div className="flex flex-col gap-2">
-        <label className="font-bold leading-6 text-base text-white">{label}</label>
-        <select
-            name={name}
-            value={value || ''}
-            onChange={onChange}
-            className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
-        >
-            {options.map(option => (
-                <option key={option.value} className="text-black" value={option.value}>
-                    {option.label}
-                </option>
-            ))}
-        </select>
-    </div>
-);
-
-
-const organizationSchema = z.object({
-    company_name: z.string().optional(),
-    email: z.string().email({ message: "Email không hợp lệ" }),
-    phone: z
-        .string()
-        .regex(/^\d+$/, { message: "Số điện thoại phải là số" })
-        .min(10, { message: "Số điện thoại phải có ít nhất 10 ký tự" }),
-    username: z.string().min(1, { message: "Họ và Tên là bắt buộc" }),
-    tables: z
-        .coerce.number()
-        .int({ message: "Số lượng bàn chính phải là số nguyên" })
-        .min(1, { message: "Số lượng bàn chính phải lớn hơn 0" }),
-    spare_table_count: z
-        .coerce.number()
-        .int({ message: "Số bàn dự phòng phải là số nguyên" })
-        .min(1, { message: "Số bàn dự phòng phải lớn hơn 0" }),
-    customer: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
-    customerAndChair: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
-    partyDate: z.string().nonempty({ message: "Ngày đặt tiệc là bắt buộc" }),
-    organization_date: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
-    shift: z.string().nonempty({ message: "Ca hoạt động là bắt buộc" }),
-    total_amount: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
-    depositAmount: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
-    // amount_booking: z
-    //     .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
-    depositDate: z.string().nonempty({ message: "Ngày đặt cọc là bắt buộc" }),
-    dataPay: z.string().nonempty({ message: "Ngày thanh toán là bắt buộc" }),
-});
 
 const fetchOptions = async (apiConfig, setState, title, name) => {
     try {
@@ -86,26 +34,29 @@ const fetchOptions = async (apiConfig, setState, title, name) => {
         console.error(`Error fetching ${name} data:`, error);
     }
 };
-const Page = ({ params }) => {
-    const { id } = params;
+const Page = () => {
     const { makeAuthorizedRequest } = useApiServices();
     const [currentBranch, setCurrentBranch] = useState(null);
-    const toast = useCustomToast();
-    const showToast = (status, title, description) => {
-        toast({ title, description, status });
-      };
-      const dispatch = useDispatch();
+    useEffect(() => {
+        const branch = localStorage.getItem("currentBranch");
+        if (typeof window !== "undefined") {
+            if (branch) {
+                setCurrentBranch(JSON.parse(branch));
+            }
+        }
+    }, []);
 
-    const [menus, setMenus] = useState([
-        {
-            svg: null,
-            title: 'Menu',
-            type: 'select',
-            name: 'menu',
-            options: [],
-        },
-    ]);
-    const [branches, setBranches] = useState([
+    
+    useEffect(() => {
+        fetchAllDecors();
+        fetchAllPartyTypes()
+        fetchAllStages();
+    }, [currentBranch]);
+
+    const toast = useCustomToast();
+    const dispatch = useDispatch();
+
+    const [stages, setStages] = useState([
         {
             svg: null,
             title: 'Sảnh',
@@ -171,51 +122,98 @@ const Page = ({ params }) => {
         },
     ])
 
-    const [selectedMenu, setSelectedMenu] = useState(menus[0]?.value || 1);
-    const [selectBranches, setSelectBranches] = useState(branches[0]?.value || 1);
-    const [selectedDecors, setSelectedDecors] = useState(decors[0]?.value || 1);
-    const [selectPartyTypes, setSelectPartyTypes] = useState(partyTypes[0]?.value || 1);
+    const [selectStages, setSelectStages] = useState('');
+    const [selectedDecors, setSelectedDecors] = useState('');
+    const [selectPartyTypes, setSelectPartyTypes] = useState('');
     const [selectedStatus, setSelectedStatus] = useState(statusPayment[0]?.value || '');
     const [selectStatusDeposit, setSelectStatusDeposit] = useState(statusDeposit[0]?.value || '');
+    const [limitStages, setLimitStages] = useState(0);
 
-    const fetchAllMenus = () => fetchOptions(API_CONFIG.MENU.GET_ALL(), setMenus, 'Menu', 'menu');
-    const fetchAllBranches = () => fetchOptions(API_CONFIG.BRANCHES.GET_ALL(), setBranches, 'Sảnh', 'stages');
+    const fetchLimitStages = async (stageId) => {
+        try {
+            const response = await makeAuthorizedRequest(API_CONFIG.STAGES.GET_ALL_BY_STAGE_ID(stageId), 'GET');
+            const limitStagesData = response.data[0];
+            setLimitStages(limitStagesData.capacity_max || 0);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const fetchAllStages = async () => {
+        try {
+            const response = await makeAuthorizedRequest(API_CONFIG.STAGES.GET_ALL_BY_BRANCH(currentBranch.id), 'GET');
+            const stageData = response.data;
+    
+            const options = stageData.length === 0
+                ? [{ value: '', label: 'Chưa có sảnh', capacity_max: 0 }]
+                : stageData.map(item => ({
+                    value: item.id,
+                    label: item.name,
+                    capacity_max: item.capacity_max,
+                }));
+            
+            setStages([
+                {
+                    title: 'Sảnh',
+                    type: 'select',
+                    options,
+                },
+            ]);
+            
+            if (!selectStages) {
+                const initialStage = options[0];
+                setSelectStages(initialStage?.value || '');
+                setLimitStages(initialStage?.capacity_max || 0);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    
     const fetchAllDecors = () => fetchOptions(API_CONFIG.DECORS.GET_ALL(), setDecors, 'Decor', 'decors');
     const fetchAllPartyTypes = () => fetchOptions(API_CONFIG.PARTY_TYPES.GET_ALL(), setPartyTypes, 'Loại tiệc', 'partyTypes');
 
     const { control, handleSubmit, reset, setValue, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
+        defaultValues: {
+            menu: '',
+            stages: '',
+            decors: '',
+            partyTypes: '',
+            customerAndChair: 10,
+            statusPayment: '',
+            statusDeposit: '',
+            payment: '',
+            total_amount: 0,
+            depositAmount: 0
+        },
     });
 
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const branch = localStorage.getItem("currentBranch");
-            if (branch) {
-                setCurrentBranch(JSON.parse(branch));
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchAllBranches()
-        fetchAllMenus();
-        fetchAllDecors();
-        fetchAllPartyTypes()
-    }, []);
     const handleFieldChange = (fieldSetter, triggerField, resetField = null) => (event) => {
         const value = event.target.value;
         fieldSetter(value);
-    
+
         if (resetField) {
-            setValue(resetField , value);
+            setValue(resetField, value);
         }
+
         trigger(triggerField);
     };
-    
-    const handleMenuChange = handleFieldChange(setSelectedMenu, 'menu');
-    const handleBranchChange = handleFieldChange(setSelectBranches, 'stages');
-    const handleDecorsChange = handleFieldChange(setSelectedDecors, 'decor');
-    const handlePartyTypesChange = handleFieldChange(setSelectPartyTypes, 'partyTypes');
+
+    const handleStageChange = async (event) => {
+        const selectedStageId = event.target.value;
+        setSelectStages(selectedStageId);
+        fetchLimitStages(selectedStageId);
+
+    };
+    const handleDecorChange = (event) => {
+        const selectedDecorId = event.target.value;
+        setSelectedDecors(selectedDecorId);
+
+    };
+    const handlePartyTypeChange = (event) => {
+        const selectedPartyTypeId = event.target.value;
+        setSelectPartyTypes(selectedPartyTypeId);
+    };
     const handlePaymentChange = handleFieldChange(() => {}, 'payment', 'payment');
     const handleStatusPaymentChange = handleFieldChange(setSelectedStatus, 'statusPayment', 'statusPayment');
     const handleStatusDepositChange = handleFieldChange(setSelectStatusDeposit, 'statusDeposit', 'statusDeposit');
@@ -230,57 +228,24 @@ const Page = ({ params }) => {
                 type: "error",
               });
         }
+        setValue('total_amount', 0);
+        setValue('depositAmount', 0);
 
         const dataform = {
             ...data,
             user_id: user.id,
-            menu_id: Number(selectedMenu),
-            decor_id: Number(selectedDecors),
-            party_type_id: Number(selectPartyTypes),
             branch_id: currentBranch.id,
+            party_type_id: Number(selectPartyTypes),
+            stage_id: Number(selectStages),
             name: data.username,
             phone: data.phone,
             email: data.email,
-            note: '',
-            shift: data.shift,
-            number_of_guests: data.customer,
-            // before data.organization_date -> after formatFullDateTime(data.organization_date).date
-            organization_date: formatFullDateTime(data.organization_date).date,
             company_name: data.company_name,
+            shift: data.shift,
+            organization_date: formatFullDateTime(data.organization_date).date,
+            number_of_guests: data.customer,
             status: setStatusPayment,
-            stage_id: Number(selectBranches),
             amount: data.total_amount,
-            booking_details: [{
-                branch_id: currentBranch.id,
-                decor_id: Number(selectedDecors),
-                menu_id: Number(selectedMenu),
-                deposit_id: Number(selectStatusDeposit),
-                deposit: data.depositAmount,
-                deposit_date: data.depositDate,
-                payment_method: data.payment,
-                created_at: data.dataPay,
-                status: data.statusPayment,
-                status_deposit: data.statusDeposit,
-                amount_booking: data.amount_booking,
-                total_amount: data.total_amount,
-                menus: {
-                    price: data.menus_price,
-                    products: data.foods?.map(item => item.id) || [],
-                },
-                decor: {
-                    decor_id: selectedDecors,
-                },
-                party_type: {
-                    party_type_id: selectPartyTypes,
-                },
-                menu: {
-                    menu_id: selectedMenu,
-                },
-                stage: {
-                    stage_id: selectBranches,
-                },
-
-            }],
             "users": {
                 id: user.id,
                 username: data.username,
@@ -294,27 +259,41 @@ const Page = ({ params }) => {
 
             if (updateBranches.success) {
                 dispatch(fetchBranchSuccess(updateBranches.data));
-                showToast("success", "Tạo dữ liệu chi nhánh thành công", "Phản hồi đã được duyệt. Đang lấy dữ liệu mới");
+                toast({
+                    title: "Tạo dữ liệu thành công",
+                    description: "Đã xử lý thành công dữ liệu",
+                    type: "success",
+                    });
             } else{
-                handleError("Đã xảy ra lỗi");
+                const { statusCode, message } = updateBranches.error || {};
+                if (statusCode == 401) {
+                    toast({
+                      title: "Phiên đăng nhập đã hết hạn",
+                      description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
+                      type: "error",
+                    });
+                  } else {
+                    toast({
+                      title: "Cập nhật thất bại",
+                      description: message,
+                      type: "error",
+                    });
+                  }
             }
         } catch (error) {
             console.log(error);
-            handleError(error);
+            const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
+            toast("error", "Cập nhật thất bại", message);
         }
-
         console.log('Dữ liệu form hợp lệ:', dataform);
     };
 
-    const handleError = (message) => {
-        dispatch(fetchFeedbacksFailure());
-        showToast("error", "Tạo dữ liệu không thành công", message);
-      };
 
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={'Thêm tiệc'} />
             <RequestBreadcrumbsForQuanLyTiec requestId={''} nameLink={currentBranch?.name} slugLink={''} />
+            
             <div className='flex gap-[10px]'>
                 <div className='ml-auto flex gap-[10px]'>
                     {buttons.map((button, index) => (
@@ -322,6 +301,11 @@ const Page = ({ params }) => {
                     ))}
                 </div>
             </div>
+            {limitStages > 0 && (
+                <span className='text-red-400 font-medium text-base'>
+                    *Số lượng bàn chính thức và bàn dự phòng của sảnh chỉ tối đa là {limitStages}
+                </span>
+                )}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className='p-4 mt-[30px] w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
                     <TitleSpanInfo title={'Thông tin liên hệ'} />
@@ -351,7 +335,7 @@ const Page = ({ params }) => {
                                 name={party.name}
                                 options={party.options}
                                 value={selectPartyTypes}
-                                onChange={handlePartyTypesChange}
+                                onChange={handlePartyTypeChange}
                             />
                         ))}
                         {inputOrganization.map((detail, index) => (
@@ -375,27 +359,17 @@ const Page = ({ params }) => {
                                 name={decor.name}
                                 options={decor.options}
                                 value={selectedDecors}
-                                onChange={handleDecorsChange}
+                                onChange={handleDecorChange}
                             />
                         ))}
-                        {branches.map((branch, index) => (
+                        {stages.map((stage, index) => (
                             <DropdownField
                                 key={index}
-                                label={branch.title}
-                                name={branch.name}
-                                options={branch.options}
-                                value={selectBranches}
-                                onChange={handleBranchChange}
-                            />
-                        ))}
-                        {menus.map((menu, index) => (
-                            <DropdownField
-                                key={index}
-                                label={menu.title}
-                                name={menu.name}
-                                options={menu.options}
-                                value={selectedMenu}
-                                onChange={handleMenuChange}
+                                label={stage.title}
+                                name={stage.name}
+                                options={stage.options}
+                                value={selectStages}
+                                onChange={handleStageChange}
                             />
                         ))}
                     </div>

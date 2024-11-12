@@ -26,7 +26,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-@Controller('memberships')
+@Controller('api/memberships')
 @ApiTags('Memberships - Quản lý hạng thành viên')
 export class MembershipsController {
   constructor(private readonly membershipsService: MembershipsService) {}
