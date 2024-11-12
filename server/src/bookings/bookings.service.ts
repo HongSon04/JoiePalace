@@ -1070,6 +1070,16 @@ export class BookingsService {
           },
         });
 
+        // Add 3 days + for expired date of booking
+        const expiredDate = dayjs().add(3, 'day').toDate();
+
+        await this.prismaService.bookings.update({
+          where: { id: Number(id) },
+          data: {
+            expired_at: expiredDate,
+          },
+        });
+
         // ! Create Or Update Booking
         const findBookingDetail =
           await this.prismaService.booking_details.findFirst({

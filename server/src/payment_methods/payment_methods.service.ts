@@ -16,11 +16,14 @@ import { OnePayInternational } from 'vn-payments';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
 @Injectable()
 export class PaymentMethodsService {
   constructor(
     private configService: ConfigService,
     private prismaService: PrismaService,
+    private notificationsService: NotificationsService,
   ) {}
 
   // ? Other
@@ -160,14 +163,9 @@ export class PaymentMethodsService {
         ress.setEncoding('utf8');
         ress.on('data', (body) => {
           const response = JSON.parse(body);
-          if (ress.statusCode === HttpStatus.CREATED && response.payUrl) {
-            throw new HttpException(
-              {
-                message: 'Tạo đơn đặt cọc thành công',
-                payUrl: response.payUrl,
-              },
-              HttpStatus.CREATED,
-            );
+          if (ress.statusCode == 200 && response.payUrl) {
+            // ? Chuyển hướng đến trang thanh toán của Momo
+            return res.redirect(response.payUrl);
           } else {
             throw new BadRequestException('Tạo đơn đặt cọc thất bại');
           }
@@ -226,7 +224,7 @@ export class PaymentMethodsService {
               deposit_id: Number(query.deposit_id),
             },
           });
-        await this.prismaService.bookings.update({
+        const updateBooking = await this.prismaService.bookings.update({
           where: {
             id: Number(findBookingDetail.booking_id),
           },
@@ -234,6 +232,10 @@ export class PaymentMethodsService {
             is_deposit: true,
           },
         });
+        this.notificationDepositSuccess(
+          findDeposit.transactionID,
+          Number(updateBooking.branch_id),
+        );
         // ? Redirect to success page
         this.successPayment(res);
       } else {
@@ -312,13 +314,9 @@ export class PaymentMethodsService {
       vnp_Params['vnp_SecureHash'] = signed;
       vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
 
-      res.redirect(vnpUrl);
       if (vnpUrl) {
-        return res.status(HttpStatus.CREATED).json({
-          message: 'Tạo đơn đặt cọc thành công',
-          status: HttpStatus.OK,
-          payUrl: vnpUrl,
-        });
+        // ? Chuyển hướng đến trang thanh toán của VNPay
+        return res.redirect(vnpUrl);
       } else {
         return res.status(400).json({
           message: 'Tạo đơn đặt cọc thất bại',
@@ -341,7 +339,7 @@ export class PaymentMethodsService {
   async callbackVNPay(query: VNPayCallbackDto, res) {
     try {
       if (query.vnp_ResponseCode === '00') {
-        await this.prismaService.deposits.update({
+        const updateDeposit = await this.prismaService.deposits.update({
           where: {
             id: Number(query.deposit_id),
           },
@@ -358,7 +356,7 @@ export class PaymentMethodsService {
               deposit_id: Number(query.deposit_id),
             },
           });
-        await this.prismaService.bookings.update({
+        const updateBooking = await this.prismaService.bookings.update({
           where: {
             id: Number(findBookingDetail.booking_id),
           },
@@ -366,7 +364,10 @@ export class PaymentMethodsService {
             is_deposit: true,
           },
         });
-        this.successPayment(res);
+        this.notificationDepositSuccess(
+          updateDeposit.transactionID,
+          Number(updateBooking.branch_id),
+        );
       } else {
         this.failPayment(res);
       }
@@ -414,12 +415,8 @@ export class PaymentMethodsService {
       this.onepayIntl
         .buildCheckoutUrl(checkoutData as any)
         .then((checkoutUrl) => {
-          return res.status(HttpStatus.CREATED).json({
-            message: 'Tạo đơn đặt cọc thành công',
-            status: HttpStatus.OK,
-            payUrl: checkoutUrl.href,
-          });
-          // res.end();
+          // ? Chuyển hướng đến trang thanh toán của OnePay
+          return res.redirect(checkoutUrl.href);
         })
         .catch((err) => {
           console.log('Lỗi từ payment_method.service.ts -> onepay', err);
@@ -444,7 +441,7 @@ export class PaymentMethodsService {
   async callbackOnePay(query: OnepayCallbackDto, res) {
     console.log('query', query);
     if (query.vpc_TxnResponseCode === '0') {
-      await this.prismaService.deposits.update({
+      const updateDeposit = await this.prismaService.deposits.update({
         where: {
           id: Number(query.deposit_id),
         },
@@ -461,7 +458,7 @@ export class PaymentMethodsService {
             deposit_id: Number(query.deposit_id),
           },
         });
-      await this.prismaService.bookings.update({
+      const updateBooking = await this.prismaService.bookings.update({
         where: {
           id: Number(findBookingDetail.booking_id),
         },
@@ -469,6 +466,10 @@ export class PaymentMethodsService {
           is_deposit: true,
         },
       });
+      this.notificationDepositSuccess(
+        updateDeposit.transactionID,
+        Number(updateBooking.branch_id),
+      );
       this.successPayment(res);
     } else {
       this.failPayment(res);
@@ -536,11 +537,8 @@ export class PaymentMethodsService {
         .post(config.endpoint, null, { params: order })
         .then(({ data }) => {
           if (data.return_code === 1) {
-            return res.status(HttpStatus.CREATED).json({
-              message: 'Tạo đơn đặt cọc thành công',
-              status: HttpStatus.OK,
-              payUrl: data.order_url,
-            });
+            // ? Chuyển hướng đến trang thanh toán của ZaloPay
+            return res.redirect(data.order_url);
           } else {
             return res.status(HttpStatus.BAD_REQUEST).json({
               status: HttpStatus.BAD_REQUEST,
@@ -591,7 +589,7 @@ export class PaymentMethodsService {
 
         result.return_code = 1;
         result.return_message = 'success';
-        await this.prismaService.deposits.update({
+        const updateDeposit = await this.prismaService.deposits.update({
           where: {
             id: Number(query.deposit_id),
           },
@@ -616,6 +614,18 @@ export class PaymentMethodsService {
           },
         });
 
+        const updateBooking = await this.prismaService.bookings.update({
+          where: {
+            id: Number(findBookingDetail.booking_id),
+          },
+          data: {
+            is_deposit: true,
+          },
+        });
+        this.notificationDepositSuccess(
+          updateDeposit.transactionID,
+          Number(updateBooking.branch_id),
+        );
         this.successPayment(res);
       }
     } catch (ex) {
@@ -638,6 +648,48 @@ export class PaymentMethodsService {
   private async failPayment(res) {
     res.redirect(
       `${this.configService.get<string>('FRONTEND_URL')}thanh-toan-that-bai`,
+    );
+  }
+
+  // ! Notification Deposit Success
+  private async notificationDepositSuccess(
+    transactionID: string,
+    branchId: number,
+  ) {
+    const findDeposit = await this.prismaService.deposits.findFirst({
+      where: {
+        transactionID: transactionID,
+      },
+    });
+    if (!findDeposit) {
+      throw new NotFoundException({ message: 'Không tìm thấy giao dịch' });
+    }
+
+    const findBooking = await this.prismaService.bookings.findFirst({
+      where: {
+        booking_details: {
+          some: {
+            deposit_id: Number(findDeposit.id),
+          },
+        },
+      },
+      include: {
+        booking_details: true,
+      },
+    });
+
+    const contents = {
+      name: `Đơn đặt tiệc của ${findBooking.name}`,
+      contents: `Đơn cọc của ${findBooking.name} đã được thanh toán thành công`,
+      type: TypeNotifyEnum.DEPOSIT_SUCCESS,
+      branch_id: Number(branchId),
+    };
+
+    await this.notificationsService.sendNotifications(
+      contents.name,
+      contents.contents,
+      contents.branch_id,
+      contents.type,
     );
   }
 }
