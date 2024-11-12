@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { BookingStatus } from 'helper/enum/booking_status.enum';
 import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { PrismaService } from 'src/prisma.service';
@@ -20,11 +21,10 @@ import {
   FormatDateWithShift,
 } from './../../helper/formatDate';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { DeleteMultipleImagesByUrlDto } from './dto/delete-multi-image.dto';
 import { FilterBookingDto } from './dto/FilterBookingDto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
-import { DeleteMultipleImagesByUrlDto } from './dto/delete-multi-image.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class BookingsService {
@@ -869,7 +869,7 @@ export class BookingsService {
 
       // ? Upload Image If Exist
       let uploadImages = [];
-      if (files.images) {
+      if (files?.images && files.images.length > 0) {
         uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/booking',
