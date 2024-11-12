@@ -11,6 +11,7 @@ import { API_CONFIG } from "@/app/_utils/api.config";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
 import { useRouter } from 'next/navigation';
+import 'animate.css';
 
 const PartyDetailClient = ({
   showDetailLink,
@@ -41,6 +42,10 @@ const PartyDetailClient = ({
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(Collapsed);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contentCancel, setcontentCancel] = useState('');
+  const [button1, setButton1] = useState('Tiếp tục');
+  const [button2, setButton2] = useState('Hủy');
+  const [clickModule, setClickModule] = useState(1);
   const id = idParty.substring(1);
   const toast = useCustomToast();
   const { makeAuthorizedRequest } = useApiServices();
@@ -51,7 +56,21 @@ const PartyDetailClient = ({
   }, []);
 
   const oncLickDelete = (data) => {
+    setcontentCancel('Sự thành công của buổi tiệc luôn là niềm vui và là sự ưu tiên của Joie Palace')
     setIsModalOpen(true);
+  };
+
+  const handleContinue = (data) => {
+    setcontentCancel('Nếu quý khách chỉ muốn thay đổi chi tiết tiệc hoặc thay đổi địa điểm tổ chức. Hãy liên hệ ngay với chúng tôi')
+    setButton1('Hủy tiệc');
+    setButton2('Liên hệ ngay');
+    setClickModule(2);
+  };
+  const handleLast = (data) => {
+    setcontentCancel('Nếu quý khách chỉ muốn thay đổi chi tiết tiệc hoặc thay đổi địa điểm tổ chức. Hãy liên hệ ngay với chúng tôi')
+    setButton1('Quay lại');
+    setButton2('Hủy tiệc');
+    setClickModule(3);
   };
 
   const handleConfirm = async (id) => {
@@ -98,13 +117,70 @@ const PartyDetailClient = ({
     router.push(`/client/form-danh-gia-gop-y/${branch_id}/${id}`);
   }
 
+  const PopupCancel = ({ content, button1, button2, clickButton1, clickButton2 }) => {
+    return (
+      <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 '>
+        <div className='bg-white rounded-lg p-6 w-1/3 animate__animated animate__bounce'>
+          <h2 className='text-lg font-bold mb-4 text-warning-500'>!!! Quý khách có chắc với quyết định hủy tiệc của mình?</h2>
+          <p className='text-black'>{content}</p>
+          <div className='flex justify-end mt-4'>
+            <button
+              onClick={clickButton1}
+              className='mr-2 px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400'
+            >
+              {button1}
+            </button>
+            <button
+              onClick={clickButton2}
+              className='px-4 py-2 bg-gold text-white rounded-md hover:bg-gold/80'
+            >
+              {button2}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'success':
+        return 'text-green-500';
+      case 'processing':
+        return 'text-sky-300';
+      case 'cancel':
+        return 'text-red-300';
+      case 'pending':
+        return 'text-yellow-300';
+      default:
+        return 'text-gray-500';
+    }
+  };
+  const getStatustext = (status) => {
+    switch (status) {
+      case 'success':
+        return 'Hoàn thành';
+      case 'processing':
+        return 'Đang chờ xử lý';
+      case 'cancel':
+        return 'Hủy';
+      case 'pending':
+        return 'Đang chờ';
+      default:
+        return 'Chưa có trang thái';
+    }
+  };
+
   return (
     <div className='flex flex-col w-full gap-5'>
       {/* Header Section */}
       <header className='flex justify-between'>
-        <div className='flex gap-3'>
-          <div className='h-full w-2 bg-gold' />
-          <span className='text-base font-medium leading-normal'>{nameParty}</span>
+        <div className='flex flex-col gap-3'>
+          <div className='flex gap-3'>
+            <div className='h-full w-2 bg-gold' />
+            <span className='text-base font-medium leading-normal'>{nameParty}</span>
+          </div>
+          <div className={`${getStatusColor(statusParty)}`}>{getStatustext(statusParty)}</div>
         </div>
         <div className='flex gap-5 items-center'>
           {showDetailLink && (
@@ -233,26 +309,13 @@ const PartyDetailClient = ({
         </div>
       )}
       {isModalOpen && (
-        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-          <div className='bg-white rounded-lg p-6 w-1/3'>
-            <h2 className='text-lg font-bold mb-4 text-warning-500'>!!! Xác nhận xóa tiệc</h2>
-            <p className='text-black'>Xác nhận xóa tiệc này. Cảm ơn bạn đã quan tâm.</p>
-            <div className='flex justify-end mt-4'>
-              <button
-                onClick={handleCancel}
-                className='mr-2 px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400'
-              >
-                Hủy
-              </button>
-              <button
-                onClick={() => handleConfirm(id)}
-                className='px-4 py-2 bg-gold text-white rounded-md hover:bg-gold/80'
-              >
-                Xác nhận
-              </button>
-            </div>
-          </div>
-        </div>
+        <PopupCancel
+          content={contentCancel}
+          button1={button1}
+          button2={button2}
+          clickButton1={clickModule === 1 ? handleContinue : clickModule === 2 ? handleLast : handleCancel}   //handleLast
+          clickButton2={clickModule === 1 ? handleCancel : clickModule === 2 ? handleContinue : clickModule === 3 ? handleConfirm : null}
+        />
       )}
     </div>
   );
