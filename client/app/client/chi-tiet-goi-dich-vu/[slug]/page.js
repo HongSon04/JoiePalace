@@ -28,6 +28,8 @@ import { IoSaveOutline } from "react-icons/io5";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import { getPackageBySlug } from "@/app/_services/packageServices";
+import Loading from "@/app/loading";
 
 const listSpaces = [
   {
@@ -318,16 +320,19 @@ const Page = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [optionIndex, setOptionIndex] = useState(0);
   const [spaceIndex, setSpaceIndex] = useState(0);
-  const [data, setData] = useState(null);
+  const [dataPackage, setDataPackage] = useState(null);
+  const [content, setContent] = useState(null);
 
   useEffect(() => {
     const fecthData = async () => {
-      const data = await axios.get("https://joieplace.live/packages/get-all");
-      setData(data);
-      console.log(data);
+      const data = await getPackageBySlug(slug);
+      setDataPackage(data.data[0]);
     };
     fecthData();
-  }, []);
+  }, [slug]);
+
+  if (!dataPackage) return <Loading></Loading>;
+  console.log(dataPackage);
 
   return (
     <>
@@ -335,19 +340,13 @@ const Page = () => {
         <section className="w-full h-screen pt-[150px] pb-[60px] flex justify-between items-center relative">
           <div className="w-2/5 h-auto flex flex-col gap-8">
             <small className="text-gold text-base font-normal leading-6">
-              Được lựa chọn nhiều nhất
+              {dataPackage.short_description}
             </small>
             <h1 className="uppercase text-gold text-5xl font-semibold leading-[68px]">
-              gói tiệc cưới lãng mạn
+              {dataPackage.name}
             </h1>
             <p className="text-base font-normal leading-6">
-              Một trong những gói dịch vụ tiệc cưới với chất lượng hàng đầu và
-              là sự lựa chọn của rất nhiều cặp đôi. Gói dịch vụ mang lại trải
-              nghiệm trọn vẹn, ấm cúng và bắt mắt với phong cách trang trí lãng
-              mạn, không quá cầu kỳ nhưng lại mang tới không khí thân mật, gần
-              gũi và đặt biệt, tiết kiệm ngân sách tối đa cho các cặp đôi. Cùng
-              khám phá xem, “GÓI TIỆC CƯỚI LÃNG MẠN” có những gì mà lại gây chú
-              ý đến vậy nhé.
+              {dataPackage.description}
             </p>
             <div className="w-full h-auto flex gap-3">
               <ButtonDiscover className="px-10" name={"LIÊN HỆ NGAY"} />

@@ -77,8 +77,7 @@ export const API_CONFIG = {
 
   STAGES: {
     CREATE: `${STAGES}/create`,
-    GET_ALL: (params) =>
-      constructUrlWithParams(`${STAGES}/get-all`, params),
+    GET_ALL: (params) => constructUrlWithParams(`${STAGES}/get-all`, params),
   },
 
   // CATEGORIES API
@@ -266,6 +265,7 @@ export const API_CONFIG = {
 
   PACKAGES: {
     GET_ALL: `${PACKAGES}/get-all`,
+    GET_BY_SLUG: (slug) => `${PACKAGES}/get-by-slug/${slug}`,
   },
 
   // MENU API
@@ -398,5 +398,5 @@ export const fetchData = async (
   } else {
     dispatch(successAction(result));
   }
-  return result; 
+  return result;
 };

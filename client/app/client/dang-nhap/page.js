@@ -121,9 +121,7 @@ const Page = () => {
     }
   };
 
-  console.log("data", process.env);
-
-  // call api login social  
+  // call api login social
   const callToApiLoginSocial = async () => {
     if (isLoginCalled) return;
     setIsLoginCalled(true);
@@ -171,7 +169,6 @@ const Page = () => {
     }
     setIsLoginCalled(false);
   };
-  console.log("platform", platform);
 
   if (data && platform !== null) {
     callToApiLoginSocial();
