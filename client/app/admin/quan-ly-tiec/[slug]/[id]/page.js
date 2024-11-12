@@ -323,12 +323,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 await fetchAllStages(partyData.branch_id);
                 const bookingDetails = partyData.booking_details[0] || {}; 
 
-                const selectedStageId = partyData.stage_id || selectStages;
+                const initialStageId = partyData.stage_id;
                 const selectedMenuId = bookingDetails.menu_id || selectedMenu;
                 const selectedDecorId = bookingDetails.decor_id || selectedDecors;
-    
-                if (!selectStages) {
-                    setSelectStages(selectedStageId);
+                setSelectStages(initialStageId);
+                const selectedStage = stages[0]?.options.find(option => option.value === initialStageId);
+                if (selectedStage) {
+                    setLimitStages(selectedStage.capacity_max || 0);
+                    setStagePrice(selectedStage.price);
                 }
     
                 if (!selectedMenu) {
@@ -518,15 +520,16 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             await fetchFoodsByMenuId(selectedMenuId); // Gọi hàm khi có giá trị hợp lệ
         }
     };
-    const handleStageChange = (event) => {
+const handleStageChange = (event) => {
         const selectedStageId = event.target.value;
         setSelectStages(selectedStageId);
-        fetchLimitStages(selectedStageId);
+        fetchLimitStages(selectedStageId)
         const selectedStage = stages[0]?.options.find(option => option.value === selectedStageId);
-    
+
         if (selectedStage) {
             setLimitStages(selectedStage.capacity_max || 0);
             setStagePrice(selectedStage.price); 
+          
         } else { 
             setStagePrice(0);
         }
@@ -691,10 +694,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
             toast("error", "Cập nhật thất bại", message);
         }
-        console.log("Data to submit:", dataform);
     };
 
-    console.log(stages)
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
