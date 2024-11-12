@@ -97,7 +97,7 @@ const Page = () => {
                             email: getUser?.email,
                             phoneUser: getUser?.phone,
                             idParty: `P${item.id}`,
-                            partyDate: formatDate(item.created_at),
+                            // partyDate: formatDate(item.created_at),
                             dateOrganization: formatDate(item.organization_date),
                             numberGuest: item.number_of_guests,
                             session: item.shift,

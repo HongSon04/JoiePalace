@@ -118,20 +118,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             ],
         },
     ]);
-    const [statusPayment, setStatusPayment] = useState([
-        {
-            svg: null,
-            title: 'Trạng thái thanh toán',
-            type: 'select',
-            name: 'statusPayment',
-            options: [
-                { value: 'pending', label: 'Đang chờ' },
-                { value: 'processing', label: 'Đang xử lý' },
-                { value: 'success', label: 'Thành công' },
-                { value: 'cancel', label: 'Hủy' },
-            ],
-        },
-    ]);
     const [partyTypes, setPartyTypes] = useState([
         {
             svg: null,
@@ -141,12 +127,26 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             options: [],
         },
     ])  
+    const [statusBookings, setStatusBookings] = useState([
+        {
+            svg: null,
+            title: 'Trạng thái tiệc',
+            type: 'select',
+            name: 'statusBookings',
+            options: [
+                { value: 'pending', label: 'Đang chờ' },
+                { value: 'processing', label: 'Đang xử lý' },
+                { value: 'success', label: 'Thành công' },
+                { value: 'cancel', label: 'Hủy' },
+            ],
+        },
+    ])
 
     const [selectedMenu, setSelectedMenu] = useState('');
     const [selectStages, setSelectStages] = useState('');
     const [selectedDecors, setSelectedDecors] = useState('');
     const [selectPartyTypes, setSelectPartyTypes] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState('');
+    const [selectStatusBookings, setSelectStatusBookings] = useState('');    
     const [selectStatusDeposit, setSelectStatusDeposit] = useState(1);
 
     const [foods, setFoods] = useState({
@@ -189,20 +189,15 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     price: item.price,
                     capacity_max: item.capacity_max,
                 }));
-            
-            setStages([
-                {
-                    title: 'Sảnh',
-                    type: 'select',
-                    options,
-                },
-            ]);
-            
+    
+            setStages([{ title: 'Sảnh', type: 'select', options }]);
+    
+            // Nếu không có giá trị nào được chọn, đặt giá trị mặc định
             if (!selectStages) {
                 const initialStage = options[0];
                 setSelectStages(initialStage?.value || '');
                 setLimitStages(initialStage?.capacity_max || 0);
-                setStagePrice(initialStage?.price);
+                setStagePrice(initialStage?.price || 0);
             }
         } catch (error) {
             console.error(error);
@@ -307,6 +302,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             stages: '',
             decors: '',
             partyTypes: '',
+            status: '',
             customerAndChair: 10,
             statusPayment: '',
             statusDeposit: '',
@@ -323,10 +319,10 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     
             if (partyData) {
                 
+                const paymentStatusMethod = partyData.payment_status; 
                 await fetchAllStages(partyData.branch_id);
-                const bookingDetails = partyData.booking_details[0] || {}; // Nếu không có booking details, sử dụng đối tượng rỗng
-    
-                // Cập nhật các giá trị từ dữ liệu API
+                const bookingDetails = partyData.booking_details[0] || {}; 
+
                 const selectedStageId = partyData.stage_id || selectStages;
                 const selectedMenuId = bookingDetails.menu_id || selectedMenu;
                 const selectedDecorId = bookingDetails.decor_id || selectedDecors;
@@ -336,7 +332,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 }
     
                 if (!selectedMenu) {
-                    setSelectedMenu(bookingDetails.menu_id || '');
+                    setSelectedMenu(bookingDetails.menu_id);
                     if (bookingDetails.menu_id) {
                         await fetchFoodsByMenuId(bookingDetails.menu_id);
                     }
@@ -347,7 +343,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 const decor_id = Array.isArray(bookingsDetail) && bookingsDetail.length > 0 ? bookingsDetail[0].decor_id : bookingsDetail.decor_id;
 
                 if (decor_id) {
-                    setSelectedDecors(decor_id);
+                    setSelectedDecors(bookingsDetail.decor_id || 0);
                     const selectedDecorOption = decors[0]?.options.find(option => option.value === decor_id);
                     if (selectedDecorOption) {
                         setDecorPrice(selectedDecorOption.price);
@@ -358,7 +354,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 } else if (decors[0]?.options.length > 0) {
                     // Nếu không có decor_id, chọn decor đầu tiên trong options
                     const defaultDecorOption = decors[0].options[0];
-                    setSelectedDecors(defaultDecorOption.value);
+                    setSelectedDecors(defaultDecorOption.value || 1);
                     setDecorPrice(defaultDecorOption.price);
                 }
     
@@ -371,15 +367,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         setPartyPrice(selectedPartyTypeOption.price);
                     }
                 }
-    
+                setSelectStatusBookings(partyData.status || '')
                 setBranch_id(partyData.branch_id);
                 setPartyPrice(partyData.party_types?.price || partyPrice);
-                setStagePrice(partyData.stages?.price || stagePrice);
+                setStagePrice(partyData.stages?.price || 0);
     
                 // Cập nhật trạng thái thanh toán
                 const depositStatus = bookingDetails.deposit_status;
                 const paymentMethod = bookingDetails.deposits?.payment_method;
-                const paymentStatusMethod = partyData.status;
                 const isDepositSuccessful = depositStatus === 'success';
                 const isDeposit = partyData.is_deposit;
     
@@ -393,7 +388,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         })),
                     },
                 ]);
-                setSelectedStatus(paymentStatusMethod);
     
                 setSelectStatusDeposit(isDepositSuccessful ? '1' : '2');
                 setStatusDeposit(prevStatus => [
@@ -402,16 +396,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         options: prevStatus[0].options.map(option => ({
                             ...option,
                             selected: option.value === (isDepositSuccessful ? '1' : '2'),
-                        })),
-                    },
-                ]);
-    
-                setStatusPayment(prevStatus => [
-                    {
-                        ...prevStatus[0],
-                        options: prevStatus[0].options.map(option => ({
-                            ...option,
-                            selected: option.value === paymentStatusMethod,
                         })),
                     },
                 ]);
@@ -464,15 +448,11 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 setValue('total_amount', partyData.total_amount || 0);
                 setValue('depositAmount', bookingDetails.deposits?.amount || 0);
     
-                if (!partyData.menu_id) {
-                    setSelectedMenu(partyData.menu_id);
-                    await fetchFoodsByMenuId(partyData.menu_id);
-                }
-    
                 // Reset form với dữ liệu từ API
                 reset({
+                    status: partyData.status || '',
                     username: partyData.users.username || partyData.name || '',
-                    company_name: partyData.company_name,
+                    company_name: partyData.company_name || partyData.name,
                     email: partyData.email || partyData.users?.email,
                     phone: partyData.phone || partyData.users?.phone,
                     party: partyData.name || '',
@@ -511,8 +491,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         }
     }, []);
 
-
-
     const handleFieldChange = (fieldSetter, triggerField, resetField = null) => (event) => {
         const value = event.target.value;
         fieldSetter(value);
@@ -543,29 +521,29 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const handleStageChange = (event) => {
         const selectedStageId = event.target.value;
         setSelectStages(selectedStageId);
-    
+        fetchLimitStages(selectedStageId);
         const selectedStage = stages[0]?.options.find(option => option.value === selectedStageId);
-        
+    
         if (selectedStage) {
-            setLimitStages(selectedStage.capacity_max);
-            setStagePrice(selectedStage.price); // Cập nhật giá của stage đã chọn
-        } else {
-            setLimitStages(0); // Nếu không tìm thấy, đặt limit là 0
-            setStagePrice(0); // Nếu không tìm thấy, đặt giá là 0
+            setLimitStages(selectedStage.capacity_max || 0);
+            setStagePrice(selectedStage.price); 
+        } else { 
+            setStagePrice(0);
         }
     };
     const handleDecorChange = (event) => {
         const selectedDecorId = Number(event.target.value);
         setSelectedDecors(selectedDecorId);
+   
         console.log('Selected Decor ID:', selectedDecorId);
         // Tìm decor đã chọn để cập nhật giá
         const selectedDecorOption = decors[0].options.find(option => option.value === selectedDecorId);
         console.log('Selected Decor Option:', selectedDecorOption);
         if (selectedDecorOption) {
-            setStagePrice(selectedDecorOption.price); // Cập nhật giá decor
+            setDecorPrice(selectedDecorOption.price); // Cập nhật giá decor
             console.log('Decor Price Updated:', selectedDecorOption.price); // Kiểm tra giá
         } else {
-            setStagePrice(0); // Nếu không tìm thấy, đặt giá là 0
+            setDecorPrice(0); // Nếu không tìm thấy, đặt giá là 0
             console.warn('Không tìm thấy decor với ID:', selectedDecorId);
         }
     };
@@ -582,7 +560,22 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         }
     };
     const handlePaymentChange = handleFieldChange(() => { }, 'payment', 'payment');
-    const handleStatusPaymentChange = handleFieldChange(setSelectedStatus, 'statusPayment', 'statusPayment');
+
+    const handleStatusBookings = (event) => {
+        const selectedValue = event.target.value;
+        setSelectStatusBookings(selectedValue);
+
+        setStatusBookings(prevStatus => [
+            {
+                ...prevStatus[0],
+                options: prevStatus[0].options.map(option => ({
+                    ...option,
+                    selected: option.value === selectedValue,
+                })),
+            },
+        ]);
+    };
+
     const handleStatusDepositChange = (event) => {
         const selectedValue = event.target.value;
         setSelectStatusDeposit(selectedValue);
@@ -600,7 +593,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         fetchAllDecors();
         fetchAllPartyTypes()
     }, [fetchDataDetailsParty]);
-
+    
     const onSubmit = async (data) => {
         // const finalFoods = foods.filter(food => !modifiedFoods.includes(food.id));
 
@@ -643,7 +636,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             table_count: data.tables,
             spare_table_count: data.spare_table_count,
             amount: total_amount_all,
-            menus: data.menus_price,
             // menus: {
             //     menu_id: Number(selectedMenu),
             //     price: data.menus_price,
@@ -651,7 +643,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             // },
             other_service: null,
             extra_service: null,
-            status: selectedStatus,
+            status: selectStatusBookings,
             is_confirm: true,
             is_deposit: selectStatusDeposit,
         }
@@ -670,7 +662,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
             if (updateBranches.success) {
                 dispatch(fetchBranchSuccess(updateBranches.data));
-                toast("success", "Tạo dữ liệu chi nhánh thành công", "Phản hồi đã được duyệt. Đang lấy dữ liệu mới");
+                toast({
+                    title: "Cập nhật thành công",
+                    description: "Đã sử lý thông tin cập nhật của khách",
+                    type: "success",
+                    });
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
             } else {
                 const { statusCode, message } = updateBranches.error || {};
                if (statusCode == 401) {
@@ -695,8 +694,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         console.log("Data to submit:", dataform);
     };
 
-
-
+    console.log(stages)
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
@@ -789,6 +787,16 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 onChange={handleMenuChange}
                             />
                         ))}
+                        {statusBookings.map((menu, index) => (
+                            <DropdownField
+                                key={index}
+                                label={menu.title}
+                                name={menu.name}
+                                options={menu.options}
+                                value={selectStatusBookings || ''}
+                                onChange={handleStatusBookings}
+                            />
+                        ))}
                         <FoodsTitle title={'Món chính'} foodsMap={foods.monChinh} handleDeleteFood={handleDeleteFood} />
                         <FoodsTitle title={'Món khai vị'} foodsMap={foods.monkhaivi} handleDeleteFood={handleDeleteFood} />
                         <FoodsTitle title={'Món tráng miệng'} foodsMap={foods.montrangMieng} handleDeleteFood={handleDeleteFood} />
@@ -820,25 +828,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 value={payment.value}
                                 onChange={handlePaymentChange}
                             />
-                        ))}
-                        {statusPayment.map((payment, index) => (
-                            <div className='flex flex-col gap-2' key={index}>
-                                <label className='font-bold leading-6 text-base text-white'>{payment.title}</label>
-                                {payment.type === 'select' && (
-                                    <select
-                                        name={payment.name}
-                                        value={selectedStatus}
-                                        onChange={handleStatusPaymentChange}
-                                        className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
-                                    >
-                                        {payment.options.map(option => (
-                                            <option key={option.value} className="text-black" value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                )}
-                            </div>
                         ))}
                         {statusDeposit.map((status, index) => (
                             <DropdownField

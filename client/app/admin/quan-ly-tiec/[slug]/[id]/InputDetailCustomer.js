@@ -25,12 +25,12 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue={options[0]?.value || ''}
+                    defaultValue={options[0]?.value || ''} // Đảm bảo không phải null
                     render={({ field }) => (
                         <select
                             className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
                             {...field}
-                            value={field.value || ''}
+                            value={field.value || ''} // Đảm bảo không phải null
                         >
                             <option className="option" value="" disabled>
                                 Chọn {title}
@@ -47,15 +47,15 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue={name === 'customerAndChair' ? 10 : ''} // Set default value for `customerAndChair`
+                    defaultValue={name === 'customerAndChair' ? 10 : ''} // Đảm bảo không phải null
                     render={({ field }) => (
                         <input
                             {...field}
                             type={type}
                             value={
                                 name === 'customerAndChair'
-                                    ? 10 // Fixed value of 10 for `customerAndChair`
-                                    : field.value // Controlled by setValue for other fields
+                                    ? 10 // Giá trị cố định cho `customerAndChair`
+                                    : field.value || '' // Đảm bảo không phải null
                             }
                             readOnly={isReadOnlyField} // Disable editing for specific fields
                             disabled={isReadOnlyField} // Disable focus and modification for specific fields
