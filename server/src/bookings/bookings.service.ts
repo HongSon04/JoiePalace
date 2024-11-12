@@ -23,8 +23,6 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { FilterBookingDto } from './dto/FilterBookingDto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { DeleteMultipleImagesByUrlDto } from './dto/delete-multi-image.dto';
 
 @Injectable()
 export class BookingsService {
@@ -32,7 +30,6 @@ export class BookingsService {
     private prismaService: PrismaService,
     private mailService: MailService,
     private notificationService: NotificationsService,
-    private cloudinaryService: CloudinaryService,
   ) {}
 
   // ! Create Booking
@@ -579,12 +576,7 @@ export class BookingsService {
   }
 
   // ! Update Booking
-  async update(
-    reqUser,
-    id: number,
-    updateBookingDto: UpdateBookingDto,
-    files: { images?: Express.Multer.File[] },
-  ) {
+  async update(reqUser, id: number, updateBookingDto: UpdateBookingDto) {
     try {
       const {
         user_id,
@@ -696,14 +688,25 @@ export class BookingsService {
         branch_id: findBooking.branch_id,
       };
 
-      // ? Send notification
-      await this.sendBookingNotification(
-        findBooking.name,
-        findBooking.branch_id,
-        status as BookingStatus,
-        is_confirm,
-        is_deposit,
-      );
+      if (is_confirm === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được xác nhận!`;
+        contents.type = TypeNotifyEnum.BOOKING_CONFIRM;
+      } else if (is_deposit === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được đặt cọc!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'cancel') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã bị hủy!`;
+        contents.type = TypeNotifyEnum.BOOKING_CANCEL;
+      } else if (status === 'processing') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đang được tổ chức!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'success') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được tiến hành!`;
+        contents.type = TypeNotifyEnum.BOOKING_SUCCESS;
+      } else {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã cập nhật!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      }
 
       await this.notificationService.sendNotifications(
         contents.name,
@@ -832,19 +835,6 @@ export class BookingsService {
         ...partyTypeFormat
       } = party_types;
 
-      // ? Upload Image If Exist
-      let uploadImages = [];
-      if (files.images) {
-        uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
-          files.images,
-          'joiepalace/booking',
-        );
-
-        if (uploadImages.length === 0) {
-          throw new BadRequestException('Upload ảnh thất bại');
-        }
-      }
-
       // ! Check is_deposit or not
       if (findBooking.is_deposit === true) {
         let extraServiceAmount = 0;
@@ -907,7 +897,7 @@ export class BookingsService {
         const findBookingDetail =
           await this.prismaService.booking_details.findFirst({
             where: { booking_id: Number(findBooking.id) },
-            select: { deposit_id: true, images: true },
+            select: { deposit_id: true },
           });
         const findDeposit = await this.prismaService.deposits.findUnique({
           where: { id: Number(findBookingDetail.deposit_id) },
@@ -916,13 +906,6 @@ export class BookingsService {
         const bookingAmount = Number(
           (totalAmount + totalFee - depositAmount).toFixed(0),
         );
-
-        // Push New Image To Old Image
-        if (uploadImages.length > 0) {
-          uploadImages.map((image) => {
-            findBookingDetail.images.push(image);
-          });
-        }
 
         // ! Update Booking
         await this.prismaService.booking_details.update({
@@ -947,7 +930,6 @@ export class BookingsService {
             extra_service: extra_service,
             gift,
             fee,
-            images: findBookingDetail.images,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
           },
@@ -1041,16 +1023,6 @@ export class BookingsService {
             where: { booking_id: Number(id) },
           });
 
-        // Push New Image To Old Image
-        if (uploadImages.length > 0) {
-          if (findBookingDetail.images === null) {
-            findBookingDetail.images = [];
-          }
-          uploadImages.map((image) => {
-            findBookingDetail.images.push(image);
-          });
-        }
-
         if (findBookingDetail) {
           const oldDepositId = findBookingDetail.deposit_id;
           await this.prismaService.booking_details.update({
@@ -1081,7 +1053,6 @@ export class BookingsService {
               fee,
               total_amount: totalAmount,
               deposit_id: deposit.id,
-              images: findBookingDetail.images,
               amount_booking: Number(bookingAmount),
             },
           });
@@ -1117,7 +1088,6 @@ export class BookingsService {
                 ? Number(spareTableAmount)
                 : 0,
               total_amount: totalAmount,
-              images: findBookingDetail.images,
               deposit_id: deposit.id,
               amount_booking: Number(bookingAmount),
             },
@@ -1302,49 +1272,6 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> destroy: ', error);
-      throw new InternalServerErrorException({
-        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
-      });
-    }
-  }
-
-  // ! Delete Multiple Image By Url
-  async deleteMultipleImageByUrl(body: DeleteMultipleImagesByUrlDto) {
-    try {
-      const { booking_id, urls } = body;
-      const findBookingDetail =
-        await this.prismaService.booking_details.findFirst({
-          where: { booking_id: Number(booking_id) },
-        });
-
-      if (!findBookingDetail) {
-        throw new NotFoundException('Không tìm thấy đơn đặt tiệc');
-      }
-
-      const newImages = findBookingDetail.images.filter(
-        (image) => !urls.includes(image),
-      );
-
-      await this.prismaService.booking_details.update({
-        where: { booking_id: Number(booking_id) },
-        data: {
-          images: newImages,
-        },
-      });
-
-      // ? Delete Image On Cloudinary
-      await this.cloudinaryService.deleteMultipleImagesByUrl(urls);
-
-      throw new HttpException('Xóa ảnh thành công', HttpStatus.OK);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log(
-        'Lỗi từ booking.service.ts -> deleteMultipleImageByUrl: ',
-        error,
-      );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
         error: error.message,
