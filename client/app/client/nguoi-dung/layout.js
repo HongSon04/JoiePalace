@@ -6,7 +6,7 @@ const Layout = ({ children }) => {
         <section className="section bg-primary min-h-screen block px-8 pt-[120px] md:pt-[120px]">
             <div className="flex justify-center">
                 <div className='w-full max-w-[1130px] flex flex-col md:flex-row gap-[30px]'>
-                    <aside className='w-full md:w-[25%] rounded-lg'>
+                    <aside className='w-full md:w-[25%] rounded-lg sticky top-[120px] h-fit'> {/* Đặt h-fit để chiều cao tự động */}
                         <SideBarUserClient />
                     </aside>
 

@@ -36,6 +36,7 @@ export class PackagesService {
         short_description,
         extra_service,
         other_service,
+        note,
       } = createPackageDto;
       let checkPrice = 0;
 
@@ -183,6 +184,7 @@ export class PackagesService {
           images: uploadImages as any,
           extra_service,
           other_service,
+          note,
         },
         include: {
           menus: true,
@@ -363,6 +365,7 @@ export class PackagesService {
         short_description,
         extra_service,
         other_service,
+        note,
       } = updatePackageDto;
       let checkPrice = 0;
 
@@ -516,6 +519,7 @@ export class PackagesService {
           images: uploadImages ? uploadImages : findPackage.images,
           extra_service,
           other_service,
+          note,
         },
         include: {
           menus: true,
