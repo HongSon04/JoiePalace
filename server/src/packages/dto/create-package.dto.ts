@@ -75,4 +75,11 @@ export class CreatePackageDto {
       'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
   })
   extra_service?: [{ id: string; quantity: number }] | any;
+
+  @ApiProperty({
+    description: 'Ghi chú',
+    required: false,
+  })
+  @IsOptional()
+  note?: string;
 }

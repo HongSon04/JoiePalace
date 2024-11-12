@@ -84,7 +84,9 @@ const Page = () => {
                 if (fetchedAllBookingsSuccess.length > 0) {
                     const parties = fetchedAllBookingsSuccess.map((item) => {
                         const dataDetailBooking = item.booking_details;
-                        const dataStages = item.stages;
+                        const dataStages = item.stages || dataDetailBooking[0]?.stage_detail;
+                        console.log('dataStages', dataStages);
+
                         const dataMenus = dataDetailBooking[0]?.menus;
                         const datadePosits = dataDetailBooking[0]?.deposits;
 
@@ -130,10 +132,7 @@ const Page = () => {
                     });
                     setResonParty(parties);
                 }
-                const formatDate = (dateString) => {
-                    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-                    return new Date(dateString).toLocaleDateString('en-GB', options).replace(/\//g, '/');
-                };
+
 
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
                     return total + item.booking_details[0].total_amount;
@@ -152,7 +151,10 @@ const Page = () => {
         };
         getData();
     }, []);
-
+    const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-GB', options).replace(/\//g, '/');
+    };
 
     return (
         <div className="flex flex-col gap-8">

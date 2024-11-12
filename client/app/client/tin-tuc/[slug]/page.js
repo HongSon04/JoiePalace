@@ -5,170 +5,6 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { fetchBlogDataBySlug, fecthAllBlog } from "@/app/_services/blogServices";
 import { useEffect, useState } from "react";
-// const data = [
-//     {
-//         "id": 1,
-//         "category_id": 1,
-//         "title": "test",
-//         "slug": "test",
-//         "description": "description",
-//         "short_description": "short_description",
-//         "content": "content",
-//         "images": [
-//             "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018423/joiepalace/blogs/fmua8fbbjedchqv0ojzf.jpg"
-//         ],
-//         "views": 2,
-//         "created_at": "2024-10-27T08:40:14.373Z",
-//         "updated_at": "2024-10-28T15:33:38.488Z",
-//         "tags": [
-//             {
-//                 "id": 1,
-//                 "name": "test1",
-//                 "slug": "test1",
-//                 "created_at": "2024-10-24T09:11:45.130Z",
-//                 "updated_at": "2024-10-24T09:11:45.130Z"
-//             },
-//             {
-//                 "id": 2,
-//                 "name": "test21",
-//                 "slug": "test21",
-//                 "created_at": "2024-10-24T09:11:49.692Z",
-//                 "updated_at": "2024-10-24T09:11:49.692Z"
-//             },
-//             {
-//                 "id": 3,
-//                 "name": "test213",
-//                 "slug": "test213",
-//                 "created_at": "2024-10-24T09:11:51.556Z",
-//                 "updated_at": "2024-10-24T09:11:51.556Z"
-//             }
-//         ],
-//         "categories": {
-//             "id": 1,
-//             "category_id": null,
-//             "name": "Nước uống",
-//             "slug": "nuoc-uong",
-//             "description": "Đồ uống giải khát",
-//             "short_description": "Đồ uống giải khát",
-//             "images": [],
-//             "deleted": false,
-//             "deleted_at": null,
-//             "deleted_by": null,
-//             "created_by": null,
-//             "updated_by": null,
-//             "created_at": "2024-10-24T08:11:33.736Z",
-//             "updated_at": "2024-10-24T08:11:33.736Z"
-//         }
-//     },
-//     {
-//         "id": 2,
-//         "category_id": 1,
-//         "title": "test2",
-//         "slug": "test2",
-//         "description": "description",
-//         "short_description": "short_description",
-//         "content": "content",
-//         "images": [
-//             "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018635/joiepalace/blogs/gophdvdsqjokdazb4cvk.jpg"
-//         ],
-//         "views": 1,
-//         "created_at": "2024-10-27T08:43:55.538Z",
-//         "updated_at": "2024-10-28T15:32:08.188Z",
-//         "tags": [
-//             {
-//                 "id": 1,
-//                 "name": "test1",
-//                 "slug": "test1",
-//                 "created_at": "2024-10-24T09:11:45.130Z",
-//                 "updated_at": "2024-10-24T09:11:45.130Z"
-//             },
-//             {
-//                 "id": 2,
-//                 "name": "test21",
-//                 "slug": "test21",
-//                 "created_at": "2024-10-24T09:11:49.692Z",
-//                 "updated_at": "2024-10-24T09:11:49.692Z"
-//             },
-//             {
-//                 "id": 3,
-//                 "name": "test213",
-//                 "slug": "test213",
-//                 "created_at": "2024-10-24T09:11:51.556Z",
-//                 "updated_at": "2024-10-24T09:11:51.556Z"
-//             }
-//         ],
-//         "categories": {
-//             "id": 1,
-//             "category_id": null,
-//             "name": "Nước uống",
-//             "slug": "nuoc-uong",
-//             "description": "Đồ uống giải khát",
-//             "short_description": "Đồ uống giải khát",
-//             "images": [],
-//             "deleted": false,
-//             "deleted_at": null,
-//             "deleted_by": null,
-//             "created_by": null,
-//             "updated_by": null,
-//             "created_at": "2024-10-24T08:11:33.736Z",
-//             "updated_at": "2024-10-24T08:11:33.736Z"
-//         }
-//     },
-//     {
-//         "id": 3,
-//         "category_id": 1,
-//         "title": "Đám Cưới Công Nghệ",
-//         "slug": "dam-cuoi-cong-nghe",
-//         "description": "Đám cưới công nghệ là xu hướng mới trong tổ chức lễ cưới, kết hợp giữa truyền thống và hiện đại.",
-//         "short_description": "Khám phá xu hướng đám cưới công nghệ.",
-//         "content": "Đám cưới công nghệ đang trở thành một xu hướng phổ biến trong những năm gần đây. Với sự phát triển của công nghệ, các cặp đôi có thể tổ chức lễ cưới của mình một cách độc đáo và sáng tạo hơn bao giờ hết. Từ việc sử dụng drone để quay phim, livestream lễ cưới đến việc tạo ra các trang web riêng cho đám cưới, công nghệ đã mang đến nhiều lựa chọn thú vị cho các cặp đôi. Ngoài ra, các ứng dụng di động cũng giúp khách mời dễ dàng theo dõi thông tin và tham gia vào các hoạt động trong ngày cưới.",
-//         "images": [
-//             "http://res.cloudinary.com/dlpvcsewd/image/upload/v1730018718/joiepalace/blogs/eqovyenkzz8q65vpmccs.png"
-//         ],
-//         "views": 7,
-//         "created_at": "2024-10-27T08:45:19.836Z",
-//         "updated_at": "2024-10-28T15:33:41.542Z",
-//         "tags": [
-//             {
-//                 "id": 1,
-//                 "name": "test1",
-//                 "slug": "test1",
-//                 "created_at": "2024-10-24T09:11:45.130Z",
-//                 "updated_at": "2024-10-24T09:11:45.130Z"
-//             }
-//         ],
-//         "categories": {
-//             "id": 1,
-//             "category_id": null,
-//             "name": "Nước uống",
-//             "slug": "nuoc-uong",
-//             "description": "Đồ uống giải khát",
-//             "short_description": "Đồ uống giải khát",
-//             "images": [],
-//             "deleted": false,
-//             "deleted_at": null,
-//             "deleted_by": null,
-//             "created_by": null,
-//             "updated_by": null,
-//             "created_at": "2024-10-24T08:11:33.736Z",
-//             "updated_at": "2024-10-24T08:11:33.736Z"
-//         }
-//     }
-// ]
-
-// const contentBanner = [
-//     {
-//         id: 1,
-//         title: 'MÀN CHÀO SÂN ĐẦY MẠNH MẼ VÀ ẤN TƯỢNG CỦA SUZUKI XL7 HYBRID',
-//         banner: 'cwe.jpg',
-//         descriptions1: 'SUZUKI XL7 HYBRID - Dòng xe đậm chất thể thao đa dụng với hàng loạt cải tiến nổi bật đã chính thức chào sân người yêu xe Việt Nam trong buổi họp báo tổ chức tại White Palace Phạm Văn Đồng vừa qua',
-//         descriptions2: "XL7 Hybrid – Mẫu xe Suzuki đậm chất SUV (xe thể thao đa dụng) đã có màn chào sân đầy ấn tượng tại sảnh Hall B - White Palace Phạm Văn Đồng. Vinh dự được đồng hành cùng Suzuki trong buổi họp báo hoành tráng này, White Palace Phạm Văn Đồng đã góp phần tạo nên thành công cho sự kiện với: Sảnh hội nghị Hall B sang trọng, được bố trí theo kiểu lớp học (Classroom), tạo điều kiện cho khách mời có thể vừa chiêm ngưỡng màn ra mắt, vừa ghi chép thông tin quan trọng Hệ thống thang máy tải trọng lớn có khả năng đưa ô tô vào tận sảnh, mang đến màn chào sân ấn tượng của 03 chiếc XL7 Hybrid tại sân khấu chính Khu vực đón khách rộng rãi cùng menu teabreak tinh tế, tiếp thêm năng lượng hứng khởi cho hoạt động networking Hệ thống âm thanh và ánh sáng hiện đại tạo nên trải nghiệm ấn tượng  Dịch vụ hội nghị tận tâm với đội ngũ nhân viên giàu kinh nghiệm",
-//         descriptions3: 'Buổi họp báo đã khẳng định vị thế vững chắc của Suzuki tại thị trường Việt Nam hiện nay...',
-//         arrayImage1: ['wdc.jpg', 'tee.jpg', 'ipk7.jpg'],
-//         arrayImage2: ['dwcwe.jpg', 'sxw.jpg', 'wqq.jpg'],
-//         arrayImage3: ['wqq (1).jpg', 'rvke.jpg'],
-//     }
-// ];
 
 const Blog = () => {
   const { slug } = useParams();
@@ -182,26 +18,26 @@ const Blog = () => {
   const [parentDiv2, setparentDiv2] = useState([]);
   const [parentDiv3, setparentDiv3] = useState([]);
 
-    useEffect(() => {
-        const getBlog = async (slug) => {            
-            const blogDataSlug = await fetchBlogDataBySlug(slug);
-            setBlog(blogDataSlug);
-        };
-        getBlog(slug);
-    }, [slug]);
-    const contentBanner = blog ? [
-        {
-          id: blog.id,
-          title: blog.title,
-          banner: blog.images[0],
-          descriptions1: blog.short_description,
-          descriptions2: blog.description,
-          descriptions3: blog.content,
-          arrayImage1: blog.images,
-          arrayImage2: [],
-          arrayImage3: [],
-        },
-      ]
+  useEffect(() => {
+    const getBlog = async (slug) => {
+      const blogDataSlug = await fetchBlogDataBySlug(slug);
+      setBlog(blogDataSlug);
+    };
+    getBlog(slug);
+  }, [slug]);
+  const contentBanner = blog ? [
+    {
+      id: blog.id,
+      title: blog.title,
+      banner: blog.images[0],
+      descriptions1: blog.short_description,
+      descriptions2: blog.description,
+      descriptions3: blog.content,
+      arrayImage1 : blog.images.slice(0, 1),
+      arrayImage2 : blog.images.slice(1, 3),
+      arrayImage3 : blog.images.slice(3, 4),
+    },
+  ]
     : [];
   // xem them
   useEffect(() => {
@@ -454,9 +290,8 @@ const Blog = () => {
             <button
               onClick={handlePreviousPage}
               disabled={numberpage === 1}
-              className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${
-                numberpage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
               <svg
                 className="shrink-0 size-3.5"
@@ -482,11 +317,10 @@ const Blog = () => {
                     setNumberPage(item);
                   }
                 }}
-                className={`min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${
-                  item === numberpage
+                className={`min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${item === numberpage
                     ? "bg-gold text-white"
                     : "bg-white text-black hover:bg-gold hover:text-white"
-                }`}
+                  }`}
                 disabled={item === "..."}
               >
                 {item}
@@ -496,11 +330,10 @@ const Blog = () => {
             <button
               onClick={handleNextPage}
               disabled={numberpage === countNumberPage}
-              className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${
-                numberpage === countNumberPage
+              className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === countNumberPage
                   ? "opacity-50 cursor-not-allowed"
                   : ""
-              }`}
+                }`}
             >
               <svg
                 className="shrink-0 size-3.5"

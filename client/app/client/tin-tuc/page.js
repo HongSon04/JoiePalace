@@ -19,8 +19,8 @@ function News() {
     const fetchData = async () => {
       setLoading(true);
       const DataBlog = await fecthAllBlog();
-      const newBlog = DataBlog.reverse();
-      const new3Blog = DataBlog.reverse().slice(0, 3);
+      const newBlog = DataBlog;
+      const new3Blog = DataBlog.slice(0, 3).reverse();
       setNew3Blog(new3Blog);
       setCountNumberPage(Math.ceil(DataBlog.length / 6));
       setNewBlog(newBlog);
@@ -159,7 +159,7 @@ function News() {
                     <div className="div-children-banner cursor-pointer relative w-[296px] max-lg:w-[200px] max-md:w-[150px] max-sm:w-[100px] before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70 ">
                       <Image
                         src={
-                          blog.images ||
+                          (blog.images)[0] ||
                           "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                         }
                         alt={blog.title || ""}
@@ -201,7 +201,7 @@ function News() {
                     <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70">
                       <Image
                         src={
-                          blog.images ||
+                          (blog.images)[0] ||
                           "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                         }
                         alt={blog.title || ""}
@@ -223,14 +223,16 @@ function News() {
             )}
           </div>
           <div className="flex flex-col justify-between items-center border-l border-r pt-20">
-          {loading ? (
+            {loading ? (
               <>
                 <LazyLoading></LazyLoading>
                 <LazyLoading></LazyLoading>
               </>
             ) : (
-              parentDiv2.map((blog, index) => (
-                <Link
+              parentDiv2.map((blog, index) => {
+                // console.log(((blog.images)[0])[0]);
+                
+                return <Link
                   className="hover:text-white"
                   href={`tin-tuc/${blog.slug}`}
                   key={index}
@@ -242,7 +244,7 @@ function News() {
                     <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70">
                       <Image
                         src={
-                          blog.images ||
+                          (blog.images)[0] ||
                           "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                         }
                         alt={blog.title || ""}
@@ -259,12 +261,12 @@ function News() {
                     </p>
                   </div>
                 </Link>
-              ))
+              })
 
             )}
           </div>
           <div className="flex flex-col justify-start items-center">
-          {loading ? (
+            {loading ? (
               <>
                 <LazyLoading></LazyLoading>
                 <LazyLoading></LazyLoading>
@@ -283,7 +285,7 @@ function News() {
                     <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70">
                       <Image
                         src={
-                          blog.images ||
+                          (blog.images)[0] ||
                           "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                         }
                         alt={blog.title || ""}
