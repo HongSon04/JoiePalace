@@ -33,7 +33,7 @@ const rankMemberships = [
     {
         id: 5,
         title: 'VIP',
-        condition: 1000000000000,
+        condition: 900000000,
         imageRank: platinum,
     },
 ];

@@ -177,6 +177,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${BOOKING_API}/get/${id}`,
     UPDATE: (id) => `${BOOKING_API}/update/${id}`,
     UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
+    DELETE: (id) => `${BOOKING_API}/delete/${id}`,
     GET_ALL_BY_IDUSER: (userId) => `${BOOKING_API}/get-all?user_id=${userId}`,
   },
 
