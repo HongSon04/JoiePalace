@@ -83,6 +83,7 @@ export class PackagesService {
         data: {
           name,
           slug,
+          stage_id: stage_id ? Number(stage_id) : null,
           decor_id: decor_id ? Number(decor_id) : null,
           menu_id: menu_id ? Number(menu_id) : null,
           party_type_id: party_type_id ? Number(party_type_id) : null,
@@ -322,6 +323,7 @@ export class PackagesService {
         data: {
           name,
           slug: MakeSlugger(name),
+          stage_id: stage_id ? Number(stage_id) : null,
           decor_id: decor_id ? Number(decor_id) : null,
           menu_id: menu_id ? Number(menu_id) : null,
           party_type_id: party_type_id ? Number(party_type_id) : null,
