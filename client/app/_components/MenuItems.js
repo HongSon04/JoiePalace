@@ -3,39 +3,34 @@ import { Image } from '@chakra-ui/react';
 import React, { useState } from 'react';
 
 const MenuItems = ({ data }) => {
-    // Trạng thái cho các danh mục mở
     const [openMenus, setOpenMenus] = useState([]);
-    // Trạng thái cho danh mục đang hoạt động
-    const [activeMenus, setActiveMenus] = useState(new Set()); // Sử dụng Set để lưu trạng thái active
+    const [activeMenus, setActiveMenus] = useState(new Set());
 
     const toggleMenu = (index) => {
-        const newActiveMenus = new Set(activeMenus); // Sao chép trạng thái active hiện tại
+        const newActiveMenus = new Set(activeMenus);
 
         if (newActiveMenus.has(index)) {
-            // Nếu danh mục đang active, bỏ active
             newActiveMenus.delete(index);
-            setOpenMenus(openMenus.filter(i => i !== index)); // Đóng danh mục
+            setOpenMenus(openMenus.filter(i => i !== index));
         } else {
-            // Nếu không, thêm danh mục vào danh sách mở và active
+
             newActiveMenus.add(index);
             setOpenMenus([...openMenus, index]);
         }
 
-        setActiveMenus(newActiveMenus); // Cập nhật trạng thái active
+        setActiveMenus(newActiveMenus); 
     };
 
     const handleMouseLeave = () => {
-        // Khi rời chuột, ẩn tất cả các menu
         setOpenMenus([]);
-        setActiveMenus(new Set()); // Đặt lại active
+        setActiveMenus(new Set()); 
     };
 
     return (
         <div 
             className="relative w-[300px] h-[426px] overflow-hidden rounded-2xl shadow-lg group"
-            onMouseLeave={handleMouseLeave} // Thêm sự kiện onMouseLeave
+            onMouseLeave={handleMouseLeave} 
         >
-            {/* First half with background image */}
             <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out bg-image group-hover:-translate-x-full">
                 <Image 
                     src='/Alacarte-Menu-Thumbnail.png' 

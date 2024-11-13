@@ -63,6 +63,7 @@ export const inputOrganization = [
         name: 'customer',
         title: 'Số lượng khách dự kiến',
         type: 'number',
+        value: 0,
         placeholder: 'Nhập số lượng khách dự kiến',
     },
     {
