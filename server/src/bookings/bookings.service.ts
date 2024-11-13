@@ -1087,7 +1087,7 @@ export class BookingsService {
           });
 
         if (findBookingDetail) {
-          const oldDepositId = findBookingDetail.deposit_id;
+          const oldDepositId = findBookingDetail?.deposit_id;
 
           // Push New Image To Old Image
           if (uploadImages.length > 0) {
@@ -1122,16 +1122,18 @@ export class BookingsService {
                 ? Number(spareTableAmount)
                 : 0,
               fee,
-              total_amount: totalAmount,
-              deposit_id: deposit.id,
+              total_amount: Number(totalAmount),
+              deposit_id: Number(deposit.id),
               images: findBookingDetail.images,
               amount_booking: Number(bookingAmount),
             },
           });
           //? Delete Old Deposit
-          await this.prismaService.deposits.delete({
-            where: { id: Number(oldDepositId) },
-          });
+          if (oldDepositId) {
+            await this.prismaService.deposits.delete({
+              where: { id: Number(oldDepositId) },
+            });
+          }
         } else {
           await this.prismaService.booking_details.create({
             data: {
@@ -1159,8 +1161,8 @@ export class BookingsService {
               spare_table_price: spare_table_count
                 ? Number(spareTableAmount)
                 : 0,
-              total_amount: totalAmount,
-              deposit_id: deposit.id,
+              total_amount: Number(totalAmount),
+              deposit_id: Number(deposit.id),
               amount_booking: Number(bookingAmount),
             },
           });
@@ -1436,7 +1438,7 @@ export class BookingsService {
           where: {
             deleted: false,
             booking_total_amount: {
-              lte: totalAmount,
+              lte: Number(totalAmount),
             },
           },
           orderBy: {
