@@ -44,5 +44,6 @@ export class StageDto {
     type: Number,
     description: 'Giá thuê sảnh',
   })
+  @IsNotEmpty({ message: 'Giá thuê sảnh không được để trống' })
   price: string;
 }

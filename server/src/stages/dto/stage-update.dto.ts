@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsNumber, IsString, IsArray } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class StageUpdateDto {
   @ApiProperty({
@@ -25,25 +25,29 @@ export class StageUpdateDto {
 
   @ApiProperty({
     type: Number,
+    required: false,
     description: 'Số lượng bàn tối thiểu (bắt buộc)',
   })
-  capacity_min: string;
+  capacity_min?: string;
 
   @ApiProperty({
     type: Number,
+    required: false,
     description: 'Số lượng bàn tối đa (bắt buộc)',
   })
-  capacity_max: string;
+  capacity_max?: string;
 
   @ApiProperty({
     required: false,
+
     description: 'Danh sách các hình ảnh của sảnh (nếu cần cập nhật)',
   })
   images: string[];
 
   @ApiProperty({
     type: Number,
+    required: false,
     description: 'Giá thuê sảnh',
   })
-  price: string;
+  price?: string;
 }
