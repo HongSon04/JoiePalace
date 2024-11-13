@@ -143,6 +143,7 @@ model stages {
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
   bookings     bookings[]
+  packages     packages[]
 }
 
 model categories {
@@ -396,15 +397,17 @@ model subscribers {
 }
 
 model packages {
-  id                Int         @id @default(autoincrement())
-  party_type_id     Int
-  party_types       party_types @relation(fields: [party_type_id], references: [id])
-  menu_id           Int
-  menus             menus       @relation(fields: [menu_id], references: [id])
-  decor_id          Int
-  decors            decors      @relation(fields: [decor_id], references: [id])
+  id                Int          @id @default(autoincrement())
+  stage_id          Int?
+  stages            stages?      @relation(fields: [stage_id], references: [id])
+  party_type_id     Int?
+  party_types       party_types? @relation(fields: [party_type_id], references: [id])
+  menu_id           Int?
+  menus             menus?       @relation(fields: [menu_id], references: [id])
+  decor_id          Int?
+  decors            decors?      @relation(fields: [decor_id], references: [id])
   name              String
-  slug              String      @unique
+  slug              String       @unique
   description       String
   short_description String?
   price             Int
@@ -412,9 +415,9 @@ model packages {
   extra_service     Json?
   other_service     Json?
   note              String?
-  deleted           Boolean     @default(false)
+  deleted           Boolean      @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
+  created_at        DateTime     @default(now())
+  updated_at        DateTime     @updatedAt
 }

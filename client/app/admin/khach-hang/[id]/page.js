@@ -9,7 +9,7 @@ import { getUserById } from "@/app/_services/apiServices";
 import BookingsTable from "../BookingsTable";
 const Page = ({params}) => {
   const userID = params.id;
-  // console.log(userID);
+
   
   const [dataUser, setDataUser] = useState(null);
   useEffect(() => {
@@ -88,16 +88,13 @@ const Page = ({params}) => {
       </div>
       <div className="flex justify-between gap-[30px]">
        
-        <div className="rounded-lg bg-whiteAlpha-100 ">
+        <div className="rounded-lg bg-whiteAlpha-50 ">
           <div className="w-full grid p-4">
-            <p className="text-lg font-bold">Tiệc đã hoàn thành</p>
-            <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-              <BookingsTable user_id = {userID} status = {"success"} />
+            <p className="text-lg font-bold">Danh sách tiệc</p>
+            <div className='overflow-x-auto max-w-[1531px]  scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
+              <BookingsTable userId = {userID}  />
             </div>
-            <p className="text-lg font-bold mt-[20px]">Tiệc dự kiến diễn ra</p>
-            <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-              <BookingsTable user_id = {userID} status = {"pending"} />
-            </div>
+            
           </div>
         </div>
       </div>

@@ -91,7 +91,7 @@ export const fetchAllByBranch = async (branchId) => {
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
     }
-    return response; 
+    return response.data; 
   } catch (error) {
     console.error("Lỗi:", error);
     throw error; 
@@ -221,4 +221,20 @@ export const getUserById = async (userId) => {
     }
     throw error;
   }
+};
+
+export  const getUserData = async () => {
+  const token = getCookie('accessToken');
+  const response = await axios.get(API_CONFIG.USER.GET_ALL, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+  if (response.status !== 200) {
+    throw new Error("Có lỗi khi lấy dữ liệu!");
+  }
+  return response.data;
+  
+
+  return response;
 };

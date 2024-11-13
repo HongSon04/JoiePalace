@@ -8,6 +8,7 @@ const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialIma
   const [imagePreviews, setImagePreviews] = useState(initialImages); 
   const imagesRef = useRef(imagePreviews);
 
+  // Update the images reference and notify parent component when image previews change
   useEffect(() => {
     if (imagesRef.current !== imagePreviews) {
       onImagesChange(name, imageFiles);
@@ -18,10 +19,7 @@ const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialIma
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
 
-    const newImagePreviews = files.map((file) => {
-
-      return URL.createObjectURL(file);
-    });
+    const newImagePreviews = files.map((file) => URL.createObjectURL(file));
 
     setImagePreviews((prevImages) => [...prevImages, ...newImagePreviews]);
     setImageFiles((prevFiles) => [...prevFiles, ...files]);
@@ -33,6 +31,7 @@ const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialIma
     const updatedFiles = imageFiles.filter((_, i) => i !== index);
     setImageFiles(updatedFiles);
     
+    // Notify parent component about the updated list of files
     onImagesChange(name, updatedFiles);
   };
 

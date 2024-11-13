@@ -1,9 +1,9 @@
 "use client";
 
-import { Grid, GridItem, Image, Button } from "@chakra-ui/react";
+import { Grid, GridItem, Image } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 
-const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = true, branchData = [], onDelete }) => {
+const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = true, branchData = [] }) => {
     // Safeguard with fallback values
     const [images, setImages] = useState([]);
     const [names, setNames] = useState([]);
@@ -15,7 +15,7 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
             setImages(branchData.flatMap((item) => item.images.map((img) => img.split(','))).flat());
             setNames(branchData.flatMap((item) => Array(item.images.length).fill(item.name)));
             setDescriptions(branchData.flatMap((item) => Array(item.images.length).fill(item.description)));
-            setStages(branchData.flatMap((item, index) => Array(item.images.length).fill(item.name)));
+            setStages(branchData.flatMap((item, index) => Array(item.images.length).fill(`SPACE ${index + 1}`)));
         }
     }, [branchData]);
 
@@ -28,7 +28,7 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
             const reader = new FileReader();
             reader.onload = () => {
                 newImages.push(reader.result);
-                newStages.push(`New Space ${images.length + index + 1}`);
+                newStages.push(`SPACE ${images.length + index + 1}`);
                 if (newImages.length === files.length) {
                     setImages((prev) => [...prev, ...newImages]);
                     setNames((prev) => [...prev, ...Array(newImages.length).fill('')]);
@@ -52,14 +52,6 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
         setDescriptions(updatedDescriptions);
     };
 
-    const handleDelete = (index) => {
-        setImages((prevImages) => prevImages.filter((_, i) => i !== index));
-        setNames((prevNames) => prevNames.filter((_, i) => i !== index));
-        setDescriptions((prevDescriptions) => prevDescriptions.filter((_, i) => i !== index));
-        setStages((prevStages) => prevStages.filter((_, i) => i !== index));
-        onDelete(index);
-    };
-
     const renderImageItem = (item, index) => (
         <GridItem key={index} w="100%" className="rounded-lg">
             <div className="flex flex-col gap-5">
@@ -74,16 +66,6 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
                     <span className="absolute top-4 left-4 bg-gray-500 text-white p-1 rounded-lg w-fit font-medium">
                         {stages[index]}
                     </span>
-                    <Button
-                        position="absolute"
-                        top="4"
-                        right="4"
-                        colorScheme="red"
-                        size="sm"
-                        onClick={() => handleDelete(index)}
-                    >
-                        Xóa
-                    </Button>
                 </div>
                 {input && (
                     <input

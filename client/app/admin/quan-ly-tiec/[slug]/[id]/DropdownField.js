@@ -5,7 +5,7 @@ export const DropdownField = ({ label, name, options, value, onChange }) => (
             name={name}
             value={value || ''}
             onChange={onChange}
-            className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
+            className="w-full bg-whiteAlpha-200 text-white rounded-md p-3 font-normal leading-6"
         >
             {options.map(option => (
                 <option key={option.value} className="text-black" value={option.value}>

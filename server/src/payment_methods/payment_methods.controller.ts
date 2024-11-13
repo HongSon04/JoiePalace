@@ -1,22 +1,16 @@
 import {
   Controller,
   Get,
-  HttpStatus,
   Param,
   Post,
   Query,
   Request,
   Response,
 } from '@nestjs/common';
-import { PaymentMethodsService } from './payment_methods.service';
-import {
-  ApiExcludeEndpoint,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
+import { PaymentMethodsService } from './payment_methods.service';
 
 @ApiTags('Payment Methods - Phương thức thanh toán')
 @Controller('api/payment-methods')
@@ -24,7 +18,7 @@ export class PaymentMethodsController {
   constructor(private readonly paymentMethodsService: PaymentMethodsService) {}
 
   // ! Payment Momo
-  @Get('momo/:deposit_id')
+  @Post('momo/:deposit_id')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua Momo' })
   momo(
@@ -45,7 +39,7 @@ export class PaymentMethodsController {
   }
 
   // ! Payment VNPay
-  @Get('vnpay/:deposit_id')
+  @Post('vnpay/:deposit_id')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua VNPay' })
   vnpay(
@@ -65,7 +59,7 @@ export class PaymentMethodsController {
   }
 
   // ! OnePay
-  @Get('onepay/:deposit_id')
+  @Post('onepay/:deposit_id')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua OnePay' })
   onePay(

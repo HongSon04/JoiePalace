@@ -15,7 +15,7 @@ import useApiServices from "@/app/_hooks/useApiServices";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import useCustomToast from "@/app/_hooks/useCustomToast";
 import { fetchFeedbacksFailure, fetchBranchSuccess } from "@/app/_lib/features/feedbacks/feedbacksSlice";
-import AdminThemChiNhanhInputAndImg from "@/app/_components/AdminThemChiNhanhInputAndImg";
+import AdminThemChiNhanhInputAndImg from "./AdminThemChiNhanhInputAndImgForADD";
 
 const fieldsConfig = {
   contact: [

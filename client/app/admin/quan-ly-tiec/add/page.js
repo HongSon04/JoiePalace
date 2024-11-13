@@ -86,32 +86,32 @@ const Page = () => {
             ],
         },
     ]);
-    const [statusDeposit, setStatusDeposit] = useState([
-        {
-            svg: null,
-            title: 'Trạng thái đặt cọc',
-            type: 'select',
-            name: 'is_deposit',
-            options: [
-                { value: 'success', label: 'Đã thanh toán', selected: false },
-                { value: 'pending', label: 'Chưa thanh toán', selected: false },
-            ],
-        },
-    ]);
-    const [statusPayment, setStatusPayment] = useState([
-        {
-            svg: null,
-            title: 'Trạng thái thanh toán',
-            type: 'select',
-            name: 'statusPayment',
-            options: [
-                { value: 'pending', label: 'Đang chờ' },
-                { value: 'processing', label: 'Đang xử lý' },
-                { value: 'success', label: 'Thành công' },
-                { value: 'cancel', label: 'Hủy' },
-            ],
-        },
-    ]);
+    // const [statusDeposit, setStatusDeposit] = useState([
+    //     {
+    //         svg: null,
+    //         title: 'Trạng thái đặt cọc',
+    //         type: 'select',
+    //         name: 'is_deposit',
+    //         options: [
+    //             { value: 'success', label: 'Đã thanh toán', selected: false },
+    //             { value: 'pending', label: 'Chưa thanh toán', selected: false },
+    //         ],
+    //     },
+    // ]);
+    // const [statusPayment, setStatusPayment] = useState([
+    //     {
+    //         svg: null,
+    //         title: 'Trạng thái thanh toán',
+    //         type: 'select',
+    //         name: 'statusPayment',
+    //         options: [
+    //             { value: 'pending', label: 'Đang chờ' },
+    //             { value: 'processing', label: 'Đang xử lý' },
+    //             { value: 'success', label: 'Thành công' },
+    //             { value: 'cancel', label: 'Hủy' },
+    //         ],
+    //     },
+    // ]);
     const [partyTypes, setPartyTypes] = useState([
         {
             svg: null,
@@ -125,8 +125,8 @@ const Page = () => {
     const [selectStages, setSelectStages] = useState('');
     const [selectedDecors, setSelectedDecors] = useState('');
     const [selectPartyTypes, setSelectPartyTypes] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState(statusPayment[0]?.value || '');
-    const [selectStatusDeposit, setSelectStatusDeposit] = useState(statusDeposit[0]?.value || '');
+    // const [selectedStatus, setSelectedStatus] = useState(statusPayment[0]?.value || '');
+    // const [selectStatusDeposit, setSelectStatusDeposit] = useState(statusDeposit[0]?.value || '');
     const [limitStages, setLimitStages] = useState(0);
 
     const fetchLimitStages = async (stageId) => {
@@ -180,8 +180,8 @@ const Page = () => {
             decors: '',
             partyTypes: '',
             customerAndChair: 10,
-            statusPayment: '',
-            statusDeposit: '',
+            // statusPayment: '',
+            // statusDeposit: '',
             payment: '',
             total_amount: 0,
             depositAmount: 0
@@ -215,8 +215,8 @@ const Page = () => {
         setSelectPartyTypes(selectedPartyTypeId);
     };
     const handlePaymentChange = handleFieldChange(() => {}, 'payment', 'payment');
-    const handleStatusPaymentChange = handleFieldChange(setSelectedStatus, 'statusPayment', 'statusPayment');
-    const handleStatusDepositChange = handleFieldChange(setSelectStatusDeposit, 'statusDeposit', 'statusDeposit');
+    // const handleStatusPaymentChange = handleFieldChange(setSelectedStatus, 'statusPayment', 'statusPayment');
+    // const handleStatusDepositChange = handleFieldChange(setSelectStatusDeposit, 'statusDeposit', 'statusDeposit');
 
     const onSubmit = async (data) => {
         const user = JSON.parse(localStorage.getItem("user"));
@@ -244,7 +244,7 @@ const Page = () => {
             shift: data.shift,
             organization_date: formatFullDateTime(data.organization_date).date,
             number_of_guests: data.customer,
-            status: setStatusPayment,
+            // status: setStatusPayment,
             amount: data.total_amount,
             "users": {
                 id: user.id,
@@ -401,7 +401,7 @@ const Page = () => {
                                 onChange={handlePaymentChange}
                             />
                         ))}
-                        {statusPayment.map((payment, index) => (
+                        {/* {statusPayment.map((payment, index) => (
                             <div className='flex flex-col gap-2' key={index}>
                                 <label className='font-bold leading-6 text-base text-white'>{payment.title}</label>
                                 {payment.type === 'select' && (
@@ -419,8 +419,8 @@ const Page = () => {
                                     </select>
                                 )}
                             </div>
-                        ))}
-                        {statusDeposit.map((status, index) => (
+                        ))} */}
+                        {/* {statusDeposit.map((status, index) => (
                             <DropdownField
                                 key={index}
                                 label={status.title}
@@ -429,7 +429,7 @@ const Page = () => {
                                 value={selectStatusDeposit} 
                                 onChange={handleStatusDepositChange}
                             />
-                        ))}
+                        ))} */}
                     </div>
                 </div>
                 <div className="flex mt-[30px] mr-[30px]">
