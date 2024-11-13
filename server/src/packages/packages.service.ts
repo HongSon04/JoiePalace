@@ -498,6 +498,8 @@ export class PackagesService {
       if (!stage) {
         throw new NotFoundException('ID Sân khấu không tồn tại');
       }
+
+      totalPrice += Number(stage.price);
     }
 
     // Add decor price
