@@ -39,4 +39,10 @@ export class StageDto {
     description: 'Danh sách các hình ảnh của sảnh',
   })
   images: string[];
+
+  @ApiProperty({
+    type: Number,
+    description: 'Giá thuê sảnh',
+  })
+  price: string;
 }
