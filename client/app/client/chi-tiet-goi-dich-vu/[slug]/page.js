@@ -27,9 +27,10 @@ import {
 import { IoSaveOutline } from "react-icons/io5";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { getPackageBySlug } from "@/app/_services/packageServices";
 import Loading from "@/app/loading";
+import { getDecorById } from "@/app/_services/decorServices";
 
 const listSpaces = [
   {
@@ -321,18 +322,42 @@ const Page = () => {
   const [optionIndex, setOptionIndex] = useState(0);
   const [spaceIndex, setSpaceIndex] = useState(0);
   const [dataPackage, setDataPackage] = useState(null);
-  const [content, setContent] = useState(null);
+  const [dataOption, dispacth] = useReducer(reducer, null);
+  const [contentOption, setContentOption] = useState(null);
 
   useEffect(() => {
     const fecthData = async () => {
       const data = await getPackageBySlug(slug);
       setDataPackage(data.data[0]);
     };
+    console.log("index: ", optionIndex);
+    dispacth(optionIndex);
     fecthData();
-  }, [slug]);
+  }, [slug, optionIndex]);
 
   if (!dataPackage) return <Loading></Loading>;
+  dataOption.then((data) => {
+    setContentOption(data.data);
+  });
+  async function reducer(state, action) {
+    switch (action) {
+      case 0:
+        return "case 0";
+      case 1:
+        const data = await getDecorById(dataPackage.decor_id);
+        console.log("data", data);
+
+        return data;
+      case 2:
+        return "case 2";
+
+      default:
+        return;
+    }
+  }
+
   console.log(dataPackage);
+  console.log(contentOption);
 
   return (
     <>
