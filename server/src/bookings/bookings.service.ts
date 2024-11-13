@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { BookingStatus } from 'helper/enum/booking_status.enum';
 import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { PrismaService } from 'src/prisma.service';
@@ -20,11 +21,10 @@ import {
   FormatDateWithShift,
 } from './../../helper/formatDate';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { DeleteMultipleImagesByUrlDto } from './dto/delete-multi-image.dto';
 import { FilterBookingDto } from './dto/FilterBookingDto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { DeleteMultipleImagesByUrlDto } from './dto/delete-multi-image.dto';
 
 @Injectable()
 export class BookingsService {
@@ -553,13 +553,37 @@ export class BookingsService {
         },
       });
 
-      // Send notification
-      await this.sendBookingNotification(
-        findBooking.name,
-        findBooking.branch_id,
-        status as BookingStatus,
-        is_confirm,
-        is_deposit,
+      // ! Send Notification
+      const contents: any = {
+        name: `Đơn đặt tiệc của ${findBooking.name}`,
+        branch_id: findBooking.branch_id,
+      };
+
+      if (is_confirm === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được xác nhận!`;
+        contents.type = TypeNotifyEnum.BOOKING_CONFIRM;
+      } else if (is_deposit === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được đặt cọc!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'cancel') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã bị hủy!`;
+        contents.type = TypeNotifyEnum.BOOKING_CANCEL;
+      } else if (status === 'processing') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đang được tổ chức!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'success') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được tiến hành!`;
+        contents.type = TypeNotifyEnum.BOOKING_SUCCESS;
+      } else {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã cập nhật!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      }
+
+      await this.notificationService.sendNotifications(
+        contents.name,
+        contents.contents,
+        contents.branch_id,
+        contents.type,
       );
 
       throw new HttpException(
@@ -696,14 +720,25 @@ export class BookingsService {
         branch_id: findBooking.branch_id,
       };
 
-      // ? Send notification
-      await this.sendBookingNotification(
-        findBooking.name,
-        findBooking.branch_id,
-        status as BookingStatus,
-        is_confirm,
-        is_deposit,
-      );
+      if (is_confirm === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được xác nhận!`;
+        contents.type = TypeNotifyEnum.BOOKING_CONFIRM;
+      } else if (is_deposit === true) {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được đặt cọc!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'cancel') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã bị hủy!`;
+        contents.type = TypeNotifyEnum.BOOKING_CANCEL;
+      } else if (status === 'processing') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đang được tổ chức!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      } else if (status === 'success') {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã được tiến hành!`;
+        contents.type = TypeNotifyEnum.BOOKING_SUCCESS;
+      } else {
+        contents.contents = `Đơn đặt tiệc của ${findBooking.name} đã cập nhật!`;
+        contents.type = TypeNotifyEnum.BOOKING_UPDATED;
+      }
 
       await this.notificationService.sendNotifications(
         contents.name,
@@ -834,7 +869,7 @@ export class BookingsService {
 
       // ? Upload Image If Exist
       let uploadImages = [];
-      if (files.images) {
+      if (files?.images && files.images.length > 0) {
         uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/booking',
@@ -947,9 +982,9 @@ export class BookingsService {
             extra_service: extra_service,
             gift,
             fee,
-            images: findBookingDetail.images,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
+            images: findBookingDetail.images,
           },
         });
 
@@ -1035,24 +1070,32 @@ export class BookingsService {
           },
         });
 
+        // Add 3 days + for expired date of booking
+        const expiredDate = dayjs().add(3, 'day').toDate();
+
+        await this.prismaService.bookings.update({
+          where: { id: Number(id) },
+          data: {
+            expired_at: expiredDate,
+          },
+        });
+
         // ! Create Or Update Booking
         const findBookingDetail =
           await this.prismaService.booking_details.findFirst({
             where: { booking_id: Number(id) },
           });
 
-        // Push New Image To Old Image
-        if (uploadImages.length > 0) {
-          if (findBookingDetail.images === null) {
-            findBookingDetail.images = [];
-          }
-          uploadImages.map((image) => {
-            findBookingDetail.images.push(image);
-          });
-        }
-
         if (findBookingDetail) {
-          const oldDepositId = findBookingDetail.deposit_id;
+          const oldDepositId = findBookingDetail?.deposit_id;
+
+          // Push New Image To Old Image
+          if (uploadImages.length > 0) {
+            uploadImages.map((image) => {
+              findBookingDetail.images.push(image);
+            });
+          }
+
           await this.prismaService.booking_details.update({
             where: { booking_id: Number(findBooking.id) },
             data: {
@@ -1079,16 +1122,18 @@ export class BookingsService {
                 ? Number(spareTableAmount)
                 : 0,
               fee,
-              total_amount: totalAmount,
-              deposit_id: deposit.id,
+              total_amount: Number(totalAmount),
+              deposit_id: Number(deposit.id),
               images: findBookingDetail.images,
               amount_booking: Number(bookingAmount),
             },
           });
           //? Delete Old Deposit
-          await this.prismaService.deposits.delete({
-            where: { id: Number(oldDepositId) },
-          });
+          if (oldDepositId) {
+            await this.prismaService.deposits.delete({
+              where: { id: Number(oldDepositId) },
+            });
+          }
         } else {
           await this.prismaService.booking_details.create({
             data: {
@@ -1116,9 +1161,8 @@ export class BookingsService {
               spare_table_price: spare_table_count
                 ? Number(spareTableAmount)
                 : 0,
-              total_amount: totalAmount,
-              images: findBookingDetail.images,
-              deposit_id: deposit.id,
+              total_amount: Number(totalAmount),
+              deposit_id: Number(deposit.id),
               amount_booking: Number(bookingAmount),
             },
           });
@@ -1394,7 +1438,7 @@ export class BookingsService {
           where: {
             deleted: false,
             booking_total_amount: {
-              lte: totalAmount,
+              lte: Number(totalAmount),
             },
           },
           orderBy: {

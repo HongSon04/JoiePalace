@@ -12,6 +12,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MakeSlugger } from 'helper/slug';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { handleErrorHelper } from 'helper/handleErrorHelper';
 
 @Injectable()
 export class PackagesService {
@@ -28,150 +29,57 @@ export class PackagesService {
     try {
       const {
         name,
+        stage_id,
         decor_id,
         menu_id,
         party_type_id,
         description,
         price,
         short_description,
-        extra_service,
         other_service,
         note,
       } = createPackageDto;
-      let checkPrice = 0;
 
-      // Validate inputs
-      if (!files.images || files.images.length === 0) {
+      // Validate images
+      if (!files.images?.length) {
         throw new BadRequestException('Ảnh không được để trống');
       }
 
-      // Check Name & slug
+      // Validate unique name and slug
       const slug = MakeSlugger(name);
-      const findPackage = await this.prismaService.packages.findFirst({
+      const existingPackage = await this.prismaService.packages.findFirst({
         where: { OR: [{ name }, { slug }] },
       });
-
-      if (findPackage) {
+      if (existingPackage) {
         throw new BadRequestException('Tên gói đã tồn tại');
       }
 
-      // ? Check decor_id
-      const findDecor = await this.prismaService.decors.findUnique({
-        where: { id: Number(decor_id) },
+      // Validate and calculate total price
+      const totalPrice = await this.calculateTotalPrice({
+        stage_id,
+        decor_id,
+        menu_id,
+        party_type_id,
+        other_service,
       });
 
-      if (!findDecor) {
-        throw new NotFoundException('ID Trang trí không tồn tại');
-      }
-      checkPrice += Number(findDecor.price);
-
-      // ? Check menu_id
-      const findMenu = await this.prismaService.menus.findUnique({
-        where: { id: Number(menu_id) },
-      });
-      checkPrice += Number(findMenu.price);
-
-      if (!findMenu) {
-        throw new NotFoundException('ID Menu không tồn tại');
-      }
-
-      // ? Check party_type_id
-      const findPartyType = await this.prismaService.party_types.findUnique({
-        where: { id: Number(party_type_id) },
-      });
-
-      if (!findPartyType) {
-        throw new NotFoundException('ID Loại tiệc không tồn tại');
-      }
-      checkPrice += Number(findPartyType.price);
-
-      // ? Check Extra Service
-      if (extra_service) {
-        const jsonString = extra_service
-          .replace(/;/g, ',')
-          .replace(/\s+/g, '')
-          .replace(/([{,])(\w+):/g, '$1"$2":');
-        const serviceArray = JSON.parse(jsonString);
-
-        await Promise.all(
-          serviceArray.map(async (extra) => {
-            const findOther = await this.prismaService.products.findUnique({
-              where: { id: Number(extra.id) },
-            });
-
-            if (!findOther)
-              throw new HttpException(
-                'Không tìm thấy dịch vụ thêm',
-                HttpStatus.NOT_FOUND,
-              );
-
-            checkPrice += Number(findOther.price) * Number(extra.quantity);
-
-            extra.name = findOther.name;
-            extra.amount = Number(findOther.price);
-            extra.total_price =
-              Number(findOther.price) * Number(extra.quantity);
-            extra.description = findOther.description;
-            extra.short_description = findOther.short_description;
-            extra.images = findOther.images;
-            extra.quantity = Number(extra.quantity);
-          }),
-        );
-      }
-
-      // ? Check Other Services
-      if (other_service) {
-        const jsonString = other_service
-          .replace(/;/g, ',')
-          .replace(/\s+/g, '')
-          .replace(/([{,])(\w+):/g, '$1"$2":');
-        const serviceArray = JSON.parse(jsonString);
-
-        await Promise.all(
-          serviceArray.map(async (other) => {
-            const findOther = await this.prismaService.products.findUnique({
-              where: { id: Number(other.id) },
-            });
-
-            if (!findOther)
-              throw new HttpException(
-                'Không tìm thấy dịch vụ khác',
-                HttpStatus.NOT_FOUND,
-              );
-
-            checkPrice += Number(findOther.price) * Number(other.quantity);
-            other.name = findOther.name;
-            other.amount = Number(findOther.price);
-            other.total_price =
-              Number(findOther.price) * Number(other.quantity);
-            other.description = findOther.description;
-            other.short_description = findOther.short_description;
-            other.images = findOther.images;
-            other.quantity = Number(other.quantity);
-          }),
-        );
-      }
-
-      // ? Check Price
-      if (Number(price) !== Number(checkPrice)) {
+      if (Number(price) !== totalPrice) {
         throw new BadRequestException(
-          `Giá không chính xác, giá thực: ${checkPrice}`,
+          `Giá không chính xác, giá thực: ${totalPrice}`,
         );
       }
 
       // Upload images
-      const uploadImages =
-        await this.cloudinaryService.uploadMultipleFilesToFolder(
-          files.images,
-          'joiepalace/packages',
-        );
-
-      if (!uploadImages) {
+      const images = await this.cloudinaryService.uploadMultipleFilesToFolder(
+        files.images,
+        'joiepalace/packages',
+      );
+      if (!images) {
         throw new BadRequestException('Upload ảnh thất bại');
       }
 
-      // Create Package
-      const createPackage = await this.prismaService.packages.create({
+      // Create package with all validated data
+      const createdPackage = await this.prismaService.packages.create({
         data: {
           name,
           slug,
@@ -181,12 +89,12 @@ export class PackagesService {
           description,
           price: Number(price),
           short_description,
-          images: uploadImages as any,
-          extra_service,
+          images: images as any,
           other_service,
           note,
         },
         include: {
+          stages: true,
           menus: true,
           decors: true,
           party_types: true,
@@ -196,19 +104,12 @@ export class PackagesService {
       throw new HttpException(
         {
           message: 'Tạo gói thành công',
-          data: FormatReturnData(createPackage, []),
+          data: FormatReturnData(createdPackage, []),
         },
         HttpStatus.CREATED,
       );
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ packages.service.ts -> create', error);
-      throw new InternalServerErrorException({
-        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
-      });
+      return handleErrorHelper(error, 'packages.service.ts -> create');
     }
   }
 
@@ -357,140 +258,51 @@ export class PackagesService {
     try {
       const {
         name,
+        stage_id,
         decor_id,
         menu_id,
         party_type_id,
         description,
         price,
         short_description,
-        extra_service,
         other_service,
         note,
       } = updatePackageDto;
-      let checkPrice = 0;
 
-      // Check Name & slug
-      const slug = MakeSlugger(name);
-      const findPackageByName = await this.prismaService.packages.findFirst({
-        where: { OR: [{ name }, { slug }] },
-      });
-
-      if (findPackageByName && findPackageByName.id !== id) {
-        throw new BadRequestException('Tên gói đã tồn tại');
-      }
-
-      // ? Check Package ID
-      const findPackage = await this.prismaService.packages.findUnique({
+      // ? Find Package By Id
+      const findPackageById = await this.prismaService.packages.findUnique({
         where: { id: Number(id) },
       });
 
-      if (!findPackage) {
+      if (!findPackageById) {
         throw new NotFoundException('Gói không tồn tại');
       }
 
-      // ? Check decor_id
-      const findDecor = await this.prismaService.decors.findUnique({
-        where: { id: Number(decor_id) },
+      // Validate unique name and slug
+      const slug = MakeSlugger(name);
+      const existingPackage = await this.prismaService.packages.findFirst({
+        where: { OR: [{ name }, { slug }] },
+      });
+      if (existingPackage) {
+        throw new BadRequestException('Tên gói đã tồn tại');
+      }
+
+      // Calculate total price from all components
+      const totalPrice = await this.calculateTotalPrice({
+        stage_id,
+        decor_id,
+        menu_id,
+        party_type_id,
+        other_service,
       });
 
-      if (!findDecor) {
-        throw new NotFoundException('ID Trang trí không tồn tại');
-      }
-      checkPrice += Number(findDecor.price);
-
-      // ? Check menu_id
-      const findMenu = await this.prismaService.menus.findUnique({
-        where: { id: Number(menu_id) },
-      });
-      checkPrice += Number(findMenu.price);
-
-      if (!findMenu) {
-        throw new NotFoundException('ID Menu không tồn tại');
-      }
-
-      // ? Check party_type_id
-      const findPartyType = await this.prismaService.party_types.findUnique({
-        where: { id: Number(party_type_id) },
-      });
-
-      if (!findPartyType) {
-        throw new NotFoundException('ID Loại tiệc không tồn tại');
-      }
-      checkPrice += Number(findPartyType.price);
-
-      // ? Check Extra Service
-      if (extra_service) {
-        const jsonString = extra_service
-          .replace(/;/g, ',')
-          .replace(/\s+/g, '')
-          .replace(/([{,])(\w+):/g, '$1"$2":');
-        const serviceArray = JSON.parse(jsonString);
-
-        await Promise.all(
-          serviceArray.map(async (extra) => {
-            const findOther = await this.prismaService.products.findUnique({
-              where: { id: Number(extra.id) },
-            });
-
-            if (!findOther)
-              throw new HttpException(
-                'Không tìm thấy dịch vụ thêm',
-                HttpStatus.NOT_FOUND,
-              );
-
-            checkPrice += Number(findOther.price) * Number(extra.quantity);
-
-            extra.name = findOther.name;
-            extra.amount = Number(findOther.price);
-            extra.total_price =
-              Number(findOther.price) * Number(extra.quantity);
-            extra.description = findOther.description;
-            extra.short_description = findOther.short_description;
-            extra.images = findOther.images;
-            extra.quantity = Number(extra.quantity);
-          }),
-        );
-      }
-
-      // ? Check Other Services
-      if (other_service) {
-        const jsonString = other_service
-          .replace(/;/g, ',')
-          .replace(/\s+/g, '')
-          .replace(/([{,])(\w+):/g, '$1"$2":');
-        const serviceArray = JSON.parse(jsonString);
-
-        await Promise.all(
-          serviceArray.map(async (other) => {
-            const findOther = await this.prismaService.products.findUnique({
-              where: { id: Number(other.id) },
-            });
-
-            if (!findOther)
-              throw new HttpException(
-                'Không tìm thấy dịch vụ khác',
-                HttpStatus.NOT_FOUND,
-              );
-
-            checkPrice += Number(findOther.price) * Number(other.quantity);
-            other.name = findOther.name;
-            other.amount = Number(findOther.price);
-            other.total_price =
-              Number(findOther.price) * Number(other.quantity);
-            other.description = findOther.description;
-            other.short_description = findOther.short_description;
-            other.images = findOther.images;
-            other.quantity = Number(other.quantity);
-          }),
-        );
-      }
-
-      // ? Check Price
-      if (Number(price) !== Number(checkPrice)) {
+      // Validate total price
+      if (Number(price) !== totalPrice) {
         throw new BadRequestException(
-          `Giá không chính xác, giá thực: ${checkPrice}`,
+          `Giá không chính xác, giá thực: ${totalPrice}`,
         );
       }
+
       let uploadImages;
       // Upload images
       if (files.images.length > 0) {
@@ -504,24 +316,24 @@ export class PackagesService {
         }
       }
 
-      // Update Package
-      const updatePackage = await this.prismaService.packages.update({
-        where: { id: id },
+      // Update package with validated data
+      const updatedPackage = await this.prismaService.packages.update({
+        where: { id },
         data: {
           name,
-          slug,
+          slug: MakeSlugger(name),
           decor_id: Number(decor_id),
           menu_id: Number(menu_id),
           party_type_id: Number(party_type_id),
           description,
           price: Number(price),
           short_description,
-          images: uploadImages ? uploadImages : findPackage.images,
-          extra_service,
+          images: uploadImages ? uploadImages : findPackageById.images,
           other_service,
           note,
         },
         include: {
+          stages: true,
           menus: true,
           decors: true,
           party_types: true,
@@ -531,7 +343,7 @@ export class PackagesService {
       throw new HttpException(
         {
           message: 'Cập nhật gói thành công',
-          data: FormatReturnData(updatePackage, []),
+          data: FormatReturnData(updatedPackage, []),
         },
         HttpStatus.OK,
       );
@@ -666,5 +478,100 @@ export class PackagesService {
         error: error.message,
       });
     }
+  }
+
+  // ! Calculate total price
+  private async calculateTotalPrice({
+    stage_id,
+    decor_id,
+    menu_id,
+    party_type_id,
+    other_service,
+  }) {
+    let totalPrice = 0;
+
+    // Validate stage
+    if (stage_id) {
+      const stage = await this.prismaService.stages.findUnique({
+        where: { id: Number(stage_id) },
+      });
+      if (!stage) {
+        throw new NotFoundException('ID Sân khấu không tồn tại');
+      }
+    }
+
+    // Add decor price
+    if (decor_id) {
+      const decor = await this.prismaService.decors.findUnique({
+        where: { id: Number(decor_id) },
+      });
+      if (!decor) {
+        throw new NotFoundException('ID Trang trí không tồn tại');
+      }
+      totalPrice += Number(decor.price);
+    }
+
+    // Add menu price
+    if (menu_id) {
+      const menu = await this.prismaService.menus.findUnique({
+        where: { id: Number(menu_id) },
+      });
+      if (!menu) {
+        throw new NotFoundException('ID Menu không tồn tại');
+      }
+      totalPrice += Number(menu.price);
+    }
+
+    // Add party type price
+    if (party_type_id) {
+      const partyType = await this.prismaService.party_types.findUnique({
+        where: { id: Number(party_type_id) },
+      });
+      if (!partyType) {
+        throw new NotFoundException('ID Loại tiệc không tồn tại');
+      }
+      totalPrice += Number(partyType.price);
+    }
+
+    // Add other services price
+    if (other_service) {
+      const jsonString = this.formatJsonString(other_service);
+      const serviceArray = JSON.parse(jsonString);
+
+      await Promise.all(
+        serviceArray.map(async (other: any) => {
+          const product = await this.prismaService.products.findUnique({
+            where: { id: Number(other.id) },
+          });
+
+          if (!product) {
+            throw new NotFoundException('Không tìm thấy dịch vụ khác');
+          }
+
+          totalPrice += Number(product.price) * Number(other.quantity);
+
+          // Enrich other service data
+          Object.assign(other, {
+            name: product.name,
+            amount: Number(product.price),
+            total_price: Number(product.price) * Number(other.quantity),
+            description: product.description,
+            short_description: product.short_description,
+            images: product.images,
+            quantity: Number(other.quantity),
+          });
+        }),
+      );
+    }
+
+    return totalPrice;
+  }
+
+  // ! Format JSON string
+  private formatJsonString(jsonStr: string): string {
+    return jsonStr
+      .replace(/;/g, ',')
+      .replace(/\s+/g, '')
+      .replace(/([{,])(\w+):/g, '$1"$2":');
   }
 }

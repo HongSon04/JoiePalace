@@ -1,23 +1,19 @@
-import { menus } from './../../node_modules/.prisma/client/index.d';
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
   Query,
   Request,
-  HttpStatus,
-  UseInterceptors,
-  BadRequestException,
   UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { BookingsService } from './bookings.service';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingDto } from './dto/update-booking.dto';
-import { isPublic } from 'decorator/auth.decorator';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -26,10 +22,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
-import { FilterBookingDto } from './dto/FilterBookingDto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { isPublic } from 'decorator/auth.decorator';
+import { BookingsService } from './bookings.service';
+import { CreateBookingDto } from './dto/create-booking.dto';
 import { DeleteMultipleImagesByUrlDto } from './dto/delete-multi-image.dto';
+import { FilterBookingDto } from './dto/FilterBookingDto';
+import { UpdateBookingDto } from './dto/update-booking.dto';
+import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
 
 @ApiTags('Bookings - Quản lý đơn tiệc')
 @Controller('api/bookings')
