@@ -243,14 +243,15 @@ export class ProductsController {
 
   // ! Get Services
   @Get('/get-services')
-  @ApiHeaders([
-    {
-      name: 'authorization',
-      description: 'Bearer token',
-      required: false,
-    },
-  ])
-  @ApiBearerAuth('authorization')
+  // @ApiHeaders([
+  //   {
+  //     name: 'authorization',
+  //     description: 'Bearer token',
+  //     required: false,
+  //   },
+  // ])
+  // @ApiBearerAuth('authorization')
+  @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
     example: {

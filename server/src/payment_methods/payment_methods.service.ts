@@ -513,7 +513,7 @@ export class PaymentMethodsService {
       };
 
       const items = [{}];
-      const transID = Math.floor(Math.random() * 1000000);
+      const transID = Math.floor(Math.random() * 99999999999);
       const order = {
         app_id: config.app_id,
         app_trans_id: `${dayjs(Date.now()).format('YYMMDDHHmmss')}-${findDeposit.transactionID}-${transID}`,

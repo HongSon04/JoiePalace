@@ -1,3 +1,4 @@
+import { tags } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
   HttpException,
@@ -6,17 +7,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaService } from 'src/prisma.service';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { MakeSlugger } from 'helper/slug';
 import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { MakeSlugger } from 'helper/slug';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -354,16 +355,75 @@ export class ProductsService {
   // ! Get Services
   async getServices() {
     try {
-      const getProducts = await this.prismaService.products.findMany({
+      const categories = await this.prismaService.categories.findMany({
         where: {
           deleted: false,
-          categories: {
-            deleted: false,
-            id: {
+          id: {
+            notIn: [10, 11, 12],
+          },
+        },
+        include: {
+          products: {
+            where: {
+              deleted: false,
+            },
+            include: {
+              tags: true,
             },
           },
         },
       });
+
+      // Khởi tạo object kết quả
+      const result = {};
+
+      // Lặp qua từng category để tạo các key trong result
+      categories.forEach((category) => {
+        result[category.slug] = [];
+      });
+
+      // Xử lý và phân loại sản phẩm theo category
+      categories.forEach((category) => {
+        category.products.forEach((product) => {
+          const transformedProduct = {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price: product.price,
+            images: product.images,
+            description: product.description,
+            short_description: product.short_description,
+            category_id: product.category_id,
+            tags: product.tags || [], // Nếu không có tags thì để mảng rỗng
+            created_at: product.created_at,
+            updated_at: product.updated_at,
+          };
+
+          // Kiểm tra xem trong category này đã có sản phẩm với slug này chưa
+          const existingProductIndex = result[category.slug].findIndex(
+            (p) => p.slug === product.slug,
+          );
+
+          if (existingProductIndex !== -1) {
+            // Nếu đã có sản phẩm với slug này, merger tags
+            const existingProduct = result[category.slug][existingProductIndex];
+            existingProduct.tags = [
+              ...new Set([
+                ...(existingProduct.tags || []),
+                ...(product.tags || []),
+              ]),
+            ];
+          } else {
+            // Nếu chưa có, thêm sản phẩm mới vào
+            result[category.slug].push(transformedProduct);
+          }
+        });
+      });
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: result,
+      };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
