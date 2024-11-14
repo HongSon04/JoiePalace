@@ -1,3 +1,4 @@
+import { stages } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
   HttpException,
@@ -700,6 +701,7 @@ export class BookingsService {
             : findBooking.user_id
               ? Number(findBooking.user_id)
               : null,
+          stage_id: Number(stage_id),
           branch_id: Number(branch_id),
           name,
           phone,
