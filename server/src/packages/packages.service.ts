@@ -124,11 +124,11 @@ export class PackagesService {
       const whereConditions: any = {};
 
       if (is_show !== null) {
-        whereConditions.is_show = is_show;
+        whereConditions.is_show = String(is_show) === 'true';
       }
 
       if (deleted !== null) {
-        whereConditions.deleted = deleted;
+        whereConditions.deleted = String(deleted) === 'true';
       }
 
       const packages = await this.prismaService.packages.findMany({
