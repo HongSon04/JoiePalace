@@ -241,6 +241,70 @@ export class ProductsController {
     return this.productsService.findAllDeleted(query);
   }
 
+  // ! Get Services
+  @Get('/get-services')
+  @ApiHeaders([
+    {
+      name: 'authorization',
+      description: 'Bearer token',
+      required: false,
+    },
+  ])
+  @ApiBearerAuth('authorization')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      data: {
+        'thuc-an': [
+          {
+            id: 'number',
+            name: 'string',
+            slug: 'string',
+            price: 'number',
+            images: 'array',
+            description: 'string',
+            short_description: 'string',
+            category_id: 'number',
+            tags: 'array',
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+        'thuc-uong': [
+          {
+            id: 'number',
+            name: 'string',
+            slug: 'string',
+            price: 'number',
+            images: 'array',
+            description: 'string',
+            short_description: 'string',
+            category_id: 'number',
+            tags: 'array',
+            created_at: 'date',
+            updated_at: 'date',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy sản phẩm',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    example: {
+      message: 'Lỗi server vui lòng thử lại sau',
+    },
+  })
+  @ApiOperation({ summary: 'Lấy danh sách sản phẩm theo danh mục' })
+  getServices() {
+    return this.productsService.getServices();
+  }
+
   // ! Get 10 product per category
   @Get('/get-ten-per-category')
   @isPublic()

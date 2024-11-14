@@ -791,7 +791,9 @@ export class BookingsService {
       let spare_chair_count = Number(spare_table_count) * 10;
       let chairAmount = chair_count * 50000;
       let spareChairAmount = spare_chair_count * 50000;
-      let totalMenuAmount = Number(menu.price) * Number(table_count);
+      let totalMenuAmount =
+        Number(menu.price) * Number(table_count) +
+        Number(menu.price) * Number(spare_table_count);
 
       if (Number(table_count) > Number(findStages.capacity_max)) {
         throw new BadRequestException(

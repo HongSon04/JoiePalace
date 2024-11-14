@@ -351,6 +351,31 @@ export class ProductsService {
     }
   }
 
+  // ! Get Services
+  async getServices() {
+    try {
+      const getProducts = await this.prismaService.products.findMany({
+        where: {
+          deleted: false,
+          categories: {
+            deleted: false,
+            id: {
+            },
+          },
+        },
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log('Lỗi từ products.service.ts -> getServices', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
+    }
+  }
+
   // ! Get all products by category
   async findOne(id: number) {
     try {

@@ -18,7 +18,6 @@ import { OnePayInternational } from 'vn-payments';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
-import uniqid from 'uniqid';
 
 @Injectable()
 export class PaymentMethodsService {
@@ -166,7 +165,8 @@ export class PaymentMethodsService {
         ress.on('data', (body) => {
           const response = JSON.parse(body);
           if (ress.statusCode == 200 && response.payUrl) {
-            return res.status(HttpStatus.OK).json({
+            return res.json({
+              status: HttpStatus.OK,
               payUrl: response.payUrl,
             });
             // return res.redirect(response.payUrl);
@@ -319,9 +319,11 @@ export class PaymentMethodsService {
       vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
 
       if (vnpUrl) {
-        return res.status(HttpStatus.OK).json({
+        return res.json({
+          status: HttpStatus.OK,
           payUrl: vnpUrl,
         });
+
         // return res.redirect(vnpUrl);
       } else {
         return res.status(400).json({
@@ -421,7 +423,8 @@ export class PaymentMethodsService {
       this.onepayIntl
         .buildCheckoutUrl(checkoutData as any)
         .then((checkoutUrl) => {
-          return res.status(HttpStatus.OK).json({
+          return res.json({
+            status: HttpStatus.OK,
             payUrl: checkoutUrl.href,
           });
         })
@@ -544,7 +547,8 @@ export class PaymentMethodsService {
         .post(config.endpoint, null, { params: order })
         .then(({ data }) => {
           if (data.return_code === 1) {
-            return res.status(HttpStatus.OK).json({
+            return res.json({
+              status: HttpStatus.OK,
               payUrl: data.order_url,
             });
           } else {
