@@ -75,7 +75,7 @@ const PartyDetailClient = ({
 
   const handleConfirm = async (id) => {
     setIsModalOpen(true);
-
+    setClickModule(1)
     try {
       const response = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.DELETE(id),
@@ -167,7 +167,7 @@ const PartyDetailClient = ({
       case 'pending':
         return 'Đang chờ';
       default:
-        return 'Chưa có trang thái';
+        return 'Đã có trang thái';
     }
   };
 
@@ -314,7 +314,7 @@ const PartyDetailClient = ({
           button1={button1}
           button2={button2}
           clickButton1={clickModule === 1 ? handleContinue : clickModule === 2 ? handleLast : handleCancel}   //handleLast
-          clickButton2={clickModule === 1 ? handleCancel : clickModule === 2 ? handleContinue : clickModule === 3 ? handleConfirm : null}
+          clickButton2={clickModule === 1 ? handleCancel : clickModule === 2 ? handleContinue : clickModule === 3 ? ()=>handleConfirm(id) : null}
         />
       )}
     </div>

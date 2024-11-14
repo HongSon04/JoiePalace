@@ -7,14 +7,27 @@ import Image from 'next/image';
 import PartySectionClient from '@/app/_components/PartySectionClient';
 import { fetchBookingById } from '@/app/_services/bookingServices';
 import { useRouter } from 'next/navigation';
+import PaymentMethod from '@/app/_components/Payment';
+
+
 
 const Page = ({ params }) => {
     const { id } = params;
     const [party, setParty] = useState([]);
     const [partyPartyDetails, setPartyDetails] = useState([]);
     const [user, setUser] = useState();
-    const [statusParty, setStatusParty] = useState();
     const router = useRouter();
+    const [countTables, setCountTables] = useState(0)
+    const [statusParty, setStatusParty] = useState(0);
+    const [priceMenu, setPriceMenu] = useState(0);
+    const [priceStages, setPriceStages] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
+    const [pricePartyTypes, setPricePartyTypes] = useState(0);
+    const [priceDecoration, setPriceDecoration] = useState(0);
+    const [spareCountTables, setSpareCountTables] = useState(0);
+    const [deposits, setDeposits] = useState(0);
+    const [showPaymentMethod, setShowPaymentMethod] = useState(false);
+    const [ deponsit_id, setDeponsit_id] = useState();
 
     useEffect(() => {
         const getData = async () => {
@@ -26,8 +39,8 @@ const Page = ({ params }) => {
             }
             try {
                 const fetchData = await fetchBookingById(id);
-                // console.log('fetchData',fetchData);
-                
+                console.log('fetchData', fetchData);
+
                 setPartyDetails(fetchData)
                 if (fetchData.length > 0) {
                     const parties = fetchData.map((item) => {
@@ -39,21 +52,21 @@ const Page = ({ params }) => {
                                 return total + (item.price || 0);
                             }
                             return total;
-                        }, 0)
+                        }, 0);
                         const dataDecors = dataDetailBooking[0]?.decors;
                         const datadePosits = dataDetailBooking[0]?.deposits;
                         const dataMenu = dataDetailBooking[0]?.menu_detail;
-                        console.log('dataMenu',dataMenus.price);
-                        
-                        
-                        setStatusParty(item.status);
 
+                     
                         // Nước uống
                         const drinkShow = dataMenus?.products.filter((item) => {
                             return item.category_id === 1;
                         });
-                        console.log(drinkShow);
-                        
+                        const dessert = dataMenus?.products.filter((item) => {
+                            return item.category_id === 15;
+                        });
+                        // console.log(drinkShow);
+
 
                         // Tính chi phí bàn và ghế
                         const tableCount = dataDetailBooking[0]?.table_count || 0;
@@ -65,13 +78,17 @@ const Page = ({ params }) => {
 
                         // Chi phí bàn và ghế dự phòng
                         const spareTableCount = dataDetailBooking[0]?.spare_table_count;
+
                         const spareTableCost = spareTableCount * 200000;
                         const spareChairCost = spareTableCount * 10 * 50000;
 
                         // Các chi phí cụ thể khác
                         const decorCost = dataDecors?.price || 0;
                         const stageCost = dataStages?.price || 0;
+
+
                         const partyTypeCost = item.party_types.price || 0;
+                        setPricePartyTypes(partyTypeCost);
                         const additionalServiceCost = 0; // chi phí của dịch vụ bổ sung nếu có thì thêm
 
                         // Chi phí dịch vụ khác
@@ -102,19 +119,28 @@ const Page = ({ params }) => {
                             additionalServiceCost +       // Chi phí dịch vụ bổ sung
                             otherServicesCost +           // Chi phí dịch vụ khác
                             extraServicesCost;
-                            console.log('amount',amount);
-                            console.log("tablePrice",tablePrice);
-                            console.log("chairPrice",chairPrice);
-                            console.log("decorCost",decorCost);
-                            console.log("partyTypeCost",partyTypeCost);
-                            console.log("stageCost",stageCost);
-                            console.log("menuCost",menuCost);
-                            console.log("drinksPrice",drinksPrice);
-                            console.log("spareTableCost",spareTableCost);
-                            console.log("additionalServiceCost",additionalServiceCost);
-                            console.log("otherServicesCost",otherServicesCost);
-                            console.log("extraServicesCost",extraServicesCost);
-                            
+                        // console.log('amount',amount);
+                        // console.log("tablePrice",tablePrice);
+                        // console.log("chairPrice",chairPrice);
+                        // console.log("decorCost",decorCost);
+                        // console.log("partyTypeCost",partyTypeCost);
+                        // console.log("stageCost",stageCost);
+                        // console.log("menuCost",menuCost);
+                        // console.log("drinksPrice",drinksPrice);
+                        // console.log("spareTableCost",spareTableCost);
+                        // console.log("additionalServiceCost",additionalServiceCost);
+                        // console.log("otherServicesCost",otherServicesCost);
+                        // console.log("extraServicesCost",extraServicesCost);
+                        setStatusParty(item.status);
+                        setPriceMenu(dataMenus?.price);
+                        setPriceStages(dataStages?.price);
+                        setPriceDecoration(dataDecors?.price);
+                        setCountTables(dataDetailBooking[0]?.table_count );
+                        setSpareCountTables(spareTableCount);
+                        setDeponsit_id( datadePosits?.transactionID);
+                        setDeposits(datadePosits?.amount)
+                        setShowPaymentMethod(item.status === 'processing');
+                        
                         return {
                             id: item.id,
                             nameParty: item?.name,
@@ -144,10 +170,10 @@ const Page = ({ params }) => {
                             drinks: drinkShow.map(i => (`${i.name} `)),
                             payerName: item.name,
                             paymentMethod: `Chuyển khoản ${datadePosits?.payment_method || "chưa có"} `,
-                            menuCostTable: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Chưa thanh toán",
+                            menuCostTable:   datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Đã thanh toán",
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND ` : "0 VND",
                             depositAmount: datadePosits?.amount ? `${datadePosits?.amount.toLocaleString('vi-VN')} VND` : "0 VND",
-                            depositStatus: item.is_deposit === 'pending' ? 'Đã cọc' : "Chưa cọc",
+                            depositStatus: item.is_deposit  ? 'Đã cọc' : "Chưa cọc",
                             depositDay: formatDate(datadePosits?.created_at),
                             remainingPaid: (dataDetailBooking[0].total_amount && datadePosits?.amount) ? `${(parseInt(dataDetailBooking[0].total_amount) - parseInt(datadePosits?.amount)).toLocaleString('vi-VN')} VND` : `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND`,
                             paymentDay: formatDate(datadePosits?.created_at),
@@ -161,10 +187,11 @@ const Page = ({ params }) => {
                             tableRental: "200.000 VND / 1 bàn",
                             chairRental: "50.000 VND / 1 ghế",
                             paymentStatus: `${(dataMenu.price).toLocaleString('vi-VN')} VND / bàn` || 0,
-                            snack: "Bánh ngọt, Trái cây",
+                            snack:  dessert.map(i => (`${i.name} `)),
                             vat: "10%",
                             drinksCost: `${drinksPrice.toLocaleString('vi-VN')} VND / bàn` || 0,
-                            arise: item.is_deposit ? '' : "Không có",
+                            arise: item.is_deposit ? '' : '0 VND',
+                            statusParty: item.status
                         };
                     });
 
@@ -253,6 +280,7 @@ const Page = ({ params }) => {
                         <Image src={OutlineFeedBack} alt='clipBoard' objectFit='cover'></Image>
                     </button>
                 </div>
+
             </div>
 
             <div className='flex items-center'>
@@ -260,6 +288,19 @@ const Page = ({ params }) => {
                     • {`${statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pedding' ? 'chưa giải quyết' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang xử lý'}`}
                 </span>
             </div>
+            {showPaymentMethod && (
+                <PaymentMethod
+                    countTables={countTables}
+                    sparecountTables={spareCountTables}
+                    priceMenu={priceMenu}
+                    pricecpartyTypes={pricePartyTypes}
+                    priceDecoration={priceDecoration}
+                    totalAmount={totalAmount}
+                    statusParty={statusParty}
+                    deposits={deposits}
+                    deposit_Id={deponsit_id}
+                />
+            )}
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             {party && party.length > 0 ? (
                 party.map(party => (
