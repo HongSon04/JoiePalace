@@ -164,13 +164,13 @@ export class PaymentMethodsService {
         ress.on('data', (body) => {
           const response = JSON.parse(body);
           if (ress.statusCode == 200 && response.payUrl) {
-            // throw new HttpException(
-            //   {
-            //     payUrl: response.payUrl,
-            //   },
-            //   HttpStatus.OK,
-            // );
-            return res.redirect(response.payUrl);
+            throw new HttpException(
+              {
+                payUrl: response.payUrl,
+              },
+              HttpStatus.OK,
+            );
+            // return res.redirect(response.payUrl);
           } else {
             throw new BadRequestException('Tạo đơn đặt cọc thất bại');
           }
@@ -320,13 +320,13 @@ export class PaymentMethodsService {
       vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
 
       if (vnpUrl) {
-        // throw new HttpException(
-        //   {
-        //     payUrl: vnpUrl,
-        //   },
-        //   HttpStatus.OK,
-        // );
-        return res.redirect(vnpUrl);
+        throw new HttpException(
+          {
+            payUrl: vnpUrl,
+          },
+          HttpStatus.OK,
+        );
+        // return res.redirect(vnpUrl);
       } else {
         return res.status(400).json({
           message: 'Tạo đơn đặt cọc thất bại',
@@ -425,13 +425,13 @@ export class PaymentMethodsService {
       this.onepayIntl
         .buildCheckoutUrl(checkoutData as any)
         .then((checkoutUrl) => {
-          // throw new HttpException(
-          //   {
-          //     payUrl: checkoutUrl.href,
-          //   },
-          //   HttpStatus.OK,
-          // );
-          return res.redirect(checkoutUrl.href);
+          throw new HttpException(
+            {
+              payUrl: checkoutUrl.href,
+            },
+            HttpStatus.OK,
+          );
+          // return res.redirect(checkoutUrl.href);
         })
         .catch((err) => {
           console.log('Lỗi từ payment_method.service.ts -> onepay', err);
@@ -552,13 +552,13 @@ export class PaymentMethodsService {
         .post(config.endpoint, null, { params: order })
         .then(({ data }) => {
           if (data.return_code === 1) {
-            // throw new HttpException(
-            //   {
-            //     payUrl: data.order_url,
-            //   },
-            //   HttpStatus.OK,
-            // );
-            return res.redirect(data.order_url);
+            throw new HttpException(
+              {
+                payUrl: data.order_url,
+              },
+              HttpStatus.OK,
+            );
+            // return res.redirect(data.order_url);
           } else {
             return res.status(HttpStatus.BAD_REQUEST).json({
               status: HttpStatus.BAD_REQUEST,
