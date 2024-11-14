@@ -34,11 +34,12 @@ function Conference() {
         const fetchData = async () => {
             try {
                 const menuData = await fetchMenuBySlug(slug);
+                console.log(menuData);
                 const getProductsMenu = menuData[0].products;
                 const mainCourse = getProductsMenu['mon-chinh'];                
                 const appetizer = getProductsMenu['mon-khai-vi'];
                 const dessert = getProductsMenu['mon-trang-mieng'];
-                const beverages = getProductsMenu['do-uong'];
+                const beverages = getProductsMenu['nuoc-uong'];
                 setMainCourse(mainCourse);
                 setAppetizer(appetizer);
                 setDessert(dessert);
@@ -49,6 +50,8 @@ function Conference() {
         };
         fetchData();
     }, [slug]);
+
+    
 
     useEffect(() => {
         const getFeedbacks = async () => {
@@ -231,7 +234,7 @@ function Conference() {
                                 className=" bg-white p-4 max-sm:p-2"
                                 src="/Alacarte-Menu-Thumbnail.png"
                                 alt="A la carte menu thumbnail"
-                            />a
+                            />
                         </div>
                     </div>
                 </section>

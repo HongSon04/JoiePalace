@@ -13,6 +13,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MakeSlugger } from 'helper/slug';
 import { FormatReturnData } from 'helper/FormatReturnData';
 import { handleErrorHelper } from 'helper/handleErrorHelper';
+import { FilterPackagesDto } from './dto/FilterPackages.dto';
 
 @Injectable()
 export class PackagesService {
@@ -38,6 +39,7 @@ export class PackagesService {
         short_description,
         other_service,
         note,
+        is_show,
       } = createPackageDto;
 
       // Validate images
@@ -93,6 +95,7 @@ export class PackagesService {
           images: images as any,
           other_service,
           note,
+          is_show: String(is_show) === 'true',
         },
         include: {
           stages: true,
@@ -115,12 +118,21 @@ export class PackagesService {
   }
 
   // ! Get all packages
-  async findAll() {
+  async findAll(query: FilterPackagesDto) {
     try {
+      const { is_show, deleted } = query;
+      const whereConditions: any = {};
+
+      if (is_show !== null) {
+        whereConditions.is_show = String(is_show) === 'true';
+      }
+
+      if (deleted !== null) {
+        whereConditions.deleted = String(deleted) === 'true';
+      }
+
       const packages = await this.prismaService.packages.findMany({
-        where: {
-          deleted: false,
-        },
+        where: whereConditions,
         include: {
           menus: true,
           decors: true,
@@ -182,39 +194,6 @@ export class PackagesService {
     }
   }
 
-  // ! Get all deleted packages
-  async findAllDeleted() {
-    try {
-      const packages = await this.prismaService.packages.findMany({
-        where: {
-          deleted: true,
-        },
-        include: {
-          menus: true,
-          decors: true,
-          party_types: true,
-        },
-      });
-
-      throw new HttpException(
-        {
-          message: 'Lấy danh sách gói đã xóa thành công',
-          data: FormatReturnData(packages, []),
-        },
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ packages.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException({
-        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
-      });
-    }
-  }
-
   // ! Get package by slug
   async findBySlug(slug: string) {
     try {
@@ -268,6 +247,7 @@ export class PackagesService {
         short_description,
         other_service,
         note,
+        is_show,
       } = updatePackageDto;
 
       // ? Find Package By Id
@@ -333,6 +313,7 @@ export class PackagesService {
           images: uploadImages ? uploadImages : findPackageById.images,
           other_service,
           note,
+          is_show: String(is_show) === 'true',
         },
         include: {
           stages: true,

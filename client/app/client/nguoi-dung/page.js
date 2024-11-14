@@ -77,15 +77,16 @@ const Page = () => {
                 // Fetch all bookings for the user
                 //pending, processing, success, cancel
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
+                // console.log(fetchedAllBookingsMembershipId);
+                
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
-                console.log(fetchedAllBookingsMembershipId);
 
                 if (fetchedAllBookingsSuccess.length > 0) {
                     const parties = fetchedAllBookingsSuccess.map((item) => {
                         const dataDetailBooking = item.booking_details;
                         const dataStages = item.stages || dataDetailBooking[0]?.stage_detail;
-                        console.log('dataStages', dataStages);
+                        // console.log('dataStages', dataStages);
 
                         const dataMenus = dataDetailBooking[0]?.menus;
                         const datadePosits = dataDetailBooking[0]?.deposits;
@@ -126,9 +127,8 @@ const Page = () => {
                             depositDay: item.is_deposit ? new Date(datadePosits?.created_at).toISOString().split("T")[0] : "",
                             remainingPaid: (item.total_amount && item.depositAmount) ? `${parseInt(item.total_amount) - parseInt(item.depositAmount)} VND` : "0 VND",
                             paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
+                            statusParty: item.status
                         };
-
-
                     });
                     setResonParty(parties);
                 }
@@ -137,7 +137,7 @@ const Page = () => {
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
                     return total + item.booking_details[0].total_amount;
                 }, 0);
-                console.log(total_amountUser);
+                // console.log(total_amountUser);
 
                 setTotalAmount(total_amountUser)
                 setLoading(false);

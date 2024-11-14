@@ -21,7 +21,6 @@ const Page = () => {
         <div className='flex gap-8'>
                     <MenuItems data={menuData}></MenuItems>
                     <MenuItems data={menuData}></MenuItems>
-
                 </div>
         </div>
        
