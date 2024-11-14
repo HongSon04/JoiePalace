@@ -18,6 +18,8 @@ import { OnePayInternational } from 'vn-payments';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
+import uniqid from 'uniqid';
+
 @Injectable()
 export class PaymentMethodsService {
   constructor(
@@ -164,12 +166,9 @@ export class PaymentMethodsService {
         ress.on('data', (body) => {
           const response = JSON.parse(body);
           if (ress.statusCode == 200 && response.payUrl) {
-            throw new HttpException(
-              {
-                payUrl: response.payUrl,
-              },
-              HttpStatus.OK,
-            );
+            return res.status(HttpStatus.OK).json({
+              payUrl: response.payUrl,
+            });
             // return res.redirect(response.payUrl);
           } else {
             throw new BadRequestException('Tạo đơn đặt cọc thất bại');
@@ -320,12 +319,9 @@ export class PaymentMethodsService {
       vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
 
       if (vnpUrl) {
-        throw new HttpException(
-          {
-            payUrl: vnpUrl,
-          },
-          HttpStatus.OK,
-        );
+        return res.status(HttpStatus.OK).json({
+          payUrl: vnpUrl,
+        });
         // return res.redirect(vnpUrl);
       } else {
         return res.status(400).json({
@@ -425,13 +421,9 @@ export class PaymentMethodsService {
       this.onepayIntl
         .buildCheckoutUrl(checkoutData as any)
         .then((checkoutUrl) => {
-          throw new HttpException(
-            {
-              payUrl: checkoutUrl.href,
-            },
-            HttpStatus.OK,
-          );
-          // return res.redirect(checkoutUrl.href);
+          return res.status(HttpStatus.OK).json({
+            payUrl: checkoutUrl.href,
+          });
         })
         .catch((err) => {
           console.log('Lỗi từ payment_method.service.ts -> onepay', err);
@@ -521,7 +513,7 @@ export class PaymentMethodsService {
       const transID = Math.floor(Math.random() * 1000000);
       const order = {
         app_id: config.app_id,
-        app_trans_id: `${dayjs(Date.now()).format('YYMMDD')}-${findDeposit.transactionID}-${transID}`,
+        app_trans_id: `${dayjs(Date.now()).format('YYMMDDHHmmss')}-${findDeposit.transactionID}-${transID}`,
         app_user: 'user123',
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items),
@@ -552,13 +544,9 @@ export class PaymentMethodsService {
         .post(config.endpoint, null, { params: order })
         .then(({ data }) => {
           if (data.return_code === 1) {
-            throw new HttpException(
-              {
-                payUrl: data.order_url,
-              },
-              HttpStatus.OK,
-            );
-            // return res.redirect(data.order_url);
+            return res.status(HttpStatus.OK).json({
+              payUrl: data.order_url,
+            });
           } else {
             return res.status(HttpStatus.BAD_REQUEST).json({
               status: HttpStatus.BAD_REQUEST,
