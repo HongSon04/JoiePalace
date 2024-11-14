@@ -24,7 +24,7 @@ export class PaymentMethodsController {
   constructor(private readonly paymentMethodsService: PaymentMethodsService) {}
 
   // ! Payment Momo
-  @Post('momo/:deposit_id')
+  @Post('momo/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua Momo' })
   @ApiResponse({
@@ -34,11 +34,11 @@ export class PaymentMethodsController {
     },
   })
   momo(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.momo(id, req, res);
+    return this.paymentMethodsService.momo(transactionID, req, res);
   }
 
   // ! Momo Callback
@@ -51,7 +51,7 @@ export class PaymentMethodsController {
   }
 
   // ! Payment VNPay
-  @Post('vnpay/:deposit_id')
+  @Post('vnpay/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua VNPay' })
   @ApiResponse({
@@ -61,11 +61,11 @@ export class PaymentMethodsController {
     },
   })
   vnpay(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.vnpay(id, req, res);
+    return this.paymentMethodsService.vnpay(transactionID, req, res);
   }
 
   // ! VNPay Callback
@@ -77,7 +77,7 @@ export class PaymentMethodsController {
   }
 
   // ! OnePay
-  @Post('onepay/:deposit_id')
+  @Post('onepay/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua OnePay' })
   @ApiResponse({
@@ -87,11 +87,11 @@ export class PaymentMethodsController {
     },
   })
   onePay(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.onePay(id, req, res);
+    return this.paymentMethodsService.onePay(transactionID, req, res);
   }
 
   // ! OnePay Callback
@@ -103,7 +103,7 @@ export class PaymentMethodsController {
   }
 
   // ! Payment ZaloPay
-  @Post('zalopay/:deposit_id')
+  @Post('zalopay/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua ZaloPay' })
   @ApiResponse({
@@ -113,11 +113,11 @@ export class PaymentMethodsController {
     },
   })
   zaloPay(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.zaloPay(id, req, res);
+    return this.paymentMethodsService.zaloPay(transactionID, req, res);
   }
 
   // ! ZaloPay Callback
