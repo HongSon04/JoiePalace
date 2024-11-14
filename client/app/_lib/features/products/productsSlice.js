@@ -157,6 +157,26 @@ const productsSlice = createSlice({
         state.isDeletingProductError = true;
         state.error = action.payload;
       });
+
+    builder
+      .addCase(fetchProductByCategorySlug.pending, (state) => {
+        state.isFetchingProducts = true;
+        state.isFetchingProductsError = false;
+        state.error = null;
+      })
+      .addCase(fetchProductByCategorySlug.fulfilled, (state, action) => {
+        state.isFetchingProducts = false;
+        console.log("fetchProductByCategorySlug payload -> ", action.payload);
+        state.products = action.payload.data;
+        state.pagination = action.payload.pagination;
+        state.isFetchingProductsError = false;
+        state.error = null;
+      })
+      .addCase(fetchProductByCategorySlug.rejected, (state, action) => {
+        state.isFetchingProducts = false;
+        state.isFetchingProductsError = true;
+        state.error = action.payload;
+      });
   },
 });
 
@@ -182,6 +202,71 @@ export const fetchProducts = createAsyncThunk(
     } else {
       dispatch(fetchingProductsFailure());
       return rejectWithValue(response);
+    }
+  }
+);
+
+export const fetchProduct = createAsyncThunk(
+  "products/fetchProduct",
+  async ({ id }, { dispatch, rejectWithValue }) => {
+    const response = await makeAuthorizedRequest(
+      API_CONFIG.PRODUCTS.GET_BY_ID(id),
+      "GET"
+    );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      return rejectWithValue(response);
+    }
+  }
+);
+
+export const fetchProductByCategory = createAsyncThunk(
+  "products/fetchProductByCategory",
+  async ({ category, params = {} }, { dispatch, rejectWithValue }) => {
+    const response = await makeAuthorizedRequest(
+      API_CONFIG.PRODUCTS.GET_BY_CATEGORY(category, params),
+      "GET"
+    );
+
+    if (response.success) {
+      return response.data;
+    } else {
+      return rejectWithValue(response);
+    }
+  }
+);
+
+export const fetchProductByCategorySlug = createAsyncThunk(
+  "products/fetchProductByCategoryId",
+  async ({ slug, params = {} }, { dispatch, rejectWithValue }) => {
+    // console.log("getting category");
+
+    const category = await makeAuthorizedRequest(
+      API_CONFIG.CATEGORIES.GET_BY_SLUG(slug),
+      "GET"
+    );
+
+    if (category.success) {
+      // console.log("getting category done...");
+      // console.log("getting products with category...", category.data.at(0).id);
+
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.GET_BY_CATEGORY(category.data.at(0).id, params),
+        "GET"
+      );
+
+      if (response.success) {
+        // console.log("getting products with category done...");
+        // console.log("getting products with category successfully...");
+        // console.log("response -> ", response);
+        return response;
+      } else {
+        return rejectWithValue(response);
+      }
+    } else {
+      return rejectWithValue(category);
     }
   }
 );

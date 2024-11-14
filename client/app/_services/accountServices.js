@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_CONFIG } from "../_utils/api.config";
+import { API_CONFIG, makeAuthorizedRequest } from "../_utils/api.config";
+import Cookies from "js-cookie";
 
 export const fetchUserProfile = async () => {
   const response = await axios.get(API_CONFIG.USER.PROFILE);
@@ -30,3 +31,18 @@ export const loginAccountUser = async (dataToSend) => {
   return response;
 };
 
+export const forgotPassword = async (email) => {
+  const response = await makeAuthorizedRequest(
+    API_CONFIG.MAIL.FORGOT_PASSWORD,
+    "POST",
+    email
+  );
+
+  // console.log(response);
+
+  if (!response.success) {
+    throw new Error(response?.error?.message || "Đã có lỗi xảy ra");
+  }
+
+  return response;
+};

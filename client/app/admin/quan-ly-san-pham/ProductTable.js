@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchProducts } from "@/app/_lib/products/productsSlice";
+import { fetchProducts } from "@/app/_lib/features/products/productsSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../loading";

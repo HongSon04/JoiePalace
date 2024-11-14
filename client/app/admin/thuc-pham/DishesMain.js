@@ -5,6 +5,7 @@ import useApiServices from "@/app/_hooks/useApiServices";
 import useRoleGuard from "@/app/_hooks/useRoleGuard";
 import {
   fetchCategories,
+  fetchCategoriesBySlug,
   fetchingCategories,
   fetchingCategoriesFailure,
   fetchingCategoriesSuccess,
@@ -41,7 +42,7 @@ function DishesMain() {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    dispatch(fetchCategories({ slug: API_CONFIG.FOOD_CATEGORY_SLUG }));
+    dispatch(fetchCategoriesBySlug({ slug: API_CONFIG.FOOD_CATEGORY_SLUG }));
 
     return () => {};
   }, []);
@@ -63,7 +64,7 @@ function DishesMain() {
             className="text-gray-400 underline"
             onClick={() =>
               dispatch(
-                fetchCategories({
+                fetchCategoriesBySlug({
                   slug: API_CONFIG.FOOD_CATEGORY_SLUG,
                 })
               )

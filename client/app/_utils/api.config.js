@@ -17,9 +17,10 @@ const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST_NO_API}/notifications`;
 const MENU_API = `${HOST}/menus`;
-const PACKAGES = `${HOST}/packages`;
-const DECORS = `${HOST}/decors`;
-const STAGES = `${HOST}/stages`;
+const PACKAGES_API = `${HOST}/packages`;
+const DECORS_API = `${HOST}/decors`;
+const STAGES_API = `${HOST}/stages`;
+const MAIL_API = `${HOST}/mail`;
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
@@ -33,6 +34,9 @@ const constructUrlWithParams = (baseUrl, params) => {
 export const API_CONFIG = {
   GENERAL_BRANCH: "ho-chi-minh",
   FOOD_CATEGORY_SLUG: "menu-products",
+  STAGE_CATEGORY_SLUG: "san-khau",
+  WEDDING_CAKE_SLUG: "banh-cuoi",
+  EXTRA_SERVICES_SLUG: "dich-vu-them",
 
   // AUTH API
   AUTH: {
@@ -53,10 +57,15 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${USER_API}/get/${id}`,
     GET_BY_BRANCH_ID: (id) => `${USER_API}/get-all-by-branch-id/${id}`,
     CHANGE_PASSWORD: `${USER_API}/change-password`,
+    FORGOT_PASSWORD: `${USER_API}/forgot-password`,
     CHANGE_PROFILE: `${USER_API}/change-profile`,
     DELETE: (id) => `${USER_API}/delete/${id}`,
     RESTORE: (id) => `${USER_API}/restore/${id}`,
     DESTROY: (id) => `${USER_API}/destroy/${id}`,
+  },
+
+  MAIL: {
+    FORGOT_PASSWORD: `${MAIL_API}/forgot-password`,
   },
 
   // BRANCHES API
@@ -75,10 +84,11 @@ export const API_CONFIG = {
   },
 
   STAGES: {
-    CREATE: `${STAGES}/create`,
-    GET_ALL: (params) => constructUrlWithParams(`${STAGES}/get-all`, params),
-    GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
-    GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
+    CREATE: `${STAGES_API}/create`,
+    GET_ALL: (params) =>
+      constructUrlWithParams(`${STAGES_API}/get-all`, params),
+    GET_ALL_BY_BRANCH: (id) => `${STAGES_API}/get-all?branch_id=${id}`,
+    GET_ALL_BY_STAGE_ID: (id) => `${STAGES_API}/get/${id}`,
   },
 
   // CATEGORIES API
@@ -201,9 +211,11 @@ export const API_CONFIG = {
     RESTORE: (membershipId) => `${MEMBERSHIPS}/restore/${membershipId}`,
     HARD_DELETE: (membershipId) => `${MEMBERSHIPS}/hard-delete/${membershipId}`,
   },
+
   DECORS: {
-    GET_ALL: (params) => constructUrlWithParams(`${DECORS}/get-all`, params),
-    GET_BY_ID: (id) => `${DECORS}/get/${id}`,
+    GET_ALL: (params) =>
+      constructUrlWithParams(`${DECORS_API}/get-all`, params),
+    GET_BY_ID: (id) => `${DECORS_API}/get/${id}`,
   },
 
   // NOTIFICATIONS API
@@ -211,9 +223,11 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
   },
 
-  // PACKAGES API
+  // PACKAGES_API API
   PACKAGES: {
-    GET_ALL: `${PACKAGES}/get-all`,
+    GET_ALL: `${PACKAGES_API}/get-all`,
+    GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
+    CREATE: `${PACKAGES_API}/create`,
   },
 
   // MENU API
