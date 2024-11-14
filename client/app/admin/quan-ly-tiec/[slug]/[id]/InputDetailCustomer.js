@@ -59,7 +59,7 @@ const InputDetailCustomer = ({
                             }
                             readOnly={isReadOnlyField}
                             disabled={isReadOnlyField}
-                            className="p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300 "
+                            className="p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300"
                             placeholder={placeholder}
                             min={type === 'number' ? 1 : undefined}
                             onWheel={(e) => (type === 'number') && e.currentTarget.blur()}
