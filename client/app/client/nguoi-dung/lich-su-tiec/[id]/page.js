@@ -8,7 +8,7 @@ import PartySectionClient from '@/app/_components/PartySectionClient';
 import { fetchBookingById } from '@/app/_services/bookingServices';
 import { useRouter } from 'next/navigation';
 import PaymentMethod from '@/app/_components/Payment';
-
+import { fetchCategoriesById } from '@/app/_services/productsServices';
 
 
 const Page = ({ params }) => {
@@ -32,6 +32,10 @@ const Page = ({ params }) => {
     useEffect(() => {
         const getData = async () => {
             const getUser = JSON.parse(localStorage.getItem("user"));
+            const fectDataBycategories = await fetchCategoriesById(9);
+            const order_service = (fectDataBycategories.data)[0].childrens;            
+            console.log(order_service);
+            
             if (getUser) {
                 setUser(getUser);
             } else {
@@ -98,12 +102,16 @@ const Page = ({ params }) => {
 
 
                         // Chi phí dịch vụ thêm (chỉ tính khi is_deposit là true)
-                        const extraServicesCost = item.extra_services?.reduce((total, service) => {
-                            if (service.is_deposit) {
-                                return total + (service.price * service.quantity); // Giá mỗi dịch vụ thêm dựa trên ID * số lượng
-                            }
-                            return total;
-                        }, 0) || 0;
+                        if(item.status){
+                            const extraServicesCost = item.extra_services?.reduce((total, service) => {
+                                if (service.is_deposit) {
+                                    return total + (service.price * service.quantity); 
+                                }
+                                return total;
+                            }, 0) || 0;
+                        }
+
+                        
 
                         // Tính tổng chi phí
                         const amount =
@@ -117,8 +125,7 @@ const Page = ({ params }) => {
                             spareTableCost +              // Chi phí bàn dự phòng
                             spareChairCost +              // Chi phí ghế dự phòng
                             additionalServiceCost +       // Chi phí dịch vụ bổ sung
-                            otherServicesCost +           // Chi phí dịch vụ khác
-                            extraServicesCost;
+                            otherServicesCost ;          // Chi phí dịch vụ khác 
                         // console.log('amount',amount);
                         // console.log("tablePrice",tablePrice);
                         // console.log("chairPrice",chairPrice);
@@ -169,20 +176,20 @@ const Page = ({ params }) => {
                             menu: dataMenus?.name,
                             drinks: drinkShow.map(i => i.name).join(', '),
                             payerName: item.name,
-                            paymentMethod: `${datadePosits?.payment_method || "chưa có"} `,
+                            paymentMethod: `${datadePosits?.payment_method || "Chưa có"} `,
                             menuCostTable: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Đã thanh toán",
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND ` : "0 VND",
                             depositAmount: datadePosits?.amount ? `${datadePosits?.amount.toLocaleString('vi-VN')} VND` : "0 VND",
                             depositStatus: item.is_deposit ? 'Đã cọc' : "Chưa đặt cọc",
                             depositDay: item.is_deposit ?  formatDate(datadePosits?.created_at) : '--/--/--',
                             remainingPaid: (dataDetailBooking[0].total_amount && datadePosits?.amount) ? `${(parseInt(dataDetailBooking[0].total_amount) - parseInt(datadePosits?.amount)).toLocaleString('vi-VN')} VND` : `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND`,
-                            paymentDay: item.is_deposit ? formatDate(datadePosits?.created_at) : '--/--/--',
+                            paymentDay:  item.status == 'success' ? formatDate(datadePosits?.created_at) : '--/--/--',
                             typeTable: "Tùy chỉnh",
                             typeChair: "Tùy chỉnh",
                             // Chi phí khác
                             costTable: `${(Math.floor(amount / tableCount) / 1000000).toFixed(1) === "1.0" ? "1 triệu" : (amount / tableCount / 1000000).toFixed(1).replace('.', ',')} triệu / bàn`,
                             decorationCost: `${dataDecors?.price.toLocaleString('vi-VN')} VND`,
-                            soundStage: 'Miễn phí',
+                            soundStage: `${dataStages?.price === 0 ? '0 VND' : `${dataStages?.price.toLocaleString('vi-VN')} VND`}`,
                             hallRental: `${dataStages?.price === 0 ? '0 VND' : `${dataStages?.price.toLocaleString('vi-VN')} VND`}`,
                             tableRental: "200.000 VND / 1 bàn",
                             chairRental: "50.000 VND / 1 ghế",

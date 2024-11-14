@@ -9,13 +9,11 @@ const AccountSectionClient = ({ title, nameUser, phoneUser, emailUser, partyBook
         const getData = async () => {
             try {
                 if (total_amount) {
-                    // Tìm hạng thành viên dựa trên total_amount
                     const foundRank = rankMemberships
                         .slice() 
                         .sort((a, b) => b.condition - a.condition) 
                         .find(member => total_amount >= member.condition); 
         
-                    // Nếu tìm thấy hạng, cập nhật trạng thái rank
                     if (foundRank) {
                         setRank(foundRank);
                     } else {

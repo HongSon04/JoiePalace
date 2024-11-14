@@ -63,7 +63,7 @@ const PaymentMethod = ({
         {
             src: VNPAY,
             alt: "VNPay",
-            bgColor: "bg-gray-200",
+            bgColor: "bg-gray-300",
             textColor: "text-gray-800",
             label: "VNPay",
             method: "vnpay",
@@ -141,6 +141,7 @@ const PaymentMethod = ({
                     position: "top",
                     type: "success",
                     title: "Tiến hành thanh toán",
+                    description: "Vui lòng tiếp tục thanh toán !!",
                     closable: true,
                 });
                
@@ -149,7 +150,7 @@ const PaymentMethod = ({
                     position: "top",
                     type: "error",
                     title: "Tiến hành thanh toán thất bại!",
-                    description: response?.error?.message || "Vui lòng thử lại sau.",
+                    description: "Vui lòng chờ đợi tiệc của bạn đang được xử lý !!",
                     closable: true,
                 });
             }
@@ -159,7 +160,7 @@ const PaymentMethod = ({
                 position: "top",
                 type: "error",
                 title: "Tiến hành thanh toán thất bại!",
-                description: error.message || "Vui lòng thử lại sau.",
+                description: 'Vui lòng chờ đợi tiệc của bạn đang được xử lý !!',
                 closable: true,
             });
         }
@@ -229,7 +230,7 @@ const PaymentMethod = ({
                                             <Image src={method.src} alt={method.alt} className="object-cover w-[30px]" />
                                         </div>
                                         <span className={method.textColor}>
-                                            Thanh toán qua <span className="px-1 font-bold">{method.label}</span>
+                                            Thanh toán qua <span className="px-1 font-bold text-ba">{method.label}</span>
                                         </span>
                                     </button>
                                 ))}

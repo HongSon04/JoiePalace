@@ -16,17 +16,14 @@ const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
-<<<<<<< HEAD
 const PACKAGES = `${HOST}/packages`;
 const DECORS = `${HOST}/decors`;
 const STAGES = `${HOST}/stages`;
 const PAYMENT = `${HOST}/payment-methods`;
-=======
 const PACKAGES_API = `${HOST}/packages`;
 const DECORS_API = `${HOST}/decors`;
 const STAGES_API = `${HOST}/stages`;
 const MAIL_API = `${HOST}/mail`;
->>>>>>> e121c25673b2c4f95b7bfdda4986e999cc8012cf
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
