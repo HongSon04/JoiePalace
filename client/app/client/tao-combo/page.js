@@ -287,6 +287,7 @@ function Page() {
   const [isImageOverSize, setIsImageOverSize] = React.useState(false);
   const [isFormatAccepted, setIsFormatAccepted] = React.useState(false);
   const [limitFilesLength, setLimitFilesLength] = React.useState(false);
+  const [submitTriggered, setSubmitTriggered] = React.useState(false);
 
   const drawerData = React.useMemo(() => {
     return {
@@ -358,6 +359,7 @@ function Page() {
   };
 
   const onSubmit = async (data) => {
+    setSubmitTriggered(true);
     if (files.length <= 0) {
       setIsImagesEmpty(true);
       return;
@@ -565,14 +567,14 @@ function Page() {
   }, [tabIndex]);
 
   React.useEffect(() => {
-    if (errors) {
+    if (submitTriggered && errors) {
       toast({
         title: "Vui lòng điền đầy đủ thông tin",
         status: "error",
         position: "top-right",
       });
     }
-  }, [errors]);
+  }, [errors, submitTriggered, toast]);
 
   React.useEffect(() => {
     if (files.some((file) => file.size > MAX_FILE_SIZE)) {

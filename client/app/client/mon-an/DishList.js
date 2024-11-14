@@ -12,7 +12,7 @@ import Error from "./Error";
 import { getUserFromLocalStorage } from "@/app/_lib/features/authentication/accountSlice";
 import { getMenuListByUserId } from "@/app/_lib/features/menu/menuSlice";
 
-function DishList({ category, userMenuList }) {
+function DishList({ category, userMenuList, isLogedIn }) {
   const dispatch = useDispatch();
 
   const { categoryDishes, pagination, isLoading, isError, error } = useSelector(
@@ -58,6 +58,7 @@ function DishList({ category, userMenuList }) {
                 removable={false}
                 usePopover={true}
                 userMenuList={userMenuList}
+                isLogedIn={isLogedIn}
               />
             </Col>
           ))}
