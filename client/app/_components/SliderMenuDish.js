@@ -107,14 +107,14 @@ const SliderMenuDish = ({ title, dataSlider, logo }) => {
                         </div>
                     ) : (
                         <Slider ref={sliderRef} {...menuSliderSettings}>
-                            {dataSlider.map((item) => (
-                                <div key={item.id} className="!flex items-center justify-center gap-6 max-sm:flex-col ">
+                            {dataSlider.map((item) => {
+                                    return <div key={item.id} className="!flex items-center justify-center gap-6 max-sm:flex-col ">
                                     <div className="flex justify-center items-center rounded-full border-gold border w-fit h-fit p-[10px]">
                                         <div className="flex justify-center items-center rounded-full border-gold border w-fit h-fit p-[10px]">
                                             <div className="flex justify-center items-center w-[200px] h-[200px] max-2md:w-[150px] max-2md:h-[150px] bg">
                                                 <Image
-                                                    className="object-cover h-[200px] w-[200px] max-2md:w-[150px] max-2md:h-[150px]"
-                                                    src={`/${item.image}`}
+                                                    className="object-cover h-[200px] w-[200px] max-2md:w-[150px] max-2md:h-[150px] rounded-full"
+                                                    src={`${item.image}`}
                                                     alt={item.name}
                                                 />
                                             </div>
@@ -127,7 +127,7 @@ const SliderMenuDish = ({ title, dataSlider, logo }) => {
                                         <Link className="font-normal text-lg leading-[40px] text-left font-gilroy text-gold border-b border-gold hover:text-gold w-fit max-2md:text-base" href={item.link}>Khám phá</Link>
                                     </div>
                                 </div>
-                            ))}
+                            })}
                         </Slider>
                     )}
                 </div>

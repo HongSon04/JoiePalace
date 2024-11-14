@@ -3,12 +3,14 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { API_CONFIG } from "@/app/_utils/api.config";
 import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
 
 const NotificationsPage = () => {
     const { makeAuthorizedRequest } = useApiServices();
-    const [listFeedback, setListFeedback] = useState([]);
     const [user, setUser] = useState();
+    const [listIdNotification, setListIdNotification] = useState([]);
     const [notifications, setNotifications] = useState([]);
+    const toast = useCustomToast();
 
     useEffect(() => {
         const getFeedbacks = async () => {
@@ -19,7 +21,7 @@ const NotificationsPage = () => {
                 router.push('/');
             }
             const data = await makeAuthorizedRequest(
-                API_CONFIG.NOTIFICATIONS.GET_BY_ID(1),
+                API_CONFIG.NOTIFICATIONS.GET_BY_ID(getUser.id),
                 'GET',
                 '',
                 null,
@@ -31,13 +33,18 @@ const NotificationsPage = () => {
                 const datanotifications = data.data;
                 const notifications = datanotifications.map(notification => {
                     const data = {
-                        message: notification.content, 
-                        time: calculateTimeAgo(notification.created_at), 
-                        status: getStatusFromType(notification.type) , 
-                        avatar: '/userImage.png', 
+                        message: notification.content,
+                        time: calculateTimeAgo(notification.created_at),
+                        status: getStatusFromType(notification.type),
+                        avatar: '/userImage.png',
                     };
                     return data;
                 });
+
+                const notificationIs_read = datanotifications
+                    .filter(notification => notification.is_read == false)
+                    .map(notification => notification.id);
+                setListIdNotification(notificationIs_read);
                 setNotifications(notifications);
 
             } else {
@@ -47,6 +54,41 @@ const NotificationsPage = () => {
         };
         getFeedbacks();
     }, []);
+
+    const is_read = async () => {
+        try {
+            const response = await makeAuthorizedRequest(
+                API_CONFIG.NOTIFICATIONS.IS_READ,
+                'PATCH',
+                {
+                    "notification_ids": listIdNotification,
+                },
+                null,
+                '/client/dang-nhap'
+            );
+            console.log(response);
+
+            if (response?.success) {
+                toast({
+                    position: "top",
+                    type: "success",
+                    title: "Cập nhật thành công!",
+                    description: 'Đã đánh dấu đọc thành công',
+                    closable: true,
+                });
+            } else {
+                toast({
+                    position: "top",
+                    type: "error",
+                    title: "Cập nhật thất bại!",
+                    description: response?.error?.message || "Vui lòng thử lại sau.",
+                    closable: true,
+                });
+            }
+        } catch (error) {
+            console.error("Error updating notification status:", error);
+        }
+    };
 
 
 
@@ -86,17 +128,17 @@ const NotificationsPage = () => {
     const getStatusFromType = (type) => {
         switch (type) {
             case 'booking_confirm':
-                return 'Đặt tiệc'; 
+                return 'Đặt tiệc';
             case 'booking_updated':
-                return 'Cập nhật'; 
+                return 'Cập nhật';
             case 'payment_confirmed':
-                return 'Thanh toán'; 
+                return 'Thanh toán';
             case 'deposit_payment':
                 return 'Thanh toán cọc';
             case 'booking_canceled':
-                return 'Hủy tiệc'; 
+                return 'Hủy tiệc';
             case 'event_upcoming':
-                return 'Tiệc sắp diễn ra'; 
+                return 'Tiệc sắp diễn ra';
             default:
                 return 'Không xác định';
         }
@@ -107,7 +149,7 @@ const NotificationsPage = () => {
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-white">Thông báo</h1>
-                <button className="text-xs text-gold">Đánh dấu đã đọc</button>
+                <button className="text-xs text-gold" onClick={is_read} >Đánh dấu đã đọc</button>
             </div>
 
             {/* Notifications */}

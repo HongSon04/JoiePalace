@@ -408,7 +408,7 @@ function RequestTable() {
           return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND',
-          }).format(item.booking_details.total_amount);
+          }).format(item.booking_details.total_amount || 0);
 
           // return item.booking_details.total_amount
         case "amount_booking":
@@ -469,6 +469,12 @@ function RequestTable() {
                 return (
                   <Chip variant="flat" color="primary">
                     Đang xử lý
+                  </Chip>
+                );
+              case "success":
+                return (
+                  <Chip variant="flat" color="primary">
+                    Sử lý thành công
                   </Chip>
                 );
               case "cancel":
@@ -651,7 +657,7 @@ function RequestTable() {
     );
   }, [currentPage, pagination.lastPage]);
 
-  // console.log(requests);
+  console.log(pathname);
 
   return (
     <Table

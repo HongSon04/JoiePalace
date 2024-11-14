@@ -25,7 +25,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-@Controller('packages')
+@Controller('api/packages')
 @ApiTags('Packages - Quản lý gói')
 export class PackagesController {
   constructor(private readonly packagesService: PackagesService) {}

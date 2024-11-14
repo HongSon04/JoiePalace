@@ -1,7 +1,6 @@
 // HOST URL
 const HOST = `https://joieplace.live/api`;
 const MEMBERSHIPS = `https://joieplace.live/memberships`;
-const HOST_NO_API = `https://joieplace.live`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
@@ -15,7 +14,7 @@ const FEEDBACKS_API = `${HOST}/feedbacks`;
 const PARTYTYPES_API = `${HOST}/party-types`;
 const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
-const NOTIFICATIONS_API = `${HOST_NO_API}/notifications`;
+const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
 const PACKAGES_API = `${HOST}/packages`;
 const DECORS_API = `${HOST}/decors`;
@@ -188,6 +187,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${BOOKING_API}/get/${id}`,
     UPDATE: (id) => `${BOOKING_API}/update/${id}`,
     UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
+    DELETE: (id) => `${BOOKING_API}/delete/${id}`,
     GET_ALL_BY_IDUSER: (userId) => `${BOOKING_API}/get-all?user_id=${userId}`,
   },
 
@@ -221,13 +221,14 @@ export const API_CONFIG = {
   // NOTIFICATIONS API
   NOTIFICATIONS: {
     GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
+    IS_READ: `${NOTIFICATIONS_API}/update-is-read`,
   },
 
   // PACKAGES_API API
   PACKAGES: {
-    GET_ALL: `${PACKAGES_API}/get-all`,
     GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     CREATE: `${PACKAGES_API}/create`,
+    GET_ALL: (params) => constructUrlWithParams(`${PACKAGES}/get-all`, params),
   },
 
   // MENU API

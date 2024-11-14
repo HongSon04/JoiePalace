@@ -19,15 +19,18 @@ const Page = ({ params }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const dataSlug = await fetchBranchBySlug(slug);
-        const branchId = dataSlug[0].id;
-        const nameBranch = dataSlug[0].name;
-
+       
+        const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+        const branchId = currentBranch.id;
+        const nameBranch = currentBranch.name;
+       
+        
         const [dataTotalBranch, allBranch] = await Promise.all([
-          fetchAllByBranch(branchId),
-          fetchAllBranch()
+          fetchAllByBranch(branchId), 
+          fetchAllBranch() 
         ]);
-
+       
+       
         setDataSlug(dataSlug);
         setBranchId(branchId);
         setNameBranch(nameBranch);
@@ -39,16 +42,17 @@ const Page = ({ params }) => {
       }
     };
     fetchData();
-  }, [slug]);
-
+  }, [slug]); 
+  // console.log(branchId);
+  
   const dataBranch = allBranch?.data || [];
-  const BranchName = (nameBranch === 'Hồ Chí Minh') ? 'tổng' : nameBranch;
-
+  // const BranchName = (nameBranch === 'Hồ Chí Minh') ? 'tổng' : nameBranch;
+  
   const fetchDataForBranch = async (branchId) => {
     try {
-      const dataTotalBranch = await fetchAllByBranch(branchId);
+      const dataTotalBranch = await fetchAllByBranch(branchId);  
       setDataTotalBranch(dataTotalBranch);
-      setSelectedBranchId(branchId); // Cập nhật ID chi nhánh đã chọn
+      setSelectedBranchId(branchId); 
     } catch (error) {
       console.error("Error fetching data for branch:", error);
     }
@@ -56,18 +60,24 @@ const Page = ({ params }) => {
 
   const handleBranchChange = (event) => {
     const newBranchId = event.target.value;
-    fetchDataForBranch(newBranchId); // Gọi hàm để lấy dữ liệu cho chi nhánh mới
+    setBranchId(newBranchId);  
+    setSelectedBranchId(newBranchId); 
+    fetchDataForBranch(newBranchId); 
   };
+ 
+  const dataBranchChart = dataTotalBranch || [];
+  const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
+  const monthlyRevenues = Object.values(dataBranchChart.total_revune_by_month || []);
+  const yearlyRevenues = Object.values(dataBranchChart.total_revune_by_year || []);
 
-  const dataBranchChart = dataTotalBranch?.data || [];
   const dataChart = {
-    labels: ['Tuần', 'Tháng', 'Năm'],
+    labels: ['Tuần', 'Tháng', 'Năm'],  
     datasets: [{
       label: 'Doanh thu',
       data: [
-        dataBranchChart.total_revune_by_week,
-        dataBranchChart.total_revune_by_month,
-        dataBranchChart.total_revune_by_year
+        ...weeklyRevenues,  
+        ...monthlyRevenues, 
+        ...yearlyRevenues  
       ]
     }]
   };
@@ -85,22 +95,22 @@ const Page = ({ params }) => {
     <main className="font-gilroy grid gap-6 p-4 text-white">
       <AdminHeader title="Thống kê doanh thu" showSearchForm={false} />
       <div className="flex justify-start items-center gap-2 text-base text-gray-500">
-        <p>Thống kê doanh thu {BranchName}</p>
+        <p>Thống kê doanh thu</p>
       </div>
       <div className='w-full'>
         <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-          <p className="text-base font-semibold">Doanh thu {BranchName}</p>
-          {branchId === 2 && (
-            <select className='select w-[300px]' onChange={handleBranchChange}>
+          <p className="text-base font-semibold">Doanh thu</p>
+          {slug === 'ho-chi-minh' && (
+            <select className='select w-[300px]' onChange={handleBranchChange} value={selectedBranchId}>
               {dataBranch.map((item) => (
-                <option key={item.id} value={item.id}>
+                <option className='option' key={item.id} value={item.id}>
                   {item.name}
                 </option>
               ))}
             </select>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="p-4 bg-blackAlpha-100 rounded-xl">
             <Chart data={dataChart} chartType="bar" />
           </div>
@@ -110,10 +120,10 @@ const Page = ({ params }) => {
         </div>
         <div className="relative">
           <div className="flex justify-between items-center">
-            <p className="text-sm font-bold">Danh sách tiệc {BranchName}</p>
+            <p className="text-base font-semibold">Danh sách tiệc</p>
           </div>
           <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-            <BookingsTable branchId={selectedBranchId} />
+            <BookingsTable branchId={branchId} />
           </div>
         </div>
       </div>

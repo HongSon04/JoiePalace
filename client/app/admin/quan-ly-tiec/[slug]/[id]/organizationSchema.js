@@ -12,10 +12,11 @@ export const organizationSchema = z.object({
         .coerce.number()
         .int({ message: "Số lượng bàn chính phải là số nguyên" })
         .min(1, { message: "Số lượng bàn chính phải lớn hơn 0" }),
-    spare_table_count: z
+spare_table_count: z
         .coerce.number()
         .int({ message: "Số bàn dự phòng phải là số nguyên" })
-        .min(1, { message: "Số bàn dự phòng phải lớn hơn 0" }),
+        .min(0, { message: "Số bàn dự phòng không được nhỏ hơn 0" }) 
+        .optional(), 
     customer: z
         .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
     customerAndChair: z
@@ -25,9 +26,9 @@ export const organizationSchema = z.object({
     organization_date: z.string().nonempty({ message: "Ngày tổ chức là bắt buộc" }),
     shift: z.string().nonempty({ message: "Ca hoạt động là bắt buộc" }),
     total_amount: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" })),
     depositAmount: z
-        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
+        .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" })),
     // amount_booking: z
     //     .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
     depositDate: z.string().nonempty({ message: "Ngày đặt cọc là bắt buộc" }),

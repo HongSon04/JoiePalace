@@ -28,12 +28,11 @@ import { API_CONFIG } from "@/app/_utils/api.config";
 const Page = ({ params }) => {
   const { slug } = params;
   const [dataUser, setDataUser] = useState(null);
-  const [dataRevenueEachMonth, setDataRevenueEachMonth] = useState(null);
-  const [dataAllByMonth, setDataAllByMonth] = useState(null);
   const [allBooking, setAllBooking] = useState([]);
   const [dataInfo, setDataInfo] = useState(null);
   const [dataSlug, setDataSlug] = useState(null);
   const [branchId, setBranchId] = useState(null);
+  const [idBranch, setIdBranch] = useState(null);
   const [dataTotalAdminByWeek, setdataTotalAdminByWeek] = useState(null);
   const [dataTotalAdminByMonth, setDataTotalAllByMonth] = useState(null);
   const [dataTotalAdminByYear, setdataTotalAdminByYear] = useState(null);
@@ -53,18 +52,21 @@ const Page = ({ params }) => {
     };
     
     
-}
+  }
   useEffect(() => {
     const fetchAminData = async () => {
       try {
-        const dataSlug = await fetchBranchBySlug(slug);
-        const branchId = dataSlug[0].id;
+        const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+        const branchId = currentBranch.id;
+        const nameBranch = currentBranch.name;
+        
+        // console.log(idBranch);
         // console.log(branchId);
         
         const { startDate, endDate } = getCurrentMonthStartAndEnd();
         const dataBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            branch_id : branchId,
+            idBranch : branchId,
             is_confirm: false,
             is_deposit: false,
             status : "pending"
@@ -77,12 +79,21 @@ const Page = ({ params }) => {
           API_CONFIG.BOOKINGS.GET_ALL({
             start_date: startDate,
             end_date: endDate,
-            itemsPerPage: 10,
             branch_id: branchId
           }),
           "GET",
           null
         );
+        const dataUser = await makeAuthorizedRequest(
+          API_CONFIG.USER.GET_ALL({
+            start_date: startDate,
+            end_date: endDate,
+          }),
+          "GET",
+          null
+        );
+        // console.log(userData);
+        
         const [
             dataInfo,
             dataTotalAdminByMonth,
@@ -90,7 +101,7 @@ const Page = ({ params }) => {
             dataTotalAdminByYear,
             dataTotalAdminByQuarter,
             dataTotalBranch,
-            dataUser,
+          
         ] = await Promise.all([
             fetchInfoByMonth(branchId),
             fetchRevenueBranchByMonth(0),
@@ -98,10 +109,10 @@ const Page = ({ params }) => {
             fetchRevenueBranchByYear(0),
             fetchRevenueBranchByQuarter(0),
             fetchAllByBranch(branchId),
-            fetchUserByBranchId(branchId),
             
         ]);
         // console.log(dataUser);
+        setIdBranch(idBranch);
         setDataBookingByMonth(dataBookingByMonth.data);
         setDataUser(dataUser);
         setdataTotalAdminByWeek(dataTotalAdminByWeek);
@@ -110,7 +121,7 @@ const Page = ({ params }) => {
         setdataTotalAdminByYear(dataTotalAdminByYear);
         setdataTotalBranch(dataTotalBranch);
         setDataSlug(dataSlug);
-        setBranchId(branchId);
+        setBranchId(branchId  || 0);
         setDataInfo(dataInfo);
         setAllBooking(dataBooking);
     } catch (error) {
@@ -121,6 +132,7 @@ const Page = ({ params }) => {
 
     fetchAminData();
   }, []);
+  // console.log(dataUser);
   
   const createChartData = (data, label) => {
     let chartData = {
@@ -149,19 +161,31 @@ const Page = ({ params }) => {
     "Doanh thu theo tháng"
   );
   let dataByYear = createChartData(dataTotalAdminByYear, "Doanh thu theo năm");
-  const dataBranchChart = dataTotalBranch?.data || [];
+
+  const dataBranchChart = dataTotalBranch || [];
+  const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
+  const monthlyRevenues = Object.values(dataBranchChart.total_revune_by_month || []);
+  const yearlyRevenues = Object.values(dataBranchChart.total_revune_by_year || []);
+
   const dataBranch = {
-    labels: ["Tuần", "Tháng", "Năm"],
-    datasets: [
-      {
-        label: "Doanh thu",
-        data: [
-          dataBranchChart.total_revune_by_week,
-          dataBranchChart.total_revune_by_month,
-          dataBranchChart.total_revune_by_year,
-        ],
-      },
-    ],
+    labels: ['Tuần', 'Tháng', 'Năm'],  
+    datasets: [{
+      label: 'Doanh thu',
+      data: [
+        ...weeklyRevenues,  
+        ...monthlyRevenues, 
+        ...yearlyRevenues  
+      ]
+    }]
+  };
+
+  const dataEachMonth = dataBranchChart.total_revune_each_month;
+  const eachMonthChartData = dataEachMonth?.data || [];
+  const dataEachMonthChart = {
+    labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    datasets: [{
+      data: eachMonthChartData
+    }]
   };
   const dataBooking = allBooking?.data || [];
   function formatDate(dateString) {
@@ -173,7 +197,7 @@ const Page = ({ params }) => {
     const formattedTime = date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
     return `${formattedTime}`;
   }
-  // console.log(dataUser);
+  // console.log(dataBookingByMonth);
   
   return (
     <main className="grid gap-6  text-white ">
@@ -207,9 +231,6 @@ const Page = ({ params }) => {
               <div className="flex justify-between items-center">
                 <p className="text-white text-base font-normal">Khách hàng</p>
 
-                <Link href={`/admin/khach-hang/${slug}`}>
-                  <PiArrowSquareOutLight className="text-2xl" />
-                </Link>
               </div>
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
@@ -259,59 +280,58 @@ const Page = ({ params }) => {
           <p>Đang tải dữ liệu...</p>
         )}
       </div>
-
+      
       <div className="container  flex gap-4 w-full h-full  p-4">
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
             <p className="text-base font-semibold ">Khách hàng</p>
-            <Link href={`/admin/khach-hang/`}>
-              <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
-            </Link>
+            
           </div>
-          <div className="flex flex-col gap-3 h-[580px] overflow-y-auto hide-scrollbar">
+          <div className="flex flex-col gap-3 h-[580px] px-[10px] overflow-y-auto hide-scrollbar">
             {dataUser && dataUser.data.length > 0 ? (
-                dataUser.data.map((item, index) => (
-                    <div key={index} className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover bg-center">
-                      {item.avatar ? (
-                            <Image
-                                className="rounded-full w-[48px]"
-                                src={item.avatar}
-                                alt="User profile"
-                                width={48}
-                                height={48}
-                            />
-                        ) : (
-                            <Image
-                                className="rounded-full w-[48px]"
-                                src="/image/user.jpg"
-                                alt="Default User"
-                                width={48}
-                                height={48}
-                            />
-                        )}
+              dataUser.data.map((item) => (
+                <Link key={item.id} href={``} className="flex gap-5 items-center w-full">
+                  <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover  w-full bg-center">
+                    {item.avatar ? (
+                      <Image
+                        className="rounded-full w-[48px]"
+                        src={item.avatar}
+                        alt="User profile"
+                        width={48}
+                        height={48}
+                      />
+                    ) : (
+                      <Image
+                        className="rounded-full w-[48px]"
+                        src="/image/user.jpg"
+                        alt="Default User"
+                        width={48}
+                        height={48}
+                      />
+                    )}
 
-                        <div className="w-full flex justify-between items-center">
-                            <div>
-                                <p className="text-sm mb-[10px] font-semibold">
-                                    {item.username || "N/A"}
-                                </p>
-                                <div className="flex gap-3 items-center text-xs">
-                                    {item.membership_id ? ( 
-                                        <>
-                                            <Image src="/image/Group.svg" alt="Membership Icon" />
-                                            <p>{item.memberships}</p>
-                                        </>
-                                    ) : null}
-                                </div>
-                            </div>
-                            <BsThreeDots className="text-xl" />
+                    <div className="w-full flex justify-between items-center">
+                      <div>
+                        <p className="text-sm mb-[10px] font-semibold">
+                          {item.username || "N/A"}
+                        </p>
+                        <div className="flex gap-3 items-center text-xs">
+                          {item.membership_id ? (
+                            <>
+                              <Image src="/image/Group.svg" alt="Membership Icon" />
+                              <p>{item.memberships}</p>
+                            </>
+                          ) : null}
                         </div>
+                      </div>
                     </div>
-                ))
+                  </div>
+                </Link>
+              ))
             ) : (
-                <div className="loading-message">
-                    <p className="text-center">Đang tải dữ liệu.</p>
-                </div>
+              <div className="loading-message">
+                <p className="text-center">Đang tải dữ liệu.</p>
+              </div>
             )}
 
           </div>
@@ -357,7 +377,7 @@ const Page = ({ params }) => {
               <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
             </Link>
           </div>
-          <div className="overflow-y-auto h-[357px]">
+          <div className="overflow-y-auto h-[377px]">
             <table className="table w-full">
               <thead>
                 <tr>
@@ -405,10 +425,10 @@ const Page = ({ params }) => {
       </div>
       <div className="w-full p-4">
         <div className="flex items-center justify-between mb-[10px]">
-          <p className="text-base  font-semibold">Doanh thu tổng / tháng</p>
-          <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
+          <p className="text-base  font-semibold">Danh sách tiệc mới nhất</p>
+          {/* <Link href={`/admin/thong-ke/doanh-thu-tong/`}>
             <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
-          </Link>
+          </Link> */}
         </div>
         <div className="overflow-y-auto max-h-72">
           <table className="table w-full table-auto rounded-lg">
@@ -460,8 +480,18 @@ const Page = ({ params }) => {
                       </li>
                     </td>
 
-                    <td>50 + 2</td>
-                    <td><p className="text-teal-400 text-xs font-bold">Xem thêm</p></td>
+                    <td>
+                      {item.booking_details && item.booking_details.length > 0 ? 
+                        `${item.booking_details[0].table_count != null ? item.booking_details[0].table_count : 'N/A'} + ${item.booking_details[0].spare_table_count != null ? item.booking_details[0].spare_table_count : 'N/A'}` 
+                        : 'N/A'}
+                    </td>
+
+
+                    <td>
+                      <Link href={`/admin/quan-ly-tiec/${slug}/${item.id}`} className="text-teal-400 text-xs font-bold">
+                        Xem thêm
+                      </Link>
+                    </td>
                   </tr>
                 ))
               ) : (

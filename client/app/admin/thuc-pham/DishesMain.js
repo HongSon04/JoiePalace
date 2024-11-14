@@ -4,7 +4,6 @@ import Error from "@/app/_components/Error";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useRoleGuard from "@/app/_hooks/useRoleGuard";
 import {
-  fetchCategories,
   fetchCategoriesBySlug,
   fetchingCategories,
   fetchingCategoriesFailure,

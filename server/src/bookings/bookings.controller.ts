@@ -1,20 +1,19 @@
-import { menus } from './../../node_modules/.prisma/client/index.d';
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
   Query,
   Request,
-  HttpStatus,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { BookingsService } from './bookings.service';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingDto } from './dto/update-booking.dto';
-import { isPublic } from 'decorator/auth.decorator';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiHeaders,
@@ -23,8 +22,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
+import { isPublic } from 'decorator/auth.decorator';
+import { BookingsService } from './bookings.service';
+import { CreateBookingDto } from './dto/create-booking.dto';
+import { DeleteMultipleImagesByUrlDto } from './dto/delete-multi-image.dto';
 import { FilterBookingDto } from './dto/FilterBookingDto';
+import { UpdateBookingDto } from './dto/update-booking.dto';
+import { UpdateStatusBookingDto } from './dto/update-status-booking.dto';
 
 @ApiTags('Bookings - Quản lý đơn tiệc')
 @Controller('api/bookings')
@@ -494,12 +498,47 @@ amount sẽ gửi lên BE check trùng giá thì pass`,
       message: 'Không tìm thấy đơn đặt tiệc',
     },
   })
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'images', maxCount: 10 }], {
+      fileFilter: (req, file, cb) => {
+        if (!file || req.files.images.length === 0) {
+          return cb(
+            new BadRequestException('Không có tệp nào được tải lên'),
+            false,
+          );
+        }
+        const files = Array.isArray(file) ? file : [file];
+        if (req.files && req.files.images && req.files.images.length >= 10) {
+          return cb(
+            new BadRequestException('Chỉ chấp nhận tối đa 10 ảnh'),
+            false,
+          );
+        }
+        for (const f of files) {
+          if (!f.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(
+              new BadRequestException('Chỉ chấp nhận ảnh jpg, jpeg, png'),
+              false,
+            );
+          }
+          if (f.size > 1024 * 1024 * 5) {
+            return cb(
+              new BadRequestException('Kích thước ảnh tối đa 5MB'),
+              false,
+            );
+          }
+        }
+        cb(null, true);
+      },
+    }),
+  )
   update(
     @Request() req,
     @Param('booking_id') id: number,
     @Body() updateBookingDto: UpdateBookingDto,
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
-    return this.bookingsService.update(req.user, id, updateBookingDto);
+    return this.bookingsService.update(req.user, id, updateBookingDto, files);
   }
 
   // ! Update Status Booking
@@ -673,5 +712,31 @@ amount sẽ gửi lên BE check trùng giá thì pass`,
   })
   destroy(@Param('booking_id') id: number) {
     return this.bookingsService.destroy(id);
+  }
+
+  // ! Delete Multiple Images By Url
+  @Delete('delete-multiple-images')
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Bearer token',
+    },
+  ])
+  @ApiBearerAuth('authorization')
+  @ApiOperation({ summary: 'Xóa nhiều ảnh theo url' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Xóa ảnh thành công',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy ảnh',
+    },
+  })
+  deleteMultipleImageByUrl(@Body() body: DeleteMultipleImagesByUrlDto) {
+    return this.bookingsService.deleteMultipleImageByUrl(body);
   }
 }

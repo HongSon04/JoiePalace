@@ -9,7 +9,6 @@ import IconButtonSave from "@/app/_components/IconButtonSave";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Stack } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { fetchBranchBySlug } from "@/app/_services/branchesServices";
@@ -62,7 +61,7 @@ function ChiNhanhAddPage() {
     slogan_images: [],
     diagram_images: [],
     equipment_images: [],
-    stage: []
+    stages: []
   });
 
   const fetchBranchData = useCallback(async () => {
@@ -84,6 +83,9 @@ function ChiNhanhAddPage() {
       equipment_images: Array.isArray(branchData.equipment_images)
         ? branchData.equipment_images
         : branchData.equipment_images?.split(",") || [],
+      stages: Array.isArray(branchData.stages)
+        ? branchData.stages
+        : branchData.stages?.split(",") || [],
       });
     } catch (error) {
       console.error("Error fetching branch data: ", error);
@@ -124,7 +126,19 @@ function ChiNhanhAddPage() {
       console.error("Error while submitting form: ", error);
     }
   };
-
+  const handleDelete = (section, index) => {
+    setImagesData((prevImagesData) => {
+      if (!prevImagesData[section]) {
+        return prevImagesData;
+      }
+      const updatedSectionData = prevImagesData[section].filter((_, i) => i !== index);
+      return {
+        ...prevImagesData,
+        [section]: updatedSectionData,
+      };
+    });
+  };
+  console.log(imagesData)
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <AdminHeader showSearchForm={false} title="Chi tiết chi nhánh" />
@@ -212,7 +226,9 @@ function ChiNhanhAddPage() {
             initialImages={imagesData.equipment_images}
           />
         </div>
-        <AdminThemChiNhanhInputAndImg name='stage' title="Sảnh" height="290px" inputId="input-image-upload-map" input={false} branchData={imagesData.stage} />
+        <AdminThemChiNhanhInputAndImg name='stages' title="Sảnh" height="290px"     inputId="input-image-upload-map" input={false} branchData={imagesData.stages} 
+        onDelete={handleDelete}
+        />
       </div>
 
       <div className="flex w-full mt-6">

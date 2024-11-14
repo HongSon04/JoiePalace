@@ -91,7 +91,7 @@ export const fetchAllByBranch = async (branchId) => {
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu !");
     }
-    return response; 
+    return response.data; 
   } catch (error) {
     console.error("Lỗi:", error);
     throw error; 
@@ -121,10 +121,32 @@ export const fetchAllBranch = async () => {
       throw error; 
   }
 };
-export const fetchUserByBranchId = async (branchId) => {
+// export const fetchUserByBranchId = async (branchId) => {
+//   try {
+//     const token = getCookie('accessToken');
+//     const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(branchId), {
+//       headers: {
+//         'Authorization': `Bearer ${token}`,
+//       }
+//     });
+    
+//     if (response.status !== 200) {
+//       throw new Error("Có lỗi khi lấy dữ liệu !");
+//     }
+//     return response.data;
+//   } catch (error) {
+//     console.error("Lỗi:", error);
+//     throw error;
+//   }
+// };
+export const fetchUserByBranchId = async (branchId, page = 1, limit = 10) => {
   try {
     const token = getCookie('accessToken');
     const response = await axios.get(API_CONFIG.USER.GET_BY_BRANCH_ID(branchId), {
+      params: {
+        page,  
+        limit  
+      },
       headers: {
         'Authorization': `Bearer ${token}`,
       }
@@ -139,6 +161,7 @@ export const fetchUserByBranchId = async (branchId) => {
     throw error;
   }
 };
+
 export  const changePassWord = async (dataToSend) => {
   const token = getCookie('accessToken');
   const response = await axios.put(API_CONFIG.USER.CHANGE_PASSWORD, dataToSend, {
@@ -198,4 +221,20 @@ export const getUserById = async (userId) => {
     }
     throw error;
   }
+};
+
+export  const getUserData = async () => {
+  const token = getCookie('accessToken');
+  const response = await axios.get(API_CONFIG.USER.GET_ALL, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+  if (response.status !== 200) {
+    throw new Error("Có lỗi khi lấy dữ liệu!");
+  }
+  return response.data;
+  
+
+  return response;
 };
