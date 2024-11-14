@@ -39,4 +39,11 @@ export class StageDto {
     description: 'Danh sách các hình ảnh của sảnh',
   })
   images: string[];
+
+  @ApiProperty({
+    type: Number,
+    description: 'Giá thuê sảnh',
+  })
+  @IsNotEmpty({ message: 'Giá thuê sảnh không được để trống' })
+  price: string;
 }

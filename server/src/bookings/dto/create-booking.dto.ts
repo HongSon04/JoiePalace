@@ -5,6 +5,12 @@ import { ShiftEnum } from 'helper/enum/shift.enum';
 export class CreateBookingDto {
   @ApiProperty({
     required: false,
+    description: 'ID của gói (nếu có)',
+  })
+  package_id?: string;
+
+  @ApiProperty({
+    required: false,
     description: 'ID của người dùng (nếu có)',
   })
   user_id?: string;

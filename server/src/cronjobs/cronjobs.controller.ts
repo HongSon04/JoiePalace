@@ -18,9 +18,9 @@ export class CronjobsController {
     return this.cronjobsService.handleBookingExpiredCron();
   }
 
-  // ? Send Email Booking if is_deposit is false run every day at 8:00 AM
+  // ? Send Email Deposit if status is pending run every day at 8:00 AM
   @Cron('0 8 * * *')
-  handleBookingEmailCron() {
-    return this.cronjobsService.handleBookingEmailCron();
+  handleDepositEmailCron() {
+    return this.cronjobsService.handleDepositEmailCron();
   }
 }

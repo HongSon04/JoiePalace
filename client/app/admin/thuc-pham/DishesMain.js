@@ -4,7 +4,7 @@ import Error from "@/app/_components/Error";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useRoleGuard from "@/app/_hooks/useRoleGuard";
 import {
-  fetchCategories,
+  fetchCategoriesBySlug,
   fetchingCategories,
   fetchingCategoriesFailure,
   fetchingCategoriesSuccess,
@@ -41,7 +41,7 @@ function DishesMain() {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    dispatch(fetchCategories({ slug: API_CONFIG.FOOD_CATEGORY_SLUG }));
+    dispatch(fetchCategoriesBySlug({ slug: API_CONFIG.FOOD_CATEGORY_SLUG }));
 
     return () => {};
   }, []);

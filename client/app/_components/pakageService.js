@@ -3,6 +3,11 @@ import { Image } from "@chakra-ui/react";
 
 const WeddingPackages = () => {
     const [openSection, setOpenSection] = useState({});
+    const [selected, setSelected] = useState(null);
+
+    const handleClick = (button) => {
+        setSelected(button);
+    };
 
     const toggleDropdown = (packageId, sectionName) => {
         setOpenSection((prev) => ({
@@ -109,19 +114,36 @@ const WeddingPackages = () => {
 
     return (
         <div className="min-h-screen p-8 flex flex-col items-center justify-between">
-            <div className="flex flex-col my-8 gap-4 items-center justify-center">
+            <div className="flex my-8 gap-4 items-center justify-center">
                 <div className="font-bold text-4xl leading-[48px] text-left font-inte text-gold">
                     DỊCH VỤ TRỌN GÓI
                 </div>
-                <div className="flex space-x-4 m-auto p-1 mt-2 bg-whiteAlpha-200 rounded-full w-fit">
-                    <button className="bg-gold px-6 py-2 rounded-full font-semibold">
+                <div className="flex space-x-4 m-auto p-1 mt-2 bg-whiteAlpha-200 rounded-full w-fit relative">
+                    {/* Sliding background */}
+                    <div
+                        className={`absolute transition-all duration-300 ease-in-out bg-gold rounded-full h-[40px] w-[160px] transform ${selected === 'wedding' ? 'translate-x-0' : 'translate-x-full'
+                            }`}
+                        style={{ zIndex: 1 }}
+                    />
+                    {/* Wedding Button */}
+                    <button
+                        className={`px-6 py-2 rounded-full font-semibold transition-colors duration-300 relative ${selected === 'wedding' ? 'text-white' : 'text-[#d3e2db]'
+                            }`}
+                        onClick={() => handleClick('wedding')}
+                        style={{ zIndex: 2 }}
+                    >
                         TIỆC CƯỚI
                     </button>
-                    <button className="text-[#d3e2db] px-6 py-2 rounded-full font-semibold">
+                    {/* Conference Button */}
+                    <button
+                        className={`px-6 py-2 rounded-full font-semibold transition-colors duration-300 relative ${selected === 'conference' ? 'text-white' : 'text-[#d3e2db]'
+                            }`}
+                        onClick={() => handleClick('conference')}
+                        style={{ zIndex: 2 }}
+                    >
                         HỘI NGHỊ
                     </button>
                 </div>
-
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full ">
@@ -129,8 +151,8 @@ const WeddingPackages = () => {
                     <div key={pkg.id} className={`overflow-y-hidden h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 ${pkg.premium ? 'border border-gold' : ''}`}>
                         <div className="affterLine mr-[290px] z-10"></div>
                         {pkg.premium && (
-                            <div className="relative bottom-[50px] max-md:hidden">
-                                {/* <Image src='/premium.png' alt="Premium" /> */}
+                            <div className="absolute top-[115px] max-md:hidden">
+                                <Image src='/premium.png' alt="Premium" />
                             </div>
                         )}
                         <h2 className="text-lg font-bold text-center z-20">{pkg.name}</h2>

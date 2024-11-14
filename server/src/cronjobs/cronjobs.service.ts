@@ -45,84 +45,75 @@ export class CronjobsService {
     try {
       const currentDate = new Date();
 
-      // Thực hiện các operations song song để tăng performance
-      const [expiredBookings, expiredDeposits] = await Promise.all([
-        // Lấy và cập nhật bookings hết hạn
-        this.prismaService.$transaction(async (prisma) => {
-          const bookings = await prisma.bookings.findMany({
-            where: {
-              deleted: false,
-              status: 'pending',
-              expired_at: {
-                gte: currentDate,
-              },
+      // Lấy tất cả các deposit hết hạn trong một truy vấn
+      const expiredDeposits = await this.prismaService.deposits.findMany({
+        where: {
+          status: 'pending',
+          expired_at: {
+            lte: currentDate,
+          },
+        },
+        include: {
+          booking_details: {
+            include: {
+              bookings: true,
             },
-          });
-
-          if (bookings.length > 0) {
-            await prisma.bookings.updateMany({
-              where: {
-                id: {
-                  in: bookings.map((booking) => Number(booking.id)),
-                },
-              },
-              data: {
-                deleted: true,
-                deleted_at: currentDate,
-                deleted_by: 1,
-                status: 'cancel',
-              },
-            });
-          }
-
-          return bookings;
-        }),
-
-        // Lấy và cập nhật deposits hết hạn
-        this.prismaService.$transaction(async (prisma) => {
-          const deposits = await prisma.deposits.findMany({
-            where: {
-              status: 'pending',
-              expired_at: {
-                gte: currentDate,
-              },
-            },
-          });
-
-          if (deposits.length > 0) {
-            await prisma.deposits.updateMany({
-              where: {
-                id: {
-                  in: deposits.map((deposit) => Number(deposit.id)),
-                },
-              },
-              data: {
-                status: 'cancel',
-              },
-            });
-          }
-
-          return deposits;
-        }),
-      ]);
+          },
+        },
+      });
 
       // Nếu có bất kỳ booking hoặc deposit nào bị hủy
-      if (expiredBookings.length > 0 || expiredDeposits.length > 0) {
-        // Gửi thông báo hệ thống
-        const notificationPromise = this.notificationService.sendNotifications(
-          'Hệ thống',
-          'Đã xóa những đơn đặt tiệc hết hạn',
-          null,
-          TypeNotifyEnum.BOOKING_CANCEL,
-        );
+      if (expiredDeposits.length > 0) {
+        // Cập nhật trạng thái của tất cả các deposit hết hạn
+        await this.prismaService.deposits.updateMany({
+          where: {
+            id: {
+              in: expiredDeposits.map((deposit) => Number(deposit.id)),
+            },
+          },
+          data: {
+            status: 'cancel',
+          },
+        });
 
-        // Gửi email cho các deposit
-        const emailPromises = expiredDeposits.map((deposit) =>
-          this.mailService.cancelAppointment(deposit.name, deposit.email),
-        );
+        // Cập nhật trạng thái của tất cả các booking tương ứng
+        await this.prismaService.bookings.updateMany({
+          where: {
+            id: {
+              in: expiredDeposits.flatMap((deposit) =>
+                deposit.booking_details.map((booking) =>
+                  Number(booking.bookings.id),
+                ),
+              ),
+            },
+          },
+          data: {
+            status: 'cancel',
+          },
+        });
 
-        // Chờ tất cả các operations hoàn thành
-        await Promise.all([notificationPromise, ...emailPromises]);
+        // Gửi thông báo và email cho các deposit hết hạn
+        const notificationPromises = expiredDeposits.map((deposit) => {
+          this.notificationService.sendNotifications(
+            deposit.booking_details[0].bookings.name,
+            `Đơn đặt tiệc của ${deposit.booking_details[0].bookings.name} đã hết hạn`,
+            Number(deposit.booking_details[0].bookings.branch_id),
+            TypeNotifyEnum.BOOKING_CANCEL,
+          );
+          this.notificationService.sendNotifications(
+            deposit.name,
+            `Đơn đặt cọc của ${deposit.booking_details[0].bookings.name} đã hết hạn`,
+            Number(deposit.booking_details[0].bookings.branch_id),
+            TypeNotifyEnum.DEPOSIT_CANCEL,
+          );
+          return this.mailService.cancelAppointment(
+            deposit.name,
+            deposit.email,
+          );
+        });
+
+        // Đợi tất cả các operations hoàn thành
+        await Promise.allSettled(notificationPromises);
       }
 
       console.log('Cron Job check booking expired_at and delete it');
@@ -131,58 +122,34 @@ export class CronjobsService {
     }
   }
 
-  // ? Send Email Booking if is_deposit is false run every day at 8:00 AM
-  async handleBookingEmailCron() {
+  // ? Send Email Deposit if status is pending run every day at 8:00 AM
+  async handleDepositEmailCron() {
     try {
       const currentDate = new Date();
-      const bookings = await this.prismaService.bookings.findMany({
+      const deposits = await this.prismaService.deposits.findMany({
         where: {
-          deleted: false,
-          is_deposit: false,
-          organization_date: {
+          status: 'pending',
+          expired_at: {
             gte: currentDate,
           },
         },
         include: {
-          users: {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-              memberships_id: true,
-              phone: true,
-              avatar: true,
-              role: true,
-            },
-          },
-          branches: true,
           booking_details: {
             include: {
-              decors: true,
-              menus: {
-                include: {
-                  products: {
-                    include: {
-                      tags: true,
-                    },
-                  },
-                },
-              },
-              deposits: true,
+              bookings: true,
             },
           },
-          stages: true,
         },
       });
 
       // Prepare notification and email content
-      bookings.map(async (booking) => {
+      deposits.map(async (deposit) => {
         // Send Mail
         const bodyMail = {
-          name: booking.name,
-          email: booking.email,
-          amount: booking.booking_details[0].total_amount,
-          created_at: booking.created_at,
+          name: deposit.name,
+          email: deposit.email,
+          amount: deposit.amount,
+          created_at: deposit.created_at,
         };
         await this.mailService.remindDeposit(
           bodyMail.name,
@@ -193,7 +160,7 @@ export class CronjobsService {
       });
     } catch (error) {
       console.log(
-        'Lỗi từ booking.service.ts -> handleBookingEmailCron: ',
+        'Lỗi từ booking.service.ts -> handleDepositEmailCron: ',
         error,
       );
     }

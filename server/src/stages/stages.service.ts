@@ -22,7 +22,14 @@ export class StagesService {
   // ! Create stage
   async create(body: StageDto, files: { images?: Express.Multer.File[] }) {
     try {
-      const { name, description, capacity_min, capacity_max, branch_id } = body;
+      const {
+        name,
+        description,
+        capacity_min,
+        capacity_max,
+        branch_id,
+        price,
+      } = body;
 
       if (!files.images) {
         throw new BadRequestException('Không được để trống ảnh');
@@ -53,6 +60,7 @@ export class StagesService {
           images: stagesImages as any,
           capacity_min: Number(capacity_min),
           capacity_max: Number(capacity_max),
+          price: Number(price),
         },
       });
 
@@ -144,7 +152,14 @@ export class StagesService {
     files: { images?: Express.Multer.File[] },
   ) {
     try {
-      const { name, description, capacity_min, capacity_max, branch_id } = body;
+      const {
+        name,
+        description,
+        capacity_min,
+        capacity_max,
+        branch_id,
+        price,
+      } = body;
       const findStage = await this.prismaService.stages.findUnique({
         where: { id: Number(stage_id) },
       });
@@ -170,6 +185,7 @@ export class StagesService {
         capacity_min: Number(capacity_min),
         capacity_max: Number(capacity_max),
         images: findStage.images,
+        price: Number(price),
       };
 
       if (files.images && files.images.length > 0) {

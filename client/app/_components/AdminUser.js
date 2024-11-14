@@ -64,16 +64,7 @@ function AdminUser() {
               Thông tin tài khoản
             </Link>
           </li>
-          <li className="w-full">
-            <Link
-              color={"foreground"}
-              href="/admin/change-password"
-              className="text-gray-600 w-full flex items-center px-2 py-3 gap-2 hover:bg-gray-50"
-            >
-              <ArrowsRightLeftIcon className="w-6 h-6 text-gray-600" />
-              Đổi mật khẩu
-            </Link>
-          </li>
+         
           <li className="w-full">
             <Button
               startContent={

@@ -27,7 +27,7 @@ const Page = ({ params }) => {
     const [spareCountTables, setSpareCountTables] = useState(0);
     const [deposits, setDeposits] = useState(0);
     const [showPaymentMethod, setShowPaymentMethod] = useState(false);
-    const [ deponsit_id, setDeponsit_id] = useState();
+    const [deponsit_id, setDeponsit_id] = useState();
 
     useEffect(() => {
         const getData = async () => {
@@ -57,7 +57,7 @@ const Page = ({ params }) => {
                         const datadePosits = dataDetailBooking[0]?.deposits;
                         const dataMenu = dataDetailBooking[0]?.menu_detail;
 
-                     
+
                         // Nước uống
                         const drinkShow = dataMenus?.products.filter((item) => {
                             return item.category_id === 1;
@@ -135,12 +135,12 @@ const Page = ({ params }) => {
                         setPriceMenu(dataMenus?.price);
                         setPriceStages(dataStages?.price);
                         setPriceDecoration(dataDecors?.price);
-                        setCountTables(dataDetailBooking[0]?.table_count );
+                        setCountTables(dataDetailBooking[0]?.table_count);
                         setSpareCountTables(spareTableCount);
-                        setDeponsit_id( datadePosits?.transactionID);
+                        setDeponsit_id(datadePosits?.transactionID);
                         setDeposits(datadePosits?.amount)
                         setShowPaymentMethod(item.status === 'processing');
-                        
+
                         return {
                             id: item.id,
                             nameParty: item?.name,
@@ -148,7 +148,7 @@ const Page = ({ params }) => {
                             phoneAddress: item.phone,
                             hostName: item.company_name,
                             email: getUser?.email,
-                            phoneUser: getUser?.phone,
+                            phoneUser: item.phone,
                             idParty: `P${item.id}`,
                             partyDate: formatDate(item.created_at),
                             dateOrganization: formatDate(item.organization_date),
@@ -167,30 +167,30 @@ const Page = ({ params }) => {
                             decorate: dataDetailBooking[0]?.decors?.name || "Không có trang trí",
                             guestTable: "10 người/bàn",
                             menu: dataMenus?.name,
-                            drinks: drinkShow.map(i => (`${i.name} `)),
+                            drinks: drinkShow.map(i => i.name).join(', '),
                             payerName: item.name,
-                            paymentMethod: `Chuyển khoản ${datadePosits?.payment_method || "chưa có"} `,
-                            menuCostTable:   datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Đã thanh toán",
+                            paymentMethod: `${datadePosits?.payment_method || "chưa có"} `,
+                            menuCostTable: datadePosits?.status === 'pending' ? 'Đang chờ thanh toán' : "Đã thanh toán",
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND ` : "0 VND",
                             depositAmount: datadePosits?.amount ? `${datadePosits?.amount.toLocaleString('vi-VN')} VND` : "0 VND",
-                            depositStatus: item.is_deposit  ? 'Đã cọc' : "Chưa cọc",
-                            depositDay: formatDate(datadePosits?.created_at),
+                            depositStatus: item.is_deposit ? 'Đã cọc' : "Chưa đặt cọc",
+                            depositDay: item.is_deposit ?  formatDate(datadePosits?.created_at) : '--/--/--',
                             remainingPaid: (dataDetailBooking[0].total_amount && datadePosits?.amount) ? `${(parseInt(dataDetailBooking[0].total_amount) - parseInt(datadePosits?.amount)).toLocaleString('vi-VN')} VND` : `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND`,
-                            paymentDay: formatDate(datadePosits?.created_at),
+                            paymentDay: item.is_deposit ? formatDate(datadePosits?.created_at) : '--/--/--',
                             typeTable: "Tùy chỉnh",
                             typeChair: "Tùy chỉnh",
                             // Chi phí khác
-                            costTable: `${(amount / tableCount).toLocaleString('vi-VN')} VND/bàn`,
+                            costTable: `${(Math.floor(amount / tableCount) / 1000000).toFixed(1) === "1.0" ? "1 triệu" : (amount / tableCount / 1000000).toFixed(1).replace('.', ',')} triệu / bàn`,
                             decorationCost: `${dataDecors?.price.toLocaleString('vi-VN')} VND`,
                             soundStage: 'Miễn phí',
-                            hallRental: `${dataStages?.price === 0 ? 'Miễn phí' : `${dataStages?.price.toLocaleString('vi-VN')} VND`}`,
+                            hallRental: `${dataStages?.price === 0 ? '0 VND' : `${dataStages?.price.toLocaleString('vi-VN')} VND`}`,
                             tableRental: "200.000 VND / 1 bàn",
                             chairRental: "50.000 VND / 1 ghế",
                             paymentStatus: `${(dataMenu.price).toLocaleString('vi-VN')} VND / bàn` || 0,
-                            snack:  dessert.map(i => (`${i.name} `)),
+                            snack: dessert.map(i => i.name).join(', '),
                             vat: "10%",
                             drinksCost: `${drinksPrice.toLocaleString('vi-VN')} VND / bàn` || 0,
-                            arise: item.is_deposit ? '' : '0 VND',
+                            arise: item.is_deposit ? '' : 'Chưa có',
                             statusParty: item.status
                         };
                     });
@@ -260,7 +260,18 @@ const Page = ({ params }) => {
     //         arise: "10,000,000 VND",
     //     },
     // ];
-
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'success':
+                return 'text-green-500';
+            case 'processing':
+                return 'text-yellow-300';
+            case 'peding':
+                return 'text-yellow-300';
+            default:
+                return 'text-gray-500';
+        }
+    };
 
     return (
         <div className='flex flex-col gap-6'>
@@ -284,8 +295,8 @@ const Page = ({ params }) => {
             </div>
 
             <div className='flex items-center'>
-                <span className='text-cyan-400 text-base'>
-                    • {`${statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pedding' ? 'chưa giải quyết' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang xử lý'}`}
+                <span className={`${getStatusColor(statusParty)} text-base`}>
+                    • {statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pending' ? 'Chưa giải quyết' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang chờ xử lý'}
                 </span>
             </div>
             {showPaymentMethod && (

@@ -77,7 +77,7 @@ const Page = () => {
                 // Fetch all bookings for the user
                 //pending, processing, success, cancel
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
-                console.log(fetchedAllBookingsMembershipId);
+                // console.log(fetchedAllBookingsMembershipId);
                 
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');

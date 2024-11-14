@@ -18,9 +18,11 @@ const page = () => {
     const [partyAll, setPartyAll] = useState([]);
     const [partySuccess, setPartySuccess] = useState([]);
     const [partyPending, setPartyPending] = useState([]);
+    const [partyOnlyPending, setPartyOnlyPending] = useState([]);
     const [partyCancel, setPartyCancel] = useState([]);
     const [partyOld, setPartyOld] = useState([]);
     const [partyNew, setPartyNew] = useState([]);
+    const [partyProcessing, setPartyProcessing] = useState([]);
     const [totalAmount, setTotalAmount] = useState([]);
     const [reloadPage, setloadPage] = useState(false);
     const router = useRouter();
@@ -45,6 +47,8 @@ const page = () => {
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser.id);
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
+                const fetchedAllBookingsOnlyProcessing = fetchedAllBookingsMembershipId.filter((i) =>  i.status === 'processing');
+                const fetchedAllBookingsOnlyPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending');
                 const fetchedAllBookingsCancel = fetchedAllBookingsMembershipId.filter((i) => i.status === 'cancel');
 
                 const fetchedAllBookingsOld = [...fetchedAllBookingsMembershipId].sort((a, b) => {
@@ -57,13 +61,13 @@ const page = () => {
 
                 setPartyOld(fetchedAllBookingsOld)
                 setPartyNew(fetchedAllBookingsNewest)
-
+                setPartyOnlyPending(fetchedAllBookingsOnlyPending)
                 setPartyAll(fetchedAllBookingsMembershipId)
-
+                setPartyProcessing(fetchedAllBookingsOnlyProcessing)
                 setPartySuccess(fetchedAllBookingsSuccess);
                 setPartyPending(fetchedAllBookingsPending);
                 setPartyCancel(fetchedAllBookingsCancel)
-
+                
                 pasteData(fetchedAllBookingsMembershipId, getUser);
 
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
@@ -158,8 +162,14 @@ const page = () => {
                     return partyDate === today;
                 });
                 break;
-            case "cancel":
-                filteredParties = partyCancel;
+            case "pending":
+                filteredParties = partyOnlyPending;
+                break;
+            case "processing":
+                filteredParties = partyProcessing;
+                break;
+            case "success":
+                filteredParties = partySuccess;
                 break;
             default:
                 filteredParties = [];
@@ -195,8 +205,11 @@ const page = () => {
                         onChange={(e) => clickFilter(e)}
                     >
                         <option className="bg-white bg-opacity-40 text-black" value="all">Tất cả</option>
+                        <option className="bg-white bg-opacity-40 text-black" value="pending">Đang chờ</option>
+                        <option className="bg-white bg-opacity-40 text-black" value="processing">Đang xử lý</option>
                         <option className="bg-white bg-opacity-40 text-black" value="happening">Đang diễn ra</option>
-                        <option className="bg-white bg-opacity-40 text-black" value="cancel">Hủy</option>
+                        <option className="bg-white bg-opacity-40 text-black" value="success">Hoàn thành</option>
+                        {/* <option className="bg-white bg-opacity-40 text-black" value="cancel">Hủy</option> */}
                     </select>
                 </div>
             </div>

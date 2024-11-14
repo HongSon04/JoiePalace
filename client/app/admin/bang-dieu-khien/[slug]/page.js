@@ -52,20 +52,13 @@ const Page = ({ params }) => {
     };
     
     
-}
+  }
   useEffect(() => {
     const fetchAminData = async () => {
       try {
-        let branchId = 0;
-        let idBranch = 0;
-        
-        const dataSlug = await fetchBranchBySlug(slug);
-        if (slug === 'ho-chi-minh') {
-          branchId = 0;
-        } else {
-          branchId = dataSlug[0]?.id || 0;
-        }
-        idBranch = dataSlug[0]?.id;
+        const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+        const branchId = currentBranch.id;
+        const nameBranch = currentBranch.name;
         
         // console.log(idBranch);
         // console.log(branchId);
@@ -91,6 +84,16 @@ const Page = ({ params }) => {
           "GET",
           null
         );
+        const dataUser = await makeAuthorizedRequest(
+          API_CONFIG.USER.GET_ALL({
+            start_date: startDate,
+            end_date: endDate,
+          }),
+          "GET",
+          null
+        );
+        // console.log(userData);
+        
         const [
             dataInfo,
             dataTotalAdminByMonth,
@@ -98,7 +101,7 @@ const Page = ({ params }) => {
             dataTotalAdminByYear,
             dataTotalAdminByQuarter,
             dataTotalBranch,
-            dataUser,
+          
         ] = await Promise.all([
             fetchInfoByMonth(branchId),
             fetchRevenueBranchByMonth(0),
@@ -106,7 +109,6 @@ const Page = ({ params }) => {
             fetchRevenueBranchByYear(0),
             fetchRevenueBranchByQuarter(0),
             fetchAllByBranch(branchId),
-            fetchUserByBranchId(idBranch),
             
         ]);
         // console.log(dataUser);
@@ -159,19 +161,31 @@ const Page = ({ params }) => {
     "Doanh thu theo tháng"
   );
   let dataByYear = createChartData(dataTotalAdminByYear, "Doanh thu theo năm");
-  const dataBranchChart = dataTotalBranch?.data || [];
+
+  const dataBranchChart = dataTotalBranch || [];
+  const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
+  const monthlyRevenues = Object.values(dataBranchChart.total_revune_by_month || []);
+  const yearlyRevenues = Object.values(dataBranchChart.total_revune_by_year || []);
+
   const dataBranch = {
-    labels: ["Tuần", "Tháng", "Năm"],
-    datasets: [
-      {
-        label: "Doanh thu",
-        data: [
-          dataBranchChart.total_revune_by_week,
-          dataBranchChart.total_revune_by_month,
-          dataBranchChart.total_revune_by_year,
-        ],
-      },
-    ],
+    labels: ['Tuần', 'Tháng', 'Năm'],  
+    datasets: [{
+      label: 'Doanh thu',
+      data: [
+        ...weeklyRevenues,  
+        ...monthlyRevenues, 
+        ...yearlyRevenues  
+      ]
+    }]
+  };
+
+  const dataEachMonth = dataBranchChart.total_revune_each_month;
+  const eachMonthChartData = dataEachMonth?.data || [];
+  const dataEachMonthChart = {
+    labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    datasets: [{
+      data: eachMonthChartData
+    }]
   };
   const dataBooking = allBooking?.data || [];
   function formatDate(dateString) {
@@ -217,9 +231,6 @@ const Page = ({ params }) => {
               <div className="flex justify-between items-center">
                 <p className="text-white text-base font-normal">Khách hàng</p>
 
-                <Link href={`/admin/khach-hang/${slug}`}>
-                  <PiArrowSquareOutLight className="text-2xl" />
-                </Link>
               </div>
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
@@ -274,14 +285,12 @@ const Page = ({ params }) => {
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
             <p className="text-base font-semibold ">Khách hàng</p>
-            <Link href={`/admin/khach-hang/${slug}`}>
-              <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
-            </Link>
+            
           </div>
-          <div className="flex flex-col gap-3 h-[580px] overflow-y-auto hide-scrollbar">
+          <div className="flex flex-col gap-3 h-[580px] px-[10px] overflow-y-auto hide-scrollbar">
             {dataUser && dataUser.data.length > 0 ? (
               dataUser.data.map((item) => (
-                <Link key={item.id} href={`/admin/khach-hang/${slug}/${item.id}`} className="flex gap-5 items-center w-full">
+                <Link key={item.id} href={``} className="flex gap-5 items-center w-full">
                   <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover  w-full bg-center">
                     {item.avatar ? (
                       <Image
@@ -333,7 +342,7 @@ const Page = ({ params }) => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 h-[580px] overflow-y-auto hide-scrollbar items-start">
-            {branchId === 0 ? (
+            {branchId === 2 ? (
               <>
                 <div className="p-2 bg-blackAlpha-100 rounded-xl">
                   <div className="flex items-center justify-between gap-[10px] mb-[10px]">
@@ -401,9 +410,9 @@ const Page = ({ params }) => {
             </table>
           </div>
         </div>
-        {branchId === 0 &&
+        {branchId === 2 &&
           <div className=" w-1/2">
-            <div className="flex items-center justify-between ">
+            <div className="flex items-center justify-between mb-[10px]">
               <p className="text-base  font-semibold">Doanh thu tổng / năm</p>
              
             </div>

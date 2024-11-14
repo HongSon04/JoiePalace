@@ -1,5 +1,5 @@
 "use client";
-import "../../../_styles/globals.css";
+import "../../_styles/globals.css";
 import {
   ChevronDownIcon,
   ExclamationCircleIcon,
@@ -42,7 +42,8 @@ import SearchForm from "@/app/_components/SearchForm";
 import CustomPagination from "@/app/_components/CustomPagination";
 import LoadingContent from "@/app/_components/LoadingContent";
 import { capitalize } from "@mui/material";
-
+import { formatPrice } from "@/app/_utils/formaters";
+import "../../_styles/client.css";
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
@@ -81,6 +82,7 @@ const columns = [
 ];
 
 function BookingsTable({userId }) {
+  
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -132,9 +134,8 @@ function BookingsTable({userId }) {
   React.useEffect(() => {
     const params = {
       user_id: userId,
-      status: "",
       page: currentPage,
-      itemsPerPage,
+      itemsPerPage: 6,
       startDate: formattedStartDate,
       endDate: formattedEndDate,
     };
@@ -146,9 +147,8 @@ function BookingsTable({userId }) {
     const controller = new AbortController();
     const params = {
       user_id: userId,
-      status: "",
+      itemsPerPage: 6,
       page: currentPage,
-      itemsPerPage,
       search: searchQuery,
    
       
@@ -207,88 +207,122 @@ function BookingsTable({userId }) {
               {cellValue}
             </Chip>
           );
-        case "organization_date":
-          return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
-        case "pay_date":
-          const pay_date = item.organization_date;
-          if (pay_date) {
-            return format(new Date(pay_date), "dd/MM/yyyy");
-          } else {
-            return "N/A"; 
-          }
-        case "created_at":
-          return format(new Date(cellValue), "dd/MM/yyyy");
-        case "deposits_expired_at":
-          const expiredAt = item.booking_details?.deposits?.expired_at;
-          if (expiredAt) {
-            return format(new Date(expiredAt), "dd/MM/yyyy");
-          } else {
-            return "N/A"; 
-          }
-        case "deposits_amount":
-          const deposits_amount = item.booking_details?.deposits?.amount;
-          if (deposits_amount) {
-            return deposits_amount;
-          } else {
-            return "N/A"; 
-          }
-        case "total_amount":
-          const total_amount = item.booking_details?.total_amount;
-          if (total_amount) {
-            return total_amount;
-          } else {
-            return "N/A"; 
-          }
-        case "remaining_amount":
-          const remaining_amount = item.booking_details?.total_amount - item.booking_details?.deposits?.amount;
-          if (remaining_amount) {
-            return remaining_amount;
-          } else {
-            return "N/A"; 
-          }
-        case "table_all":
-          const tableCount = item.booking_details?.table_count;
-          const spareTableCount = item.booking_details?.spare_table_count;
-        
-          if (tableCount != null) {
-            if (spareTableCount != null) {
-              return tableCount + ' + ' + spareTableCount;
+          case "organization_date":
+            return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
+          case "pay_date":
+            const pay_date = item.organization_date;
+            if (pay_date) {
+              return format(new Date(pay_date), "dd/MM/yyyy");
             } else {
-              return tableCount;
+              return "N/A"; 
             }
-          } else {
-            return "N/A"; 
-          }
-        case "branches_name":
-          const branches_name = item.booking_details?.branches?.name;
-          if (branches_name) {
-            return branches_name;
-          } else {
-            return "N/A"; 
-          }
+          case "created_at":
+            return format(new Date(cellValue), "dd/MM/yyyy");
+          case "deposits_expired_at":
+            const depositsDetails = item.booking_details?.[0]?.deposits;
           
-        case "stages_name":
-          const stages_name = item.booking_details?.stages?.name;
-          if (stages_name) {
-            return stages_name;
-          } else {
-            return "N/A"; 
-          }
-        case "name":
-          return (
-            <User
-              avatarProps={{ radius: "lg", src: item.avatar }}
-              description={item.email}
-              name={cellValue}
-            >
-              {item.email}
-            </User>
-          );
+            if (depositsDetails?.expired_at) {
+              const expiredAt = depositsDetails.expired_at;
+              return format(new Date(expiredAt), "dd/MM/yyyy");
+            } else {
+              return "N/A";  
+            }
+            
+          case "deposits_amount":
+            const bookingDetails = item.booking_details?.[0];  
+            if (bookingDetails) {
+              const depositsAmount = bookingDetails?.deposits?.amount ?? "N/A";
+              return formatPrice(depositsAmount);
+            } else {
+              return "N/A";
+            }
+           
+          case "total_amount":
+            const totalAmountDetails = item.booking_details?.[0];  
+            if (totalAmountDetails) {
+              const totalAmount = totalAmountDetails?.total_amount ?? "N/A";
+              return formatPrice(totalAmount);  
+            } else {
+              return "N/A";  
+            }
+          
+          case "remaining_amount":
+            const remainingAmountDetails = item.booking_details?.[0];
+            if (remainingAmountDetails) {
+              const remainingAmount = (remainingAmountDetails?.total_amount - remainingAmountDetails?.deposits?.amount) ?? "N/A";
+              return formatPrice(remainingAmount);  
+            } else {
+              return "N/A"; 
+            }
+          case "table_all":
+            const totalTableDetails = item.booking_details?.[0]; 
+            if (totalTableDetails) {
+              const tableCount = totalTableDetails?.table_count;
+              const spareTableCount = totalTableDetails?.spare_table_count;
+              if (tableCount != null) {
+                if (spareTableCount != null) {
+                  return `${tableCount} + ${spareTableCount}`;
+                } else {
+                  return `${tableCount}`; 
+                }
+              } else {
+                return "N/A"; 
+              }
+            } else {
+              return "N/A"; 
+            }
+            
+          case "branches_name":
+            const bookingBranches = item.branches;
+            
+            if (bookingBranches) {
+              const branches_name = bookingBranches?.name
+              
+              return branches_name ?? "N/A";
+            } else {
+              return "N/A";
+            }
+            
+          
+          case "stages_name":
+            const bookingStages = item.stages;
+            if (bookingStages) {
+              const stages_name = bookingStages?.name;
+              return stages_name ?? "N/A";
+            } else {
+              return "N/A";
+            }
+            
+          case "name":
+            return (
+              <User
+                avatarProps={{ radius: "lg", src: item.avatar }}
+                description={item.email}
+                name={cellValue}
+              >
+                {item.email}
+              </User>
+            );
         case "status":
           return (
-            <Chip variant="flat" color="warning">
-              Chưa xử lý
-            </Chip>
+            <li className={`status ${
+                  item.is_deposit 
+                      ? item.status === 'pending' ? 'chua-thanh-toan' :
+                        item.status === 'processing' ? 'da-hoan-tien' :
+                        item.status === 'success' ? 'da-thanh-toan ' :
+                        item.status === 'cancel' ? 'da-huy' :
+                        ''
+                      : 'da-dat-coc' 
+              }`}>
+                  {item.is_deposit 
+                      ? item.status === 'pending' ? 'Đang chờ' :
+                        item.status === 'processing' ? 'Đang xử lý' :
+                        item.status === 'success' ? 'Thành công' :
+                        item.status === 'cancel' ? 'Đã hủy' :
+                        ''
+                      : 'Chưa đặt cọc'
+                  }
+            </li>
           );
         case "actions":
           return (
@@ -301,7 +335,7 @@ function BookingsTable({userId }) {
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem>
-                    <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                    <Link href={`/admin/quan-ly-tiec/${item.branches?.slug}/${item.id}`}>Xem chi tiết</Link>
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -311,7 +345,6 @@ function BookingsTable({userId }) {
           return cellValue;
       }
     },
-    [ pathname]
   );
 
   const onItemsPerPageChange = React.useCallback((e) => {
@@ -394,12 +427,13 @@ function BookingsTable({userId }) {
       </div>
     );
   }, [visibleColumns, isShowTips, itemsPerPage, searchQuery, date]);
-
+  const itemPerPage = 6;
   const bottomContent = React.useMemo(() => {
     return (
       <CustomPagination
         page={currentPage}
         total={pagination.lastPage}
+        itemPerPage = {itemPerPage}
         onChange={onPageChange}
         classNames={{
           base: "flex justify-center",
@@ -415,9 +449,10 @@ function BookingsTable({userId }) {
         isHeaderSticky
         bottomContent={bottomContent}
         bottomContentPlacement="inside"
-        classNames={{
+        
+        classNames={{ 
           thead:
-            "has-[role=columnheader]:bg-whiteAlpha-200 [&>tr>th]:bg-whiteAlpha-200",
+            "has-[role=columnheader]:bg-whiteAlpha-200  [&>tr>th]:bg-whiteAlpha-200",
           wrapper: "!bg-whiteAlpha-100",
           root: "w-full",
           td: "!text-white group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-100 before:bg-whiteAlpha-50 data-[hover=true]:before:bg-whiteAlpha-100",

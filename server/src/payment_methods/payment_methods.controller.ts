@@ -8,7 +8,6 @@ import {
   Request,
   Response,
 } from '@nestjs/common';
-import { PaymentMethodsService } from './payment_methods.service';
 import {
   ApiExcludeEndpoint,
   ApiOperation,
@@ -17,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
+import { PaymentMethodsService } from './payment_methods.service';
 
 @ApiTags('Payment Methods - Phương thức thanh toán')
 @Controller('api/payment-methods')
@@ -24,15 +24,21 @@ export class PaymentMethodsController {
   constructor(private readonly paymentMethodsService: PaymentMethodsService) {}
 
   // ! Payment Momo
-  @Get('momo/:deposit_id')
+  @Post('momo/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua Momo' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      payUrl: 'https://testmomo.com',
+    },
+  })
   momo(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.momo(id, req, res);
+    return this.paymentMethodsService.momo(transactionID, req, res);
   }
 
   // ! Momo Callback
@@ -45,15 +51,21 @@ export class PaymentMethodsController {
   }
 
   // ! Payment VNPay
-  @Get('vnpay/:deposit_id')
+  @Post('vnpay/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua VNPay' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      payUrl: 'https://testvnpay.com',
+    },
+  })
   vnpay(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.vnpay(id, req, res);
+    return this.paymentMethodsService.vnpay(transactionID, req, res);
   }
 
   // ! VNPay Callback
@@ -65,15 +77,21 @@ export class PaymentMethodsController {
   }
 
   // ! OnePay
-  @Get('onepay/:deposit_id')
+  @Post('onepay/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua OnePay' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      payUrl: 'https://onepay.com',
+    },
+  })
   onePay(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.onePay(id, req, res);
+    return this.paymentMethodsService.onePay(transactionID, req, res);
   }
 
   // ! OnePay Callback
@@ -85,15 +103,21 @@ export class PaymentMethodsController {
   }
 
   // ! Payment ZaloPay
-  @Post('zalopay/:deposit_id')
+  @Post('zalopay/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua ZaloPay' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      payUrl: 'https://zalopay.com',
+    },
+  })
   zaloPay(
-    @Param('deposit_id') id: number,
+    @Param('transactionID') transactionID: string,
     @Request() req: any,
     @Response() res: any,
   ) {
-    return this.paymentMethodsService.zaloPay(id, req, res);
+    return this.paymentMethodsService.zaloPay(transactionID, req, res);
   }
 
   // ! ZaloPay Callback

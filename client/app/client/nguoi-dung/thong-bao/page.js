@@ -12,6 +12,7 @@ const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
     const toast = useCustomToast();
 
+    
     useEffect(() => {
         const getFeedbacks = async () => {
             const getUser = JSON.parse(localStorage.getItem("user"));
@@ -40,7 +41,7 @@ const NotificationsPage = () => {
                     };
                     return data;
                 });
-
+                
                 const notificationIs_read = datanotifications
                     .filter(notification => notification.is_read == false)
                     .map(notification => notification.id);
@@ -149,7 +150,7 @@ const NotificationsPage = () => {
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-white">Thông báo</h1>
-                <button className="text-xs text-gold" onClick={is_read} >Đánh dấu đã đọc</button>
+                <button className={`text-xs text-gold ${notifications.length == 0 ? 'hidden' : ''  }` } onClick={is_read} >Đánh dấu đã đọc</button>
             </div>
 
             {/* Notifications */}
