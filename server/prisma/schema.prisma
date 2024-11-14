@@ -417,6 +417,7 @@ model packages {
   extra_service     Json?
   other_service     Json?
   note              String?
+  is_show           Boolean      @default(false)
   deleted           Boolean      @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
