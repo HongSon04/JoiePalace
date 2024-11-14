@@ -498,7 +498,7 @@ export class PackagesService {
         where: { id: Number(stage_id) },
       });
       if (!stage) {
-        throw new NotFoundException('ID Sân khấu không tồn tại');
+        throw new NotFoundException('ID Sảnh không tồn tại');
       }
 
       totalPrice += Number(stage.price);
