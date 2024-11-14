@@ -11,13 +11,14 @@ import axios from 'axios';
 import * as CryptoJS from 'crypto-js';
 import dayjs from 'dayjs';
 import { PaymentMethod } from 'helper/enum/payment_method.enum';
+import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { PrismaService } from 'src/prisma.service';
 import { OnePayInternational } from 'vn-payments';
 import { MomoCallbackDto } from './dto/momo-callback.dto';
 import { OnepayCallbackDto } from './dto/onepay-calback.dto';
 import { VNPayCallbackDto } from './dto/vnpay-callback.dto';
-import { NotificationsService } from 'src/notifications/notifications.service';
-import { TypeNotifyEnum } from 'helper/enum/type_notify.enum';
+
 @Injectable()
 export class PaymentMethodsService {
   constructor(
@@ -52,11 +53,11 @@ export class PaymentMethodsService {
   }
 
   // ! Payment Momo
-  async momo(id: number, req, res) {
+  async momo(transactionID: string, req, res) {
     try {
       const findDeposit = await this.prismaService.deposits.findFirst({
         where: {
-          id: Number(id),
+          transactionID: transactionID,
         },
       });
       if (!findDeposit) {
@@ -80,7 +81,7 @@ export class PaymentMethodsService {
       var secretKey = this.configService.get<string>('MOMO_SECRET_KEY');
       var orderInfo = 'Thanh toán tiền cọc';
       var partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE');
-      var redirectUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/momo-callback?deposit_id=${id}`;
+      var redirectUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/momo-callback?deposit_id=${findDeposit.id}`;
       var ipnUrl = 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b';
       var requestType = 'payWithMethod';
       var amount = Number(findDeposit.amount);
@@ -164,8 +165,11 @@ export class PaymentMethodsService {
         ress.on('data', (body) => {
           const response = JSON.parse(body);
           if (ress.statusCode == 200 && response.payUrl) {
-            // ? Chuyển hướng đến trang thanh toán của Momo
-            return res.redirect(response.payUrl);
+            return res.json({
+              status: HttpStatus.OK,
+              payUrl: response.payUrl,
+            });
+            // return res.redirect(response.payUrl);
           } else {
             throw new BadRequestException('Tạo đơn đặt cọc thất bại');
           }
@@ -249,11 +253,11 @@ export class PaymentMethodsService {
   }
 
   // ! Payment VNPay
-  async vnpay(id: number, req, res) {
+  async vnpay(transactionID: string, req, res) {
     try {
       const findDeposit = await this.prismaService.deposits.findFirst({
         where: {
-          id: Number(id),
+          transactionID: transactionID,
         },
       });
       if (!findDeposit) {
@@ -278,7 +282,7 @@ export class PaymentMethodsService {
       let tmnCode = this.configService.get<string>('VNP_TMN_CODE');
       let secretKey = this.configService.get<string>('VNP_HASH_SECRET');
       let vnpUrl = this.configService.get<string>('VNP_URL');
-      let returnUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/vnpay-callback?deposit_id=${id}`;
+      let returnUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/vnpay-callback?deposit_id=${findDeposit.id}`;
       let orderId = dayjs(date).format('DDHHmmss');
       let amount = findDeposit.amount;
       let bankCode = '';
@@ -315,8 +319,12 @@ export class PaymentMethodsService {
       vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
 
       if (vnpUrl) {
-        // ? Chuyển hướng đến trang thanh toán của VNPay
-        return res.redirect(vnpUrl);
+        return res.json({
+          status: HttpStatus.OK,
+          payUrl: vnpUrl,
+        });
+
+        // return res.redirect(vnpUrl);
       } else {
         return res.status(400).json({
           message: 'Tạo đơn đặt cọc thất bại',
@@ -378,11 +386,11 @@ export class PaymentMethodsService {
   }
 
   // ! Payment OnePay
-  async onePay(id: number, req, res) {
+  async onePay(transactionID: string, req, res) {
     try {
       const findDeposit = await this.prismaService.deposits.findFirst({
         where: {
-          id: Number(id),
+          transactionID: transactionID,
         },
       });
       if (!findDeposit) {
@@ -400,7 +408,7 @@ export class PaymentMethodsService {
         customerId: findDeposit.transactionID,
         currency: 'VND',
         returnUrl: `${this.configService.get<string>('BACKEND_URL')}payment-methods/onepay/callback`,
-        againLink: `${this.configService.get<string>('BACKEND_URL')}payment-methods/onepay/${id}`,
+        againLink: `${this.configService.get<string>('BACKEND_URL')}payment-methods/onepay/${findDeposit.id}`,
         clientIp:
           req.headers['x-forwarded-for'] ||
           req.connection.remoteAddress ||
@@ -415,8 +423,10 @@ export class PaymentMethodsService {
       this.onepayIntl
         .buildCheckoutUrl(checkoutData as any)
         .then((checkoutUrl) => {
-          // ? Chuyển hướng đến trang thanh toán của OnePay
-          return res.redirect(checkoutUrl.href);
+          return res.json({
+            status: HttpStatus.OK,
+            payUrl: checkoutUrl.href,
+          });
         })
         .catch((err) => {
           console.log('Lỗi từ payment_method.service.ts -> onepay', err);
@@ -477,11 +487,11 @@ export class PaymentMethodsService {
   }
 
   // ! Payment ZaloPay
-  async zaloPay(id, req, res) {
+  async zaloPay(transactionID, req, res) {
     try {
       const findDeposit = await this.prismaService.deposits.findFirst({
         where: {
-          id: Number(id),
+          transactionID: transactionID,
         },
       });
       if (!findDeposit) {
@@ -503,10 +513,10 @@ export class PaymentMethodsService {
       };
 
       const items = [{}];
-      const transID = Math.floor(Math.random() * 1000000);
+      const transID = Math.floor(Math.random() * 99999999999);
       const order = {
         app_id: config.app_id,
-        app_trans_id: `${dayjs(Date.now()).format('YYMMDD')}-${findDeposit.transactionID}-${transID}`,
+        app_trans_id: `${dayjs(Date.now()).format('YYMMDDHHmmss')}-${findDeposit.transactionID}-${transID}`,
         app_user: 'user123',
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items),
@@ -515,7 +525,7 @@ export class PaymentMethodsService {
         description: `Thanh toán tiền cọc cho ID: ${findDeposit.transactionID}`,
         bank_code: '',
         mac: '',
-        callback_url: `${this.configService.get<string>('BACKEND_URL')}payment-methods/zalopay-callback?deposit_id=${id}`,
+        callback_url: `${this.configService.get<string>('BACKEND_URL')}payment-methods/zalopay-callback?deposit_id=${findDeposit.id}`,
       };
 
       const data =
@@ -537,8 +547,10 @@ export class PaymentMethodsService {
         .post(config.endpoint, null, { params: order })
         .then(({ data }) => {
           if (data.return_code === 1) {
-            // ? Chuyển hướng đến trang thanh toán của ZaloPay
-            return res.redirect(data.order_url);
+            return res.json({
+              status: HttpStatus.OK,
+              payUrl: data.order_url,
+            });
           } else {
             return res.status(HttpStatus.BAD_REQUEST).json({
               status: HttpStatus.BAD_REQUEST,

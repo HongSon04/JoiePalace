@@ -42,6 +42,7 @@ import SearchForm from "@/app/_components/SearchForm";
 import CustomPagination from "@/app/_components/CustomPagination";
 import LoadingContent from "@/app/_components/LoadingContent";
 import { capitalize } from "@mui/material";
+import { formatPrice } from "@/app/_utils/formaters";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
@@ -62,6 +63,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
+
 const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "Chủ tiệc", uid: "name" },
@@ -71,7 +73,7 @@ const columns = [
   { name: "Ngày đặt cọc", uid: "deposits_expired_at", sortable: true },
   { name: "Còn lại phải thanh toán", uid: "remaining_amount", sortable: true },
   { name: "Ngày tổ chức", uid: "organization_date", sortable: true },
-  { name: "Trạng thái thanh toán", uid: "status", sortable: true },
+  { name: "Trạng thái thanh toán", uid: "status"},
   { name: "Ngày thanh toán", uid: "pay_date", sortable: true },
   { name: "Số lượng khách dự kiến", uid: "number_of_guests", sortable: true },
   { name: "Số lượng bàn (chính thức + dự phòng)", uid: "table_all", sortable: true },
@@ -188,7 +190,7 @@ function BookingsTable({ branchId}) {
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
-      // console.log(renderCell);
+      // console.log(cellValue);
       
       switch (columnKey) {
         case "shift":
@@ -219,61 +221,80 @@ function BookingsTable({ branchId}) {
         case "created_at":
           return format(new Date(cellValue), "dd/MM/yyyy");
         case "deposits_expired_at":
-          const expiredAt = item.booking_details?.deposits?.expired_at;
-          if (expiredAt) {
+          const depositsDetails = item.booking_details?.[0]?.deposits;
+        
+          if (depositsDetails?.expired_at) {
+            const expiredAt = depositsDetails.expired_at;
             return format(new Date(expiredAt), "dd/MM/yyyy");
           } else {
-            return "N/A"; 
+            return "N/A";  
           }
+          
         case "deposits_amount":
-          const deposits_amount = item.booking_details?.deposits?.amount;
-          if (deposits_amount) {
-            return deposits_amount;
+          const bookingDetails = item.booking_details?.[0];  
+          if (bookingDetails) {
+            const depositsAmount = bookingDetails?.deposits?.amount ?? "N/A";
+            return formatPrice(depositsAmount);
           } else {
-            return "N/A"; 
+            return "N/A";
           }
+         
         case "total_amount":
-          const total_amount = item.booking_details?.total_amount;
-          if (total_amount) {
-            return total_amount;
+          const totalAmountDetails = item.booking_details?.[0];  
+          if (totalAmountDetails) {
+            const totalAmount = totalAmountDetails?.total_amount ?? "N/A";
+            return formatPrice(totalAmount);  
           } else {
-            return "N/A"; 
+            return "N/A";  
           }
+        
         case "remaining_amount":
-          const remaining_amount = item.booking_details?.total_amount - item.booking_details?.deposits?.amount;
-          if (remaining_amount) {
-            return remaining_amount;
+          const remainingAmountDetails = item.booking_details?.[0];
+          if (remainingAmountDetails) {
+            const remainingAmount = (remainingAmountDetails?.total_amount - remainingAmountDetails?.deposits?.amount) ?? "N/A";
+            return formatPrice(remainingAmount);  
           } else {
             return "N/A"; 
           }
         case "table_all":
-          const tableCount = item.booking_details?.table_count;
-          const spareTableCount = item.booking_details?.spare_table_count;
-        
-          if (tableCount != null) {
-            if (spareTableCount != null) {
-              return tableCount + ' + ' + spareTableCount;
+          const totalTableDetails = item.booking_details?.[0]; 
+          if (totalTableDetails) {
+            const tableCount = totalTableDetails?.table_count;
+            const spareTableCount = totalTableDetails?.spare_table_count;
+            if (tableCount != null) {
+              if (spareTableCount != null) {
+                return `${tableCount} + ${spareTableCount}`;
+              } else {
+                return `${tableCount}`; 
+              }
             } else {
-              return tableCount;
+              return "N/A"; 
             }
           } else {
             return "N/A"; 
           }
+          
         case "branches_name":
-          const branches_name = item.booking_details?.branches?.name;
-          if (branches_name) {
-            return branches_name;
+          const bookingBranches = item.branches;
+          
+          if (bookingBranches) {
+            const branches_name = bookingBranches?.name
+            
+            return branches_name ?? "N/A";
           } else {
-            return "N/A"; 
+            return "N/A";
           }
           
+        
         case "stages_name":
-          const stages_name = item.booking_details?.stages?.name;
-          if (stages_name) {
-            return stages_name;
+          const bookingStages = item.stages;
+          if (bookingStages) {
+            const stages_name = bookingStages?.name;
+            return stages_name ?? "N/A";
           } else {
-            return "N/A"; 
+            return "N/A";
           }
+          
         case "name":
           return (
             <User
@@ -286,10 +307,11 @@ function BookingsTable({ branchId}) {
           );
         case "status":
           return (
-            <Chip variant="flat" color="warning">
-              Chưa xử lý
+            <Chip variant="flat" color="success">
+              Đã thanh toán 
             </Chip>
           );
+         
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
@@ -301,7 +323,7 @@ function BookingsTable({ branchId}) {
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem>
-                    <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                    <Link href={`/admin/quan-ly-tiec/${item.branches?.slug}/${item.id}`}>Xem chi tiết</Link>
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -311,8 +333,9 @@ function BookingsTable({ branchId}) {
           return cellValue;
       }
     },
-    [ pathname]
+    [ ]
   );
+
 
   const onItemsPerPageChange = React.useCallback((e) => {
     setItemsPerPage(Number(e.target.value));
@@ -417,7 +440,7 @@ function BookingsTable({ branchId}) {
         bottomContentPlacement="inside"
         classNames={{
           thead:
-            "has-[role=columnheader]:bg-whiteAlpha-200 [&>tr>th]:bg-whiteAlpha-200",
+            "has-[role=columnheader]:bg-whiteAlpha-200  [&>tr>th]:bg-whiteAlpha-200",
           wrapper: "!bg-whiteAlpha-100",
           root: "w-full",
           td: "!text-white group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-100 before:bg-whiteAlpha-50 data-[hover=true]:before:bg-whiteAlpha-100",

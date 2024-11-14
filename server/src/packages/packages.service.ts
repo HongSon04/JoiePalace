@@ -83,9 +83,10 @@ export class PackagesService {
         data: {
           name,
           slug,
-          decor_id: Number(decor_id),
-          menu_id: Number(menu_id),
-          party_type_id: Number(party_type_id),
+          stage_id: stage_id ? Number(stage_id) : null,
+          decor_id: decor_id ? Number(decor_id) : null,
+          menu_id: menu_id ? Number(menu_id) : null,
+          party_type_id: party_type_id ? Number(party_type_id) : null,
           description,
           price: Number(price),
           short_description,
@@ -322,9 +323,10 @@ export class PackagesService {
         data: {
           name,
           slug: MakeSlugger(name),
-          decor_id: Number(decor_id),
-          menu_id: Number(menu_id),
-          party_type_id: Number(party_type_id),
+          stage_id: stage_id ? Number(stage_id) : null,
+          decor_id: decor_id ? Number(decor_id) : null,
+          menu_id: menu_id ? Number(menu_id) : null,
+          party_type_id: party_type_id ? Number(party_type_id) : null,
           description,
           price: Number(price),
           short_description,
@@ -496,8 +498,10 @@ export class PackagesService {
         where: { id: Number(stage_id) },
       });
       if (!stage) {
-        throw new NotFoundException('ID Sân khấu không tồn tại');
+        throw new NotFoundException('ID Sảnh không tồn tại');
       }
+
+      totalPrice += Number(stage.price);
     }
 
     // Add decor price

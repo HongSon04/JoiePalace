@@ -272,6 +272,8 @@ model deposits {
 
 model bookings {
   id                Int               @id @default(autoincrement())
+  package_id        Int?
+  packages          packages?         @relation(fields: [package_id], references: [id])
   user_id           Int?
   users             users?            @relation(fields: [user_id], references: [id])
   branch_id         Int
@@ -420,4 +422,5 @@ model packages {
   deleted_by        Int?
   created_at        DateTime     @default(now())
   updated_at        DateTime     @updatedAt
+  bookings          bookings[]
 }
