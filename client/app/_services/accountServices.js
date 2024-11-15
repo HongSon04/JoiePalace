@@ -30,6 +30,18 @@ export const loginAccountUser = async (dataToSend) => {
 
   return response;
 };
+export const loginGoogle = async (dataToSend) => {
+  const response = await axios.post(
+    "https://joieplace.live/api/auth/login-social",
+    dataToSend
+  );
+  if (response.status !== 200 && response.status !== 201) {
+    throw new Error("Có lỗi");
+  }
+
+  console.log("responseapi", response);
+  return response;
+};
 
 export const forgotPassword = async (email) => {
   const response = await makeAuthorizedRequest(

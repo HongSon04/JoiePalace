@@ -15,6 +15,8 @@ import HeaderClient from "./_components/HeaderClient";
 import Contact from "./_components/Contact";
 import WeddingPackages from "@/app/_components/pakageService";
 import ToolCreactCombo from "./_components/ToolCreactCombo";
+import Loading from "./loading";
+import { getAllPackages } from "./_services/packageServices";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -126,17 +128,29 @@ function Home() {
   const [timeAutoPlay, setTimeAutoPlay] = useState(false);
   const carouselRef = useRef();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [dataPackage, setDataPackage] = useState(null);
   const delay = () => {
     setTimeout(() => {
       setTimeAutoPlay(true);
     }, 5000);
   };
   useEffect(() => {
+    const callApi = async () => {
+      const res = await getAllPackages();
+      console.log(res.data);
+
+      setDataPackage(res.data.slice(0, 3));
+    };
     delay();
+    callApi();
   }, []);
   const handleSlideChange = (nextSlide) => {
     setCurrentSlide(nextSlide);
   };
+
+  if (!dataPackage) return <Loading></Loading>;
+  console.log("dataPackage", dataPackage);
+
   return (
     <>
       <HeaderClient />
@@ -270,7 +284,7 @@ function Home() {
             ))}
           </div>
         </section>
-        {/* events */} 
+        {/* events */}
         <section className="section relative w-screen" id="section-services">
           <TextFade
             settings={{
@@ -354,10 +368,10 @@ function Home() {
             ))}
           </MultiCarousel>
         </section>
-       
+
         {/*WeddingPackages*/}
         <section className="section">
-          <WeddingPackages></WeddingPackages>
+          <WeddingPackages dataPackage={dataPackage}></WeddingPackages>
         </section>
         <section className="section">
           <ToolCreactCombo></ToolCreactCombo>

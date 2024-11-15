@@ -33,12 +33,9 @@ const nextConfig = {
     ],
   },
   webpack: (config, { dev }) => {
-    // Ensure that Fast Refresh is not affected by caching in development mode
     if (config.cache && dev) {
-      config.cache = false; // Disable caching in development for better Fast Refresh
+      config.cache = false;
     }
-
-    // Important: return the modified config
     return config;
   },
   productionBrowserSourceMaps: false,

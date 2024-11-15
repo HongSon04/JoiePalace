@@ -164,8 +164,8 @@ const Page = () => {
         <div className="flex flex-col gap-8">
 
             <span className="text-2xl font-bold text-white leading-6">Chung</span>
-
-            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone == null ? user?.phone : (<span onClick={updatePhone}> Cập nhật ngay </span>)} emailUser={user?.email} imgUser={user?.avatar} total_amount={partyTotalAmount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} isLoading={loading} />
+            {/* == null ? user?.phone : (<span onClick={updatePhone}> Cập nhật ngay </span>) */}
+            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={partyTotalAmount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} isLoading={loading} />
 
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             <div className='flex justify-between'>

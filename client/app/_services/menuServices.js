@@ -10,15 +10,11 @@ export const fetchMenuBySlug = async (slug) => {
 
   return response.data.data;
 };
-export const fetchAllMenu = async (slug) => {
-  const response = await axios.get(
-    API_CONFIG.MENU.GET_ALL({
-      itemsPerPage: 99999,
-    })
-  );
+export const getMenuById = async (id) => {
+  const response = await axios.get(API_CONFIG.MENU.GET_BY_ID(id));
 
   if (response.status !== 200) {
-    throw new Error("Có lỗi khi lấy danh sách chi nhánh");
+    throw new Error("Có lỗi khi lấy dữ liệu");
   }
 
   return response.data.data;

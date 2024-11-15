@@ -48,6 +48,7 @@ export const API_CONFIG = {
     LOGOUT: `${AUTH_API}/logout`,
     REFRESH_TOKEN: `${AUTH_API}/refresh-token`,
     UPLOAD_AVATAR: `${AUTH_API}/upload-avatar`,
+    LOGIN_GOOLGE: `${AUTH_API}/login-social`,
   },
 
   // USER API
@@ -88,11 +89,11 @@ export const API_CONFIG = {
   },
 
   STAGES: {
-    CREATE: `${STAGES_API}/create`,
-    GET_ALL: (params) =>
-      constructUrlWithParams(`${STAGES_API}/get-all`, params),
-    GET_ALL_BY_BRANCH: (id) => `${STAGES_API}/get-all?branch_id=${id}`,
-    GET_ALL_BY_STAGE_ID: (id) => `${STAGES_API}/get/${id}`,
+    CREATE: `${STAGES}/create`,
+    GET_ALL: (params) => constructUrlWithParams(`${STAGES}/get-all`, params),
+    GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
+    GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
+    GET_BY_ID: (id) => `${STAGES}/get/${id}`,
   },
 
   // CATEGORIES API
@@ -233,10 +234,12 @@ export const API_CONFIG = {
 
   // PACKAGES_API API
   PACKAGES: {
-    GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     CREATE: `${PACKAGES_API}/create`,
+    GET_ALL: `${PACKAGES_API}/get-all`,
+    GET_BY_SLUG: (slug) => `${PACKAGES_API}/get-by-slug/${slug}`,
+    GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     GET_ALL_BY_PARAMS: (params) =>
-      constructUrlWithParams(`${PACKAGES}/get-all`, params),
+      constructUrlWithParams(`${PACKAGES_API}/get-all`, params),
   },
 
   // MENU API

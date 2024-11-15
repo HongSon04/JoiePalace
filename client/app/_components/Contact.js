@@ -9,7 +9,8 @@ import { fecthAllPartyTypes } from "../_services/partyTypesServices";
 import { createNewBooking } from "../_services/bookingServices";
 import { formatDate } from "../_utils/format";
 import useCustomToast from "../_hooks/useCustomToast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getPackageById } from "../_services/packageServices";
 
 const formSchema = z.object({
   name: z.string().min(2, "Vui lòng nhập Họ và tên!"),
@@ -23,13 +24,14 @@ const formSchema = z.object({
   guestCount: z
     .number()
     .min(100, "Số lượng khách ít nhất là 100 khách!")
-    .max(1000, "Tối đa 1000 khách!"),
+    .max(5000, "Tối đa 5000 khách!"),
 });
 
 const Contact = () => {
   const [errors, setErrors] = useState({});
   const [listBranches, setListBranches] = useState([]);
   const [listPartyTypes, setListPartyTypes] = useState([]);
+  const [dataPackage, setDataPackage] = useState(null);
   const toast = useCustomToast();
   const router = useRouter();
   const [userInfo, setUserInfo] = useState({});
@@ -43,6 +45,9 @@ const Contact = () => {
       setUserInfo(JSON.parse(storedUser));
     }
   }, []);
+  const searchParams = useSearchParams();
+  const package_id = searchParams.get("package_id");
+  const [bookingDetails, setBookingDetails] = useState({});
 
   const [formData, setFormData] = useState({
     user_id: userInfo?.id,
@@ -62,20 +67,41 @@ const Contact = () => {
     const fetchData = async () => {
       const branches = await fetchBranchesFromApi();
       const partyTypes = await fecthAllPartyTypes();
+      let dataPackageRes = null;
+      if (package_id !== null) {
+        dataPackageRes = await getPackageById(package_id);
+        setDataPackage(dataPackageRes.data[0]);
+        setBookingDetails({
+          decor_id: dataPackageRes.data[0].decor_id,
+          menu_id: dataPackageRes.data[0].menu_id,
+          party_types: dataPackageRes.data[0].party_types,
+          decor: dataPackageRes.data[0].decors,
+          menu: dataPackageRes.data[0].menus,
+        });
+      }
       setListBranches(branches);
       setListPartyTypes(partyTypes);
 
       // Thiết lập giá trị mặc định cho formData
       if (branches.length > 0 && partyTypes.length > 0) {
-        setFormData((prevData) => ({
-          ...prevData,
-          branch: branches[0]?.id || "",
-          partyType: partyTypes[0]?.id || "",
-        }));
+        if (dataPackageRes) {
+          const partyTypeData = dataPackageRes.data[0].party_types;
+          setFormData((prevData) => ({
+            ...prevData,
+            branch: branches[0]?.id || "",
+            partyType: partyTypeData.id,
+          }));
+        } else {
+          setFormData((prevData) => ({
+            ...prevData,
+            branch: branches[0]?.id || "",
+            partyType: partyTypes[0]?.id || "",
+          }));
+        }
       }
     };
     fetchData();
-  }, []);
+  }, [package_id]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -104,6 +130,7 @@ const Contact = () => {
         branch_id: formData.branch,
         party_type_id: formData.partyType,
         stage_id: 0,
+        package_id: package_id,
         name: formData.name,
         phone: formData.phone.toString(),
         email: formData.email,
@@ -113,6 +140,7 @@ const Contact = () => {
         budget: formData.budget.toString(),
         shift: formData.shift.toString(),
         organization_date: formatDate(formData.date),
+        // bookingDetails,
       };
       const response = await createNewBooking(dataToSend);
       if (response.status === 200 || response.status === 201) {
@@ -131,7 +159,8 @@ const Contact = () => {
           position: "top",
           type: "error",
           title: "Thất bại!",
-          description: error.response?.data.message,
+          description:
+            error.response?.data.message || "Vui lòng kiểm tra lại thông tin!",
           closable: true,
         });
       }

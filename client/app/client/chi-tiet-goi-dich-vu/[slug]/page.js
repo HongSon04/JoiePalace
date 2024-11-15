@@ -25,9 +25,16 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { IoSaveOutline } from "react-icons/io5";
-import axios from "axios";
 import { useParams } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
+import { getPackageBySlug } from "@/app/_services/packageServices";
+import Loading from "@/app/loading";
+import { getDecorById } from "@/app/_services/decorServices";
+import { getMenuById } from "@/app/_services/menuServices";
+import RenderDetailPackage from "@/app/_components/RenderDetailPackage";
+import { getCakeWedding } from "@/app/_services/otherServices";
+import { getProductById } from "@/app/_services/productsServices";
+import { getStageById } from "@/app/_services/stageServices";
 
 const listSpaces = [
   {
@@ -318,16 +325,27 @@ const Page = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [optionIndex, setOptionIndex] = useState(0);
   const [spaceIndex, setSpaceIndex] = useState(0);
-  const [data, setData] = useState(null);
+  const [dataPackage, setDataPackage] = useState(null);
+  const [dataToShow, setDataToShow] = useState(null);
+  const [listOtherServices, setListOtherServices] = useState(null);
+
+  const handleCallData = async (callback) => {
+    const res = await callback;
+    setDataToShow(res[0]);
+  };
 
   useEffect(() => {
     const fecthData = async () => {
-      const data = await axios.get("https://joieplace.live/api/menus/get-all");
-      setData(data);
-      console.log(data);
+      const data = await getPackageBySlug(slug);
+      setDataPackage(data.data[0]);
+      handleCallData(getStageById(data.data[0].stage_id || 39));
+      setListOtherServices(JSON.parse(data.data[0].other_service));
     };
     fecthData();
-  }, []);
+  }, [slug]);
+
+  if (!dataPackage) return <Loading></Loading>;
+  console.log("re-render");
 
   return (
     <>
@@ -335,19 +353,13 @@ const Page = () => {
         <section className="w-full h-screen pt-[150px] pb-[60px] flex justify-between items-center relative">
           <div className="w-2/5 h-auto flex flex-col gap-8">
             <small className="text-gold text-base font-normal leading-6">
-              Được lựa chọn nhiều nhất
+              {dataPackage.short_description}
             </small>
             <h1 className="uppercase text-gold text-5xl font-semibold leading-[68px]">
-              gói tiệc cưới lãng mạn
+              {dataPackage.name}
             </h1>
             <p className="text-base font-normal leading-6">
-              Một trong những gói dịch vụ tiệc cưới với chất lượng hàng đầu và
-              là sự lựa chọn của rất nhiều cặp đôi. Gói dịch vụ mang lại trải
-              nghiệm trọn vẹn, ấm cúng và bắt mắt với phong cách trang trí lãng
-              mạn, không quá cầu kỳ nhưng lại mang tới không khí thân mật, gần
-              gũi và đặt biệt, tiết kiệm ngân sách tối đa cho các cặp đôi. Cùng
-              khám phá xem, “GÓI TIỆC CƯỚI LÃNG MẠN” có những gì mà lại gây chú
-              ý đến vậy nhé.
+              {dataPackage.description}
             </p>
             <div className="w-full h-auto flex gap-3">
               <ButtonDiscover className="px-10" name={"LIÊN HỆ NGAY"} />
@@ -369,10 +381,13 @@ const Page = () => {
             />
           </div>
         </section>
-        <section className="w-full py-[60px] h-screen flex flex-col items-center gap-8">
+        <section className="w-full py-[60px] min-h-screen flex flex-col items-center gap-8">
           <div className="flex w-fit justify-center gap-4 py-2 px-4 items-center rounded-full bg-whiteAlpha-50">
             <span
-              onClick={() => setOptionIndex(0)}
+              onClick={() => {
+                setOptionIndex(0);
+                handleCallData(getStageById(dataPackage.stage_id || 39));
+              }}
               className={`text-base font-semibold leading-8 ${
                 optionIndex === 0 ? "bg-gold" : "opacity-50"
               } flex py-2 px-6 justify-center items-center rounded-full cursor-pointer transition duration-300`}
@@ -380,7 +395,10 @@ const Page = () => {
               SẢNH TIỆC
             </span>
             <span
-              onClick={() => setOptionIndex(1)}
+              onClick={() => {
+                setOptionIndex(1);
+                handleCallData(getDecorById(dataPackage.decor_id));
+              }}
               className={`text-base font-semibold leading-8 ${
                 optionIndex === 1 ? "bg-gold" : "opacity-50"
               } flex py-2 px-6 justify-center items-center rounded-full cursor-pointer transition duration-300`}
@@ -388,7 +406,10 @@ const Page = () => {
               TRANG TRÍ
             </span>
             <span
-              onClick={() => setOptionIndex(2)}
+              onClick={() => {
+                setOptionIndex(2);
+                handleCallData(getProductById(listOtherServices[0].id));
+              }}
               className={`text-base font-semibold leading-8 ${
                 optionIndex === 2 ? "bg-gold" : "opacity-50"
               }  flex py-2 px-6 justify-center items-center rounded-full cursor-pointer transition duration-300`}
@@ -396,7 +417,10 @@ const Page = () => {
               SÂN KHẤU
             </span>
             <span
-              onClick={() => setOptionIndex(3)}
+              onClick={() => {
+                setOptionIndex(3);
+                handleCallData(getCakeWedding(listOtherServices[1]?.id));
+              }}
               className={`text-base font-semibold leading-8 ${
                 optionIndex === 3 ? "bg-gold" : "opacity-50"
               } flex py-2 px-6 justify-center items-center rounded-full cursor-pointer transition duration-300`}
@@ -404,7 +428,10 @@ const Page = () => {
               BÁNH CƯỚI
             </span>
             <span
-              onClick={() => setOptionIndex(4)}
+              onClick={() => {
+                setOptionIndex(4);
+                handleCallData(getMenuById(dataPackage.menu_id));
+              }}
               className={`text-base font-semibold leading-8 ${
                 optionIndex === 4 ? "bg-gold" : "opacity-50"
               } flex py-2 px-6 justify-center items-center rounded-full cursor-pointer transition duration-300`}
@@ -417,7 +444,7 @@ const Page = () => {
                 optionIndex === 5 ? "bg-gold" : "opacity-50"
               } flex py-2 px-6 justify-center items-center rounded-full cursor-pointer transition duration-300`}
             >
-              NƯỚC UỐNG
+              DỊCH VỤ KHÁC
             </span>
             <button
               ref={drawerStriggerRef}
@@ -448,33 +475,36 @@ const Page = () => {
             </div>
             <div className="w-2/3 h-full  flex flex-col gap-3 relative">
               <div className="flex gap-3 items-center">
-                <span className="inline-flex bg-gold w-1 h-full"></span>
-                <span className="text-3xl font-bold">Sảnh tiệc</span>
+                <span className="text-3xl font-bold">{dataToShow?.name}</span>
               </div>
               <span className="text-sm font-normal">
-                Sảnh tiệc có sức chứa cho khoảng 100 khách
+                {dataToShow?.description}
               </span>
               <div className="w-full flex flex-wrap gap-4">
-                {listSpaces.map((space, index) => (
-                  <div
-                    onClick={() => setSpaceIndex(index)}
-                    key={space.id}
-                    className={`w-[calc(25%-16px)] aspect-w-1 aspect-h-1 ${
-                      spaceIndex === index ? "bg-whiteAlpha-400" : ""
-                    } p-2 gap-3 flex flex-col rounded-lg cursor-pointer`}
-                  >
+                {optionIndex === 3 || optionIndex === 2 || optionIndex === 0 ? (
+                  <div className="w-[calc(25%-16px)] aspect-w-1 aspect-h-1 bg-whiteAlpha-400 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
                     <div className="overflow-hidden">
                       <Image
-                        src="https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg"
+                        src={dataToShow?.images[0]}
                         className="w-full h-full object-cover"
-                        alt=""
+                        alt={dataToShow?.name || ""}
                       />
                     </div>
-                    <span className="text-sm font-normal">Sảnh Diamon</span>
+                    <span className="text-sm font-normal">
+                      {dataToShow?.name}
+                    </span>
                   </div>
-                ))}
+                ) : (
+                  <RenderDetailPackage
+                    key={optionIndex}
+                    optionIndex={optionIndex}
+                    dataToShow={dataToShow}
+                    setSpaceIndex={setSpaceIndex}
+                    spaceIndex={spaceIndex}
+                  />
+                )}
               </div>
-              <div className="w-full absolute bottom-0 flex justify-end">
+              <div className="w-full bottom-0 flex justify-end">
                 <ButtonDiscover name={"Liên hệ ngay"} className="px-4" />
               </div>
             </div>

@@ -147,7 +147,7 @@ const PartyDetailClient = ({
       case 'success':
         return 'text-green-500';
       case 'processing':
-        return 'text-yellow-300';
+        return 'text-blue-300';
       case 'cancel':
         return 'text-red-300';
       case 'pending':
@@ -161,7 +161,7 @@ const PartyDetailClient = ({
       case 'success':
         return 'Hoàn thành';
       case 'processing':
-        return 'Đang chờ xử lý';
+        return 'Đang xử lý';
       case 'cancel':
         return 'Hủy';
       case 'pending':

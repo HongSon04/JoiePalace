@@ -8,7 +8,7 @@ export const DropdownField = ({ label, name, options, value, onChange }) => (
             className="w-full bg-whiteAlpha-200 text-white rounded-md p-3 font-normal leading-6"
         >
             {options.map(option => (
-                <option key={option.value} className="text-black" value={option.value}>
+                <option key={`${option.value}-${option.label}`} className="text-black" value={option.value}>
                     {option.label}
                 </option>
             ))}

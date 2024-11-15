@@ -71,7 +71,7 @@ const HeaderClient = () => {
   const handleShowMenu = () => {
     isShowMenu ? setIsShowMenu(false) : setIsShowMenu(true);
   };
-  if (!listBranches) return;  
+  if (!listBranches) return;
   return (
     <header
       className={`fixed top-0 left-0 w-full z-40 text-white ${
@@ -168,7 +168,7 @@ const HeaderClient = () => {
           isShowMenu ? "showMenu" : ""
         }`}
       >
-        <div className="w-full h-[90px] flex justify-between items-center bg-transparent border-b-[1px] border-white">
+        <div className="w-full h-[90px] flex flex-row-reverse justify-between items-center bg-transparent border-b-[1px] border-white">
           <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer max-sm:hidden">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +192,7 @@ const HeaderClient = () => {
               JOIE PALACE
             </span>
           </div>
-          <div className="h-full flex items-center gap-14 max-sm:w-full max-sm:justify-between">
+          <div className="h-full flex flex-row-reverse items-center gap-4 max-sm:w-full max-sm:justify-between">
             <div className="flex items-center gap-2">
               <span className="px-2 text-white h-6 flex justify-center items-center rounded-md cursor-pointer">
                 en
@@ -202,7 +202,7 @@ const HeaderClient = () => {
               </span>
             </div>
             <button
-              className="flex px-4 gap-2 items-center"
+              className="flex px-4 gap-2 items-center flex-row-reverse"
               onClick={handleShowMenu}
             >
               <span className="uppercase text-base font-normal leading-6">

@@ -2,9 +2,9 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-const TextFade = (props) => {
+const TextFade = ({ replayEffect, ...props }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: !props.replayEffect });
+  const isInView = useInView(ref, { once: !replayEffect });
   const [hasBeenViewed, setHasBeenViewed] = useState(false);
 
   useEffect(() => {

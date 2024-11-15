@@ -28,6 +28,7 @@ const Page = ({ params }) => {
     const [deposits, setDeposits] = useState(0);
     const [showPaymentMethod, setShowPaymentMethod] = useState(false);
     const [deponsit_id, setDeponsit_id] = useState();
+    const [ partyStatus, setPartyStatus] = useState();
 
     useEffect(() => {
         const getData = async () => {
@@ -147,7 +148,8 @@ const Page = ({ params }) => {
                         setDeponsit_id(datadePosits?.transactionID);
                         setDeposits(datadePosits?.amount)
                         setShowPaymentMethod(item.status === 'processing');
-
+                        setPartyStatus(item.status);
+                        setTotalAmount(dataDetailBooking[0]?.total_amount);
                         return {
                             id: item.id,
                             nameParty: item?.name,
@@ -272,14 +274,15 @@ const Page = ({ params }) => {
             case 'success':
                 return 'text-green-500';
             case 'processing':
-                return 'text-yellow-300';
+                return 'text-blue-300';
             case 'peding':
                 return 'text-yellow-300';
             default:
                 return 'text-gray-500';
         }
     };
-
+    // console.log(totalAmount);
+    
     return (
         <div className='flex flex-col gap-6'>
             <div className='flex justify-between items-center'>
@@ -306,7 +309,7 @@ const Page = ({ params }) => {
                     • {statusParty === 'success' ? 'Đã hoàn thành' : statusParty === 'pending' ? 'Chưa giải quyết' : statusParty === 'cancel' ? 'Đã Hủy' : 'Đang chờ xử lý'}
                 </span>
             </div>
-            {showPaymentMethod && (
+            {showPaymentMethod && countTables > 0 ? (
                 <PaymentMethod
                     countTables={countTables}
                     sparecountTables={spareCountTables}
@@ -317,8 +320,9 @@ const Page = ({ params }) => {
                     statusParty={statusParty}
                     deposits={deposits}
                     deposit_Id={deponsit_id}
+                    partyStatus={partyStatus}
                 />
-            )}
+            ) : ''}
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             {party && party.length > 0 ? (
                 party.map(party => (
