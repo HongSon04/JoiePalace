@@ -139,7 +139,7 @@ function Home() {
       const res = await getAllPackages();
       console.log(res.data);
 
-      setDataPackage(res.data);
+      setDataPackage(res.data.slice(0, 3));
     };
     delay();
     callApi();
@@ -149,6 +149,8 @@ function Home() {
   };
 
   if (!dataPackage) return <Loading></Loading>;
+  console.log("dataPackage", dataPackage);
+
   return (
     <>
       <HeaderClient />
