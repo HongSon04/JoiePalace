@@ -141,6 +141,8 @@ export const API_CONFIG = {
         `${PRODUCTS_API}/get-by-category/${categoryId}`,
         params
       ),
+    GET_SERVICES: (params) =>
+      constructUrlWithParams(`${PRODUCTS_API}/get-services`, params),
     UPDATE: (id) => `${PRODUCTS_API}/update/${id}`,
     DELETE: (id) => `${PRODUCTS_API}/delete/${id}`,
     RESTORE: (id) => `${PRODUCTS_API}/restore/${id}`,
@@ -232,7 +234,7 @@ export const API_CONFIG = {
   PACKAGES: {
     GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     CREATE: `${PACKAGES_API}/create`,
-    GET_ALL: (params) => constructUrlWithParams(`${PACKAGES}/get-all`, params),
+    GET_ALL_BY_PARAMS: (params) => constructUrlWithParams(`${PACKAGES}/get-all`, params),
   },
 
   // MENU API
