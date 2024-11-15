@@ -55,7 +55,6 @@ export class CreatePackageDto {
     description: 'Giá của gói tiệc, không được để trống',
     required: true,
   })
-  @IsNotEmpty({ message: 'Giá của gói tiệc không được để trống' })
   price: string;
 
   @ApiProperty({
