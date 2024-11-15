@@ -61,6 +61,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${USER_API}/get/${id}`,
     GET_BY_BRANCH_ID: (id) => `${USER_API}/get-all-by-branch-id/${id}`,
     CHANGE_PASSWORD: `${USER_API}/change-password`,
+    RESET_PASSWORD: `${USER_API}/forgot-passwod`,
     FORGOT_PASSWORD: `${USER_API}/forgot-password`,
     CHANGE_PROFILE: `${USER_API}/change-profile`,
     DELETE: (id) => `${USER_API}/delete/${id}`,

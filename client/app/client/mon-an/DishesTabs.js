@@ -87,7 +87,11 @@ function DishesTabs() {
         <TabPanels className="mt-6">
           {categories.map((category, index) => (
             <TabPanel key={index}>
-              <DishList userMenuList={menuList} category={category} />
+              <DishList
+                isLogedIn={isLogedIn}
+                userMenuList={menuList}
+                category={category}
+              />
             </TabPanel>
           ))}
         </TabPanels>

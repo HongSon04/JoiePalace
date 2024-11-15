@@ -58,3 +58,17 @@ export const forgotPassword = async (email) => {
 
   return response;
 };
+
+export const resetPassword = async (data) => {
+  const response = await makeAuthorizedRequest(
+    API_CONFIG.USER.RESET_PASSWORD,
+    "POST",
+    data
+  );
+
+  if (!response.success) {
+    throw new Error(response?.error?.message || "Đã có lỗi xảy ra");
+  }
+
+  return response;
+};
