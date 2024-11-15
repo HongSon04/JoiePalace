@@ -38,12 +38,14 @@ const Contact = () => {
   const package_id = searchParams.get("package_id");
   const [bookingDetails, setBookingDetails] = useState({});
 
-  const [userInfo, setUserInfo] = useState(
-    JSON.parse(localStorage.getItem("user"))
-  );
+  // const [userInfo, setUserInfo] = useState(
+  //   JSON.parse(localStorage?.getItem("user"))
+  // );
+
+  // console.log("userInfo", userInfo);
 
   const [formData, setFormData] = useState({
-    user_id: userInfo?.id,
+    user_id: "",
     name: "",
     email: "",
     phone: "",
@@ -119,7 +121,7 @@ const Contact = () => {
       formSchema.parse(formData);
       setErrors({});
       const dataToSend = {
-        user_id: formData.user_id,
+        user_id: JSON.parse(localStorage?.getItem("user")).id,
         branch_id: formData.branch,
         party_type_id: formData.partyType,
         stage_id: 0,
