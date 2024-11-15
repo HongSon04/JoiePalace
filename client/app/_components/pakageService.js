@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import { Image } from "@chakra-ui/react";
 
-const WeddingPackages = () => {
-    const [openSection, setOpenSection] = useState({});
-    const [selected, setSelected] = useState(null);
-
-    const handleClick = (button) => {
-        setSelected(button);
-    };
+const WeddingPackages = ({ dataPackage }) => {
+  const [openSection, setOpenSection] = useState({});
+  const [selected, setSelected] = useState(null);
+  const [packageFocus, setPackageFocus] = useState(0);
+  const handleClick = (button) => {
+    setSelected(button);
+  };
 
   const toggleDropdown = (packageId, sectionName) => {
     setOpenSection((prev) => ({
@@ -135,6 +135,7 @@ const WeddingPackages = () => {
     { id: 5, name: "Bánh cưới" },
     { id: 6, name: "Nước uống" },
   ];
+  if (!dataPackage) return null;
   return (
     <div className="min-h-screen p-8 flex flex-col items-center justify-between">
       <div className="flex my-8 gap-4 items-center justify-center">
