@@ -5,6 +5,12 @@ import { BookingStatus } from 'helper/enum/booking_status.enum';
 export class UpdateBookingDto {
   @ApiProperty({
     required: false,
+    description: 'ID của gói (nếu có)',
+  })
+  package_id?: string;
+
+  @ApiProperty({
+    required: false,
     description: 'ID của người dùng (nếu có)',
   })
   user_id?: string;

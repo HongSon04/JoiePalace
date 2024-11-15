@@ -25,12 +25,12 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue={options[0]?.value || ''} // Đảm bảo không phải null
+                    defaultValue={options[0]?.value || ''}
                     render={({ field }) => (
                         <select
-                            className="w-full bg-whiteAlpha-200 text-white rounded-md p-2 font-normal leading-6"
+                            className="w-full bg-whiteAlpha-200 text-white rounded-md p-3 font-normal leading-6"
                             {...field}
-                            value={field.value || ''} // Đảm bảo không phải null
+                            value={field.value || ''}
                         >
                             <option className="option" value="" disabled>
                                 Chọn {title}
@@ -47,7 +47,7 @@ const InputDetailCustomer = ({
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue={name === 'customerAndChair' ? 10 : ''} // Đảm bảo không phải null
+                    defaultValue={name === 'customerAndChair' ? 10 : ''}
                     render={({ field }) => (
                         <input
                             {...field}
@@ -55,11 +55,11 @@ const InputDetailCustomer = ({
                             value={
                                 name === 'customerAndChair'
                                     ? 10 // Giá trị cố định cho `customerAndChair`
-                                    : field.value || '' // Đảm bảo không phải null
+                                    : field.value || ''
                             }
-                            readOnly={isReadOnlyField} // Disable editing for specific fields
-                            disabled={isReadOnlyField} // Disable focus and modification for specific fields
-                            className="p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300 "
+                            readOnly={isReadOnlyField}
+                            disabled={isReadOnlyField}
+                            className="p-3 bg-whiteAlpha-200 rounded-lg text-white placeholder-gray-300"
                             placeholder={placeholder}
                             min={type === 'number' ? 1 : undefined}
                             onWheel={(e) => (type === 'number') && e.currentTarget.blur()}

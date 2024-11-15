@@ -4,37 +4,44 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class CreatePackageDto {
   @ApiProperty({
     description: 'Tên gói tiệc, không được để trống',
-    required: true,
+    required: false,
   })
-  @IsNotEmpty({ message: 'Tên gói tiệc không được để trống' })
-  name: string;
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty({
+    description: 'ID sảnh',
+    required: false,
+  })
+  @IsOptional()
+  stage_id?: string;
 
   @ApiProperty({
     description: 'ID loại tiệc, không được để trống',
-    required: true,
+    required: false,
   })
-  @IsNotEmpty({ message: 'Loại tiệc không được để trống' })
-  party_type_id: string;
+  @IsOptional()
+  party_type_id?: string;
 
   @ApiProperty({
     description: 'ID menu, không được để trống',
-    required: true,
+    required: false,
   })
-  @IsNotEmpty({ message: 'Menu không được để trống' })
-  menu_id: string;
+  @IsOptional()
+  menu_id?: string;
 
   @ApiProperty({
     description: 'ID trang trí, không được để trống',
-    required: true,
+    required: false,
   })
-  @IsNotEmpty({ message: 'Trang trí không được để trống' })
-  decor_id: string;
+  @IsOptional()
+  decor_id?: string;
 
   @ApiProperty({
     description: 'Mô tả chi tiết về gói tiệc, không được để trống',
     required: true,
   })
-  @IsNotEmpty({ message: 'Mô tả không được để trống' })
+  @IsNotEmpty({ message: 'Mô tả chi tiết về gói tiệc không được để trống' })
   description: string;
 
   @ApiProperty({
@@ -48,14 +55,14 @@ export class CreatePackageDto {
     description: 'Giá của gói tiệc, không được để trống',
     required: true,
   })
-  @IsNotEmpty({ message: 'Giá không được để trống' })
+  @IsNotEmpty({ message: 'Giá của gói tiệc không được để trống' })
   price: string;
 
   @ApiProperty({
     description: 'Ảnh gói tiệc, không được để trống',
-    required: true,
+    required: false,
   })
-  images: string[];
+  images?: string[];
 
   @ApiProperty({
     example: [
@@ -63,18 +70,9 @@ export class CreatePackageDto {
       { id: 2, quantity: 1 },
     ],
     description: 'Danh sách các dịch vụ khác (ví dụ nước uống, bánh kem, ...)',
+    required: false,
   })
   other_service?: [{ id: string; quantity: number }] | any;
-
-  @ApiProperty({
-    example: [
-      { id: 1, quantity: 2 },
-      { id: 2, quantity: 1 },
-    ],
-    description:
-      'Danh sách các dịch vụ khác (chỉ điền id và số lượng khi đã đặt cọc thành công)',
-  })
-  extra_service?: [{ id: string; quantity: number }] | any;
 
   @ApiProperty({
     description: 'Ghi chú',
@@ -82,4 +80,11 @@ export class CreatePackageDto {
   })
   @IsOptional()
   note?: string;
+
+  @ApiProperty({
+    description: 'Hiển thị gói tiệc hay không',
+    required: false,
+  })
+  @IsNotEmpty({ message: 'Giá của gói tiệc không được để trống' })
+  is_show: Boolean;
 }

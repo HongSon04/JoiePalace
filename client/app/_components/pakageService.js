@@ -2,9 +2,13 @@
 import React, { useState } from "react";
 import { Image } from "@chakra-ui/react";
 
-const WeddingPackages = ({ dataPackage }) => {
-  const [openSection, setOpenSection] = useState({});
-  const [packageFocus, setPackageFocus] = useState(0);
+const WeddingPackages = () => {
+    const [openSection, setOpenSection] = useState({});
+    const [selected, setSelected] = useState(null);
+
+    const handleClick = (button) => {
+        setSelected(button);
+    };
 
   const toggleDropdown = (packageId, sectionName) => {
     setOpenSection((prev) => ({

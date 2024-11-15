@@ -77,15 +77,16 @@ const Page = () => {
                 // Fetch all bookings for the user
                 //pending, processing, success, cancel
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
+                // console.log(fetchedAllBookingsMembershipId);
+
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
-                console.log(fetchedAllBookingsMembershipId);
 
                 if (fetchedAllBookingsSuccess.length > 0) {
                     const parties = fetchedAllBookingsSuccess.map((item) => {
                         const dataDetailBooking = item.booking_details;
                         const dataStages = item.stages || dataDetailBooking[0]?.stage_detail;
-                        console.log('dataStages', dataStages);
+                        // console.log('dataStages', dataStages);
 
                         const dataMenus = dataDetailBooking[0]?.menus;
                         const datadePosits = dataDetailBooking[0]?.deposits;
@@ -97,7 +98,7 @@ const Page = () => {
                             phoneAddress: item.phone,
                             hostName: getUser?.name,
                             email: getUser?.email,
-                            phoneUser: getUser?.phone,
+                            phoneUser: item.phone,
                             idParty: `P${item.id}`,
                             partyDate: formatDate(item.created_at),
                             dateOrganization: formatDate(item.organization_date),
@@ -122,13 +123,12 @@ const Page = () => {
                             menuCostTable: `${dataMenus?.price} VND/bàn`,
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount} VND` : "0 VND",
                             depositAmount: item.is_deposit ? `${datadePosits?.amount} VND` : "0 VND",
-                            depositStatus: item.is_deposit ? "Đã thanh toán" : "Chưa thanh toán",
-                            depositDay: item.is_deposit ? new Date(datadePosits?.created_at).toISOString().split("T")[0] : "",
+                            depositStatus: item.status == 'success' ? "Đã thanh toán" : "Chưa thanh toán",
+                            depositDay: item.is_deposit ? formatDate(datadePosits?.created_at) : '--/--/--',
                             remainingPaid: (item.total_amount && item.depositAmount) ? `${parseInt(item.total_amount) - parseInt(item.depositAmount)} VND` : "0 VND",
-                            paymentDay: item.organization_date ? item.organization_date.split("T")[0] : "",
+                            paymentDay: item.status == 'success' ? formatDate(datadePosits?.created_at) : '--/--/--',
+                            statusParty: item.status
                         };
-
-
                     });
                     setResonParty(parties);
                 }
@@ -137,7 +137,7 @@ const Page = () => {
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
                     return total + item.booking_details[0].total_amount;
                 }, 0);
-                console.log(total_amountUser);
+                // console.log(total_amountUser);
 
                 setTotalAmount(total_amountUser)
                 setLoading(false);
@@ -156,12 +156,16 @@ const Page = () => {
         return new Date(dateString).toLocaleDateString('en-GB', options).replace(/\//g, '/');
     };
 
+    const updatePhone = () => {
+        router.push('/client/nguoi-dung/tai-khoan')
+    }
+
     return (
         <div className="flex flex-col gap-8">
 
             <span className="text-2xl font-bold text-white leading-6">Chung</span>
 
-            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone} emailUser={user?.email} imgUser={user?.avatar} total_amount={partyTotalAmount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} isLoading={loading} />
+            <AccountSectionClient title="Tài khoản" nameUser={user?.name} phoneUser={user?.phone == null ? user?.phone : (<span onClick={updatePhone}> Cập nhật ngay </span>)} emailUser={user?.email} imgUser={user?.avatar} total_amount={partyTotalAmount} partyBooked={partySuccess?.length} waitingParty={partyPending?.length} totalMoney={`${partyTotalAmount.toLocaleString('vi-VN')} VND`} isLoading={loading} />
 
             <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
             <div className='flex justify-between'>

@@ -193,8 +193,6 @@ const dishesSlice = createSlice({
 export const fetchCategoryDishes = createAsyncThunk(
   "dishes/fetchCategoryDishes",
   async ({ categoryId, params, signal }, { dispatch, rejectWithValue }) => {
-    dispatch(fetchingCategoryDishes());
-
     const response = await makeAuthorizedRequest(
       API_CONFIG.PRODUCTS.GET_BY_CATEGORY(categoryId, params),
       "GET",
@@ -202,12 +200,11 @@ export const fetchCategoryDishes = createAsyncThunk(
       { signal }
     );
 
+    // console.log("params -> ", params);
     // console.log("response from fetchCategoryDishes thunk -> ", response);
     if (response.success) {
-      dispatch(fetchingCategoryDishesSuccess(response));
       return response;
     } else {
-      dispatch(fetchingCategoryDishesFailure(response));
       return rejectWithValue(response.message);
     }
   }

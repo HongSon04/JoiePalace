@@ -1,29 +1,39 @@
 "use client";
 
-import { Grid, GridItem, Image } from "@chakra-ui/react";
+import { Grid, GridItem, Image, Button } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 
-const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = true, branchData = {}, stage = [] }) => {
+const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = true, branchData = [], onDelete }) => {
     // Safeguard with fallback values
-    const initialImages = branchData.images ? branchData.images.flatMap(img => img.split(',')) : []; // Split images if they are in a comma-separated string
-    const [description, setDescription] = useState(initialImages);
-    const [names, setNames] = useState(Array(initialImages.length).fill(''));
-    const [descriptions, setDescriptions] = useState(Array(initialImages.length).fill(''));
-    const [stages, setStages] = useState(Array(initialImages.length).fill('')); // State for stages
+    const [images, setImages] = useState([]);
+    const [names, setNames] = useState([]);
+    const [descriptions, setDescriptions] = useState([]);
+    const [stages, setStages] = useState([]);
+
+    useEffect(() => {
+        if (branchData.length > 0) {
+            setImages(branchData.flatMap((item) => item.images.map((img) => img.split(','))).flat());
+            setNames(branchData.flatMap((item) => Array(item.images.length).fill(item.name)));
+            setDescriptions(branchData.flatMap((item) => Array(item.images.length).fill(item.description)));
+            setStages(branchData.flatMap((item, index) => Array(item.images.length).fill(item.name)));
+        }
+    }, [branchData]);
 
     const handleAddDescription = (event) => {
         const files = Array.from(event.target.files);
         const newImages = [];
+        const newStages = [];
 
-        files.forEach((file) => {
+        files.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = () => {
                 newImages.push(reader.result);
+                newStages.push(`New Space ${images.length + index + 1}`);
                 if (newImages.length === files.length) {
-                    setDescription((prev) => [...prev, ...newImages]);
+                    setImages((prev) => [...prev, ...newImages]);
                     setNames((prev) => [...prev, ...Array(newImages.length).fill('')]);
                     setDescriptions((prev) => [...prev, ...Array(newImages.length).fill('')]);
-                    setStages((prev) => [...prev, ...Array(newImages.length).fill('')]); // Update stages
+                    setStages((prev) => [...prev, ...newStages]);
                 }
             };
             reader.readAsDataURL(file);
@@ -42,10 +52,12 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
         setDescriptions(updatedDescriptions);
     };
 
-    const handleStageChange = (index, value) => {
-        const updatedStages = [...stages];
-        updatedStages[index] = value;
-        setStages(updatedStages);
+    const handleDelete = (index) => {
+        setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+        setNames((prevNames) => prevNames.filter((_, i) => i !== index));
+        setDescriptions((prevDescriptions) => prevDescriptions.filter((_, i) => i !== index));
+        setStages((prevStages) => prevStages.filter((_, i) => i !== index));
+        onDelete(index);
     };
 
     const renderImageItem = (item, index) => (
@@ -60,8 +72,18 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
                         className="rounded-lg object-cover"
                     />
                     <span className="absolute top-4 left-4 bg-gray-500 text-white p-1 rounded-lg w-fit font-medium">
-                        HALL {String.fromCharCode(65 + index)}
+                        {stages[index]}
                     </span>
+                    <Button
+                        position="absolute"
+                        top="4"
+                        right="4"
+                        colorScheme="red"
+                        size="sm"
+                        onClick={() => handleDelete(index)}
+                    >
+                        Xóa
+                    </Button>
                 </div>
                 {input && (
                     <input
@@ -88,8 +110,8 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
         <div className="flex p-4 flex-col gap-2 bg-whiteAlpha-200 rounded-lg">
             <span className="font-bold text-white text-base">{title}</span>
             <Grid templateColumns="repeat(3, 1fr)" gap="20px" className="mt-2">
-                {description.map(renderImageItem)}
-                {description.length < 6 && (
+                {images.map(renderImageItem)}
+                {images.length < 6 && (
                     <GridItem w="100%" className="rounded-lg" h={height}>
                         <div className="flex items-center justify-center bg-whiteAlpha-200 h-full rounded-lg">
                             <label

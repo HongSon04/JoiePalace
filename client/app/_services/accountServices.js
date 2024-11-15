@@ -1,5 +1,6 @@
 import axios from "axios";
-import { API_CONFIG } from "../_utils/api.config";
+import { API_CONFIG, makeAuthorizedRequest } from "../_utils/api.config";
+import Cookies from "js-cookie";
 
 export const fetchUserProfile = async () => {
   const response = await axios.get(API_CONFIG.USER.PROFILE);
@@ -31,9 +32,24 @@ export const loginAccountUser = async (dataToSend) => {
 };
 export const loginGoogle = async (dataToSend) => {
   const response = await axios.post(API_CONFIG.AUTH.LOGIN_GOOLGE, dataToSend);
-
   if (response.status !== 200 && response.status !== 201) {
-    throw new Error("Có lỗi khi đăng nhập");
+    throw new Error("Có lỗi");
+  }
+
+  return response.data.data;
+};
+
+export const forgotPassword = async (email) => {
+  const response = await makeAuthorizedRequest(
+    API_CONFIG.MAIL.FORGOT_PASSWORD,
+    "POST",
+    email
+  );
+
+  // console.log(response);
+
+  if (!response.success) {
+    throw new Error(response?.error?.message || "Đã có lỗi xảy ra");
   }
 
   return response;

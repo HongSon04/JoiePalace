@@ -14,6 +14,8 @@ const initialState = {
   isFetchingMenuListError: false,
   isCreatingMenu: false,
   isCreatingMenuError: false,
+  isUpdatingMenu: false,
+  isUpdatingMenuError: false,
   pagination: {},
 };
 
@@ -129,6 +131,37 @@ const checkboxSlice = createSlice({
         state.isCreatingMenu = false;
         state.isCreatingMenuError = true;
       });
+
+    builder
+      .addCase(getMenuListByUserId.pending, (state) => {
+        state.isFetchingMenuList = true;
+        state.isFetchingMenuError = false;
+      })
+      .addCase(getMenuListByUserId.fulfilled, (state, action) => {
+        state.isFetchingMenuList = false;
+        state.menuList = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(getMenuListByUserId.rejected, (state) => {
+        state.isFetchingMenuList = false;
+        state.isFetchingMenu;
+      });
+
+    builder
+      .addCase(updateMenu.pending, (state) => {
+        state.isUpdatingMenu = true;
+        state.isUpdatingMenuError = false;
+      })
+      .addCase(updateMenu.fulfilled, (state, action) => {
+        state.isUpdatingMenu = false;
+        state.menuList = state.menuList.map((item) =>
+          item.id === action.payload.id ? action.payload : item
+        );
+      })
+      .addCase(updateMenu.rejected, (state) => {
+        state.isUpdatingMenu = false;
+        state.isUpdatingMenuError = true;
+      });
   },
 });
 
@@ -169,13 +202,31 @@ export const getMenuList = createAsyncThunk(
         { signal }
       );
 
-      console.log(response);
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const getMenuListByUserId = createAsyncThunk(
+  "menu/fetchMenuListByUserId",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.GET_ALL({ params }),
+        "GET",
+        null,
+        { signal }
+      );
 
       if (response.success) {
-        dispatch(fetchMenuListSuccess(response.data));
-        return response.data;
+        return response;
       } else {
-        dispatch(fetchMenuListError());
         return rejectWithValue(response.message);
       }
     } catch (error) {
@@ -201,6 +252,27 @@ export const getMenu = createAsyncThunk(
       } else {
         dispatch(fetchMenuListError());
         return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateMenu = createAsyncThunk(
+  "menu/updateMenu",
+  async ({ data, id }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.UPDATE(id),
+        "PATCH",
+        data
+      );
+
+      if (response.success) {
+        return response;
+      } else {
+        return response;
       }
     } catch (error) {
       return rejectWithValue(error.message);

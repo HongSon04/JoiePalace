@@ -242,7 +242,7 @@ function FormInput({
           </Button>
         )}
       </div>
-      {errors[name] && (
+      {errors && errors[name] && (
         <AnimatePresence mode="wait" initial={false}>
           {errors[name] && <InputError message={errorMessage} key={name} />}
         </AnimatePresence>

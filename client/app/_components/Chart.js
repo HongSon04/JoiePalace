@@ -28,11 +28,18 @@ const Chart = ({ data, chartType }) => {
                     color: '#ffff',
                     padding: 5,
                     callback: function(value) {
-                        return value / 1000000 + 'M'; 
-                    }
-                },
-                suggestedMax: 800000000,
-                min: 0,
+                        if (value >= 1000000000) {
+                          return (value / 1000000000).toFixed(1) + 'B';
+                        } 
+                        else if (value >= 1000000) {
+                          return (value / 1000000).toFixed(1) + 'M';
+                        } 
+                        
+                        return value;
+                      }
+                    },
+                    suggestedMax: 8000000000,  
+                    min: 0 ,
             },
         },
         elements: {
@@ -71,11 +78,18 @@ const Chart = ({ data, chartType }) => {
                     color: '#ffff',
                     padding: 5,
                     callback: function(value) {
-                        return value / 1000000 + 'M'; 
-                    }
-                },
-                suggestedMax: 800000000,
-                min: 0,
+                        if (value >= 1000000000) {
+                          return (value / 1000000000).toFixed(1) + 'B';
+                        } 
+                        else if (value >= 1000000) {
+                          return (value / 1000000).toFixed(1) + 'M';
+                        } 
+                        
+                        return value;
+                      }
+                    },
+                    suggestedMax: 8000000000,  
+                    min: 0 
             },
         },
         elements: {

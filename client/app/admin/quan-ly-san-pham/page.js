@@ -1,13 +1,22 @@
-"use client";
-
 import AdminHeader from "@/app/_components/AdminHeader";
-import ProductTable from "./ProductTable";
+import DishesMain from "./DishesMain";
+import PageBreadcrumbs from "./PageBreadcrumbs";
+import DishesTable from "./ProductTable";
+
+export const metadata = {
+  title: "Quản lý món ăn",
+};
 
 function Page() {
   return (
     <div>
-      <AdminHeader title={"Quản lý sản phẩm"} />
-      <ProductTable />
+      {/* Header */}
+      <div className="flex items-center">
+        <AdminHeader
+          title={"Quản lý sản phẩm"}
+        />
+      </div>
+      <DishesMain />
     </div>
   );
 }

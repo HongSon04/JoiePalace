@@ -471,6 +471,12 @@ function RequestTable() {
                     Đang xử lý
                   </Chip>
                 );
+              case "success":
+                return (
+                  <Chip variant="flat" color="primary">
+                    Sử lý thành công
+                  </Chip>
+                );
               case "cancel":
                 return (
                   <Chip variant="flat" color="danger">
@@ -651,7 +657,7 @@ function RequestTable() {
     );
   }, [currentPage, pagination.lastPage]);
 
-  // console.log(requests);
+  console.log(pathname);
 
   return (
     <Table
