@@ -57,9 +57,15 @@ const Page = ({ params }) => {
     const fetchAminData = async () => {
       try {
         const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-        const branchId = currentBranch.id;
-        const nameBranch = currentBranch.name;
-        
+        let branchId = 0;
+        // const slug = currentBranch.slug;
+        if (slug === "ho-chi-minh") {
+         const branchId = 0;
+         setBranchId(branchId);
+        } else {
+          const branchId = (currentBranch.id);
+          setBranchId(branchId);
+        }
         // console.log(idBranch);
         // console.log(branchId);
         
@@ -69,6 +75,8 @@ const Page = ({ params }) => {
             idBranch : branchId,
             is_confirm: false,
             is_deposit: false,
+            start_date: startDate,
+            end_date: endDate,
             status : "pending"
             
           }),
@@ -92,7 +100,9 @@ const Page = ({ params }) => {
           "GET",
           null
         );
-        // console.log(userData);
+        // console.log(startDate);
+        // console.log(endDate);
+        
         
         const [
             dataInfo,
@@ -108,7 +118,7 @@ const Page = ({ params }) => {
             fetchRevenueBranchByWeek(0),
             fetchRevenueBranchByYear(0),
             fetchRevenueBranchByQuarter(0),
-            fetchAllByBranch(branchId),
+            fetchAllByBranch(2),
             
         ]);
         // console.log(dataUser);
@@ -121,7 +131,7 @@ const Page = ({ params }) => {
         setdataTotalAdminByYear(dataTotalAdminByYear);
         setdataTotalBranch(dataTotalBranch);
         setDataSlug(dataSlug);
-        setBranchId(branchId  || 0);
+        setBranchId(branchId);
         setDataInfo(dataInfo);
         setAllBooking(dataBooking);
     } catch (error) {
@@ -144,28 +154,43 @@ const Page = ({ params }) => {
         },
       ],
     };
-
+  
     if (data) {
-      const totalRevune = data["Hồ Chí Minh"] || {};
-      const branches = totalRevune.branches || {};
-
-      chartData.labels = Object.keys(branches);
-      chartData.datasets[0].data = Object.values(branches);
+      const totalRevune = data["Hồ Chí Minh"] || {}; 
+      const branches = totalRevune.branches || {}; 
+  
+      chartData.labels = ["Hồ Chí Minh", ...Object.keys(branches)];
+  
+      chartData.datasets[0].data = [totalRevune.value, ...Object.values(branches)];
     }
-
+  
     return chartData;
   };
+  
   let dataByWeek = createChartData(dataTotalAdminByWeek, "Doanh thu theo tuần");
   let dataByMonth = createChartData(
     dataTotalAdminByMonth,
     "Doanh thu theo tháng"
   );
   let dataByYear = createChartData(dataTotalAdminByYear, "Doanh thu theo năm");
-
+  // console.log(dataTotalAdminByYear);
   const dataBranchChart = dataTotalBranch || [];
-  const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
+  // Kiểm tra nếu các đối tượng không phải là null hoặc undefined, nếu không thì sử dụng mảng rỗng
+  const quarterlyRevenues = Object.values(dataBranchChart.total_revune_by_quarter || {}).flat();
   const monthlyRevenues = Object.values(dataBranchChart.total_revune_by_month || []);
-  const yearlyRevenues = Object.values(dataBranchChart.total_revune_by_year || []);
+  const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
+
+  // Tính tổng doanh thu của các quý, tháng, tuần
+  const totalQuarterRevenue = quarterlyRevenues.reduce((acc, curr) => acc + curr, 0);
+  const totalMonthRevenue = monthlyRevenues.reduce((acc, curr) => acc + curr, 0);
+  const totalWeekRevenue = weeklyRevenues.reduce((acc, curr) => acc + curr, 0);
+
+  // Tổng doanh thu
+  const yearlyRevenues = totalQuarterRevenue + totalMonthRevenue + totalWeekRevenue;
+
+  // console.log(yearlyRevenues);  // In ra tổng doanh thu
+
+
 
   const dataBranch = {
     labels: ['Tuần', 'Tháng', 'Năm'],  
@@ -174,7 +199,7 @@ const Page = ({ params }) => {
       data: [
         ...weeklyRevenues,  
         ...monthlyRevenues, 
-        ...yearlyRevenues  
+        yearlyRevenues  
       ]
     }]
   };
@@ -187,6 +212,7 @@ const Page = ({ params }) => {
       data: eachMonthChartData
     }]
   };
+ 
   const dataBooking = allBooking?.data || [];
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -229,7 +255,7 @@ const Page = ({ params }) => {
                 <p className="text-2xl font-bold">{dataInfo.totalUser}</p>
               </div>
               <div className="flex justify-between items-center">
-                <p className="text-white text-base font-normal">Khách hàng</p>
+                <p className="text-white text-base font-normal">Khách hàng trong tháng</p>
 
               </div>
             </div>
@@ -284,7 +310,7 @@ const Page = ({ params }) => {
       <div className="container  flex gap-4 w-full h-full  p-4">
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
-            <p className="text-base font-semibold ">Khách hàng</p>
+            <p className="text-base font-semibold ">Khách hàng trong tháng</p>
             
           </div>
           <div className="flex flex-col gap-3 h-[580px] px-[10px] overflow-y-auto hide-scrollbar">
@@ -342,7 +368,7 @@ const Page = ({ params }) => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 h-[580px] overflow-y-auto hide-scrollbar items-start">
-            {branchId === 2 ? (
+            {branchId === 0 ? (
               <>
                 <div className="p-2 bg-blackAlpha-100 rounded-xl">
                   <div className="flex items-center justify-between gap-[10px] mb-[10px]">
@@ -410,7 +436,7 @@ const Page = ({ params }) => {
             </table>
           </div>
         </div>
-        {branchId === 2 &&
+        {branchId === 0 &&
           <div className=" w-1/2">
             <div className="flex items-center justify-between mb-[10px]">
               <p className="text-base  font-semibold">Doanh thu tổng / năm</p>

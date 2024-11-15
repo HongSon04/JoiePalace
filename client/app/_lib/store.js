@@ -11,6 +11,7 @@ import requestsSlice from "./features/requests/requestsSlice";
 import sidebarSlice from "./features/sidebar/sidebarSlice";
 import themeSlice from "./features/theme/themeSlice";
 import productsSlice from "./products/productsSlice";
+import customersSlice from "./features/customer/customerSlice";
 
 const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ const store = configureStore({
     feedbacks: feedbacksSlice.reducer,
     partyTypes: partyTypesSlice.reducer,
     products: productsSlice.reducer,
+    customers: customersSlice.reducer,
   },
 });
 
