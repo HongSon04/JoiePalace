@@ -20,7 +20,11 @@ export const fetchAllPartyBookings = async (id) => {
 };
 export const fetchAllBookingByUserId = async (userId) => {
   try {
-    const response = await axios.get(API_CONFIG.BOOKINGS.GET_ALL_BY_IDUSER(userId));
+    const response = await axios.get(API_CONFIG.BOOKINGS.GET_ALL({
+        user_id: userId,
+        itemsPerPage: 99999,
+      }
+    ));
 
     if (response.status !== 200) {
       throw new Error("Có lỗi khi lấy dữ liệu");
@@ -28,7 +32,7 @@ export const fetchAllBookingByUserId = async (userId) => {
 
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching bookings:', error); 
+    console.error('Error fetching bookings:', error);
     throw new Error("Có lỗi khi lấy dữ liệu");
   }
 };
@@ -42,7 +46,7 @@ export const fetchBookingById = async (id) => {
 
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching bookings:', error); 
+    console.error('Error fetching bookings:', error);
     throw new Error("Có lỗi khi lấy dữ liệu");
   }
 };

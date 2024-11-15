@@ -1,11 +1,37 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import gear from '@/public/gear.svg';
 import checked from '@/public/Checked.svg';
 import Image from "next/image";
+import { fetchAllPackages } from '@/app/_services/packagesServices';
 
-const weddingPacks = [
-    {
+
+
+const WeddingSection = () => {
+    const [openPackIndex, setOpenPackIndex] = useState(null);
+    const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+    const [dataPackage, setDataPackage] = useState([]);
+
+    useEffect(() => {
+        const getUser = JSON.parse(localStorage.getItem("user"));
+        if (!getUser) {
+            router.push('/');
+            return;
+        }
+
+        const fetchData = async () => {
+            try {
+                const data = await fetchAllPackages();
+                setDataPackage(data);
+            } catch (error) {
+                console.error('Error fetching menu data:', error);
+            }
+        };
+
+        fetchData();
+    }, []); 
+
+    const weddingPacks = dataPackage.map(item => ({
         title: "GÓI TIỆC CƯỚI NGỌT NGÀO",
         price: "50 - 100 Triệu VND",
         details: "Thường dành cho tiệc khoảng 100 khách.",
@@ -27,13 +53,35 @@ const weddingPacks = [
                 ]
             },
         ]
-    },
-    // Thêm các gói khác nếu cần
-];
+    }));
 
-const WeddingSection = () => {
-    const [openPackIndex, setOpenPackIndex] = useState(null);
-    const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+
+    // const weddingPacks = [
+    //     {
+    //         title: "GÓI TIỆC CƯỚI NGỌT NGÀO",
+    //         price: "50 - 100 Triệu VND",
+    //         details: "Thường dành cho tiệc khoảng 100 khách.",
+    //         categories: [
+    //             {
+    //                 title: "Trang trí",
+    //                 items: [
+    //                     "Màu sắc tự chọn theo chủ đề",
+    //                     "Hoa tươi tự chọn",
+    //                     "Backdrop đơn giản, có thể tự thiết kế"
+    //                 ]
+    //             },
+    //             {
+    //                 title: "Âm thanh",
+    //                 items: [
+    //                     "Dàn âm thanh chất lượng cao",
+    //                     "Nhân viên kỹ thuật âm thanh",
+    //                     "DJ chuyên nghiệp"
+    //                 ]
+    //             },
+    //         ]
+    //     },
+    //     // Thêm các gói khác nếu cần
+    // ];
 
     const togglePack = (index) => {
         setOpenPackIndex(openPackIndex === index ? null : index);
@@ -71,7 +119,7 @@ const WeddingSection = () => {
 
                             {pack.categories.map((category, index) => (
                                 <div key={index}>
-                                    <div 
+                                    <div
                                         className="flex items-center justify-between cursor-pointer py-2 border-b border-gray-300"
                                         onClick={() => toggleDropdown(index)}
                                     >

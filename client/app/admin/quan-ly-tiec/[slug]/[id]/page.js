@@ -24,16 +24,6 @@ const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
 );
 
-const fetchOptions = async (apiConfig, setState, title, name) => {
-    try {
-        const response = await makeAuthorizedRequest(apiConfig, "GET");
-        const options = response.data.map(item => ({ value: item.id, label: item.name, price: item.price }));
-        setState([{ svg: null, title, type: 'select', name, options }]);
-    } catch (error) {
-        console.error(`Error fetching ${name} data:`, error);
-    }
-};
-
 const FoodsTitle = ({ title, foodsMap, handleDeleteFood }) => {
     return (
         <div className="flex flex-col gap-2">
@@ -131,24 +121,24 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         },
     ])
 
-    const [otherService, setOtherService] = useState([
-        {
-            svg: null,
-            title: 'Dịch vụ khác',
-            type: 'select',
-            name: 'other_service',
-            options: [
-                { value: null, label: 'Không chọn' }
-            ],
-        },
-    ])
+    // const [otherService, setOtherService] = useState([
+    //     {
+    //         svg: null,
+    //         title: 'Dịch vụ khác',
+    //         type: 'select',
+    //         name: 'other_service',
+    //         options: [
+    //             { value: null, label: 'Không chọn' }
+    //         ],
+    //     },
+    // ])
 
     const [selectedMenu, setSelectedMenu] = useState('');
     const [selectStages, setSelectStages] = useState('');
     const [selectedDecors, setSelectedDecors] = useState('');
     const [selectPartyTypes, setSelectPartyTypes] = useState('');
     const [selectStatusBookings, setSelectStatusBookings] = useState('');
-    const [selectOtherServices, setSelectOtherServices] = useState(null);
+    // const [selectOtherServices, setSelectOtherServices] = useState(null);
     const [selectStatusDeposit, setSelectStatusDeposit] = useState(false);
 
     const [foods, setFoods] = useState({
@@ -194,11 +184,16 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     
             setStages([{ title: 'Sảnh', type: 'select', options }]);
     
-            // Nếu chỉ có 1 options, tự động chọn
+            // Automatically select the first option if there is only one
             if (options.length === 1) {
                 setSelectStages(options[0].value);
                 setLimitStages(options[0].capacity_max || 0);
                 setStagePrice(options[0].price || 0);
+            } else {
+                // If there are no selected stages, set to the first option if available
+                if (!selectStages && options.length > 0) {
+                    setSelectStages(options[0].value);
+                }
             }
         } catch (error) {
             console.error(error);
@@ -269,7 +264,17 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 label: decor.name,
                 price: decor.price,
             }));
+    
             setDecors(prevDecors => [{ ...prevDecors[0], options: decorOptions }]);
+    
+            // Automatically select the first option if only one available
+            if (decorOptions.length === 1) {
+                setSelectedDecors(decorOptions[0].value);
+                setDecorPrice(decorOptions[0].price);
+            } else if (!selectedDecors && decorOptions.length > 0) {
+                // Select the first option if no decor is currently selected
+                setSelectedDecors(decorOptions[0].value);
+            }
         } catch (error) {
             console.error('Error fetching decors:', error);
         }
@@ -293,44 +298,35 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             console.error('Error fetching party types:', error);
         }
     };
-    const fetchPackageForOtherServices = async () => {
-        try {
-            const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_ALL(), 'GET');
-            const otherServices = response.data.map(packages => ({
-                value: packages.id,
-                label: packages.name,
-                price: packages.price,
-                extra_service: packages.extra_service
-            }));
+    // const fetchPackageForOtherServices = async () => {
+    //     try {
+    //         const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_ALL(), 'GET');
+    //         const otherServices = response.data.map(packages => ({
+    //             value: packages.id,
+    //             label: packages.name,
+    //             price: packages.price,
+    //             extra_service: packages.extra_service
+    //         }));
     
-            const optionsWithDefault = [
-                { value: null, label: 'Không chọn' },
-                ...otherServices 
-            ];
+    //         const optionsWithDefault = [
+    //             { value: null, label: 'Không chọn' },
+    //             ...otherServices 
+    //         ];
     
-            setOtherService([{ ...otherService[0], options: optionsWithDefault }]);
-        } catch (error) {
-            console.error('Error fetching other services:', error);
-        }
-    };
+    //         setOtherService([{ ...otherService[0], options: optionsWithDefault }]);
+    //     } catch (error) {
+    //         console.error('Error fetching other services:', error);
+    //     }
+    // };
 
 
     const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
         defaultValues: {
-            menu: '',
-            stages: '',
-            decors: '',
             other_services: null,
-            partyTypes: '',
-            status: '',
             customerAndChair: 10,
-            statusPayment: '',
-            statusDeposit: '',
-            payment: '',
             total_amount: 0,
             depositAmount: 0,
-            customer: '',
             spare_table_count: 0,
         },
     });
@@ -345,26 +341,26 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 const paymentStatusMethod = partyData.payment_status;
                 await fetchAllStages(partyData.branch_id);
                 const bookingDetails = partyData.booking_details[0] || {};
-                const decorId = bookingDetails.decor_id;
 
-                const initialStageId = partyData.stage_id || '';
+                const initialStageId = partyData.stage_id || (partyData.booking_details[0]?.stage_detail?.id || '');
                 const selectedMenuId = bookingDetails.menu_id || selectedMenu;
-                const selectedDecorId = bookingDetails.decor_id;
+                const selectedDecorId = bookingDetails.decor_id || selectedDecors;
 
-                
                 if (stages[0]?.options.length === 1) {
                     setSelectStages(stages[0].options[0].value);
-                }else if (initialStageId) {
+                } else if (initialStageId) {
                     const selectedStage = stages[0]?.options.find(option => option.value === initialStageId);
-                    setSelectStages(initialStageId);
-
+                    
                     if (selectedStage) {
+                        setSelectStages(selectedStage.value);
                         setLimitStages(selectedStage.capacity_max || 0);
-                        setStagePrice(selectedStage.price);
+                        setStagePrice(selectedStage.price || 0);
                     } else {
-                        setSelectStages(stages[0].options[0].value);
+                        setSelectStages(stages[0].options[0]?.value);
                         setStagePrice(0);
                     }
+                } else if (stages[0]?.options.length > 0) {
+                    setSelectStages(stages[0].options[0].value);
                 }
 
                 if (!selectedMenu) {
@@ -374,26 +370,30 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     }
                 }
 
-                if (bookingDetails.extra_service) {
-                    setSelectOtherServices(bookingDetails.extra_service);
-                    const selectedOption = otherService[0].options.find(option => option.value === bookingDetails.extra_service);
-                    if (selectedOption) {
-                        setOtherServicePrice(selectedOption.price);
-                    }
-                } else {
-                    setSelectOtherServices(null); 
-                }
+                // if (bookingDetails.extra_service) {
+                //     setSelectOtherServices(bookingDetails.extra_service);
+                //     const selectedOption = otherService[0].options.find(option => option.value === bookingDetails.extra_service);
+                //     if (selectedOption) {
+                //         setOtherServicePrice(selectedOption.price);
+                //     }
+                // } else {
+                //     setSelectOtherServices(null); 
+                // }
 
-                if(decors[0]?.options.length === 1){
+                if (decors[0]?.options.length === 1) {
                     setSelectedDecors(decors[0].options[0].value);
                     setDecorPrice(decors[0].options[0].price);
-                }
-                 else if (decorId) {
-                    setSelectedDecors(decorId);
-                    const selectedDecorOption = decors.find(option => option.value === Number(decorId));
+                } else if (selectedDecorId) {
+                    const selectedDecorOption = decors[0].options.find(option => option.value === Number(selectedDecorId));
+                    
                     if (selectedDecorOption) {
+                        setSelectedDecors(selectedDecorOption.value);
                         setDecorPrice(selectedDecorOption.price);
+                    } else {
+                        setSelectedDecors(decors[0]?.options[0]?.value);
                     }
+                } else if (decors[0]?.options.length > 0) {
+                    setSelectedDecors(decors[0].options[0].value);
                 }
 
                 // Cập nhật loại tiệc
@@ -475,12 +475,12 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 // Cập nhật giá trị cho form
                 setValue('total_amount', partyData.total_amount || 0);
                 setValue('depositAmount', bookingDetails.deposits?.amount || 0);
-
+                const shiftValue = partyData.shift.toLowerCase() === 'tối' ? 'tối' : 'sáng';
                 // Reset form với dữ liệu từ API
                 reset({
                     status: partyData.status || '',
                     username: partyData.name || '',
-                    company_name: partyData.company_name || '',
+                    company_name: partyData.name || '',
                     email: partyData.email || partyData.users?.email,
                     phone: partyData.phone || partyData.users?.phone,
                     customerAndChair: 10,
@@ -489,7 +489,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     customer: Number(partyData.number_of_guests) || 0,
                     partyDate: partyData.created_at.slice(0, 10) || '',
                     organization_date: partyData.organization_date.slice(0, 10) || '',
-                    shift: partyData.shift,
+                    shift: shiftValue,
                     menu: selectedMenuId,
                     decor: selectedDecorId,
                     total_amount: bookingDetails.total_amount,
@@ -533,27 +533,27 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             await fetchFoodsByMenuId(selectedMenuId);
         }
     };
-    const handleOtherService = (event) => {
-        const packages_id = event.target.value;
-        setSelectOtherServices(packages_id);
+    // const handleOtherService = (event) => {
+    //     const packages_id = event.target.value;
+    //     setSelectOtherServices(packages_id);
 
-        const selectedMenuOption = otherService[0].options.find(option => option.value === packages_id);
+    //     const selectedMenuOption = otherService[0].options.find(option => option.value === packages_id);
 
-        if (selectedMenuOption) {
-            setOtherServicePrice(selectedMenuOption.price);
-        } else {
-            setOtherServicePrice(0);
-        }
+    //     if (selectedMenuOption) {
+    //         setOtherServicePrice(selectedMenuOption.price);
+    //     } else {
+    //         setOtherServicePrice(0);
+    //     }
 
-        setValue('other_service', packages_id); 
-    };
+    //     setValue('other_service', packages_id); 
+    // };
     
     const handleStageChange = (event) => {
         const selectedStageId = event.target.value;
         setSelectStages(selectedStageId);
         fetchLimitStages(selectedStageId);
+        
         const selectedStage = stages[0]?.options.find(option => option.value === selectedStageId);
-
         if (selectedStage) {
             setLimitStages(selectedStage.capacity_max || 0);
             setStagePrice(selectedStage.price);
@@ -616,7 +616,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         fetchAllMenus();
         fetchAllDecors();
         fetchAllPartyTypes()
-        fetchPackageForOtherServices()
+        // fetchPackageForOtherServices()
     }, [fetchDataDetailsParty]);
 
     const onSubmit = async (data) => {
@@ -641,8 +641,11 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         // Tổng tiền menu (cho bàn chính)
         const total_menus = data.tables * menuPrice;
 
+        //Tổng tiền menu cho bàn phụ
+        const total_menus_backup = data.spare_table_count * menuPrice;
+
         // Tính tổng tiền amount
-        const total_amount_all = total_table_price + total_table_price_backup + total_chair_price + total_chair_price_backup + decorPrice + partyPrice + stagePrice + total_menus;
+        const total_amount_all = total_table_price + total_table_price_backup + total_chair_price + total_chair_price_backup + decorPrice + partyPrice + stagePrice + total_menus + total_menus_backup;
 
         console.log(total_amount_all)
 
@@ -661,23 +664,17 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             table_count: data.tables,
             spare_table_count: data.spare_table_count,
             amount: total_amount_all,
-            // menus: {
-            //     menu_id: Number(selectedMenu),
-            //     price: data.menus_price,
-            //     products: finalFoods,
-            // },
             other_service: null,
             extra_service: null,
-            status: selectStatusBookings,
             is_confirm: true,
             is_deposit: selectStatusDeposit,
+            status: selectStatusBookings,
         }
 
         console.log("total_chair_price_backup" + total_chair_price_backup)
         console.log("total_chair_price" + total_chair_price)
         console.log("total_table_price" + total_table_price)
         console.log("total_table_price_backup" + total_table_price_backup)
-        console.log("amount" + total_amount_all)
         console.log("menus" + total_menus)
         console.log("decorPrice" + decorPrice)
         console.log("partyPrice" + partyPrice)
@@ -716,10 +713,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
             toast("error", "Cập nhật thất bại", message);
         }
-
+        console.log(dataform)
     };
 
-    console.log(otherService)
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
@@ -812,7 +808,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 onChange={handleMenuChange}
                             />
                         ))}
-                        {otherService.map((service, index) => (
+                        {/* {otherService.map((service, index) => (
                             <DropdownField
                                 key={index}
                                 label={service.title}
@@ -821,7 +817,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 value={selectOtherServices}
                                 onChange={handleOtherService}
                             />
-                        ))}
+                        ))} */}
                         {statusBookings.map((menu, index) => (
                             <DropdownField
                                 key={index}
