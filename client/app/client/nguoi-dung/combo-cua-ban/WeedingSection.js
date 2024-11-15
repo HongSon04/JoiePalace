@@ -22,6 +22,7 @@ const WeddingSection = () => {
         const fetchData = async () => {
             try {
                 const data = await fetchAllPackages();
+                // const packagesByUser = data.filter( item => item.user.id);
                 setDataPackage(data);
             } catch (error) {
                 console.error('Error fetching menu data:', error);
@@ -123,7 +124,7 @@ const WeddingSection = () => {
             {weddingPacks.map((pack, packIndex) => (
                 <div key={packIndex} className=" relative group rounded-lg shadow-lg bg-gradient-to-r from-gold to-whiteAlpha-400 p-6 text-white cursor-pointer overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 hover:shadow-xl">
                  
-                    <div className={`transition-transform duration-500 ease-in-out ${openPackIndex === packIndex ? 'translate-y-[-8px]' : ''}`}>
+                    <div className={`transition-transform duration-500 ease-in-out ${openPackIndex === packIndex ? 'translate-y-[-8px]' : ''} `}>
                         <div className='flex justify-between items-center'>
                             <h2 className="text-lg font-bold uppercase">{pack.title}</h2>
                             <div className="flex items-center bg-gray-800 p-2 rounded-full">

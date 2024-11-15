@@ -50,7 +50,7 @@ const MenuItems = ({ data, imgMenu, nameMenu }) => {
                     alt='menu' 
                     className='absolute inset-0 object-cover blur-md opacity-30' 
                 />
-                <div className="relative z-10 overflow-y-auto max-h-[300px] flex flex-col gap-5">
+                <div className="relative z-10 overflow-y-auto max-h-[450px] flex flex-col gap-5">
                     {data.map((menu, index) => (
                         <div key={index} className='flex flex-col'>
                             <h2 

@@ -18,6 +18,8 @@ const Page = () => {
         const fetchData = async () => {
             try {
                 const data = await fetchAllMenu();
+                console.log(data);
+                
                 const filteredMenuData = data.filter(menu => menu.user_id === getUser.id);
                 setMenuDataByIDUser(filteredMenuData);
             } catch (error) {
