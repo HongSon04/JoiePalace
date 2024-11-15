@@ -29,23 +29,49 @@ const WeddingSection = () => {
         };
 
         fetchData();
-    }, []); 
+    }, []);
 
     const weddingPacks = dataPackage.map(item => ({
-        title: "GÓI TIỆC CƯỚI NGỌT NGÀO",
-        price: "50 - 100 Triệu VND",
+        title: item.name,
+        price: `${item.price.toLocaleString().slice(0, 2)} Triệu VND`,
         details: "Thường dành cho tiệc khoảng 100 khách.",
         categories: [
             {
                 title: "Trang trí",
                 items: [
-                    "Màu sắc tự chọn theo chủ đề",
-                    "Hoa tươi tự chọn",
-                    "Backdrop đơn giản, có thể tự thiết kế"
+                    'Tùy chọn theo trang trí tiệc'
+                ]
+            },
+            {
+                title: "Bàn tiệc",
+                items: [
+                    'Tùy chọn theo trang trí tiệc'
+                ]
+            },
+            {
+                title: "MC",
+                items: [
+                    'MC chuyên nghiệp'
                 ]
             },
             {
                 title: "Âm thanh",
+                items: [
+                    "Dàn âm thanh chất lượng cao",
+                    "Nhân viên kỹ thuật âm thanh",
+                    "DJ chuyên nghiệp"
+                ]
+            },
+            {
+                title: "Bánh cưới",
+                items: [
+                    "Dàn âm thanh chất lượng cao",
+                    "Nhân viên kỹ thuật âm thanh",
+                    "DJ chuyên nghiệp"
+                ]
+            },
+            {
+                title: "Nước uống",
                 items: [
                     "Dàn âm thanh chất lượng cao",
                     "Nhân viên kỹ thuật âm thanh",
@@ -95,7 +121,8 @@ const WeddingSection = () => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {weddingPacks.map((pack, packIndex) => (
-                <div key={packIndex} className="relative group rounded-lg shadow-lg bg-gradient-to-r from-gold to-whiteAlpha-400 p-6 text-white cursor-pointer overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 hover:shadow-xl">
+                <div key={packIndex} className=" relative group rounded-lg shadow-lg bg-gradient-to-r from-gold to-whiteAlpha-400 p-6 text-white cursor-pointer overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 hover:shadow-xl">
+                 
                     <div className={`transition-transform duration-500 ease-in-out ${openPackIndex === packIndex ? 'translate-y-[-8px]' : ''}`}>
                         <div className='flex justify-between items-center'>
                             <h2 className="text-lg font-bold uppercase">{pack.title}</h2>
