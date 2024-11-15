@@ -1,6 +1,5 @@
 import axios from "axios";
 import { API_CONFIG } from "../_utils/api.config";
-import axios from 'axios';
 
 export const getProductById = async (id) => {
   const response = await axios.get(API_CONFIG.PRODUCTS.GET_BY_ID(id), {

@@ -36,18 +36,10 @@ const Contact = () => {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState({});
 
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const storedUser = window.localStorage.getItem("user");
-
-    if (storedUser) {
-      setUserInfo(JSON.parse(storedUser));
-    }
-  }, []);
   const searchParams = useSearchParams();
   const package_id = searchParams.get("package_id");
   const [bookingDetails, setBookingDetails] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     user_id: userInfo?.id,
@@ -123,6 +115,7 @@ const Contact = () => {
     e.preventDefault();
     const validationErrors = {};
     try {
+      setIsLoading(true);
       formSchema.parse(formData);
       setErrors({});
       const dataToSend = {
@@ -168,6 +161,8 @@ const Contact = () => {
         validationErrors[err.path[0]] = err.message;
       });
       setErrors(validationErrors);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -316,7 +311,12 @@ const Contact = () => {
         styles="overflow-hidden"
       />
       <div className="w-full flex justify-end">
-        <ButtonDiscover type="submit" name="Gửi" className="w-auto px-6" />
+        <ButtonDiscover
+          isLoading={isLoading}
+          type="submit"
+          name="Gửi"
+          className="w-auto px-6"
+        />
       </div>
     </form>
   );

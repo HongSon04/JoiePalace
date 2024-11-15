@@ -1,11 +1,21 @@
+import { Spinner } from "@nextui-org/react";
 import { memo } from "react";
 
-const ButtonDiscover = ({ name, className, ...props }) => {
+const ButtonDiscover = ({ name, className, isLoading, ...props }) => {
   return (
     <button
       className={`bg-gold flex justify-center items-center gap-1 py-2 px-3 rounded-3xl cursor-pointer ${className}`}
       {...props}
     >
+      {isLoading && (
+        <Spinner
+          size="sm"
+          classNames={{
+            circle1: "w-12 h-12 border-b-gold",
+            circle2: "w-12 h-12 border-b-gold",
+          }}
+        />
+      )}
       <span className="text-[1em] font-medium flex items-center h-6">
         {name ? name : "Khám phá"}
       </span>
