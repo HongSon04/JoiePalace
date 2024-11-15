@@ -231,12 +231,11 @@ export const API_CONFIG = {
 
   // PACKAGES_API API
   PACKAGES: {
-    GET_ALL: `${PACKAGES}/get-all`,
-    GET_BY_SLUG: (slug) => `${PACKAGES}/get-by-slug/${slug}`,
-    GET_BY_ID: (id) => `${PACKAGES}/get/${id}`,
-    GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     CREATE: `${PACKAGES_API}/create`,
-    GET_ALL: (params) => constructUrlWithParams(`${PACKAGES}/get-all`, params),
+    GET_BY_SLUG: (slug) => `${PACKAGES_API}/get-by-slug/${slug}`,
+    GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
+    GET_ALL: (params) =>
+      constructUrlWithParams(`${PACKAGES_API}/get-all`, params),
   },
 
   // MENU API
@@ -258,11 +257,11 @@ export const API_CONFIG = {
   },
 
   // PAYMENT
-  PAYMENT:{
-    PAYMENT_METHOD: ( method, deposit_id ) => `${PAYMENT}/${method}/${deposit_id}`,
-  }
+  PAYMENT: {
+    PAYMENT_METHOD: (method, deposit_id) =>
+      `${PAYMENT}/${method}/${deposit_id}`,
+  },
 };
-
 
 // apiServices.js
 import axios from "axios";

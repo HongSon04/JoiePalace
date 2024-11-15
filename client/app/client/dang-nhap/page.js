@@ -30,7 +30,6 @@ const Page = () => {
   const { tryCatchWrapper, makeAuthorizedRequest } = useApiServices();
   const dispatch = useDispatch();
   const platform = GetPlatform();
-  const [isLoginCalled, setIsLoginCalled] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -134,7 +133,8 @@ const Page = () => {
         name: data?.user?.name.toString(),
         platform: "Google",
       });
-
+      console.log("response", response);
+      
       if (response.status === 200) {
         user = decodeJwt(response.data.data.access_token);
         Cookies.set("accessToken", response.data.data.access_token, {
