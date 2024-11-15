@@ -118,10 +118,11 @@ export class PackagesController {
     }),
   )
   create(
+    @Request() req,
     @Body() createPackageDto: CreatePackageDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
-    return this.packagesService.create(createPackageDto, files);
+    return this.packagesService.create(req.user, createPackageDto, files);
   }
 
   // ! Get all packages

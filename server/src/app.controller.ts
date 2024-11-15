@@ -16,4 +16,11 @@ export class AppController {
   ) {
     return this.appService.confirmRegister(token, email);
   }
+
+  @ApiExcludeEndpoint()
+  @Get('get-secretkey')
+  @isPublic()
+  getSecretKey() {
+    return this.appService.getSecretKey();
+  }
 }

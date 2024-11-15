@@ -19,40 +19,35 @@ const Page = ({ params }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-       
         const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
         const branchId = currentBranch.id;
         const nameBranch = currentBranch.name;
-       
-        
+
         const [dataTotalBranch, allBranch] = await Promise.all([
-          fetchAllByBranch(branchId), 
-          fetchAllBranch() 
+          fetchAllByBranch(branchId),
+          fetchAllBranch()
         ]);
-       
-       
+
         setDataSlug(dataSlug);
         setBranchId(branchId);
         setNameBranch(nameBranch);
         setDataTotalBranch(dataTotalBranch);
         setAllBranch(allBranch);
-        setSelectedBranchId(branchId); 
+        setSelectedBranchId(branchId);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
-  }, [slug]); 
-  // console.log(branchId);
-  
+  }, [slug]);
+
   const dataBranch = allBranch?.data || [];
-  // const BranchName = (nameBranch === 'Hồ Chí Minh') ? 'tổng' : nameBranch;
-  
+
   const fetchDataForBranch = async (branchId) => {
     try {
-      const dataTotalBranch = await fetchAllByBranch(branchId);  
+      const dataTotalBranch = await fetchAllByBranch(branchId);
       setDataTotalBranch(dataTotalBranch);
-      setSelectedBranchId(branchId); 
+      setSelectedBranchId(branchId);
     } catch (error) {
       console.error("Error fetching data for branch:", error);
     }
@@ -60,24 +55,24 @@ const Page = ({ params }) => {
 
   const handleBranchChange = (event) => {
     const newBranchId = event.target.value;
-    setBranchId(newBranchId);  
-    setSelectedBranchId(newBranchId); 
-    fetchDataForBranch(newBranchId); 
+    setBranchId(newBranchId);
+    setSelectedBranchId(newBranchId);
+    fetchDataForBranch(newBranchId);
   };
- 
+
   const dataBranchChart = dataTotalBranch || [];
   const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
   const monthlyRevenues = Object.values(dataBranchChart.total_revune_by_month || []);
   const yearlyRevenues = Object.values(dataBranchChart.total_revune_by_year || []);
 
   const dataChart = {
-    labels: ['Tuần', 'Tháng', 'Năm'],  
+    labels: ['Tuần', 'Tháng', 'Năm'],
     datasets: [{
       label: 'Doanh thu',
       data: [
-        ...weeklyRevenues,  
-        ...monthlyRevenues, 
-        ...yearlyRevenues  
+        ...weeklyRevenues,
+        ...monthlyRevenues,
+        ...yearlyRevenues
       ]
     }]
   };
@@ -123,7 +118,8 @@ const Page = ({ params }) => {
             <p className="text-base font-semibold">Danh sách tiệc</p>
           </div>
           <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-            <BookingsTable branchId={branchId} />
+            {/* Truyền selectedBranchId vào BookingsTable */}
+            <BookingsTable branchId={selectedBranchId} />
           </div>
         </div>
       </div>

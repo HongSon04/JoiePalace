@@ -17,7 +17,8 @@ const PaymentMethod = ({
     priceDecoration,
     sparecountTables,
     deposits,
-    deposit_Id
+    deposit_Id,
+    partyStatus
 }) => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertTitle, setAlertTitle] = useState('');
@@ -25,36 +26,38 @@ const PaymentMethod = ({
     const [totalamount, setTotalAmount] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showPaymentMethod, setShowPaymentMethod] = useState('');
-    const [ linkPaymentMethod, setLinkPaymentMethod] = useState('');
+    const [linkPaymentMethod, setLinkPaymentMethod] = useState('');
     const toast = useCustomToast();
     const router = useRouter();
 
+    const formatPrice = (price) => (typeof price === 'number' ? price.toLocaleString() : "0");
+
     const statementPrice = {
-        statementtable: `(Bàn ${countTables} + bàn phụ ${sparecountTables} ) x 200.000đ  + Ghế ${(countTables + sparecountTables) * 10} x 50.000đ + Menu ${countTables + sparecountTables} x ${priceMenu.toLocaleString()}đ = ${(((countTables + sparecountTables) * priceMenu) + ((countTables + sparecountTables) * 10 * 50000) + (countTables * 200000)).toLocaleString()}đ`,
-        statementPartyType: `Dịch vụ: ${(pricecpartyTypes).toLocaleString()}đ`,
-        statementeDecoration: `Trang trí: ${(priceDecoration).toLocaleString()}đ`,
+        statementtable: `(Bàn ${countTables} + bàn phụ ${sparecountTables} ) x 200.000đ  + Ghế ${(countTables + sparecountTables) * 10} x 50.000đ + Menu ${countTables + sparecountTables} x ${formatPrice(priceMenu)}đ = ${formatPrice(((countTables + sparecountTables) * priceMenu) + ((countTables + sparecountTables) * 10 * 50000) + (countTables * 200000))}đ`,
+        statementPartyType: `Dịch vụ: ${formatPrice(pricecpartyTypes)}đ`,
+        statementeDecoration: `Trang trí: ${formatPrice(priceDecoration)}đ`,
     };
     useEffect(() => {
-        const total = ((countTables + sparecountTables) * priceMenu) +
-            ((countTables + sparecountTables) * 10 * 50000) +
-            ((countTables + sparecountTables) * 200000) +
-            pricecpartyTypes + priceDecoration;
+        const total = ((countTables + sparecountTables) * priceMenu || 0) +
+            ((countTables + sparecountTables) * 10 * 50000 || 0) +
+            ((countTables + sparecountTables) * 200000 || 0) +
+            (pricecpartyTypes || 0) + (priceDecoration || 0);
         setTotalAmount(total);
-    }, [countTables, sparecountTables, priceMenu, pricecpartyTypes]);
+    }, [countTables, sparecountTables, priceMenu, pricecpartyTypes, priceDecoration]);
     const fees = [
         {
             name: 'Chi phí bàn tiệc',
-            totalPrice: ((countTables * 200000) + (countTables * 10 * 50000) + priceMenu + (countTables * priceMenu)).toLocaleString(),
+            totalPrice: formatPrice((countTables * 200000) + (countTables * 10 * 50000) + priceMenu + (countTables * priceMenu)),
             description: statementPrice.statementtable
         },
         {
             name: 'Chi phí dịch vụ',
-            totalPrice: (pricecpartyTypes).toLocaleString(),
+            totalPrice: formatPrice(pricecpartyTypes),
             description: statementPrice.statementPartyType
         },
         {
             name: 'Chi phí trang trí',
-            totalPrice: (priceDecoration).toLocaleString(),
+            totalPrice: formatPrice(priceDecoration),
             description: statementPrice.statementeDecoration
         },
     ];
@@ -132,10 +135,10 @@ const PaymentMethod = ({
 
         try {
             const response = await payment_method(method, depositId);
-                console.log(response);
-                
+            console.log(response);
+
             if (response.status === 200) {
-                 setLinkPaymentMethod(response.payUrl)
+                setLinkPaymentMethod(response.payUrl)
                 setIsModalOpen(true);
                 toast({
                     position: "top",
@@ -144,7 +147,7 @@ const PaymentMethod = ({
                     description: "Vui lòng tiếp tục thanh toán !!",
                     closable: true,
                 });
-               
+
             } else {
                 toast({
                     position: "top",
@@ -193,9 +196,9 @@ const PaymentMethod = ({
                             )}
                             <div className="mt-4 p-4 bg-gray-800 text-white rounded-lg">
                                 <h3 className="font-bold text-lg">Cọc phí:</h3>
-                                <div className="text-right">{deposits.toLocaleString()} VND</div>
+                                <div className="text-right">{formatPrice(deposits)} VND</div>
                                 <h3 className="font-bold text-lg mt-2">Tổng phí:</h3>
-                                <div className="text-right">{totalamount.toLocaleString()} VND</div>
+                                <div className="text-right">{formatPrice(totalamount)} VND</div>
                             </div>
                         </div>
                         <div className="space-y-4">
@@ -249,7 +252,7 @@ const PaymentMethod = ({
                                 <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="black" />
                             </svg>
                         </div> */}
-                        <h2 className='text-xl font-bold mb-4 text-success text-center'>Tiến hành thanh toán</h2>
+                        <h2 className='text-xl font-bold mb-4 text-gold text-center'>Tiến hành thanh toán</h2>
                         <p className='text-black text-center'>Phương thức thanh toán {showPaymentMethod}</p>
                         <div className='flex justify-center mt-4'>
                             <button
