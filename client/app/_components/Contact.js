@@ -49,12 +49,6 @@ const Contact = () => {
   const package_id = searchParams.get("package_id");
   const [bookingDetails, setBookingDetails] = useState({});
 
-  // const [userInfo, setUserInfo] = useState(
-  //   JSON.parse(localStorage?.getItem("user"))
-  // );
-
-  // console.log("userInfo", userInfo);
-
   const [formData, setFormData] = useState({
     user_id: "",
     name: "",

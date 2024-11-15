@@ -227,10 +227,10 @@ const HeaderClient = () => {
         </div>
         <div className="flex lg:justify-center gap-16 max-lg: justify-between">
           <div>
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col !overflow-y-auto">
               {listMenu.map((menu) => (
                 <div key={menu.id}>
-                  <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
@@ -256,7 +256,7 @@ const HeaderClient = () => {
               ))}
               {!isLogin ? (
                 <>
-                  <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
@@ -265,7 +265,7 @@ const HeaderClient = () => {
                       Đăng ký
                     </Link>
                   </li>
-                  <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
