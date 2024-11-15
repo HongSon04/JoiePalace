@@ -79,6 +79,7 @@ export const API_CONFIG = {
     GET_ALL: (params) => constructUrlWithParams(`${STAGES}/get-all`, params),
     GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
     GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
+    GET_BY_ID: (id) => `${STAGES}/get/${id}`,
   },
 
   // CATEGORIES API
@@ -217,6 +218,7 @@ export const API_CONFIG = {
   PACKAGES: {
     GET_ALL: `${PACKAGES}/get-all`,
     GET_BY_SLUG: (slug) => `${PACKAGES}/get-by-slug/${slug}`,
+    GET_BY_ID: (id) => `${PACKAGES}/get/${id}`,
   },
 
   // MENU API

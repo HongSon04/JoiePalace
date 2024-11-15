@@ -1,8 +1,10 @@
 import axios from "axios";
 import { API_CONFIG } from "../_utils/api.config";
 
-export const getDecorById = async (id) => {
-  const response = await axios.get(API_CONFIG.DECORS.GET_BY_ID(id));
+export const getCakeWedding = async (id) => {
+  const response = await axios.get(
+    `https://joieplace.live/api/products/get/${id}`
+  );
   if (response.status !== 201 && response.status !== 200) {
     throw new Error("Có lỗi xảy ra khi lấy dữ liệu");
   }

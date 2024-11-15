@@ -10,3 +10,12 @@ export const fetchMenuBySlug = async (slug) => {
   
     return response.data.data;
   };
+export const getMenuById = async (id) => {
+    const response = await axios.get(API_CONFIG.MENU.GET_BY_ID(id));
+    
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu");
+    }
+  
+    return response.data.data;
+  };

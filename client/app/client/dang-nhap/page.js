@@ -5,7 +5,7 @@ import useCustomToast from "@/app/_hooks/useCustomToast";
 import { Image } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { loginAccountUser, loginGoogle } from "@/app/_services/accountServices";
 import { decodeJwt } from "@/app/_utils/helpers";
@@ -122,52 +122,70 @@ const Page = () => {
   };
 
   // call api login social
+  const isLoginCalledRef = useRef(false);
   const callToApiLoginSocial = async () => {
-    if (isLoginCalled) return;
-    setIsLoginCalled(true);
-    let user = null;
-    const response = await loginGoogle({
-      email: data?.user?.email.toString(),
-      name: data?.user?.name.toString(),
-      platform: platform ? platform : "Windows",
-    });
-    if (response.status === 200) {
-      user = decodeJwt(response.data.data.access_token);
-      Cookies.set("accessToken", response.data.data.access_token, {
-        expires: 1,
+    if (isLoginCalledRef.current) return;
+    isLoginCalledRef.current = true;
+
+    try {
+      let user = null;
+      const response = await loginGoogle({
+        email: data?.user?.email.toString(),
+        name: data?.user?.name.toString(),
+        platform: "Google",
       });
-      localStorage.setItem("refreshToken", response.data.data.refresh_token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: user.id,
-          name: user.username,
-          email: user.email,
-          memberships: user.memberships,
-          phone: user.phone,
-          role: user.role,
-          avatar: data?.user?.image,
-          accountGoogle: true,
-        })
-      );
-      toast({
-        position: "top",
-        type: "success",
-        title: `"Đăng nhập thành công!"`,
-        description: `Chào mừng ${data?.user?.name} đã trở lại ✌️`,
-        closable: true,
-      });
-      router.push("/");
-    } else {
+
+      if (response.status === 200) {
+        user = decodeJwt(response.data.data.access_token);
+        Cookies.set("accessToken", response.data.data.access_token, {
+          expires: 1,
+        });
+        localStorage.setItem("refreshToken", response.data.data.refresh_token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: user.id,
+            name: user.username,
+            email: user.email,
+            memberships: user.memberships,
+            phone: user.phone,
+            role: user.role,
+            avatar: data?.user?.image,
+            accountGoogle: true,
+          })
+        );
+
+        // Kiểm tra nếu chưa hiển thị toast trước đó
+        toast({
+          position: "top",
+          type: "success",
+          title: "Đăng nhập thành công!",
+          description: `Chào mừng ${data?.user?.name} đã trở lại ✌️`,
+          closable: true,
+        });
+
+        router.push("/");
+      } else {
+        toast({
+          position: "top",
+          type: "error",
+          title: "Đăng nhập thất bại!",
+          description: "Đã có lỗi khi đăng nhập với Google",
+          closable: true,
+        });
+      }
+    } catch (error) {
+      console.error("Đã xảy ra lỗi:", error);
       toast({
         position: "top",
         type: "error",
-        title: `"Đăng nhập thất bại!"`,
-        description: `Đã có lỗi khi đăng nhập với Google`,
+        title: "Lỗi hệ thống!",
+        description: "Vui lòng thử lại sau.",
         closable: true,
       });
+    } finally {
+      isLoginCalledRef.current = false;
     }
-    setIsLoginCalled(false);
   };
 
   if (data && platform !== null) {
