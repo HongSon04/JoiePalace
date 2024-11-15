@@ -379,7 +379,7 @@ export class ProductsService {
 
       // Lặp qua từng category để tạo các key trong result
       categories.forEach((category) => {
-        result[category.slug] = [];
+        result[category.name] = [];
       });
 
       // Xử lý và phân loại sản phẩm theo category
@@ -400,13 +400,13 @@ export class ProductsService {
           };
 
           // Kiểm tra xem trong category này đã có sản phẩm với slug này chưa
-          const existingProductIndex = result[category.slug].findIndex(
-            (p) => p.slug === product.slug,
+          const existingProductIndex = result[category.name].findIndex(
+            (p) => p.name === product.name,
           );
 
           if (existingProductIndex !== -1) {
             // Nếu đã có sản phẩm với slug này, merger tags
-            const existingProduct = result[category.slug][existingProductIndex];
+            const existingProduct = result[category.name][existingProductIndex];
             existingProduct.tags = [
               ...new Set([
                 ...(existingProduct.tags || []),
@@ -415,7 +415,7 @@ export class ProductsService {
             ];
           } else {
             // Nếu chưa có, thêm sản phẩm mới vào
-            result[category.slug].push(transformedProduct);
+            result[category.name].push(transformedProduct);
           }
         });
       });
