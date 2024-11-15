@@ -24,6 +24,37 @@ import { DropDownSelect2 } from './DropDownSelect2';
 const TitleSpanInfo = ({ title }) => (
     <span className="font-semibold text-xl leading-7 text-white">{title}</span>
 );
+const handleServiceChange = (event, services, selectedDishesState, setSelectedDishesState, setSelectService) => {
+    const packageId = event.target.value;
+
+    // Handle "Không chọn" option
+    if (packageId === "" || packageId === "null") {
+        setSelectedDishesState([]);
+        setSelectService(null);
+        return;
+    }
+
+    const options = services.flatMap(service =>
+        service.options.flatMap(option => option.items ? option.items : option)
+    );
+
+    const selectedOption = options.find(item => item.value == packageId);
+
+    if (!selectedOption) {
+        console.error('Tùy chọn không hợp lệ:', packageId);
+        return;
+    }
+
+    const existingDish = selectedDishesState.find(dish => dish.id == packageId);
+
+    if (existingDish) {
+        handleChangeQuantity(packageId, selectedDishesState, setSelectedDishesState, 1); // Increase quantity
+    } else {
+        setSelectedDishesState([...selectedDishesState, { id: packageId, name: selectedOption.label, price: selectedOption.price, quantity: 1 }]);
+    }
+
+    setSelectService(packageId);
+};
 
 const FoodsTitle = ({ title, foodsMap, handleDeleteFood }) => {
     return (
@@ -34,7 +65,9 @@ const FoodsTitle = ({ title, foodsMap, handleDeleteFood }) => {
                     foodsMap.map((food) => (
                         <div key={food.id} className="bg-white border-1 rounded-lg p-2 flex gap-[6px] text-gray-600 items-center w-fit transition-transform transform hover:scale-105">
                             <span className="text-[12px] font-medium leading-4">{food.name}</span>
-                            <button onClick={() => handleDeleteFood(food.id)} className="text-red-500 hover:text-red-700">
+                            <button type='button'
+                            // onClick={() => handleDeleteFood(food.id)}
+                             className="text-red-500 hover:text-red-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
                                     <path opacity="0.5" d="M5 3.88906L8.88906 0L10 1.11094L6.11094 5L10 8.88906L8.88906 10L5 6.11094L1.11094 10L0 8.88906L3.88906 5L0 1.11094L1.11094 0L5 3.88906Z" fill="#1A202C" />
                                 </svg>
@@ -133,7 +166,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             ],
         },
     ]);
-    const [otherServices, SetOtherServices] = useState([
+    const [otherServices, setOtherServices] = useState([
         {
             svg: null,
             title: 'Dịch vụ thêm',
@@ -350,38 +383,30 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const fetchPackageForOtherServices = async () => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.CATEGORIES.GET_BY_ID(9), 'GET');
-            
-            // Log toàn bộ phản hồi để kiểm tra
-            console.log('Phản hồi từ API:', response);
-    
-            if (response.statusCode === 200) {
-                if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
-                    console.error('Dữ liệu không hợp lệ:', response.data);
-                    return;
-                }
-    
-                const childrenServices = response.data[0]?.childrens || [];
-                const options = childrenServices.flatMap(child => 
-                    child.products.map(product => ({
-                        value: product.id,
-                        label: product.name,
-                        price: product.price,
-                    }))
-                );
-    
-                const optionsWithDefault = [
-                    { category: 'Chọn dịch vụ', items: [{ value: '', label: 'Không chọn' }] },
-                    { category: 'Dịch vụ thêm', items: options },
-                ];
-    
-                setOtherServices(prev => [{ ...prev[0], options: optionsWithDefault }]);
-            } else {
-                console.error('Không có dữ liệu hợp lệ, mã lỗi:', response.statusCode);
+            const childrenServices = response.data[0]?.childrens || [];
+            if (childrenServices.length === 0) {
+                console.error('Không có dịch vụ con nào trong childrenServices');
+                return;
             }
+            const options = childrenServices.flatMap(child =>
+                child.products.map(product => ({
+                    value: product.id,
+                    label: product.name,
+                    price: product.price,
+                }))
+            );
+            setOtherServices(prev => {
+                const newOptions = [
+                    { category: 'Chọn dịch vụ', items: [{ value: '', label: 'Không chọn' }] },
+                    ...options,
+                ];
+                return [{ ...prev[0], options: newOptions }];
+            });
         } catch (error) {
             console.error('Lỗi khi lấy dịch vụ khác:', error);
         }
     };
+
 
     const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
@@ -582,52 +607,34 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         }
     };
 
-    const handleExtraService = (event) => {
-        const packageId = event.target.value; // Giá trị sẽ là chuỗi
-        console.log('Giá trị packageId:', packageId);
-    
-        // Nếu chọn "Không chọn", xóa tất cả các món ăn đã chọn
-        if (packageId === "" || packageId === "null") { // Kiểm tra chuỗi rỗng và chuỗi "null"
-            setSelectedDishes([]);  // Xóa hết selectedDishes
-            setSelectExtraServices(null);  // Đặt lại giá trị đã chọn
-            return; // Dừng lại
-        }
-    
-        // Tìm tùy chọn đã chọn
-        const selectedOption = extraServices[0].options.flatMap(option => option.items).find(item => item.value == packageId);
-    
-        // Kiểm tra xem tùy chọn có hợp lệ không
-        if (!selectedOption) {
-            console.error('Tùy chọn không hợp lệ:', packageId);
-            return;
-        }
-    
-        // Kiểm tra xem món ăn đã tồn tại chưa
-        const existingDish = selectedDishes.find(dish => dish.id == packageId);
-    
-        if (existingDish) {
-            handleIncreaseQuantity(packageId); // Tăng số lượng nếu đã tồn tại
-        } else {
-            // Thêm món ăn mới vào danh sách
-            setSelectedDishes([...selectedDishes, { id: packageId, name: selectedOption.label, price: selectedOption.price, quantity: 1 }]);
-        }
-        setSelectExtraServices(packageId); // Cập nhật giá trị đã chọn
-    };
-    
-    const handleIncreaseQuantity = (id) => {
-        setSelectedDishes(selectedDishes.map(dish =>
-            dish.id === id ? { ...dish, quantity: dish.quantity + 1 } : dish
+    const handleChangeQuantity = (id, selectedDishesState, setSelectedDishesState, change) => {
+        setSelectedDishesState(selectedDishesState.map(dish =>
+            dish.id === id ? { ...dish, quantity: dish.quantity + change } : dish
         ));
     };
-
     const handleDecreaseQuantity = (id) => {
         setSelectedDishes(selectedDishes.map(dish =>
             dish.id === id && dish.quantity > 1 ? { ...dish, quantity: dish.quantity - 1 } : dish
         ));
     };
+    const handleDecreaseOtherQuantity = (id) => {
+        setSelectOtherDishes(selectOtherDishes.map(dish =>
+            dish.id === id && dish.quantity > 1 ? { ...dish, quantity: dish.quantity - 1 } : dish
+        ));
+    };
 
-    const handleRemoveDish = (id) => {
-        setSelectedDishes(selectedDishes.filter(dish => dish.id !== id));
+    const handleRemoveDish = (id, selectedDishesState, setSelectedDishesState) => {
+        setSelectedDishesState(selectedDishesState.filter(dish => dish.id !== id));
+    };
+
+    // Handle extra service change
+    const handleExtraService = (event) => {
+        handleServiceChange(event, extraServices, selectedDishes, setSelectedDishes, setSelectExtraServices);
+    };
+
+    // Handle other services change
+    const handleOtherServices = (event) => {
+        handleServiceChange(event, otherServices, selectOtherDishes, setSelectOtherDishes, setSelectOtherServices);
     };
 
     // Tạo object mới chứa id và quantity
@@ -702,15 +709,13 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     };
 
     useEffect(() => {
+        fetchPackageForExtraServices()
+        fetchPackageForOtherServices()
         fetchDataDetailsParty();
         fetchAllMenus();
         fetchAllDecors();
         fetchAllPartyTypes()
-        fetchPackageForExtraServices()
-        fetchPackageForOtherServices()
     }, [id, reset]);
-
-    console.log(otherServices)
 
     const onSubmit = async (data) => {
         // const finalFoods = foods.filter(food => !modifiedFoods.includes(food.id));
@@ -912,27 +917,30 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 onChange={handleStatusBookings}
                             />
                         ))}
-                        
-                        <FoodsTitle title={'Món chính'} foodsMap={foods.monChinh} handleDeleteFood={handleDeleteFood} />
+
+                        {/* <FoodsTitle title={'Món chính'} foodsMap={foods.monChinh} handleDeleteFood={handleDeleteFood} />
                         <FoodsTitle title={'Món khai vị'} foodsMap={foods.monkhaivi} handleDeleteFood={handleDeleteFood} />
-                        <FoodsTitle title={'Món tráng miệng'} foodsMap={foods.montrangMieng} handleDeleteFood={handleDeleteFood} />
+                        <FoodsTitle title={'Món tráng miệng'} foodsMap={foods.montrangMieng} handleDeleteFood={handleDeleteFood} /> */}
+                        <FoodsTitle title={'Món chính'} foodsMap={foods.monChinh} />
+                        <FoodsTitle title={'Món khai vị'} foodsMap={foods.monkhaivi} />
+                        <FoodsTitle title={'Món tráng miệng'} foodsMap={foods.montrangMieng}/>
                     </div>
                 </div>
                 <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
-                    <TitleSpanInfo title={'Thêm mới dịch vụ'} />
+                    <TitleSpanInfo title={'Thêm mới dịch vụ - Chỉ thêm khi tiệc đã hoàn thành'} />
                     <div className='grid grid-cols-3 gap-[30px]'>
 
-                    {extraServices.map((service, index) => (
+                        {extraServices.map((service, index) => (
                             <DropDownSelect2
-                                key={index} // Sử dụng service.id nếu có
+                                key={index}
                                 label={service.title}
-                                name={`service-${service.id}`} // Cũng nên sử dụng id ở đây
+                                name={`service-${service.id}`}
                                 options={service.options || []}
                                 value={selectExtraServices}
                                 onChange={handleExtraService}
                             />
-))}
-                        {selectedDishes.length > 0 && 
+                        ))}
+                        {selectedDishes.length > 0 &&
                             selectedDishes.map(dish => (
                                 <div key={dish.id} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                                     <div className="flex flex-col">
@@ -942,14 +950,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                     <div className="flex items-center space-x-2">
                                         <button
                                             type="button"
-                                            onClick={() => handleDecreaseQuantity(dish.id)}
+                                            onClick={() => handleDecreaseOtherQuantity(dish.id)} // Call the specific decrease function for other dishes
                                             className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
                                         >
                                             -
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => handleIncreaseQuantity(dish.id)}
+                                            onClick={() => handleChangeQuantity(dish.id, selectOtherDishes, setSelectOtherDishes, 1)} // Increase function
                                             className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
                                         >
                                             +
@@ -972,18 +980,18 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     <TitleSpanInfo title={'Thêm dịch vụ khác'} />
                     <div className='grid grid-cols-3 gap-[30px]'>
 
-                    {extraServices.map((service, index) => (
-                            <DropDownSelect2
-                                key={index} 
+                        {otherServices.map((service, index) => (
+                            <DropdownField
+                                key={index}
                                 label={service.title}
-                                name={`service-${service.id}`} 
+                                name={`service-${service.id}`}
                                 options={service.options || []}
-                                value={selectExtraServices}
-                                onChange={handleExtraService}
+                                value={selectOtherServices}
+                                onChange={handleOtherServices}
                             />
-))}
-                        {selectedDishes.length > 0 && 
-                            selectedDishes.map(dish => (
+                        ))}
+                        {selectOtherDishes.length > 0 &&
+                            selectOtherDishes.map(dish => (
                                 <div key={dish.id} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                                     <div className="flex flex-col">
                                         <span className="text-base font-semibold text-white">{dish.name}</span>
@@ -992,14 +1000,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                     <div className="flex items-center space-x-2">
                                         <button
                                             type="button"
-                                            onClick={() => handleDecreaseQuantity(dish.id)}
+                                            onClick={() => handleDecreaseOtherQuantity(dish.id)} // Call the specific decrease function for other dishes
                                             className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
                                         >
                                             -
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => handleIncreaseQuantity(dish.id)}
+                                            onClick={() => handleChangeQuantity(dish.id, selectOtherDishes, setSelectOtherDishes, 1)} // Increase function
                                             className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
                                         >
                                             +

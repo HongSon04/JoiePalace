@@ -35,7 +35,6 @@ const ChiTietTiecPage = ({ params }) => {
         }
     }, [fetchBranchData]);
 
-    console.log(branch)
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={branch?.name || 'Tên chi nhánh không xác định'} />
