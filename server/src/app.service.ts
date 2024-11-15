@@ -5,10 +5,14 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AppService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private configService: ConfigService,
+  ) {}
 
   async confirmRegister(token: string, email: string) {
     try {
@@ -67,5 +71,13 @@ export class AppService {
         error: error.message,
       });
     }
+  }
+
+  async getSecretKey() {
+    return {
+      google_id: this.configService.get('GOOGLE_ID'),
+      google_secret: this.configService.get('GOOGLE_SECRET'),
+      next_auth_secret: this.configService.get('NEXTAUTH_SECRET'),
+    };
   }
 }
