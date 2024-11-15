@@ -11,7 +11,6 @@ const useApiServices = () => {
     try {
       return await callback();
     } catch (error) {
-      // console.error(`Error caught: ${error.message}`, error);
       return {
         success: false,
         message: options?.errorMessage || "An error occurred",
@@ -29,10 +28,6 @@ const useApiServices = () => {
   ) => {
     const accessToken = Cookies.get("accessToken");
 
-    // console.log(
-    //   "access token when making request from apiRequest function -> ",
-    //   accessToken
-    // );
     return await tryCatchWrapper(async () => {
       const response = await axios({
         url: endpoint,
@@ -51,6 +46,12 @@ const useApiServices = () => {
   const refreshAccessToken = async (redirectURL) => {
     const refreshToken = localStorage.getItem("refreshToken");
 
+    // Check if the refresh token is available
+    if (!refreshToken) {
+      router.push(redirectURL);
+      return null; // No refresh token available
+    }
+
     const result = await tryCatchWrapper(async () => {
       const response = await axios.post(API_CONFIG.AUTH.REFRESH_TOKEN, {
         refresh_token: refreshToken,
@@ -60,25 +61,8 @@ const useApiServices = () => {
         return { success: false, message: "Refresh token failed" };
       }
 
-      // console.log("response from refreshAccessToken function -> ", response);
-      // console.log(
-      //   "response data from refreshAccessToken function -> ",
-      //   response.data
-      // );
-      // console.log(
-      //   "token from refreshAccessToken function -> ",
-      //   response.data.access_token
-      // );
-
-      // console.log(
-      //   "new access token from refreshAccessToken function -> ",
-      //   response.data.data.access_token
-      // );
-
       // Update the access token in cookies
-      Cookies.set("accessToken", response.data.access_token, {
-        expires: 1,
-      });
+      Cookies.set("accessToken", response.data.access_token, { expires: 1 });
 
       // Update the refresh token if provided
       if (response.data.refresh_token) {
@@ -90,18 +74,11 @@ const useApiServices = () => {
 
     // Handle expired refresh token
     if (result && result.success === false) {
-      // console.log("I will redirect you here");
-      // console.log(
-      //   "result if success === false from refreshAccessToken function -> ",
-      //   result
-      // );
-
       router.push(redirectURL);
       Cookies.remove("accessToken");
       localStorage.removeItem("refreshToken");
     }
 
-    // console.log("result from refreshAccessToken function -> ", result);
     return result; // Return the result (new access token or error)
   };
 
@@ -110,12 +87,12 @@ const useApiServices = () => {
     endpoint,
     method = "GET",
     data = null,
-    signal = null, // Add signal parameter
+    signal = null,
     redirectURL = "/auth/chon-chi-nhanh?isExpired=true"
   ) => {
     let dataResponse;
-    let attempts = 0; // Track the number of attempts
-    const maxAttempts = 3; // Set a maximum number of attempts to avoid infinite loops
+    let attempts = 0;
+    const maxAttempts = 3;
 
     while (attempts < maxAttempts) {
       dataResponse = await apiRequest(endpoint, method, data, signal);
@@ -130,7 +107,7 @@ const useApiServices = () => {
 
         // If a new access token was obtained, retry the request
         if (newAccessToken) {
-          attempts++; // Increment the attempt counter
+          attempts++;
           continue; // Retry the API request
         } else {
           // If the refresh token is expired or invalid, break the loop
@@ -145,7 +122,7 @@ const useApiServices = () => {
     return {
       ...dataResponse,
       success: dataResponse?.success !== false,
-    }; // Return the response (either success or error)
+    };
   };
 
   // Function for fetching data with Redux integration

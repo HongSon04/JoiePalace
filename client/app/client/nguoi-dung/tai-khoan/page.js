@@ -98,27 +98,41 @@ const Page = () => {
 
     useEffect(() => {
         const getData = async () => {
-            const getUser = JSON.parse(localStorage.getItem("user"));
-            if (getUser) {
+            try {
+                const getUser = JSON.parse(localStorage.getItem("user"));
+
+                // Check if user data exists
+                if (!getUser) {
+                    router.push('/');
+                    return;
+                }
+
+                // Handle phone value when it's 'null'
+                const phone = getUser.phone === 'null' ? '' : getUser.phone;
+
+                // Set user data and form values
                 setUser(getUser);
-                // Thiết lập giá trị cho các trường nhập liệu
                 setValue("name", getUser.name);
                 setValue("email", getUser.email);
-                setValue("phone", getUser.phone);
-            } else {
-                router.push('/');
-            }
-            try {
-                const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
-                const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
+                setValue("phone", phone);
+
+                // Fetch bookings associated with the user
+                const fetchedAllBookings = await fetchAllBookingByUserId(getUser.id);
+                const fetchedAllBookingsSuccess = fetchedAllBookings.filter((i) => i.status === 'success');
+
+                // Calculate total amount from successful bookings
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
                     return total + item.booking_details[0].total_amount;
                 }, 0);
-                rankuser(total_amountUser)
+
+                // Rank user based on total amount
+                rankuser(total_amountUser);
+
             } catch (error) {
                 console.error('Chưa lấy được dữ liệu người dùng', error);
             }
         };
+
         getData();
     }, []);
 
@@ -126,21 +140,21 @@ const Page = () => {
         if (total_amount !== undefined && total_amount !== null) {
             // Tìm hạng thành viên dựa trên total_amount
             const foundRank = rankMemberships
-                .slice() 
-                .sort((a, b) => b.condition - a.condition) 
-                .find(member => total_amount >= member.condition); 
+                .slice()
+                .sort((a, b) => b.condition - a.condition)
+                .find(member => total_amount >= member.condition);
 
             // Nếu tìm thấy hạng, cập nhật trạng thái rank
             if (foundRank) {
                 setRank(foundRank);
             } else {
-                setRank(rankMemberships[0]); 
+                setRank(rankMemberships[0]);
             }
         } else {
-            setRank(null); 
+            setRank(null);
         }
     };
-    const Setcancel = () =>{
+    const Setcancel = () => {
         setValue("name", user.name);
         setValue("email", user.email);
         setValue("phone", user.phone);

@@ -1,3 +1,4 @@
+import { stages } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
   HttpException,
@@ -39,6 +40,7 @@ export class BookingsService {
   async create(createBookingDto: CreateBookingDto) {
     try {
       const {
+        package_id,
         user_id,
         branch_id,
         stage_id,
@@ -71,24 +73,30 @@ export class BookingsService {
       }
 
       // Fetching user, branch, party type, and stage in parallel
-      const [user, partyType, branch, stage] = await Promise.all([
-        user_id
-          ? this.prismaService.users.findUnique({
-              where: { id: Number(user_id) },
-            })
-          : null,
-        this.prismaService.party_types.findUnique({
-          where: { id: Number(party_type_id) },
-        }),
-        this.prismaService.branches.findUnique({
-          where: { id: Number(branch_id) },
-        }),
-        stage_id
-          ? this.prismaService.stages.findUnique({
-              where: { id: Number(stage_id) },
-            })
-          : null,
-      ]);
+      const [user, partyType, branch, stage, bookingPackage] =
+        await Promise.all([
+          user_id
+            ? this.prismaService.users.findUnique({
+                where: { id: Number(user_id) },
+              })
+            : null,
+          this.prismaService.party_types.findUnique({
+            where: { id: Number(party_type_id) },
+          }),
+          this.prismaService.branches.findUnique({
+            where: { id: Number(branch_id) },
+          }),
+          stage_id
+            ? this.prismaService.stages.findUnique({
+                where: { id: Number(stage_id) },
+              })
+            : null,
+          package_id
+            ? this.prismaService.packages.findUnique({
+                where: { id: Number(package_id) },
+              })
+            : null,
+        ]);
 
       // Validate fetched data
       if (user_id && !user)
@@ -101,7 +109,8 @@ export class BookingsService {
       // Create Booking
       const booking = await this.prismaService.bookings.create({
         data: {
-          user_id: Number(user_id),
+          package_id: package_id ? Number(package_id) : null,
+          user_id: user_id ? Number(user_id) : null,
           branch_id: Number(branch_id),
           company_name: company_name || null,
           email,
@@ -611,6 +620,7 @@ export class BookingsService {
   ) {
     try {
       const {
+        package_id,
         user_id,
         branch_id,
         stage_id,
@@ -692,14 +702,16 @@ export class BookingsService {
       }
 
       // ! Update Booking
-      await this.prismaService.bookings.update({
+      const updatedBooking = await this.prismaService.bookings.update({
         where: { id: Number(id) },
         data: {
+          package_id: package_id ? Number(package_id) : null,
           user_id: user_id
             ? Number(user_id)
             : findBooking.user_id
               ? Number(findBooking.user_id)
               : null,
+          stage_id: Number(stage_id),
           branch_id: Number(branch_id),
           name,
           phone,
@@ -707,8 +719,8 @@ export class BookingsService {
           email,
           note,
           number_of_guests: Number(number_of_guests),
-          is_confirm: String(is_confirm) === 'true' ? true : false,
-          is_deposit: String(is_deposit) === 'true' ? true : false,
+          is_confirm: String(is_confirm) == 'true' ? true : false,
+          is_deposit: String(is_deposit) == 'true' ? true : false,
           party_type_id: Number(party_type_id),
           status: status as BookingStatus,
         },
@@ -747,7 +759,7 @@ export class BookingsService {
         contents.type,
       );
 
-      if (!findBooking.is_confirm) {
+      if (!updatedBooking.is_confirm) {
         throw new BadRequestException(
           'Không thể sửa thông tin đơn đặt tiệc khi chưa xác nhận',
         );
@@ -789,7 +801,9 @@ export class BookingsService {
       let spare_chair_count = Number(spare_table_count) * 10;
       let chairAmount = chair_count * 50000;
       let spareChairAmount = spare_chair_count * 50000;
-      let totalMenuAmount = Number(menu.price) * Number(table_count);
+      let totalMenuAmount =
+        Number(menu.price) * Number(table_count) +
+        Number(menu.price) * Number(spare_table_count);
 
       if (Number(table_count) > Number(findStages.capacity_max)) {
         throw new BadRequestException(

@@ -80,4 +80,11 @@ export class CreatePackageDto {
   })
   @IsOptional()
   note?: string;
+
+  @ApiProperty({
+    description: 'Hiển thị gói tiệc hay không',
+    required: false,
+  })
+  @IsNotEmpty({ message: 'Trạng thái hiện thị hay không' })
+  is_show: Boolean;
 }

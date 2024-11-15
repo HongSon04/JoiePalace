@@ -76,6 +76,7 @@ model users {
   feedbacks      feedbacks[]
   notifications  notifications[]
   menus          menus[]
+  packages       packages[]
 }
 
 model memberships {
@@ -272,6 +273,8 @@ model deposits {
 
 model bookings {
   id                Int               @id @default(autoincrement())
+  package_id        Int?
+  packages          packages?         @relation(fields: [package_id], references: [id])
   user_id           Int?
   users             users?            @relation(fields: [user_id], references: [id])
   branch_id         Int
@@ -398,6 +401,8 @@ model subscribers {
 
 model packages {
   id                Int          @id @default(autoincrement())
+  user_id           Int?
+  users             users?       @relation(fields: [user_id], references: [id])
   stage_id          Int?
   stages            stages?      @relation(fields: [stage_id], references: [id])
   party_type_id     Int?
@@ -415,9 +420,11 @@ model packages {
   extra_service     Json?
   other_service     Json?
   note              String?
+  is_show           Boolean      @default(false)
   deleted           Boolean      @default(false)
   deleted_at        DateTime?
   deleted_by        Int?
   created_at        DateTime     @default(now())
   updated_at        DateTime     @updatedAt
+  bookings          bookings[]
 }

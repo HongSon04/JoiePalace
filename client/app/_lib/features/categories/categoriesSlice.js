@@ -144,6 +144,7 @@ const categoriesSlice = createSlice({
       .addCase(fetchCategoriesBySlug.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
+        console.log("action.payload", action.payload);
         state.categories = action.payload;
         state.error = null;
       })
@@ -152,6 +153,7 @@ const categoriesSlice = createSlice({
         state.isError = true;
         state.error = action.payload;
       });
+
     // Adding a category
     builder
       .addCase(addCategory.pending, (state) => {
@@ -167,6 +169,7 @@ const categoriesSlice = createSlice({
         state.isAddingCategoryError = true;
         state.error = action.payload; // Use the error message from the rejected action
       });
+
     // // Updating a category
     builder
       .addCase(updateCategory.pending, (state) => {
@@ -184,6 +187,7 @@ const categoriesSlice = createSlice({
         state.isUpdatingCategoryError = true;
         state.error = action.payload; // Use the error message from the rejected action
       });
+
     // Deleting a category
     builder
       .addCase(deleteCategory.pending, (state) => {
@@ -252,26 +256,14 @@ export const fetchParentCategory = createAsyncThunk(
 export const fetchCategoriesBySlug = createAsyncThunk(
   "categories/fetchCategoriesBySlug",
   async ({ slug }, { dispatch, rejectWithValue }) => {
-    dispatch(fetchingCategories());
-
     const response = await makeAuthorizedRequest(
       API_CONFIG.CATEGORIES.GET_BY_SLUG(slug),
       "GET"
     );
 
-    // console.log("response from thunk -> ", response);
-    // console.log(
-    //   "categories that should be stoređ -> ",
-    //   response.data.at(0).children
-    // );
-
-    console.log(response);
-
     if (response.success) {
-      dispatch(fetchingCategoriesSuccess(response.data.at(0).childrens));
       return response.data.at(0).childrens;
     } else {
-      dispatch(fetchingCategoriesFailure(response.message));
       return rejectWithValue(response.message);
     }
   }

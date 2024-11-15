@@ -63,7 +63,7 @@ function DishesMain() {
             className="text-gray-400 underline"
             onClick={() =>
               dispatch(
-                fetchCategories({
+                fetchCategoriesBySlug({
                   slug: API_CONFIG.FOOD_CATEGORY_SLUG,
                 })
               )

@@ -3,6 +3,11 @@ import { Image } from "@chakra-ui/react";
 
 const WeddingPackages = () => {
     const [openSection, setOpenSection] = useState({});
+    const [selected, setSelected] = useState(null);
+
+    const handleClick = (button) => {
+        setSelected(button);
+    };
 
     const toggleDropdown = (packageId, sectionName) => {
         setOpenSection((prev) => ({
@@ -107,21 +112,37 @@ const WeddingPackages = () => {
         },
     ];
 
-
     return (
         <div className="min-h-screen p-8 flex flex-col items-center justify-between">
             <div className="flex my-8 gap-4 items-center justify-center">
-                {/* <h1 className="text-4xl font-bold text-center mb-2 text-gold uppercase">DỊCH VỤ TRỌN GÓI</h1> */}
-                <div className="flex space-x-4 m-auto p-1 mt-2 bg-whiteAlpha-200 rounded-full w-fit">
-                    <button className="bg-gold px-6 py-2 rounded-full font-semibold">
-                        TIỆC CƯỚI
-                    </button>
-                    <button className="text-[#d3e2db] px-6 py-2 rounded-full font-semibold">
-                        HỘI NGHỊ
-                    </button>
-                </div>
                 <div className="font-bold text-4xl leading-[48px] text-left font-inte text-gold">
                     DỊCH VỤ TRỌN GÓI
+                </div>
+                <div className="flex space-x-4 m-auto p-1 mt-2 bg-whiteAlpha-200 rounded-full w-fit relative">
+                    {/* Sliding background */}
+                    <div
+                        className={`absolute transition-all duration-300 ease-in-out bg-gold rounded-full h-[40px] w-[160px] transform ${selected === 'wedding' ? 'translate-x-0' : 'translate-x-full'
+                            }`}
+                        style={{ zIndex: 1 }}
+                    />
+                    {/* Wedding Button */}
+                    <button
+                        className={`px-6 py-2 rounded-full font-semibold transition-colors duration-300 relative ${selected === 'wedding' ? 'text-white' : 'text-[#d3e2db]'
+                            }`}
+                        onClick={() => handleClick('wedding')}
+                        style={{ zIndex: 2 }}
+                    >
+                        TIỆC CƯỚI
+                    </button>
+                    {/* Conference Button */}
+                    <button
+                        className={`px-6 py-2 rounded-full font-semibold transition-colors duration-300 relative ${selected === 'conference' ? 'text-white' : 'text-[#d3e2db]'
+                            }`}
+                        onClick={() => handleClick('conference')}
+                        style={{ zIndex: 2 }}
+                    >
+                        HỘI NGHỊ
+                    </button>
                 </div>
             </div>
 
@@ -130,7 +151,7 @@ const WeddingPackages = () => {
                     <div key={pkg.id} className={`overflow-y-hidden h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 ${pkg.premium ? 'border border-gold' : ''}`}>
                         <div className="affterLine mr-[290px] z-10"></div>
                         {pkg.premium && (
-                            <div className="absolute top-[120px] max-md:hidden">
+                            <div className="absolute top-[115px] max-md:hidden">
                                 <Image src='/premium.png' alt="Premium" />
                             </div>
                         )}

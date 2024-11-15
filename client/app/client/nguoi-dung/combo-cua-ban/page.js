@@ -5,7 +5,7 @@ import WeedingSection from './WeedingSection';
 const page = () => {
     return (
         <div className='flex flex-col gap-8'>
-            <h1 className='text-2xl font-bold  leading-6'>Thực đơn của bạn</h1>
+            <h1 className='text-2xl font-bold  leading-6'>Gói combo tiệc</h1>
             <WeedingSection></WeedingSection>
         </div>
     );

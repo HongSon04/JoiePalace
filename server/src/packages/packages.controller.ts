@@ -12,6 +12,7 @@ import {
   UploadedFiles,
   Request,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { PackagesService } from './packages.service';
 import { CreatePackageDto } from './dto/create-package.dto';
@@ -21,9 +22,11 @@ import {
   ApiBearerAuth,
   ApiHeaders,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { FilterPackagesDto } from './dto/FilterPackages.dto';
 
 @Controller('api/packages')
 @ApiTags('Packages - Quản lý gói')
@@ -115,10 +118,11 @@ export class PackagesController {
     }),
   )
   create(
+    @Request() req,
     @Body() createPackageDto: CreatePackageDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
-    return this.packagesService.create(createPackageDto, files);
+    return this.packagesService.create(req.user, createPackageDto, files);
   }
 
   // ! Get all packages
@@ -157,48 +161,12 @@ export class PackagesController {
     },
   })
   @ApiOperation({ summary: 'Lấy tất cả gói' })
-  findAll() {
-    return this.packagesService.findAll();
+  @ApiQuery({ name: 'is_show', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'deleted', required: false, type: 'boolean' })
+  findAll(@Query() query: FilterPackagesDto) {
+    return this.packagesService.findAll(query);
   }
 
-  // ! Get All Packages deleted
-  @Get('get-all-deleted')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    example: [
-      {
-        id: 1,
-        name: 'Gói 1',
-        party_type_id: 1,
-        menu_id: 1,
-        decor_id: 1,
-        price: 100000,
-        description: 'Mô tả gói 1',
-        short_description: 'Mô tả ngắn gọn gói 1',
-        slug: 'goi-1',
-        images: [
-          'http://localhost:3000/images/1.jpg',
-          'http://localhost:3000/images/2.jpg',
-        ],
-        extra_service: [
-          { id: 1, quantity: 2 },
-          { id: 2, quantity: 1 },
-        ],
-        created_at: '2021-06-29T07:34:00.000Z',
-        updated_at: '2021-06-29T07:34:00.000Z',
-      },
-    ],
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    example: {
-      message: 'Đã có lỗi xảy ra, vui lòng thử lại sau',
-    },
-  })
-  @ApiOperation({ summary: 'Lấy tất cả gói đã xóa' })
-  findAllDeleted() {
-    return this.packagesService.findAllDeleted();
-  }
   // ! Get package by ID
   @Get('get/:id')
   @isPublic()

@@ -13,6 +13,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MakeSlugger } from 'helper/slug';
 import { FormatReturnData } from 'helper/FormatReturnData';
 import { handleErrorHelper } from 'helper/handleErrorHelper';
+import { FilterPackagesDto } from './dto/FilterPackages.dto';
 
 @Injectable()
 export class PackagesService {
@@ -23,6 +24,7 @@ export class PackagesService {
 
   // ! Create package
   async create(
+    reqUser,
     createPackageDto: CreatePackageDto,
     files: { images?: Express.Multer.File[] },
   ) {
@@ -38,13 +40,13 @@ export class PackagesService {
         short_description,
         other_service,
         note,
+        is_show,
       } = createPackageDto;
 
       // Validate images
       if (!files.images?.length) {
         throw new BadRequestException('Ảnh không được để trống');
       }
-
       // Validate unique name and slug
       const slug = MakeSlugger(name);
       const existingPackage = await this.prismaService.packages.findFirst({
@@ -83,15 +85,18 @@ export class PackagesService {
         data: {
           name,
           slug,
-          decor_id: Number(decor_id),
-          menu_id: Number(menu_id),
-          party_type_id: Number(party_type_id),
+          user_id: reqUser.id,
+          stage_id: stage_id ? Number(stage_id) : null,
+          decor_id: decor_id ? Number(decor_id) : null,
+          menu_id: menu_id ? Number(menu_id) : null,
+          party_type_id: party_type_id ? Number(party_type_id) : null,
           description,
           price: Number(price),
           short_description,
           images: images as any,
           other_service,
           note,
+          is_show: String(is_show) === 'true',
         },
         include: {
           stages: true,
@@ -114,12 +119,21 @@ export class PackagesService {
   }
 
   // ! Get all packages
-  async findAll() {
+  async findAll(query: FilterPackagesDto) {
     try {
+      const { is_show, deleted } = query;
+      const whereConditions: any = {};
+
+      if (is_show !== null) {
+        whereConditions.is_show = String(is_show) === 'true';
+      }
+
+      if (deleted !== null) {
+        whereConditions.deleted = String(deleted) === 'true';
+      }
+
       const packages = await this.prismaService.packages.findMany({
-        where: {
-          deleted: false,
-        },
+        where: whereConditions,
         include: {
           menus: true,
           decors: true,
@@ -181,39 +195,6 @@ export class PackagesService {
     }
   }
 
-  // ! Get all deleted packages
-  async findAllDeleted() {
-    try {
-      const packages = await this.prismaService.packages.findMany({
-        where: {
-          deleted: true,
-        },
-        include: {
-          menus: true,
-          decors: true,
-          party_types: true,
-        },
-      });
-
-      throw new HttpException(
-        {
-          message: 'Lấy danh sách gói đã xóa thành công',
-          data: FormatReturnData(packages, []),
-        },
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      console.log('Lỗi từ packages.service.ts -> findAllDeleted', error);
-      throw new InternalServerErrorException({
-        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
-        error: error.message,
-      });
-    }
-  }
-
   // ! Get package by slug
   async findBySlug(slug: string) {
     try {
@@ -267,6 +248,7 @@ export class PackagesService {
         short_description,
         other_service,
         note,
+        is_show,
       } = updatePackageDto;
 
       // ? Find Package By Id
@@ -322,15 +304,17 @@ export class PackagesService {
         data: {
           name,
           slug: MakeSlugger(name),
-          decor_id: Number(decor_id),
-          menu_id: Number(menu_id),
-          party_type_id: Number(party_type_id),
+          stage_id: stage_id ? Number(stage_id) : null,
+          decor_id: decor_id ? Number(decor_id) : null,
+          menu_id: menu_id ? Number(menu_id) : null,
+          party_type_id: party_type_id ? Number(party_type_id) : null,
           description,
           price: Number(price),
           short_description,
           images: uploadImages ? uploadImages : findPackageById.images,
           other_service,
           note,
+          is_show: String(is_show) === 'true',
         },
         include: {
           stages: true,
@@ -496,8 +480,10 @@ export class PackagesService {
         where: { id: Number(stage_id) },
       });
       if (!stage) {
-        throw new NotFoundException('ID Sân khấu không tồn tại');
+        throw new NotFoundException('ID Sảnh không tồn tại');
       }
+
+      totalPrice += Number(stage.price);
     }
 
     // Add decor price
