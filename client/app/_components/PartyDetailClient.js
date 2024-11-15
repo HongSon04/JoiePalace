@@ -75,7 +75,7 @@ const PartyDetailClient = ({
 
   const handleConfirm = async (id) => {
     setIsModalOpen(true);
-
+    setClickModule(1)
     try {
       const response = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.DELETE(id),
@@ -147,7 +147,7 @@ const PartyDetailClient = ({
       case 'success':
         return 'text-green-500';
       case 'processing':
-        return 'text-sky-300';
+        return 'text-yellow-300';
       case 'cancel':
         return 'text-red-300';
       case 'pending':
@@ -167,7 +167,7 @@ const PartyDetailClient = ({
       case 'pending':
         return 'Đang chờ';
       default:
-        return 'Chưa có trang thái';
+        return 'Đã có trang thái';
     }
   };
 
@@ -209,8 +209,8 @@ const PartyDetailClient = ({
                 <path
                   d={
                     isCollapsed
-                      ? "M4 11.0303L4.94 11.9703L8 8.91669L11.06 11.9703L12 11.0303L8 7.0303L4 11.0303Z"
-                      : "M12 6.97003L11.06 6.03003L8 9.08336L4.94 6.03003L4 6.97003L8 10.97L12 6.97003Z"
+                      ? "M12 6.97003L11.06 6.03003L8 9.08336L4.94 6.03003L4 6.97003L8 10.97L12 6.97003Z"
+                      : "M4 11.0303L4.94 11.9703L8 8.91669L11.06 11.9703L12 11.0303L8 7.0303L4 11.0303Z"
                   }
                   fill="#9BA2AE"
                 />
@@ -314,7 +314,7 @@ const PartyDetailClient = ({
           button1={button1}
           button2={button2}
           clickButton1={clickModule === 1 ? handleContinue : clickModule === 2 ? handleLast : handleCancel}   //handleLast
-          clickButton2={clickModule === 1 ? handleCancel : clickModule === 2 ? handleContinue : clickModule === 3 ? handleConfirm : null}
+          clickButton2={clickModule === 1 ? handleCancel : clickModule === 2 ? handleContinue : clickModule === 3 ? () => handleConfirm(id) : null}
         />
       )}
     </div>

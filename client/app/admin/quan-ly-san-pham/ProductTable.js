@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchProducts } from "@/app/_lib/features/products/productsSlice";
 import {
   PlusIcon,
   TrashIcon,

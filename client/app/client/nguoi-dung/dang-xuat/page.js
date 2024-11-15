@@ -62,7 +62,7 @@ const Page = () => {
                     party?.length > 0 ? <p className='mt-4 text-base text-red-400 leading-6'>
                         Lưu ý:
                         <br />
-                        Quý khách vẫn đang còn {party?.length} tiệc chờ {formatDateTime(party[0]?.organization_date)}, quý khách sẽ không nhận được thông báo từ trang web nếu đăng xuất.
+                        Quý khách vẫn đang còn {party?.length} tiệc chờ, Tiệc gần nhất {formatDateTime(party[0]?.organization_date)}, quý khách sẽ không nhận được thông báo từ trang web nếu đăng xuất.
                     </p> : ''
                 }
 

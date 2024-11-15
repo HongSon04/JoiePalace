@@ -689,6 +689,8 @@ export class DashboardService {
             gte: startOfWeek,
             lte: endOfWeek,
           },
+          status: 'success',
+          deleted: false,
         },
         include: {
           booking_details: {
@@ -764,6 +766,8 @@ export class DashboardService {
             in: branches.map((branch) => branch.id),
           },
           created_at: dateRange,
+          status: 'success',
+          deleted: false,
         },
         select: {
           branch_id: true,

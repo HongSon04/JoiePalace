@@ -10,7 +10,11 @@ import partyTypesSlice from "./features/partyTypes/partyTypesSlice";
 import requestsSlice from "./features/requests/requestsSlice";
 import sidebarSlice from "./features/sidebar/sidebarSlice";
 import themeSlice from "./features/theme/themeSlice";
-import productsSlice from "./products/productsSlice";
+import productsSlice from "./features/products/productsSlice";
+import packagesSlice from "./features/packages/packagesSlice";
+import stagesSlice from "./features/stages/stagesSlice";
+import decorsSlice from "./decors/decorsSlice";
+import hallsSlice from "./halls/hallsSlice";
 
 const store = configureStore({
   reducer: {
@@ -25,6 +29,10 @@ const store = configureStore({
     feedbacks: feedbacksSlice.reducer,
     partyTypes: partyTypesSlice.reducer,
     products: productsSlice.reducer,
+    packages: packagesSlice.reducer,
+    stages: stagesSlice.reducer,
+    decors: decorsSlice.reducer,
+    halls: hallsSlice.reducer,
   },
 });
 

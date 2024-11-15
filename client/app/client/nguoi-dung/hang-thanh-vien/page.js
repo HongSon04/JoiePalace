@@ -52,8 +52,10 @@ const Page = () => {
             try {
                 // Fetch all bookings for the user
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
-
+               
                 const fetchedAllBookingsSuccess = fetchedAllBookingsMembershipId.filter((i) => i.status === 'success');
+                console.log(fetchedAllBookingsSuccess);
+                
                 const total_amountUser = fetchedAllBookingsSuccess.reduce((total, item) => {
                     return total + item.booking_details[0].total_amount;
                 }, 0);
