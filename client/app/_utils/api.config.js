@@ -142,6 +142,8 @@ export const API_CONFIG = {
         `${PRODUCTS_API}/get-by-category/${categoryId}`,
         params
       ),
+    GET_SERVICES: (params) =>
+      constructUrlWithParams(`${PRODUCTS_API}/get-services`, params),
     UPDATE: (id) => `${PRODUCTS_API}/update/${id}`,
     DELETE: (id) => `${PRODUCTS_API}/delete/${id}`,
     RESTORE: (id) => `${PRODUCTS_API}/restore/${id}`,

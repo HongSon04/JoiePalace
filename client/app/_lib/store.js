@@ -10,6 +10,7 @@ import partyTypesSlice from "./features/partyTypes/partyTypesSlice";
 import requestsSlice from "./features/requests/requestsSlice";
 import sidebarSlice from "./features/sidebar/sidebarSlice";
 import themeSlice from "./features/theme/themeSlice";
+import customersSlice from "./features/customer/customerSlice";
 import productsSlice from "./features/products/productsSlice";
 import packagesSlice from "./features/packages/packagesSlice";
 import stagesSlice from "./features/stages/stagesSlice";
@@ -29,6 +30,7 @@ const store = configureStore({
     feedbacks: feedbacksSlice.reducer,
     partyTypes: partyTypesSlice.reducer,
     products: productsSlice.reducer,
+    customers: customersSlice.reducer,
     packages: packagesSlice.reducer,
     stages: stagesSlice.reducer,
     decors: decorsSlice.reducer,

@@ -5,12 +5,6 @@ import GoogleProvider from "next-auth/providers/google";
 //   GOOGLE_SECRET,
 //   NEXTAUTH_SECRET,
 // } from "@/app/_utils/googleKey.config";
-console.log(
-  "process.env.NEXT_PUBLIC_GOOGLE_ID",
-  process.env.NEXT_PUBLIC_GOOGLE_ID,
-  process.env.NEXT_PUBLIC_GOOGLE_SECRET,
-  process.env.NEXT_PUBLIC_NEXTAUTH_SECRET
-);
 
 const handler = NextAuth({
   providers: [

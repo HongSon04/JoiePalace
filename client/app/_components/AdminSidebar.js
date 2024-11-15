@@ -168,7 +168,9 @@ function AdminSidebarNav() {
         className: "",
       },
       {
-        title: "Danh mục",
+        title: "Danh mục",// path: isGeneralBranch
+        //   ? "/admin/bang-dieu-khien"
+        //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
         path: `/admin/quan-ly-danh-muc/`,
         icon: categoryIcon,
         className: "",
