@@ -57,15 +57,7 @@ const Page = ({ params }) => {
     const fetchAminData = async () => {
       try {
         const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-        let branchId = 0;
-        // const slug = currentBranch.slug;
-        if (slug === "ho-chi-minh") {
-         const branchId = 0;
-         setBranchId(branchId);
-        } else {
-          const branchId = (currentBranch.id);
-          setBranchId(branchId);
-        }
+        const branchId = currentBranch.id;
         // console.log(idBranch);
         // console.log(branchId);
         
@@ -368,7 +360,7 @@ const Page = ({ params }) => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 h-[580px] overflow-y-auto hide-scrollbar items-start">
-            {branchId === 0 ? (
+            {slug === "ho-chi-minh" ? (
               <>
                 <div className="p-2 bg-blackAlpha-100 rounded-xl">
                   <div className="flex items-center justify-between gap-[10px] mb-[10px]">
@@ -436,7 +428,7 @@ const Page = ({ params }) => {
             </table>
           </div>
         </div>
-        {branchId === 0 &&
+        {slug === "ho-chi-minh" &&
           <div className=" w-1/2">
             <div className="flex items-center justify-between mb-[10px]">
               <p className="text-base  font-semibold">Doanh thu tổng / năm</p>
