@@ -150,7 +150,7 @@ function AdminSidebarNav() {
       },
       {
         title: "Khách hàng",
-        path: `/admin/khach-hang/`,
+        path: `/admin/khach-hang/${currentBranch?.slug}`,
         icon: customerIcon,
         className: "",
       },
