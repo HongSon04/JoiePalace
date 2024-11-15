@@ -234,7 +234,7 @@ export const API_CONFIG = {
   PACKAGES: {
     GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     CREATE: `${PACKAGES_API}/create`,
-    GET_ALL: (params) => constructUrlWithParams(`${PACKAGES}/get-all`, params),
+    GET_ALL_BY_PARAMS: (params) => constructUrlWithParams(`${PACKAGES}/get-all`, params),
   },
 
   // MENU API
