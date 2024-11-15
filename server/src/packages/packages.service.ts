@@ -24,6 +24,7 @@ export class PackagesService {
 
   // ! Create package
   async create(
+    reqUser,
     createPackageDto: CreatePackageDto,
     files: { images?: Express.Multer.File[] },
   ) {
@@ -46,7 +47,6 @@ export class PackagesService {
       if (!files.images?.length) {
         throw new BadRequestException('Ảnh không được để trống');
       }
-
       // Validate unique name and slug
       const slug = MakeSlugger(name);
       const existingPackage = await this.prismaService.packages.findFirst({
@@ -85,6 +85,7 @@ export class PackagesService {
         data: {
           name,
           slug,
+          user_id: reqUser.id,
           stage_id: stage_id ? Number(stage_id) : null,
           decor_id: decor_id ? Number(decor_id) : null,
           menu_id: menu_id ? Number(menu_id) : null,

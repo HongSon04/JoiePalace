@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import ButtonDiscover from "./ButtonDiscover";
 import InputIndex from "./InputIndexClient";
@@ -32,9 +32,18 @@ const Contact = () => {
   const [listPartyTypes, setListPartyTypes] = useState([]);
   const toast = useCustomToast();
   const router = useRouter();
-  const [userInfo, setUserInfo] = useState(
-    JSON.parse(localStorage.getItem("user"))
-  );
+  const [userInfo, setUserInfo] = useState({});
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedUser = window.localStorage.getItem("user");
+
+    if (storedUser) {
+      setUserInfo(JSON.parse(storedUser));
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     user_id: userInfo?.id,
     name: "",

@@ -16,6 +16,10 @@ const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
 const NOTIFICATIONS_API = `${HOST}/notifications`;
 const MENU_API = `${HOST}/menus`;
+const PACKAGES = `${HOST}/packages`;
+const DECORS = `${HOST}/decors`;
+const STAGES = `${HOST}/stages`;
+const PAYMENT = `${HOST}/payment-methods`;
 const PACKAGES_API = `${HOST}/packages`;
 const DECORS_API = `${HOST}/decors`;
 const STAGES_API = `${HOST}/stages`;
@@ -138,6 +142,8 @@ export const API_CONFIG = {
         `${PRODUCTS_API}/get-by-category/${categoryId}`,
         params
       ),
+    GET_SERVICES: (params) =>
+      constructUrlWithParams(`${PRODUCTS_API}/get-services`, params),
     UPDATE: (id) => `${PRODUCTS_API}/update/${id}`,
     DELETE: (id) => `${PRODUCTS_API}/delete/${id}`,
     RESTORE: (id) => `${PRODUCTS_API}/restore/${id}`,
@@ -229,7 +235,8 @@ export const API_CONFIG = {
   PACKAGES: {
     GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     CREATE: `${PACKAGES_API}/create`,
-    GET_ALL: (params) => constructUrlWithParams(`${PACKAGES}/get-all`, params),
+    GET_ALL_BY_PARAMS: (params) =>
+      constructUrlWithParams(`${PACKAGES}/get-all`, params),
   },
 
   // MENU API

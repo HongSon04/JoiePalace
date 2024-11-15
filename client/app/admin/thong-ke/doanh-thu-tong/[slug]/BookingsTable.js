@@ -130,37 +130,20 @@ function BookingsTable({ branchId}) {
   const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
   const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
   React.useEffect(() => {
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-    const params = {
-      status: "success",
-      page: currentPage,
-      itemsPerPage,
-      branch_id: currentBranch.id,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-    };
-
-    dispatch(fetchRequests({ params }));
-  }, [currentPage, itemsPerPage]);
-
-  React.useEffect(() => {
     const controller = new AbortController();
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
     const params = {
-      branch_id: currentBranch.id,
+      branch_id: branchId,
       status: "success",
       page: currentPage,
       itemsPerPage,
-      search: searchQuery
-      
+      search: searchQuery,            
     };
-
+  
     dispatch(fetchRequests({ signal: controller.signal, params }));
-
     return () => {
       controller.abort();
     };
-  }, [currentPage, itemsPerPage, date, searchQuery]);
+  }, [branchId, currentPage, itemsPerPage, searchQuery]);
   
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(

@@ -126,40 +126,26 @@ function BookingsTable({userId }) {
   const toStandardDate = (customDate) => {
     return new Date(customDate.year, customDate.month - 1, customDate.day);
   };
-
-  const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
-  const formattedEndDate = format(toStandardDate(date.end), "dd-MM-yyyy");
-  const [status, setStatus] = useState(""); 
-
   React.useEffect(() => {
     const params = {
       user_id: userId,
-      page: currentPage,
-      itemsPerPage: 6,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
     };
-
     dispatch(fetchRequests({ params }));
-  }, [currentPage, itemsPerPage,  userId,status]);
+  }, [userId]);
 
   React.useEffect(() => {
     const controller = new AbortController();
     const params = {
-      user_id: userId,
-      itemsPerPage: 6,
-      page: currentPage,
-      search: searchQuery,
-   
-      
+      user_id: userId   
     };
 
     dispatch(fetchRequests({ signal: controller.signal, params }));
-
     return () => {
       controller.abort();
     };
-  }, [currentPage, itemsPerPage, date, searchQuery,  userId, status]);
+  }, [userId]);
+  // console.log(requests);
+  
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -185,6 +171,7 @@ function BookingsTable({userId }) {
     });
   }, [sortDescriptor, requests]);
 
+  
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
@@ -431,10 +418,9 @@ function BookingsTable({userId }) {
   const bottomContent = React.useMemo(() => {
     return (
       <CustomPagination
-        page={currentPage}
-        total={pagination.lastPage}
-        itemPerPage = {itemPerPage}
-        onChange={onPageChange}
+          page={currentPage}
+          total={pagination.lastPage}
+          onChange={onPageChange}
         classNames={{
           base: "flex justify-center",
         }}

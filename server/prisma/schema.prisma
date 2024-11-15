@@ -76,6 +76,7 @@ model users {
   feedbacks      feedbacks[]
   notifications  notifications[]
   menus          menus[]
+  packages       packages[]
 }
 
 model memberships {
@@ -400,6 +401,8 @@ model subscribers {
 
 model packages {
   id                Int          @id @default(autoincrement())
+  user_id           Int?
+  users             users?       @relation(fields: [user_id], references: [id])
   stage_id          Int?
   stages            stages?      @relation(fields: [stage_id], references: [id])
   party_type_id     Int?
