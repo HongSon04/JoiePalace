@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import ButtonDiscover from "./ButtonDiscover";
 import InputIndex from "./InputIndexClient";
@@ -34,6 +34,17 @@ const Contact = () => {
   const [dataPackage, setDataPackage] = useState(null);
   const toast = useCustomToast();
   const router = useRouter();
+  const [userInfo, setUserInfo] = useState({});
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedUser = window.localStorage.getItem("user");
+
+    if (storedUser) {
+      setUserInfo(JSON.parse(storedUser));
+    }
+  }, []);
   const searchParams = useSearchParams();
   const package_id = searchParams.get("package_id");
   const [bookingDetails, setBookingDetails] = useState({});

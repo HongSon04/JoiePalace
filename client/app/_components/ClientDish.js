@@ -10,12 +10,16 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Skeleton,
   Tooltip,
 } from "@nextui-org/react";
 import { formatPrice } from "../_utils/formaters";
 import React from "react";
 import { formatDate } from "../_utils/format";
-import { updateMenu } from "../_lib/features/menu/menuSlice";
+import {
+  getMenuListByUserId,
+  updateMenu,
+} from "../_lib/features/menu/menuSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useToast } from "@chakra-ui/react";
 
@@ -35,6 +39,7 @@ function ClientDish({
 }) {
   const dispatch = useDispatch();
   const toast = useToast();
+  const [isLogedin, setIsLogedIn] = React.useState(false);
 
   const [dishImage, setDishImage] = React.useState(dish.images[0]);
 
@@ -90,6 +95,8 @@ function ClientDish({
           description: `Món ăn đã được thêm vào thực đơn ${menu.name}`,
           status: "success",
         });
+
+        fetchMenuList();
       } else {
         toast({
           title: "Lỗi",
@@ -101,6 +108,32 @@ function ClientDish({
       console.log(error);
     }
   };
+
+  const fetchMenuList = React.useCallback(async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      try {
+        const result = await dispatch(
+          getMenuListByUserId({
+            params: { user_id: storedUser.id, is_show: false },
+          })
+        ).unwrap();
+
+        if (result.success) {
+          console.log("success result -> ", result);
+        } else {
+          console.log("failure result -> ", result);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) setIsLogedIn(true);
+  }, []);
 
   return (
     <div
@@ -198,63 +231,83 @@ function ClientDish({
                 </PopoverTrigger>
                 <PopoverContent>
                   <div className="max-h-[400px] overflow-y-auto py-2">
-                    {userMenuList &&
-                      userMenuList.map((item, index) => {
-                        const menuProducts = Object.keys(item.products).reduce(
-                          (acc, cur) => {
+                    {isUpdatingMenu ? (
+                      <MenuListSkeleton />
+                    ) : isLogedin ? (
+                      userMenuList && userMenuList.length > 0 ? (
+                        userMenuList.map((item, index) => {
+                          const menuProducts = Object.keys(
+                            item.products
+                          ).reduce((acc, cur) => {
                             return [...acc, ...item.products[cur]];
-                          },
-                          []
-                        );
+                          }, []);
 
-                        const isAdded = menuProducts
-                          .map((p) => p.id)
-                          .includes(dish.id);
-                        // const isAdded = false;
+                          const isAdded = menuProducts
+                            .map((p) => p.id)
+                            .includes(dish.id);
+                          // const isAdded = false;
 
-                        return (
-                          <div
-                            key={index}
-                            className={`flex gap-2 items-center bg-white rounded-lg p-2 mb-2 hover:brightness-90 transition ${
-                              isAdded && "opacity-80"
-                            }`}
-                          >
-                            <div className="flex flex-center h-full">
-                              <Button
-                                onClick={() => handleUpdateMenu(item, dish)}
-                                isIconOnly
-                                className="bg-transparent w-fit h-fit min-w-0"
-                                isLoading={isUpdatingMenu}
-                                isDisabled={isAdded}
-                              >
-                                {!isUpdatingMenu &&
-                                  (isAdded ? (
+                          return (
+                            <div
+                              key={index}
+                              className={`flex gap-2 items-center bg-white rounded-lg p-2 mb-2 hover:brightness-90 transition ${
+                                isAdded && "opacity-80"
+                              }`}
+                            >
+                              <div className="flex flex-center h-full">
+                                <Button
+                                  onClick={() => handleUpdateMenu(item, dish)}
+                                  isIconOnly
+                                  className="bg-transparent w-fit h-fit min-w-0"
+                                  isDisabled={isAdded}
+                                >
+                                  {isAdded ? (
                                     <CheckIcon className="w-5 h-5 text-gray-600" />
                                   ) : (
                                     <PlusIcon className="w-5 h-5 text-gray-600" />
-                                  ))}
-                              </Button>
+                                  )}
+                                </Button>
+                              </div>
+                              <div className="relative w-[60px] h-[88px] rounded-lg overflow-hidden bg-blackAlpha-200 flex-center">
+                                <Image
+                                  src={item.images.at(0)}
+                                  alt={item.name}
+                                  sizes="100px"
+                                  className="object-cover rounded-lg"
+                                  fill
+                                />
+                              </div>
+                              <div className="flex flex-col gap-3 justify-start h-full">
+                                <p className="text-base font-semibold text-gray-600">
+                                  {item.name}
+                                </p>
+                                <p className="text-gray-600">
+                                  Tạo ngày {formatDate(item.created_at)}
+                                </p>
+                              </div>
                             </div>
-                            <div className="relative w-[60px] h-[88px] rounded-lg overflow-hidden bg-blackAlpha-200 flex-center">
-                              <Image
-                                src={item.images.at(0)}
-                                alt={item.name}
-                                sizes="100px"
-                                className="object-cover rounded-lg"
-                                fill
-                              />
-                            </div>
-                            <div className="flex flex-col gap-3 justify-start h-full">
-                              <p className="text-base font-semibold text-gray-600">
-                                {item.name}
-                              </p>
-                              <p className="text-gray-600">
-                                Tạo ngày {formatDate(item.created_at)}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                      ) : (
+                        <div className="flex-center">
+                          <p className="text-md text-gold">
+                            Bạn chưa có thực đơn nào
+                          </p>
+                          <Link
+                            href={"/client/tao-thuc-don"}
+                            className="text-gold underline"
+                          >
+                            Tạo ngay
+                          </Link>
+                        </div>
+                      )
+                    ) : (
+                      <div className="flex-center">
+                        <p className="text-md text-gold">
+                          Bạn cần phải đăng nhập để thực hiện thao tác trên
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </PopoverContent>
               </Popover>
@@ -266,3 +319,25 @@ function ClientDish({
 }
 
 export default ClientDish;
+
+function MenuListSkeleton() {
+  return Array(6)
+    .fill()
+    .map((_, index) => {
+      return (
+        <div
+          key={index}
+          className={`flex gap-2 items-center bg-white rounded-lg p-2 mb-2 transition min-w-[300px]`}
+        >
+          <div className="flex flex-center h-full">
+            <Skeleton className="w-5 h-5 rounded-full bg-gray-400"></Skeleton>
+          </div>
+          <Skeleton className="relative w-[60px] h-[88px] rounded-lg overflow-hidden bg-gray-400 flex-center shrink-0"></Skeleton>
+          <div className="flex flex-col gap-3 justify-start h-full w-full">
+            <Skeleton className="w-full h-5 rounded-lg bg-gray-400"></Skeleton>
+            <Skeleton className="w-1/2 h-5 rounded-lg bg-gray-400"></Skeleton>
+          </div>
+        </div>
+      );
+    });
+}

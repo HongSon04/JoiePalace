@@ -14,7 +14,7 @@ function HeroSection() {
       <div className="absolute inset-0 flex-center ">
         <div className="max-w-[440px] flex flex-col">
           <h1 className="text-gold text-6xl font-semibold">Món ăn</h1>
-          <p className="text-md leading-6 text-white">
+          <p className="text-md leading-6 text-white mt-3">
             Chào mừng đến với thiên đường ẩm thực Joie Palace, nơi nâng niu vị
             giác của quý khách{" "}
           </p>

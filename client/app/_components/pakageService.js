@@ -140,14 +140,14 @@ const WeddingPackages = ({ dataPackage }) => {
     <div className="min-h-screen p-8 flex flex-col items-center justify-between">
       <div className="flex my-8 gap-4 items-center justify-center">
         {/* <h1 className="text-4xl font-bold text-center mb-2 text-gold uppercase">DỊCH VỤ TRỌN GÓI</h1> */}
-        <div className="flex space-x-4 m-auto p-1 mt-2 bg-whiteAlpha-200 rounded-full w-fit">
+        {/* <div className="flex space-x-4 m-auto p-1 mt-2 bg-whiteAlpha-200 rounded-full w-fit">
           <button className="bg-gold px-6 py-2 rounded-full font-semibold">
             TIỆC CƯỚI
           </button>
           <button className="text-[#d3e2db] px-6 py-2 rounded-full font-semibold">
-            HỘI NGHỊ
+            HỘI NGHỊa
           </button>
-        </div>
+        </div> */}
         <div className="font-bold text-4xl leading-[48px] text-left font-inte text-gold">
           DỊCH VỤ TRỌN GÓI
         </div>
@@ -158,13 +158,13 @@ const WeddingPackages = ({ dataPackage }) => {
           <div
             key={pkg.id}
             onClick={() => setPackageFocus(index)}
-            className={`overflow-y-hidden h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${
+            className={`overflow-y-hidden min-h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${
               packageFocus === index ? "border border-gold" : ""
             }`}
           >
             <div className="affterLine mr-[290px] z-10"></div>
             {packageFocus === index && (
-              <div className="absolute top-[120px] max-md:hidden">
+              <div className="absolute top-[90px] max-md:hidden">
                 <Image src="/premium.png" alt="Premium" />
               </div>
             )}
