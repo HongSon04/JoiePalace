@@ -419,6 +419,8 @@ model packages {
   images            String[]
   extra_service     Json?
   other_service     Json?
+  number_of_guests  Int?
+  budget            String?
   note              String?
   is_show           Boolean      @default(false)
   deleted           Boolean      @default(false)

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -23,6 +24,8 @@ import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { User as UserEntity } from './entities/user.entity';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
@@ -31,6 +34,7 @@ export class UserService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private cloudinaryService: CloudinaryService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // ! Create User
@@ -338,10 +342,66 @@ export class UserService {
   // ! Get All User
   async getAll(query: FilterDto) {
     try {
-      const page = Number(query.page) || 1;
-      const itemsPerPage = Number(query.itemsPerPage) || 10;
       const search = query.search || '';
-      const skip = (page - 1) * itemsPerPage;
+      if (query.itemsPerPage && query.itemsPerPage === 'all') {
+        //? Caching
+        const cacheKey = `getAllUsers`;
+        const cacheData = await this.cacheManager.get(cacheKey);
+        if (cacheData) {
+          console.log('Hit cache');
+          throw new HttpException(
+            {
+              data: FormatReturnData(cacheData, ['password', 'refresh_token']),
+            },
+            HttpStatus.OK,
+          );
+        }
+
+        // Lấy tất cả user cùng booking statistics
+        const users = await this.prismaService.users.findMany({
+          where: {
+            deleted: false,
+            OR: [
+              { username: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+              { phone: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+          include: {
+            bookings: {
+              include: {
+                booking_details: {
+                  include: {
+                    deposits: true,
+                  },
+                },
+              },
+            },
+            memberships: true,
+          },
+          orderBy: { created_at: 'desc' },
+        });
+
+        // Lấy booking statistics cho tất cả users cùng một lúc
+        const userStatsPromises = await this.getBookingDashboardDataByManyUser(
+          users as any,
+        );
+
+        // Cache data
+        await this.cacheManager.set(cacheKey, userStatsPromises);
+        throw new HttpException(
+          {
+            data: FormatReturnData(userStatsPromises, [
+              'password',
+              'refresh_token',
+            ]),
+          },
+          HttpStatus.OK,
+        );
+      }
+      let page = Number(query.page) || 1;
+      let itemsPerPage = Number(query.itemsPerPage) || 10;
+      let skip = (page - 1) * itemsPerPage;
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
@@ -374,9 +434,7 @@ export class UserService {
           },
           skip: Number(skip),
           take: itemsPerPage,
-          orderBy: {
-            memberships: { booking_total_amount: 'desc' },
-          },
+          orderBy: { created_at: 'desc' },
         }),
         this.prismaService.users.count({ where: whereConditions }),
       ]);
@@ -853,6 +911,66 @@ export class UserService {
       }
       return acc;
     }, metrics);
+  }
+
+  // ? Get Booking Dashboard Data by many User
+  async getBookingDashboardDataByManyUser(users: any) {
+    // ? Khởi tạo object để theo dõi các metrics
+    const metrics = {
+      totalAmount: 0,
+      totalBookingPending: 0,
+      totalBookingSuccess: 0,
+      totalBookingCancel: 0,
+      totalBookingProcess: 0,
+      totalDepositAmount: 0,
+    };
+    // Duyệt qua từng user
+    users.forEach((user) => {
+      // Kiểm tra nếu user có bookings
+      if (user.bookings && Array.isArray(user.bookings)) {
+        // Duyệt qua từng booking của user
+        user.bookings.forEach((booking) => {
+          if (
+            booking.status === 'success' &&
+            booking.is_deposit === true &&
+            booking.is_confirm === true
+          ) {
+            metrics.totalBookingSuccess++;
+
+            // Kiểm tra và tính tổng deposits
+            if (
+              booking.booking_details &&
+              Array.isArray(booking.booking_details)
+            ) {
+              booking.booking_details.forEach((detail) => {
+                if (detail.deposits && detail.deposits.amount) {
+                  metrics.totalDepositAmount += detail.deposits.amount;
+                }
+                if (detail.total_amount) {
+                  metrics.totalAmount += detail.total_amount;
+                }
+              });
+            }
+          } else if (booking.status === 'pending') {
+            metrics.totalBookingPending++;
+          } else if (booking.status === 'cancel') {
+            metrics.totalBookingCancel++;
+          } else if (booking.status === 'processing') {
+            metrics.totalBookingProcess++;
+          }
+        });
+      }
+      user.totalAmount = metrics.totalAmount;
+      user.totalBookingPending = metrics.totalBookingPending;
+      user.totalBookingSuccess = metrics.totalBookingSuccess;
+      user.totalBookingCancel = metrics.totalBookingCancel;
+      user.totalBookingProcess = metrics.totalBookingProcess;
+      user.totalDepositAmount = metrics.totalDepositAmount;
+
+      // ? Bỏ booking ra khỏi user object
+      delete user.bookings;
+    });
+    return users;
   }
 
   // ! Generate Token
