@@ -82,6 +82,18 @@ export class CreatePackageDto {
   note?: string;
 
   @ApiProperty({
+    required: false,
+    description: 'Số lượng khách dự kiến',
+  })
+  number_of_guests?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Ngân sách dự kiến cho tiệc',
+  })
+  budget?: string;
+
+  @ApiProperty({
     description: 'Hiển thị gói tiệc hay không',
     required: false,
   })

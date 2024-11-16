@@ -41,6 +41,8 @@ export class PackagesService {
         other_service,
         note,
         is_show,
+        budget,
+        number_of_guests,
       } = createPackageDto;
 
       // Validate images
@@ -97,6 +99,8 @@ export class PackagesService {
           other_service,
           note,
           is_show: String(is_show) === 'true',
+          budget: budget,
+          number_of_guests: Number(number_of_guests),
         },
         include: {
           stages: true,
@@ -249,6 +253,8 @@ export class PackagesService {
         other_service,
         note,
         is_show,
+        budget,
+        number_of_guests,
       } = updatePackageDto;
 
       // ? Find Package By Id
@@ -315,6 +321,8 @@ export class PackagesService {
           other_service,
           note,
           is_show: String(is_show) === 'true',
+          budget: budget,
+          number_of_guests: Number(number_of_guests),
         },
         include: {
           stages: true,
