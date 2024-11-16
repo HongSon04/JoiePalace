@@ -157,6 +157,7 @@ function Home() {
       <ScrollFullPage>
         {/* banner */}
         <section className="section banner w-full h-screen relative top-0 left-0">
+          <div className="w-full h-full absolute z-10 bg-blackAlpha-400 top-0 left-0"></div>
           <MultiCarousel
             removeArrowOnDeviceType={["tablet", "mobile", "desktop"]}
             autoplaySpeed={5000}
@@ -168,7 +169,13 @@ function Home() {
           >
             {bannerImages.map((image, index) => (
               <div key={index}>
-                <Image w={"100vw"} h={"100vh"} src={image} alt="banner" />
+                <Image
+                  w={"100vw"}
+                  h={"100vh"}
+                  src={image}
+                  className=""
+                  alt="banner"
+                />
               </div>
             ))}
           </MultiCarousel>
@@ -186,7 +193,7 @@ function Home() {
             }}
             initial="hidden"
             animate="visible"
-            className="absolute  flex flex-col gap-8 items-center top-1/2 !-translate-y-[60%] 2md:-translate-y-1/2"
+            className="absolute z-20 [text-shadow:_0_2px_4px_black] flex flex-col gap-8 items-center top-1/2 !-translate-y-[60%] 2md:-translate-y-1/2"
           >
             <h1 className="font-medium text-center w-full text-4xl leading-[56px] sm:text-6xl sm:leading-[80px] 2md:w-4/6">
               NƠI CỦA SỰ THANH LỊCH, <br />
@@ -596,9 +603,9 @@ function Home() {
                         },
                       }}
                       replayEffect={true}
-                      styles="h-full flex flex-col justify-center gap-[50px] gap-16 2xl:gap-[100px]"
+                      styles="h-full flex flex-col justify-between"
                     >
-                      <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-4">
+                      <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-3">
                         {offer.title}
                       </span>
                       <span className="font-normal text-lg">

@@ -1,12 +1,20 @@
 import { memo } from "react";
+import { useRouter } from "next/navigation";
 
-const ButtonDiscover = ({ name, className, ...props }) => {
+const ButtonDiscover = ({link, name, className, ...props }) => {
+  const router = useRouter();
+
+  const navigation = () => {
+    router.push(link || '');
+  }
+
   return (
     <button
       className={`bg-gold flex justify-center items-center gap-1 py-2 px-3 rounded-3xl cursor-pointer ${className}`}
       {...props}
+      onClick={navigation}
     >
-      <span className="text-[1em] font-medium flex items-center h-6">
+      <span className="text-[1em] font-medium flex items-center h-6 max-lg:text-xs">
         {name ? name : "Khám phá"}
       </span>
       <svg

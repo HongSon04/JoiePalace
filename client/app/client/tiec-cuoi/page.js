@@ -8,22 +8,7 @@ import { Image } from "@chakra-ui/react";
 import Footer from "@/app/_components/FooterClient";
 import CustomSliderMenu from "@/app/_components/CustomSliderMenu";
 
-const dataslider = [
-  {
-    id: 1,
-    name: "set menu",
-    img: "Alacarte-Menu-Thumbnail.png",
-    descriptions:
-      "Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!",
-  },
-  {
-    id: 2,
-    name: "set menu 2",
-    img: "Alacarte-Menu-Thumbnail.png",
-    descriptions:
-      "Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!",
-  },
-];
+
 
 function Event() {
   return (
@@ -125,7 +110,7 @@ function Event() {
           </section>
         </div>
         <div className="section">
-          <CustomSliderMenu dataSlider={dataslider} />
+          <CustomSliderMenu />
         </div>
         <section className="section">
           <Footer />

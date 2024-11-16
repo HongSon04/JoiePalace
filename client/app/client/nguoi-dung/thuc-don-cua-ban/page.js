@@ -17,10 +17,10 @@ const Page = () => {
 
         const fetchData = async () => {
             try {
-                const data = await fetchAllMenu();
-                console.log(data);
-                
+                const data = await fetchAllMenu();                
                 const filteredMenuData = data.filter(menu => menu.user_id === getUser.id);
+                console.log(filteredMenuData);
+                
                 setMenuDataByIDUser(filteredMenuData);
             } catch (error) {
                 console.error('Error fetching menu data:', error);
@@ -41,24 +41,34 @@ const Page = () => {
                         // Extract items for each category
                         const appetizers = menu.products['mon-khai-vi'] || [];
                         const mainDishes = menu.products['mon-chinh'] || [];
+                        const mainDessert = menu.products['mon-trang-mieng'] || [];
                         const nameDish = (data) => {
                             return (data.map(item => ({
+                                price: item.price,
                                 name: item.name,
-                            }))).map(item => item.name)
+                            })))
                         };
                         
                         const menuData = [
                             {
                                 title: "Món khai vị",
-                                items: nameDish(appetizers)
+                                items: nameDish(appetizers).map(item => item.name),
+                                price: nameDish(appetizers).map(item => item.price),
+                                // totalPrice: menu.price
                             },
                             {
                                 title: "Món chính",
-                                items: nameDish(mainDishes)
+                                items: nameDish(mainDishes).map(item => item.name),
+                                price: nameDish(mainDishes).map(item => item.price),
+                            },
+                            {
+                                title: "Món tráng miệng",
+                                items: nameDish(mainDessert).map(item => item.name),
+                                price: nameDish(mainDessert).map(item => item.price),
                             },
                         ];
 
-                        return <MenuItems key={menu.id} data={menuData} imgMenu={menu.images} nameMenu={menu.name} />;
+                        return <MenuItems key={menu.id} data={menuData} imgMenu={menu.images} nameMenu={menu.name} priceTotal={menu.price} />;
                     })
                 ) : (
                     <p>Bạn chưa có thực đơn nào cho mình </p>
