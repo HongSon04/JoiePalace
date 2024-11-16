@@ -2,6 +2,7 @@ import {
   BadRequestException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -23,6 +24,8 @@ import { ChangeProfileUserDto } from './dto/change-profile-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { User as UserEntity } from './entities/user.entity';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
@@ -31,6 +34,7 @@ export class UserService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private cloudinaryService: CloudinaryService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // ! Create User
@@ -340,6 +344,20 @@ export class UserService {
     try {
       const search = query.search || '';
       if (query.itemsPerPage && query.itemsPerPage === 'all') {
+        //? Caching
+        const cacheKey = `getAllUsers`;
+        const cacheData = await this.cacheManager.get(cacheKey);
+        if (cacheData) {
+          console.log('Hit cache');
+          throw new HttpException(
+            {
+              data: FormatReturnData(cacheData, ['password', 'refresh_token']),
+            },
+            HttpStatus.OK,
+          );
+        }
+
+        // Lấy tất cả user cùng booking statistics
         const users = await this.prismaService.users.findMany({
           where: {
             deleted: false,
@@ -369,6 +387,8 @@ export class UserService {
           users as any,
         );
 
+        // Cache data
+        await this.cacheManager.set(cacheKey, userStatsPromises);
         throw new HttpException(
           {
             data: FormatReturnData(userStatsPromises, [
@@ -946,8 +966,10 @@ export class UserService {
       user.totalBookingCancel = metrics.totalBookingCancel;
       user.totalBookingProcess = metrics.totalBookingProcess;
       user.totalDepositAmount = metrics.totalDepositAmount;
-    });
 
+      // ? Bỏ booking ra khỏi user object
+      delete user.bookings;
+    });
     return users;
   }
 

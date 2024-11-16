@@ -1,10 +1,8 @@
-import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
-import { redisStore } from 'cache-manager-redis-store';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -33,6 +31,7 @@ import { StagesModule } from './stages/stages.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import { TagsModule } from './tags/tags.module';
 import { UserModule } from './user/user.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -52,23 +51,9 @@ import { UserModule } from './user/user.module';
       }),
       inject: [ConfigService],
     }),
-    CacheModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
+    CacheModule.register({
       isGlobal: true,
-      useFactory: async (configService: ConfigService) => {
-        const store = await redisStore({
-          socket: {
-            host: configService.get<string>('REDIS_HOST'),
-            port: configService.get<number>('REDIS_PORT'),
-          },
-          password: configService.get<string>('REDIS_PASSWORD'),
-          ttl: 60 * 3,
-        });
-        return {
-          store: store as unknown as CacheStore,
-        };
-      },
+      ttl: 60 * 3,
     }),
     AuthModule,
     UserModule,
