@@ -103,7 +103,6 @@ const Page = ({ params }) => {
             dataTotalAdminByYear,
             dataTotalAdminByQuarter,
             dataTotalBranch,
-          
         ] = await Promise.all([
             fetchInfoByMonth(branchId),
             fetchRevenueBranchByMonth(0),
