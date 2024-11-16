@@ -50,7 +50,7 @@ const Contact = () => {
   const [bookingDetails, setBookingDetails] = useState({});
 
   const [formData, setFormData] = useState({
-    user_id: userInfo?.id,
+    user_id: "",
     name: "",
     email: "",
     phone: "",
@@ -126,7 +126,7 @@ const Contact = () => {
       formSchema.parse(formData);
       setErrors({});
       const dataToSend = {
-        user_id: formData.user_id,
+        user_id: JSON.parse(localStorage?.getItem("user")).id,
         branch_id: formData.branch,
         party_type_id: formData.partyType,
         stage_id: 0,
