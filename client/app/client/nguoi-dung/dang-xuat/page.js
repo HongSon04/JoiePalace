@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+
 import iconExitLogout from '@/public/iconExitLogout.svg'
 import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
@@ -9,10 +10,14 @@ import { fetchAllBookingByUserId, fetchBookingById } from '@/app/_services/booki
 
 const Page = () => {
     const [party, setParty] = useState([]);
-
+    const router = useRouter();
     useEffect(() => {
         const getData = async () => {
             const getUser = JSON.parse(localStorage.getItem("user"));
+            if (!getUser) {
+                router.push('/');
+                return;
+            }
             try {
                 const fetchedAllBookingsMembershipId = await fetchAllBookingByUserId(getUser?.id);
                 const fetchedAllBookingsPending = fetchedAllBookingsMembershipId.filter((i) => i.status === 'pending' || i.status === 'processing');
@@ -31,13 +36,18 @@ const Page = () => {
         getData();
     }, []);
 
-    const router = useRouter();
-    const logout = () => {
-        signOut();
-        localStorage.removeItem('user');
-        router.push('/');
-        Cookies.remove("accessToken");
-    }
+
+    const logout = async () => {
+        try {
+            localStorage.removeItem('user');
+            Cookies.remove("accessToken");
+            await signOut(); 
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Error during logout", error);
+        }
+    };
+
     function formatDateTime(dateTimeString) {
         const date = new Date(dateTimeString);
 

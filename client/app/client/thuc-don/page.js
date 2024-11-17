@@ -1,6 +1,6 @@
 "use client";
-import { useRef } from "react";
-
+import React, { useEffect, useCallback, useState } from "react"; // Import React
+import { useDispatch } from "react-redux"; // Import useDispatch
 import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import mouseIcon from "../../../public/mouse.svg";
 import { motion } from "framer-motion";
@@ -9,25 +9,12 @@ import Footer from "@/app/_components/FooterClient";
 import CustomSliderMenu from "@/app/_components/CustomSliderMenu";
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
 import Link from "next/link";
-const dataslider = [
-  {
-    id: 1,
-    name: "set menu",
-    img: "Alacarte-Menu-Thumbnail.png",
-    descriptions:
-      "Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!",
-  },
-  {
-    id: 2,
-    name: "set menu 2",
-    img: "Alacarte-Menu-Thumbnail.png",
-    descriptions:
-      "Phép màu giúp chúng ta vượt ra khỏi những giới hạn về định nghĩa, tự do sáng tạo thế giới trải nghiệm, khi kết hợp cùng Flavors - Hương vị của niềm hân hoan, hạnh phúc và năng lượng tích cực. Món ăn là phép màu và hương vị là chìa khóa mở ra những trải nghiệm. Hãy cùng nhau khám phá!",
-  },
-];
+
+
 
 
 function Event() {
+
   return (
     <div className="m-auto h-full" id="fullpage">
       <ScrollFullPage>
@@ -85,7 +72,7 @@ function Event() {
           </div>
         </div>
         <div className="section">
-          <CustomSliderMenu dataSlider={dataslider} />
+          <CustomSliderMenu/>
         </div>
         <div className="section">
           <div className="select-none flex h-screen max-lg:h-fit max-lg:py-10 justify-between items-center px-[200px] max-xl:px-[100px] max-lg:px-[50px]">
@@ -95,7 +82,7 @@ function Event() {
               <p className="text-white mb-6  max-lg:text-[13px]">
                 Nhầm gia tăng trải nghiệm của quý khách và thích ứng với thị trường hiện tại, Joie Palace ra mắt tính năng <Link href={''} className="font-bold" >“Tạo thực đơn”</Link>, thực đơn được tạo riêng sẽ mang lại nét đặc trưng, sự thoải mái và tính phù hợp với từng mục đích của buổi tiệc.
               </p>
-              <ButtonDiscover name={'Tạo ngay'}></ButtonDiscover>
+              <ButtonDiscover name={'Tạo ngay'} link={'/client/tao-thuc-don'}></ButtonDiscover>
             </div>
             <div className="relative bottom-10 right-24  max-lg:right-4 max-sm:hidden">
               <div className="max-xl:w-48 max-lg:w-32 w-64 h-auto shadow-lg p-2 bg-white right-10">

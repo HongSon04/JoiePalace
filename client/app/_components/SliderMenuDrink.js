@@ -10,7 +10,7 @@ import Link from "next/link";
 
 
 
-const SliderMenuDrink = ({ title, dataSlider, logo }) => {
+const SliderMenuDrink = ({ title, dataSlider, logo, idDish }) => {
     const sliderRef = useRef(null);
 
     const nextSlide = () => {
@@ -31,15 +31,14 @@ const SliderMenuDrink = ({ title, dataSlider, logo }) => {
             <div className="custom-dot-line"></div>
         ),
         dotsClass: "slick-dots custom-dots-line",
-        slidesToShow: 2.124,
-        slidesToScroll: 2,
-        infinite: true,
+        slidesToShow: 1.35,
+        slidesToScroll: 1,
+        infinite: false,
         speed: 1500,
-        // autoplay: true,
         autoplaySpeed: 3000,
         cssEase: "ease-in-out",
         arrows: false,
-        responsive: [            
+        responsive: [
             {
                 breakpoint: 600,
                 settings: {
@@ -51,13 +50,13 @@ const SliderMenuDrink = ({ title, dataSlider, logo }) => {
     };
 
     return (
-        <section className="flex items-center w-[60%] max-xl:w-[80%] max-2md::w-[95%] m-auto max-sm:py-[40px]">
+        <section className="flex items-center w-[60%] max-xl:w-[80%] max-2md::w-[95%] m-auto max-sm:py-[40px]" id={idDish}>
             <div className="w-full min-h-[450px] ">
                 <div className="flex justify-between items-center">
                     <div className="flex">
                         <div className="mr-4">
                             <Image
-                            className="max-2md:w-[40px]"
+                                className="max-2md:w-[40px]"
                                 src={logo.src}
                                 alt={logo.name}
                             />
@@ -107,27 +106,38 @@ const SliderMenuDrink = ({ title, dataSlider, logo }) => {
                     </div>
                 </div>
                 <div className="">
-                    <Slider ref={sliderRef} {...menuSliderSettings}>
-                        {dataSlider.map((item, index) => (
-                            <div key={item.id} className="!flex items-center justify-center gap-6 max-sm:flex-col">
-                                <div className="flex justify-center items-center w-fit h-fit p-[10px]">
-                                    <p className="text-2xl"> {index+1}.</p>
-                                    <Image
-                                        className="object-cover h-full w-full"
-                                        src={`${item.image}`}
-                                        alt={item.name}
-                                    />
+                    {dataSlider.length > 0 ? (
+                        <Slider ref={sliderRef} {...menuSliderSettings}>
+                            {dataSlider.map((item, index) => (
+                                <div key={item.id} className="!flex items-center justify-center gap-6 max-sm:flex-col">
+                                    <div className="flex justify-center items-center  border-gold border w-fit h-fit p-[10px]">
+                                        <div className="flex justify-center items-center  border-gold border w-fit h-fit p-[10px]">
+                                            <div className="flex justify-center items-center w-[200px] h-[200px] max-2md:w-[150px] max-2md:h-[150px] bg">
+                                                <Image
+                                                    className="object-cover h-[200px] w-[200px] max-2md:w-[150px] max-2md:h-[150px]  bg-cloche"
+                                                    src={`${item.image}`}
+                                                    alt=''
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-6">
+                                        <h1 className="font-bold text-xl leading-[40px] text-left font-gilroy uppercase max-2md:text-lg">{item.name}</h1>
+                                        <p className="font-normal text-lg leading-[40px] text-left font-gilroy max-2md:text-base">{item.price}</p>
+                                        <p className="font-normal text-base text-left font-gilroy w-[80%] max-2md:text-[13px]">{item.description}</p>
+                                        <Link className="font-normal text-lg leading-[40px] text-left font-gilroy text-gold border-b border-gold hover:text-gold w-fit max-2md:text-base" href={item.link}>Khám phá</Link>
+                                    </div>
                                 </div>
-                                <div className="flex flex-col gap-6">
-                                    <h1 className="font-bold text-xl leading-[40px] text-left font-gilroy uppercase max-2md:text-lg">{item.name}</h1>
-                                    <p className="font-normal text-lg leading-[40px] text-left font-gilroy max-2md:text-base">{item.price}</p>
-                                    <p className="font-normal text-base text-left font-gilroy w-[80%] max-2md:text-[13px]">{item.description}</p>
-                                    <Link className="font-normal text-lg leading-[40px] text-left font-gilroy text-gold border-b border-gold hover:text-gold w-fit max-2md:text-base" href={item.link}>Khám phá</Link>
-                                </div>
-                            </div>
-                        ))}
-                    </Slider>
+                            ))}
+                        </Slider>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center p-5 text-center relative top-[70px]">
+                            <h2 className="font-bold text-xl text-white-700">Hiện tại menu chưa có phần nước bàn.</h2>
+                            <p className="font-normal text-lg text-white-100">Bạn có muốn chọn thêm không?</p>
+                        </div>
+                    )}
                 </div>
+
             </div>
         </section>
     );
