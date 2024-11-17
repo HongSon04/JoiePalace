@@ -20,67 +20,7 @@ import { fetchBranchSuccess } from '@/app/_lib/features/branch/branchSlice';
 import { organizationSchema } from './organizationSchema';
 import { DropdownField } from './DropdownField';
 import { DropDownSelect2 } from './DropDownSelect2';
-
-const TitleSpanInfo = ({ title }) => (
-    <span className="font-semibold text-xl leading-7 text-white">{title}</span>
-);
-const handleServiceChange = (event, services, selectedDishesState, setSelectedDishesState, setSelectService) => {
-    const packageId = event.target.value;
-
-    // Handle "Không chọn" option
-    if (packageId === "" || packageId === "null") {
-        setSelectedDishesState([]);
-        setSelectService(null);
-        return;
-    }
-
-    const options = services.flatMap(service =>
-        service.options.flatMap(option => option.items ? option.items : option)
-    );
-
-    const selectedOption = options.find(item => item.value == packageId);
-
-    if (!selectedOption) {
-        console.error('Tùy chọn không hợp lệ:', packageId);
-        return;
-    }
-
-    const existingDish = selectedDishesState.find(dish => dish.id == packageId);
-
-    if (existingDish) {
-        handleChangeQuantity(packageId, selectedDishesState, setSelectedDishesState, 1); // Increase quantity
-    } else {
-        setSelectedDishesState([...selectedDishesState, { id: packageId, name: selectedOption.label, price: selectedOption.price, quantity: 1 }]);
-    }
-
-    setSelectService(packageId);
-};
-
-const FoodsTitle = ({ title, foodsMap, handleDeleteFood }) => {
-    return (
-        <div className="flex flex-col gap-2">
-            <span className="font-bold leading-6 text-base text-white">{title}</span>
-            <div className="flex flex-wrap gap-[10px]">
-                {foodsMap && foodsMap.length > 0 ? (
-                    foodsMap.map((food) => (
-                        <div key={food.id} className="bg-white border-1 rounded-lg p-2 flex gap-[6px] text-gray-600 items-center w-fit transition-transform transform hover:scale-105">
-                            <span className="text-[12px] font-medium leading-4">{food.name}</span>
-                            <button type='button'
-                            onClick={() => handleDeleteFood(food.id)}
-                             className="text-red-500 hover:text-red-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path opacity="0.5" d="M5 3.88906L8.88906 0L10 1.11094L6.11094 5L10 8.88906L8.88906 10L5 6.11094L1.11094 10L0 8.88906L3.88906 5L0 1.11094L1.11094 0L5 3.88906Z" fill="#1A202C" />
-                                </svg>
-                            </button>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-white font-semibold text-base">Chưa có món ăn nào cho menu này.</p>
-                )}
-            </div>
-        </div>
-    );
-};
+import { FoodsTitle, TitleSpanInfo } from './ServiceMethod';
 
 const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const { id } = params;
@@ -162,7 +102,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             type: 'select',
             name: 'extra_service',
             options: [
-                { value: null, label: 'Không chọn' },
+                { value: null, label: 'Không chọn', id: 0 },
             ],
         },
     ]);
@@ -173,7 +113,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             type: 'select',
             name: 'other_service',
             options: [
-                { value: null, label: 'Không chọn' },
+                { value: null, label: 'Không chọn', id: 0 },
             ],
         },
     ]);
@@ -186,7 +126,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const [selectStatusDeposit, setSelectStatusDeposit] = useState(false);
 
     const [selectExtraServices, setSelectExtraServices] = useState(null);
-    const [selectedDishes, setSelectedDishes] = useState([]);
+    const [selectExtraDishes, setSelectExtraDishes] = useState([]);
 
     const [selectOtherServices, setSelectOtherServices] = useState(null);
     const [selectOtherDishes, setSelectOtherDishes] = useState([]);
@@ -202,9 +142,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const [partyPrice, setPartyPrice] = useState(0);
     const [stagePrice, setStagePrice] = useState(0);
     const [decorPrice, setDecorPrice] = useState(0);
-    const [otherServicePrice, setOtherServicePrice] = useState(0);
     const [limitStages, setLimitStages] = useState(0);
-    const [modifiedFoods, setModifiedFoods] = useState([]);
     const [detailCostTable, setDetailCostTable] = useState([]);
 
     const [branch_id, setBranch_id] = useState();
@@ -221,32 +159,35 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const fetchAllStages = async (branchId) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.STAGES.GET_ALL_BY_BRANCH(branchId), 'GET');
-            const stageData = response.data;
 
-            const options = stageData.length === 0
-                ? [{ value: '', label: 'Chưa có sảnh', capacity_max: 0 }]
-                : stageData.map(item => ({
-                    value: item.id,
-                    label: item.name,
-                    price: item.price,
-                    capacity_max: item.capacity_max,
-                }));
+            if (!response.data || response.data.length === 0) {
+                console.warn('No stages available.');
+                setStages([{ title: 'Sảnh', type: 'select', options: [{ value: '', label: 'Chưa có sảnh', capacity_max: 0 }] }]);
+                return;
+            }
+
+            const options = response.data.map(item => ({
+                value: item.id,
+                label: item.name,
+                price: item.price,
+                capacity_max: item.capacity_max,
+            }));
 
             setStages([{ title: 'Sảnh', type: 'select', options }]);
 
-            // Automatically select the first option if there is only one
             if (options.length === 1) {
                 setSelectStages(options[0].value);
                 setLimitStages(options[0].capacity_max || 0);
                 setStagePrice(options[0].price || 0);
             } else {
-                // If there are no selected stages, set to the first option if available
                 if (!selectStages && options.length > 0) {
                     setSelectStages(options[0].value);
+                    setLimitStages(options[0].capacity_max || 0);
+                    setStagePrice(options[0].price || 0);
                 }
             }
         } catch (error) {
-            console.error(error);
+            console.error('Error fetching stages:', error);
         }
     };
     const fetchAllMenus = async () => {
@@ -317,16 +258,18 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
             setDecors(prevDecors => [{ ...prevDecors[0], options: decorOptions }]);
 
-            // Automatically select the first option if only one available
             if (decorOptions.length === 1) {
                 setSelectedDecors(decorOptions[0].value);
                 setDecorPrice(decorOptions[0].price);
             } else if (!selectedDecors && decorOptions.length > 0) {
-                // Select the first option if no decor is currently selected
                 setSelectedDecors(decorOptions[0].value);
+                setDecorPrice(decorOptions[0].price);
             }
+
+            return decorOptions;
         } catch (error) {
             console.error('Error fetching decors:', error);
+            return []; // Trả về mảng rỗng nếu có lỗi
         }
     };
     const fetchAllPartyTypes = async () => {
@@ -407,7 +350,38 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         }
     };
 
+    const fetchPackageByID = async (packageId) => {
+        try {
+            const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_BY_ID(packageId), 'GET');
+            const packageData = response.data[0];
+            
+            // Xử lý other_service từ packageData
+            if (packageData.other_service) {
+                const otherServicesFromAPI = JSON.parse(packageData.other_service);
+                const otherServiceOptions = otherServicesFromAPI.map(service => ({
+                    id: Number(service.id),
+                    name: service.name,
+                    price: service.price, // Chuyển đổi sang số
+                    quantity: service.quantity,
+                }));
+                setSelectOtherDishes(prev => [...prev, ...otherServiceOptions]);
+            }
 
+            // Xử lý extra_service từ packageData
+            if (packageData.extra_service) {
+                const extraServicesFromAPI = JSON.parse(packageData.extra_service);
+                const extraServiceOptions = extraServicesFromAPI.map(service => ({
+                    id: Number(service.id),
+                    name: service.name,
+                    price: service.price, // Chuyển đổi sang số
+                    quantity: service.quantity,
+                }));
+                setSelectExtraDishes(prev => [...prev, ...extraServiceOptions]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
     const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
         defaultValues: {
@@ -423,56 +397,26 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.GET_BY_ID(id), 'GET');
             const partyData = response.data[0];
-
             if (partyData) {
                 const paymentStatusMethod = partyData.payment_status;
                 await fetchAllStages(partyData.branch_id);
                 const bookingDetails = partyData.booking_details[0] || {};
-
-                const initialStageId = partyData.stage_id || (partyData.booking_details[0]?.stage_detail?.id || '');
                 const selectedMenuId = bookingDetails.menu_id || selectedMenu;
-                const selectedDecorId = bookingDetails.decor_id || selectedDecors;
-
-                if (stages[0]?.options.length === 1) {
-                    setSelectStages(stages[0].options[0].value);
-                } else if (initialStageId) {
-                    const selectedStage = stages[0]?.options.find(option => option.value === initialStageId);
-
-                    if (selectedStage) {
-                        setSelectStages(selectedStage.value);
-                        setLimitStages(selectedStage.capacity_max || 0);
-                        setStagePrice(selectedStage.price || 0);
-                    } else {
-                        setSelectStages(stages[0].options[0]?.value);
-                        setStagePrice(0);
-                    }
-                } else if (stages[0]?.options.length > 0) {
-                    setSelectStages(stages[0].options[0].value);
-                }
-
-                if (!selectedMenu) {
-                    setSelectedMenu(bookingDetails.menu_id);
-                    if (bookingDetails.menu_id) {
-                        await fetchFoodsByMenuId(bookingDetails.menu_id);
+                const decorOptions = await fetchAllDecors();
+                // Kiểm tra package_id
+                if (partyData.package_id) {
+                    await fetchPackageByID(partyData.package_id);
+                } else {
+                    setSelectStages(partyData.stage_id || '')
+                    if (!selectedMenu) {
+                        setSelectedMenu(bookingDetails.menu_id);
+                        if (bookingDetails.menu_id) {
+                            await fetchFoodsByMenuId(bookingDetails.menu_id);
+                        }
                     }
                 }
-
-                if (decors[0]?.options.length === 1) {
-                    setSelectedDecors(decors[0].options[0].value);
-                    setDecorPrice(decors[0].options[0].price);
-                } else if (selectedDecorId) {
-                    const selectedDecorOption = decors[0].options.find(option => option.value === Number(selectedDecorId));
-
-                    if (selectedDecorOption) {
-                        setSelectedDecors(selectedDecorOption.value);
-                        setDecorPrice(selectedDecorOption.price);
-                    } else {
-                        setSelectedDecors(decors[0]?.options[0]?.value);
-                    }
-                } else if (decors[0]?.options.length > 0) {
-                    setSelectedDecors(decors[0].options[0].value);
-                }
-
+                checkSelectedDecor(decorOptions, partyData);
+                // Xử lý party types
                 if (!selectPartyTypes) {
                     setSelectPartyTypes(partyData.party_type_id);
                     const selectedPartyTypeOption = partyTypes[0]?.options?.find(option => option.value === partyData.party_type_id);
@@ -480,7 +424,32 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         setPartyPrice(selectedPartyTypeOption.price);
                     }
                 }
-                setSelectStatusBookings(partyData.status || '')
+
+                if (partyData.other_service) {
+                    const otherServicesFromAPI = JSON.parse(partyData.other_service);
+                    const otherServiceOptions = otherServicesFromAPI.map(service => ({
+                        id: Number(service.id), 
+                        quantity: service.quantity,
+                        name: service.name,
+                        price: service.price,
+                    }));
+                    setSelectOtherDishes(prev => [...prev, ...otherServiceOptions]);
+                }
+    
+                // Xử lý extra_service từ partyData
+                if (partyData.extra_service) {
+                    const extraServicesFromAPI = JSON.parse(partyData.extra_service);
+                    const extraServiceOptions = extraServicesFromAPI.map(service => ({
+                        id: Number(service.id), 
+                        quantity: service.quantity,
+                        name: service.name,
+                        price: service.price,
+                    }));
+                    setSelectExtraDishes(prev => [...prev, ...extraServiceOptions]);
+                }
+
+                // Cập nhật giá trị khác
+                setSelectStatusBookings(partyData.status || '');
                 setBranch_id(partyData.branch_id);
                 setPartyPrice(partyData.party_types?.price || partyPrice);
                 setStagePrice(partyData.stages?.price || 0);
@@ -488,13 +457,13 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 const depositStatus = bookingDetails.deposit_status;
                 const isDepositSuccessful = depositStatus === 'success';
 
-                setSelectStatusDeposit(isDepositSuccessful ? true : false);
+                setSelectStatusDeposit(isDepositSuccessful);
                 setStatusDeposit(prevStatus => [
                     {
                         ...prevStatus[0],
                         options: prevStatus[0].options.map(option => ({
                             ...option,
-                            selected: option.value === (isDepositSuccessful ? true : false),
+                            selected: option.value === isDepositSuccessful,
                         })),
                     },
                 ]);
@@ -502,7 +471,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 setDetailCostTable([
                     {
                         service: 'Menu',
-                        description: bookingDetails.menus?.products.map(product => product.name).join(', '),
+                        description: bookingDetails.menus?.products.map(product => product.name).join(', ') || '',
                         cost: bookingDetails.menus?.price.toLocaleString('vi', { style: 'currency', currency: 'VND' }) || 0,
                     },
                     {
@@ -543,13 +512,10 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 ]);
 
                 setValue('customer', partyData.number_of_guests / 10);
-
-                // Cập nhật giá trị cho form
                 setValue('total_amount', partyData.total_amount || 0);
                 setValue('depositAmount', bookingDetails.deposits?.amount || 0);
                 const shiftValue = partyData.shift.toLowerCase() === 'tối' ? 'tối' : 'sáng';
 
-                // Reset form với dữ liệu từ API
                 reset({
                     status: partyData.status || '',
                     username: partyData.name || '',
@@ -564,7 +530,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     organization_date: partyData.organization_date.slice(0, 10) || '',
                     shift: shiftValue,
                     menu: selectedMenuId,
-                    decor: selectedDecorId,
+                    decor: selectedMenuId,
                     total_amount: bookingDetails.total_amount,
                     depositAmount: bookingDetails.deposits?.amount,
                     amount_booking: bookingDetails.amount_booking,
@@ -575,10 +541,34 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     statusPayment: paymentStatusMethod,
                     foods: bookingDetails.menus?.products,
                     menus_price: bookingDetails.menus?.price || 0,
+                    other_service: partyData.other_service || null
                 });
             }
         } catch (error) {
             console.error('Error fetching party details:', error);
+        }
+    };
+
+    const checkSelectedDecor = (decorOptions, partyData) => {
+        if (!Array.isArray(decorOptions) || decorOptions.length === 0) {
+            console.error('No decor options available');
+            return;
+        }
+
+        if (Array.isArray(partyData.booking_details) && partyData.booking_details.length > 0) {
+            const selectedDecorId = partyData.booking_details[0].decor_id;
+            console.log('Selected Decor ID:', selectedDecorId);
+
+            const selectedDecorOption = decorOptions.find(option => option.value === selectedDecorId);
+            console.log('Selected Decor Option:', selectedDecorOption);
+
+            if (selectedDecorOption) {
+                setSelectedDecors(selectedDecorOption.value);
+                setDecorPrice(selectedDecorOption.price);
+            } else {
+                setSelectedDecors(decorOptions[0].value);
+                setDecorPrice(decorOptions[0].price);
+            }
         }
     };
 
@@ -613,10 +603,11 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         ));
     };
     const handleDecreaseQuantity = (id) => {
-        setSelectedDishes(selectedDishes.map(dish =>
+        setSelectExtraDishes(selectExtraDishes.map(dish =>
             dish.id === id && dish.quantity > 1 ? { ...dish, quantity: dish.quantity - 1 } : dish
         ));
     };
+
     const handleDecreaseOtherQuantity = (id) => {
         setSelectOtherDishes(selectOtherDishes.map(dish =>
             dish.id === id && dish.quantity > 1 ? { ...dish, quantity: dish.quantity - 1 } : dish
@@ -629,7 +620,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
     // Handle extra service change
     const handleExtraService = (event) => {
-        handleServiceChange(event, extraServices, selectedDishes, setSelectedDishes, setSelectExtraServices);
+        handleServiceChange(event, extraServices, selectExtraDishes, setSelectExtraDishes, setSelectExtraServices);
     };
 
     // Handle other services change
@@ -639,7 +630,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
     // Tạo object mới chứa id và quantity
     const createPayload = () => {
-        return selectedDishes.map(dish => ({
+        return selectExtraDishes.map(dish => ({
             id: dish.id,
             quantity: dish.quantity
         }));
@@ -701,25 +692,62 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         const selectedValue = event.target.value === 'true';
         setSelectStatusDeposit(selectedValue);
     };
-
-    const handleDeleteFood = (foodId) => {
-        const updatedFoods = foods.filter(food => food.id !== foodId);
-        setFoods(updatedFoods);
-        setModifiedFoods(prev => [...prev, foodId]);
+    const handleServiceChange = (event, services, selectedDishesState, setSelectedDishesState, setSelectService) => {
+        const packageId = event.target.value;
+        if (packageId === "" || packageId === "null") {
+            setSelectedDishesState([]);
+            setSelectService(null);
+            return;
+        }
+    
+        const options = services.flatMap(service =>
+            service.options.flatMap(option => option.items ? option.items : option)
+        );
+    
+        const selectedOption = options.find(item => item.value == packageId);
+    
+        if (!selectedOption) {
+            console.error('Tùy chọn không hợp lệ:', packageId);
+            return;
+        }
+    
+        const existingDish = selectedDishesState.find(dish => dish.id == packageId);
+    
+        if (existingDish) {
+            handleChangeQuantity(packageId, selectedDishesState, setSelectedDishesState, 1); 
+        } else {
+            setSelectedDishesState([...selectedDishesState, { id: Number(packageId), name: selectedOption.label, price: selectedOption.price, quantity: 1 }]);
+        }
+    
+        setSelectService(packageId);
     };
-
+    
     useEffect(() => {
         fetchPackageForExtraServices()
         fetchPackageForOtherServices()
-        fetchDataDetailsParty();
         fetchAllMenus();
-        fetchAllDecors();
         fetchAllPartyTypes()
+        fetchAllDecors();
+        fetchDataDetailsParty();
     }, [id, reset]);
 
     const onSubmit = async (data) => {
-        // const finalFoods = foods.filter(food => !modifiedFoods.includes(food.id));
+        const formattedOtherDishes = selectOtherDishes.map(dish => ({
+            id: dish.id,
+            quantity: dish.quantity,
+        }));
+        const formattedExtraDishes = selectExtraDishes.map(dish => ({
+            id: dish.id,
+            quantity: dish.quantity,
+        }));
 
+        const totalOtherServicesPrice = selectOtherDishes.reduce((total, dish) => {
+            return total + (dish.price * dish.quantity);
+        }, 0);
+    
+        const totalExtraServicesPrice = selectExtraDishes.reduce((total, dish) => {
+            return total + (dish.price * dish.quantity);
+        }, 0);
         // Định nghĩa các giá trị đơn giá
         const table_price = 200000; // Giá mỗi bàn
         const chair_price = 50000; // Giá mỗi ghế
@@ -743,7 +771,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         const total_menus_backup = data.spare_table_count * menuPrice;
 
         // Tính tổng tiền amount
-        const total_amount_all = total_table_price + total_table_price_backup + total_chair_price + total_chair_price_backup + decorPrice + partyPrice + stagePrice + total_menus + total_menus_backup;
+        const total_amount_all = total_table_price + total_table_price_backup + total_chair_price + total_chair_price_backup + decorPrice + partyPrice + stagePrice + total_menus + total_menus_backup + totalOtherServicesPrice;
 
         console.log(total_amount_all)
 
@@ -759,11 +787,12 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             email: data.email,
             company_name: data.company_name,
             number_of_guests: data.customer,
+
             table_count: data.tables,
             spare_table_count: data.spare_table_count,
             amount: total_amount_all,
-            other_service: null,
-            extra_service: null,
+            other_service: formattedOtherDishes,
+            extra_service: formattedExtraDishes,
             is_confirm: true,
             is_deposit: selectStatusDeposit,
             status: selectStatusBookings,
@@ -788,9 +817,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     description: "Đã sử lý thông tin cập nhật của khách",
                     type: "success",
                 });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 3000);
+                // setTimeout(() => {
+                //     window.location.reload();
+                // }, 3000);
             } else {
                 const { statusCode, message } = updateBranches.error || {};
                 if (statusCode == 401) {
@@ -812,9 +841,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
             toast("error", "Cập nhật thất bại", message);
         }
-        console.log(dataform)
     };
-
+    console.log(selectExtraDishes)
+    console.log(selectOtherDishes)
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
@@ -917,62 +946,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                 onChange={handleStatusBookings}
                             />
                         ))}
-
-                        {/* <FoodsTitle title={'Món chính'} foodsMap={foods.monChinh} handleDeleteFood={handleDeleteFood} />
-                        <FoodsTitle title={'Món khai vị'} foodsMap={foods.monkhaivi} handleDeleteFood={handleDeleteFood} />
-                        <FoodsTitle title={'Món tráng miệng'} foodsMap={foods.montrangMieng} handleDeleteFood={handleDeleteFood} /> */}
                         <FoodsTitle title={'Món chính'} foodsMap={foods.monChinh} />
                         <FoodsTitle title={'Món khai vị'} foodsMap={foods.monkhaivi} />
-                        <FoodsTitle title={'Món tráng miệng'} foodsMap={foods.montrangMieng}/>
-                    </div>
-                </div>
-                <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
-                    <TitleSpanInfo title={'Thêm mới dịch vụ - Chỉ thêm khi tiệc đã hoàn thành'} />
-                    <div className='grid grid-cols-3 gap-[30px]'>
-
-                        {extraServices.map((service, index) => (
-                            <DropDownSelect2
-                                key={index}
-                                label={service.title}
-                                name={`service-${service.id}`}
-                                options={service.options || []}
-                                value={selectExtraServices}
-                                onChange={handleExtraService}
-                            />
-                        ))}
-                        {selectedDishes.length > 0 &&
-                            selectedDishes.map(dish => (
-                                <div key={dish.id} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                                    <div className="flex flex-col">
-                                        <span className="text-base font-semibold text-white">{dish.name}</span>
-                                        <span className="text-gray-400">Số lượng: <span className='text-base font-semibold'>{dish.quantity}</span></span>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDecreaseOtherQuantity(dish.id)} // Call the specific decrease function for other dishes
-                                            className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
-                                        >
-                                            -
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleChangeQuantity(dish.id, selectOtherDishes, setSelectOtherDishes, 1)} // Increase function
-                                            className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
-                                        >
-                                            +
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveDish(dish.id)}
-                                            className="bg-red-600 text-white px-3 h-[32px] rounded hover:bg-red-700 transition"
-                                        >
-                                            Xóa
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
-                        }
+                        <FoodsTitle title={'Món tráng miệng'} foodsMap={foods.montrangMieng} />
                     </div>
                 </div>
                 {/* other_service */}
@@ -1000,21 +976,21 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                                     <div className="flex items-center space-x-2">
                                         <button
                                             type="button"
-                                            onClick={() => handleDecreaseOtherQuantity(dish.id)} // Call the specific decrease function for other dishes
+                                            onClick={() => handleDecreaseOtherQuantity(dish.id)}
                                             className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
                                         >
                                             -
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => handleChangeQuantity(dish.id, selectOtherDishes, setSelectOtherDishes, 1)} // Increase function
+                                            onClick={() => handleChangeQuantity(dish.id, selectOtherDishes, setSelectOtherDishes, 1)}
                                             className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
                                         >
                                             +
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => handleRemoveDish(dish.id)}
+                                            onClick={() => handleRemoveDish(dish.id, selectOtherDishes, setSelectOtherDishes)}
                                             className="bg-red-600 text-white px-3 h-[32px] rounded hover:bg-red-700 transition"
                                         >
                                             Xóa
@@ -1025,6 +1001,56 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         }
                     </div>
                 </div>
+                <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
+                    <TitleSpanInfo title={'Thêm mới dịch vụ - Chỉ thêm khi tiệc đã hoàn thành'} />
+                    <div className='grid grid-cols-3 gap-[30px]'>
+
+                        {extraServices.map((service, index) => (
+                            <DropDownSelect2
+                                key={index}
+                                label={service.title}
+                                name={`service-${service.id}`}
+                                options={service.options || []}
+                                value={selectExtraServices}
+                                onChange={handleExtraService}
+                            />
+                        ))}
+                        {selectExtraDishes.length > 0 &&
+                            selectExtraDishes.map(dish => (
+                                <div key={dish.id} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                                    <div className="flex flex-col">
+                                        <span className="text-base font-semibold text-white">{dish.name}</span>
+                                        <span className="text-gray-400">Số lượng: <span className='text-base font-semibold'>{dish.quantity}</span></span>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDecreaseQuantity(dish.id)}
+                                            className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
+                                        >
+                                            -
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleChangeQuantity(dish.id, selectExtraDishes, setSelectExtraDishes, 1)}
+                                            className="bg-whiteAlpha-400 text-white w-[34px] h-[32px] rounded hover:bg-whiteAlpha-600 transition text-base font-bold"
+                                        >
+                                            +
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveDish(dish.id, selectExtraDishes, setSelectExtraDishes)}
+                                            className="bg-red-600 text-white px-3 h-[32px] rounded hover:bg-red-700 transition"
+                                        >
+                                            Xóa
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+
                 <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
                     <TitleSpanInfo title={'Thông tin thanh toán'} />
                     <div className='grid grid-cols-3 gap-[30px]'>

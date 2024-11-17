@@ -31,6 +31,6 @@ spare_table_count: z
         .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" })),
     // amount_booking: z
     //     .preprocess(val => parseInt(val, 10), z.number().int({ message: "Số lượng khách phải là số nguyên" }).positive({ message: "Số lượng khách phải lớn hơn 0" })),
-    depositDate: z.string().nonempty({ message: "Ngày đặt cọc là bắt buộc" }),
-    dataPay: z.string().nonempty({ message: "Ngày thanh toán là bắt buộc" }),
+    depositDate: z.string().optional(),
+    dataPay: z.string().optional(),
 });
