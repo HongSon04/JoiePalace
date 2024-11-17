@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import gear from '@/public/gear.svg';
 import checked from '@/public/Checked.svg';
-import Image from "next/image";
+import { Image } from '@nextui-org/react';
 import { fetchAllPackages } from '@/app/_services/packagesServices';
 import { getProductById } from '@/app/_services/productsServices';
+import Link from 'next/link';
 
 
 const WeddingSection = () => {
@@ -36,13 +37,10 @@ const WeddingSection = () => {
 
     const weddingPacks = dataPackage.map(item => {
         const other_service = JSON.parse(item.other_service);
-        // dataPackage.map(async (item) => {
-        //     const productPromises = other_service.map(service => getProductById(service.id));
-        //     const data = await Promise.all(productPromises);            
-        //     setDataproduct(data);
-        // })
-        const totalPackages = 0;        
+        console.log(other_service);
         
+        const menu = (item.menus).name;
+        const decors = (item.decors).name;
         return {
             title: item.name,
             price: `${item.price.toLocaleString().slice(0, 2)} Triệu VND`,
@@ -51,43 +49,13 @@ const WeddingSection = () => {
                 {
                     title: "Trang trí",
                     items: [
-                        'Tùy chọn theo trang trí tiệc'
+                        decors
                     ]
                 },
                 {
-                    title: "Bàn tiệc",
+                    title: "Sân khấu",
                     items: [
                         'Tùy chọn theo trang trí tiệc'
-                    ]
-                },
-                {
-                    title: "Menu",
-                    items: [
-                        "Dàn âm thanh chất lượng cao",
-                        "Nhân viên kỹ thuật âm thanh",
-                        "DJ chuyên nghiệp"
-                    ]
-                },
-                {
-                    title: "Nước uống",
-                    items: [
-                        "Nước ngọt",
-                        "Nước khoáng",
-                        "Rượu vang"
-                    ]
-                },
-                {
-                    title: "Âm thanh",
-                    items: [
-                        "Dàn âm thanh chất lượng cao",
-                        "Nhân viên kỹ thuật âm thanh",
-                        "DJ chuyên nghiệp"
-                    ]
-                },
-                {
-                    title: "MC",
-                    items: [
-                        'MC chuyên nghiệp'
                     ]
                 },
                 {
@@ -97,38 +65,37 @@ const WeddingSection = () => {
                         "Bánh cưới theo yêu cầu"
                     ]
                 },
+                {
+                    title: "Menu",
+                    items: [
+                        menu
+                    ]
+                },
+                {
+                    title: "Chụp ảnh",
+                    items: [
+                        "Bánh cưới 3 tầng",
+                        "Bánh cưới theo yêu cầu"
+                    ]
+                },
+                {
+                    title: "Vũ đoàn",
+                    items: [
+                        "Bánh cưới 3 tầng",
+                        "Bánh cưới theo yêu cầu"
+                    ]
+                },
+                {
+                    title: "MC",
+                    items: [
+                        "Bánh cưới 3 tầng",
+                        "Bánh cưới theo yêu cầu"
+                    ]
+                },
+
             ]
         };
     });
-
-
-
-    // const weddingPacks = [
-    //     {
-    //         title: "GÓI TIỆC CƯỚI NGỌT NGÀO",
-    //         price: "50 - 100 Triệu VND",
-    //         details: "Thường dành cho tiệc khoảng 100 khách.",
-    //         categories: [
-    //             {
-    //                 title: "Trang trí",
-    //                 items: [
-    //                     "Màu sắc tự chọn theo chủ đề",
-    //                     "Hoa tươi tự chọn",
-    //                     "Backdrop đơn giản, có thể tự thiết kế"
-    //                 ]
-    //             },
-    //             {
-    //                 title: "Âm thanh",
-    //                 items: [
-    //                     "Dàn âm thanh chất lượng cao",
-    //                     "Nhân viên kỹ thuật âm thanh",
-    //                     "DJ chuyên nghiệp"
-    //                 ]
-    //             },
-    //         ]
-    //     },
-    //     // Thêm các gói khác nếu cần
-    // ];
 
     const togglePack = (index) => {
         setOpenPackIndex(openPackIndex === index ? null : index);
@@ -138,6 +105,26 @@ const WeddingSection = () => {
     const toggleDropdown = (index) => {
         setOpenDropdownIndex(openDropdownIndex === index ? null : index);
     };
+
+    if (weddingPacks.length === 0) {
+        return (
+            <div className='flex flex-col items-center justify-center w-full h-[50vh]'>
+                <div className='w-[200px] opacity-50'>
+                    <Image
+                        src='/notebook.png'
+                        alt="Notebook image"
+                        className="object-cover"
+                    />
+                </div>
+                <div className='flex mt-4 text-lg'>
+                    <p>Bạn có muốn tạo gói cho riêng mình?</p>
+                    <Link href='/client/tao-combo' className='ml-2 text-gold hover:text-gold hover:underline'>
+                        Tạo gói
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -197,7 +184,7 @@ const WeddingSection = () => {
                                     <div className={`transition-all duration-500 ease-in-out ${openDropdownIndex === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
                                         <ul className="mt-2 list-disc ml-6 text-white">
                                             {category.items.map((item, itemIndex) => (
-                                                <li key={itemIndex}>{item}</li>
+                                                <li className='ml-5' key={itemIndex}>{item}</li>
                                             ))}
                                         </ul>
                                     </div>
@@ -205,7 +192,7 @@ const WeddingSection = () => {
                             ))}
 
                             <button className="mt-6 flex items-center gap-2 justify-center w-full bg-gold text-white text-base py-2 leading-5 rounded-md font-semibold transition duration-300">
-                                LIÊN HỆ NGAY <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                Xem gói <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="arrow_forward">
                                         <path id="Vector" d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z" fill="white" />
                                     </g>
@@ -214,19 +201,9 @@ const WeddingSection = () => {
                         </div>
                     </div>
                 </div>
-            )) : <div
-                className='absolute'
-            >
-                <div className='relative left-[400px] top-[200px]  w-[100px] h-[100px]'>
-                    <div>  <Image
-                        src='/notebook.png'
-                        alt="user-img"
-                        fill
-                        className="w-[200px] opacity-50"
-                    /></div>
-                </div>
-
-            </div>}
+            )) :
+                ''
+            }
         </div>
     );
 };

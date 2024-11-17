@@ -3,6 +3,8 @@ import MenuItems from '@/app/_components/MenuItems';
 import React, { useEffect, useState } from 'react';
 import { fetchAllMenu } from '@/app/_services/menuServices';
 import { useRouter } from 'next/navigation';
+import { Image } from '@nextui-org/react';
+import Link from 'next/link';
 
 const Page = () => {
     const [menuDataByIDUser, setMenuDataByIDUser] = useState([]);
@@ -17,10 +19,10 @@ const Page = () => {
 
         const fetchData = async () => {
             try {
-                const data = await fetchAllMenu();                
+                const data = await fetchAllMenu();
                 const filteredMenuData = data.filter(menu => menu.user_id === getUser.id);
                 console.log(filteredMenuData);
-                
+
                 setMenuDataByIDUser(filteredMenuData);
             } catch (error) {
                 console.error('Error fetching menu data:', error);
@@ -42,40 +44,61 @@ const Page = () => {
                         const appetizers = menu.products['mon-khai-vi'] || [];
                         const mainDishes = menu.products['mon-chinh'] || [];
                         const mainDessert = menu.products['mon-trang-mieng'] || [];
-                        const nameDish = (data) => {
-                            return (data.map(item => ({
-                                price: item.price,
-                                name: item.name,
-                            })))
-                        };
-                        
+
+                        // Extract names and prices once
+                        const extractDishData = (data) => data.map(item => ({
+                            price: item.price,
+                            name: item.name,
+                        }));
+
                         const menuData = [
                             {
                                 title: "Món khai vị",
-                                items: nameDish(appetizers).map(item => item.name),
-                                price: nameDish(appetizers).map(item => item.price),
-                                // totalPrice: menu.price
+                                items: extractDishData(appetizers).map(item => item.name),
+                                price: extractDishData(appetizers).map(item => item.price),
                             },
                             {
                                 title: "Món chính",
-                                items: nameDish(mainDishes).map(item => item.name),
-                                price: nameDish(mainDishes).map(item => item.price),
+                                items: extractDishData(mainDishes).map(item => item.name),
+                                price: extractDishData(mainDishes).map(item => item.price),
                             },
                             {
                                 title: "Món tráng miệng",
-                                items: nameDish(mainDessert).map(item => item.name),
-                                price: nameDish(mainDessert).map(item => item.price),
+                                items: extractDishData(mainDessert).map(item => item.name),
+                                price: extractDishData(mainDessert).map(item => item.price),
                             },
                         ];
 
-                        return <MenuItems key={menu.id} data={menuData} imgMenu={menu.images} nameMenu={menu.name} priceTotal={menu.price} />;
+                        return (
+                            <MenuItems
+                                key={menu.id}
+                                data={menuData}
+                                imgMenu={menu.images}
+                                nameMenu={menu.name}
+                                priceTotal={menu.price}
+                            />
+                        );
                     })
                 ) : (
-                    <p>Bạn chưa có thực đơn nào cho mình </p>
+                    <div className='flex flex-col items-center justify-center w-full h-[50vh]'>
+                        <div className='w-[200px] opacity-50'>
+                            <Image
+                                src='/cloche.png'
+                                alt="Notebook image"
+                                className="object-cover "
+                            />
+                        </div>
+                        <div className='flex mt-4 text-lg '>
+                            <p>Bạn có muốn tạo menu cho riêng mình?</p>
+                            <Link href='/client/tao-thuc-don' className='ml-2 text-gold hover:text-gold hover:underline'>
+                                Tạo menu
+                            </Link>
+                        </div>
+                    </div>
                 )}
-
             </div>
         </div>
+
     );
 };
 

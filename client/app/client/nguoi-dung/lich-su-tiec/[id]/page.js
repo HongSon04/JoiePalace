@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import clipBoard from "@/public/clipBoard.svg";
 import DownloadIcon from "@/public/DownloadIcon.svg";
 import OutlineFeedBack from "@/public/OutlineFeedBack.svg";
-import Image from 'next/image';
+import { Image } from '@nextui-org/react';
 import PartySectionClient from '@/app/_components/PartySectionClient';
 import { fetchBookingById } from '@/app/_services/bookingServices';
 import { useRouter } from 'next/navigation';
@@ -291,15 +291,17 @@ const Page = ({ params }) => {
                 </span>
 
                 <div className='flex gap-3'>
-                    <button className='px-4 py-3 rounded bg-white flex items-center justify-center'>
+                    {/* <button className='px-4 py-3 rounded bg-white flex items-center justify-center'>
                         <Image src={clipBoard} alt='clipBoard' objectFit='cover'></Image>
                     </button>
                     <button className='px-4 py-3 rounded bg-white flex items-center justify-center'>
                         <Image src={DownloadIcon} alt='clipBoard' objectFit='cover'></Image>
-                    </button>
-                    <button className='px-4 py-3 rounded bg-white flex items-center justify-center' onClick={() => router.push(`/client/form-danh-gia-gop-y/${partyPartyDetails[0].branch_id}/${partyPartyDetails[0].id}`)}>
+                    </button> */}
+
+                    {partyStatus == 'success' ? <button className='px-4 py-3 rounded bg-white flex items-center justify-center' onClick={() => router.push(`/client/form-danh-gia-gop-y/${partyPartyDetails[0].branch_id}/${partyPartyDetails[0].id}`)}>
                         <Image src={OutlineFeedBack} alt='clipBoard' objectFit='cover'></Image>
-                    </button>
+                    </button> : ''}
+                    
                 </div>
 
             </div>
