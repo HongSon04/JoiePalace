@@ -113,6 +113,7 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
+    
     GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>

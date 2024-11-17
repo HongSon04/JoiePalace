@@ -13,6 +13,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { formatPrice } from "@/app/_utils/formaters";
 import { useSearchParams } from "next/navigation";
 import SearchForm from "@/app/_components/SearchForm";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
 
 const Page = ({ params }) => {
   const { slug } = params;
@@ -50,22 +51,50 @@ const Page = ({ params }) => {
       }
     });
 
+  // useEffect(() => {
+  //   const controller = new AbortController();
+  //   const { signal } = controller;
+  //   const params = {
+  //     search: searchQuery,
+  //     itemsPerPage: "all",
+  //     page: currentPage,
+  //     sortOrder,
+  //   };
+  //   dispatch(fetchAllCustomers({ params }));
+
+  //   return () => {
+  //     controller.abort(); 
+  //   };
+  // }, [dispatch, searchQuery, currentPage, sortOrder]);
   useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
-    const params = {
-      search: searchQuery,
-      itemsPerPage: pagination.itemsPerPage,
-      page: currentPage,
-      sortOrder,
+  
+    const fetchData = async () => {
+      try {
+        const dataUser = await makeAuthorizedRequest(
+          API_CONFIG.USER.GET_ALL({
+            itemsPerPage: "all"
+          }),
+          "GET",
+          signal 
+        );
+        console.log(dataUser);
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log("Request was aborted");
+        } else {
+          console.error("Lỗi khi gọi API:", error); 
+        }
+      }
     };
-    dispatch(fetchAllCustomers({ params }));
+  
+    fetchData();
 
     return () => {
       controller.abort(); 
     };
-  }, [dispatch, searchQuery, currentPage, sortOrder]);
-
+  }, []); 
   const onPageChange = (page) => {
     setCurrentPage(page);
   };
