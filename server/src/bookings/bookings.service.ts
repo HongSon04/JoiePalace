@@ -820,35 +820,66 @@ export class BookingsService {
       // ? Orther Service
       let otherServiceAmount = 0;
       // ! Fetch booking with relations
+      // if (other_service) {
+      //   const jsonString = other_service
+      //     .replace(/;/g, ',')
+      //     .replace(/\s+/g, '')
+      //     .replace(/([{,])(\w+):/g, '$1"$2":');
+      //   const serviceArray = JSON.parse(jsonString);
+
+      //   await Promise.all(
+      //     serviceArray.map(async (orther) => {
+      //       const findOther = await this.prismaService.products.findUnique({
+      //         where: { id: Number(orther.id) },
+      //       });
+
+      //       if (!findOther)
+      //         throw new HttpException(
+      //           'Không tìm thấy dịch vụ thêm',
+      //           HttpStatus.NOT_FOUND,
+      //         );
+
+      //       otherServiceAmount +=
+      //         Number(findOther.price) * Number(orther.quantity);
+      //       orther.name = findOther.name;
+      //       orther.amount = Number(findOther.price);
+      //       orther.total_price =
+      //         Number(findOther.price) * Number(orther.quantity);
+      //       orther.description = findOther.description;
+      //       orther.short_description = findOther.short_description;
+      //       orther.images = findOther.images;
+      //       orther.quantity = Number(orther.quantity);
+      //     }),
+      //   );
+      // }
+
       if (other_service) {
-        const jsonString = other_service
-          .replace(/;/g, ',')
-          .replace(/\s+/g, '')
-          .replace(/([{,])(\w+):/g, '$1"$2":');
+        const jsonString = this.formatServiceData(other_service);
         const serviceArray = JSON.parse(jsonString);
 
         await Promise.all(
-          serviceArray.map(async (orther) => {
-            const findOther = await this.prismaService.products.findUnique({
-              where: { id: Number(orther.id) },
+          serviceArray.map(async (other: any) => {
+            const product = await this.prismaService.products.findUnique({
+              where: { id: Number(other.id) },
             });
 
-            if (!findOther)
-              throw new HttpException(
-                'Không tìm thấy dịch vụ thêm',
-                HttpStatus.NOT_FOUND,
-              );
+            if (!product) {
+              throw new NotFoundException('Không tìm thấy dịch vụ khác');
+            }
 
             otherServiceAmount +=
-              Number(findOther.price) * Number(orther.quantity);
-            orther.name = findOther.name;
-            orther.amount = Number(findOther.price);
-            orther.total_price =
-              Number(findOther.price) * Number(orther.quantity);
-            orther.description = findOther.description;
-            orther.short_description = findOther.short_description;
-            orther.images = findOther.images;
-            orther.quantity = Number(orther.quantity);
+              Number(product.price) * Number(other.quantity);
+
+            // Enrich other service data
+            Object.assign(other, {
+              name: product.name,
+              amount: Number(product.price),
+              total_price: Number(product.price) * Number(other.quantity),
+              description: product.description,
+              short_description: product.short_description,
+              images: product.images,
+              quantity: Number(other.quantity),
+            });
           }),
         );
       }
@@ -900,10 +931,7 @@ export class BookingsService {
         // ! Fetch booking with relations
 
         if (extra_service) {
-          const jsonString = extra_service
-            .replace(/;/g, ',')
-            .replace(/\s+/g, '')
-            .replace(/([{,])(\w+):/g, '$1"$2":');
+          const jsonString = this.formatServiceData(extra_service);
           const serviceArray = JSON.parse(jsonString);
 
           await Promise.all(
@@ -994,6 +1022,7 @@ export class BookingsService {
               : 0,
             spare_table_price: spare_table_count ? Number(spareTableAmount) : 0,
             extra_service: extra_service,
+            other_service: other_service,
             gift,
             fee,
             total_amount: Number(totalAmount),
@@ -1120,6 +1149,7 @@ export class BookingsService {
               party_type_detail: partyTypeFormat,
               stage_detail: stageFormat,
               extra_service: extra_service ? extra_service : null,
+              other_service: other_service ? other_service : null,
               gift,
               table_count: Number(table_count),
               chair_count: Number(chair_count),
@@ -1159,6 +1189,7 @@ export class BookingsService {
               party_type_detail: partyTypeFormat,
               stage_detail: stageFormat,
               extra_service: extra_service ? extra_service : null,
+              other_service: other_service ? other_service : null,
               gift,
               fee,
               table_count: Number(table_count),
@@ -1539,5 +1570,23 @@ export class BookingsService {
       contents.branch_id,
       contents.type,
     );
+  }
+
+  // ! Format JSON string
+  private formatServiceData(data: any) {
+    // Nếu data là string (từ form-urlencoded), thực hiện format
+    if (typeof data === 'string') {
+      return data
+        .replace(/;/g, ',')
+        .replace(/\s+/g, '')
+        .replace(/([{,])(\w+):/g, '$1"$2":');
+    }
+
+    // Nếu data đã là object (từ FormData), chuyển về JSON string
+    if (typeof data === 'object') {
+      return JSON.stringify(data);
+    }
+
+    return data;
   }
 }

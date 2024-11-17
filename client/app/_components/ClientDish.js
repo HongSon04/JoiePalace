@@ -177,7 +177,7 @@ function ClientDish({
         <div className="flex justify-between w-full">
           <Link
             className={`text-gold underline hover:brightness-90 transition font-normal hover:text-gold hover:underline ${sizeClassName.buttonText}`}
-            href={`/chi-tiet-mon-an/${dish.slug}`}
+            href={`/client/chi-tiet-mon-an/${dish.slug}`}
           >
             Khám phá
           </Link>

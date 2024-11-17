@@ -9,6 +9,7 @@ import { fetchBookingById } from '@/app/_services/bookingServices';
 import { useRouter } from 'next/navigation';
 import PaymentMethod from '@/app/_components/Payment';
 import { fetchCategoriesById } from '@/app/_services/productsServices';
+import { getProductById } from '@/app/_services/productsServices';
 
 
 const Page = ({ params }) => {
@@ -28,15 +29,13 @@ const Page = ({ params }) => {
     const [deposits, setDeposits] = useState(0);
     const [showPaymentMethod, setShowPaymentMethod] = useState(false);
     const [deponsit_id, setDeponsit_id] = useState();
-    const [ partyStatus, setPartyStatus] = useState();
+    const [partyStatus, setPartyStatus] = useState();
+    const [order_service, setOrder_service] = useState();
 
     useEffect(() => {
         const getData = async () => {
             const getUser = JSON.parse(localStorage.getItem("user"));
-            const fectDataBycategories = await fetchCategoriesById(9);
-            const order_service = (fectDataBycategories.data)[0].childrens;            
-            console.log(order_service);
-            
+
             if (getUser) {
                 setUser(getUser);
             } else {
@@ -48,7 +47,7 @@ const Page = ({ params }) => {
 
                 setPartyDetails(fetchData)
                 if (fetchData.length > 0) {
-                    const parties = fetchData.map((item) => {
+                    const parties = await Promise.all(fetchData.map(async (item) => {
                         const dataDetailBooking = item.booking_details;
                         const dataStages = item.stages || dataDetailBooking[0]?.stage_detail;
                         const dataMenus = dataDetailBooking[0]?.menus;
@@ -62,6 +61,15 @@ const Page = ({ params }) => {
                         const datadePosits = dataDetailBooking[0]?.deposits;
                         const dataMenu = dataDetailBooking[0]?.menu_detail;
 
+                        const otherService = dataDetailBooking[0]?.other_service;
+                        const products = await Promise.all(
+                            otherService.map(service => getProductById(service.id))
+                        );
+
+                        const dataOtherService = products.flat().map((product, index) => ({
+                            name: product.name,
+                            quantity: otherService[index].quantity
+                        }));
 
                         // Nước uống
                         const drinkShow = dataMenus?.products.filter((item) => {
@@ -93,8 +101,9 @@ const Page = ({ params }) => {
 
 
                         const partyTypeCost = item.party_types.price || 0;
-                        setPricePartyTypes(partyTypeCost);
-                        const additionalServiceCost = 0; // chi phí của dịch vụ bổ sung nếu có thì thêm
+
+
+                        const additionalServiceCost = 0;
 
                         // Chi phí dịch vụ khác
                         const otherServicesCost = item.other_services?.reduce((total, service) => {
@@ -103,16 +112,16 @@ const Page = ({ params }) => {
 
 
                         // Chi phí dịch vụ thêm (chỉ tính khi is_deposit là true)
-                        if(item.status){
+                        if (item.status) {
                             const extraServicesCost = item.extra_services?.reduce((total, service) => {
                                 if (service.is_deposit) {
-                                    return total + (service.price * service.quantity); 
+                                    return total + (service.price * service.quantity);
                                 }
                                 return total;
                             }, 0) || 0;
                         }
 
-                        
+
 
                         // Tính tổng chi phí
                         const amount =
@@ -126,7 +135,7 @@ const Page = ({ params }) => {
                             spareTableCost +              // Chi phí bàn dự phòng
                             spareChairCost +              // Chi phí ghế dự phòng
                             additionalServiceCost +       // Chi phí dịch vụ bổ sung
-                            otherServicesCost ;          // Chi phí dịch vụ khác 
+                            otherServicesCost;          // Chi phí dịch vụ khác 
                         // console.log('amount',amount);
                         // console.log("tablePrice",tablePrice);
                         // console.log("chairPrice",chairPrice);
@@ -150,6 +159,8 @@ const Page = ({ params }) => {
                         setShowPaymentMethod(item.status === 'processing');
                         setPartyStatus(item.status);
                         setTotalAmount(dataDetailBooking[0]?.total_amount);
+
+
                         return {
                             id: item.id,
                             nameParty: item?.name,
@@ -183,9 +194,9 @@ const Page = ({ params }) => {
                             amountPayable: dataDetailBooking[0]?.total_amount ? `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND ` : "0 VND",
                             depositAmount: datadePosits?.amount ? `${datadePosits?.amount.toLocaleString('vi-VN')} VND` : "0 VND",
                             depositStatus: item.is_deposit ? 'Đã cọc' : "Chưa đặt cọc",
-                            depositDay: item.is_deposit ?  formatDate(datadePosits?.created_at) : '--/--/--',
+                            depositDay: item.is_deposit ? formatDate(datadePosits?.created_at) : '--/--/--',
                             remainingPaid: (dataDetailBooking[0].total_amount && datadePosits?.amount) ? `${(parseInt(dataDetailBooking[0].total_amount) - parseInt(datadePosits?.amount)).toLocaleString('vi-VN')} VND` : `${dataDetailBooking[0].total_amount.toLocaleString('vi-VN')} VND`,
-                            paymentDay:  item.status == 'success' ? formatDate(datadePosits?.created_at) : '--/--/--',
+                            paymentDay: item.status == 'success' ? formatDate(datadePosits?.created_at) : '--/--/--',
                             typeTable: "Tùy chỉnh",
                             typeChair: "Tùy chỉnh",
                             // Chi phí khác
@@ -199,11 +210,14 @@ const Page = ({ params }) => {
                             snack: dessert.map(i => i.name).join(', '),
                             vat: "10%",
                             drinksCost: `${drinksPrice.toLocaleString('vi-VN')} VND / bàn` || 0,
-                            arise: item.is_deposit ? '' : 'Chưa có',
+                            arise: dataOtherService?.length > 0
+                                ? dataOtherService?.map(
+                                    (i) => (<div>{i.name} x{i.quantity}</div>)
+                                )
+                                : 'Chưa có',
                             statusParty: item.status
                         };
-                    });
-
+                    }));
                     setParty(parties);
                 }
 
@@ -220,55 +234,6 @@ const Page = ({ params }) => {
         return new Date(dateString).toLocaleDateString('en-GB', options).replace(/\//g, '/');
     };
 
-    // const parties = [
-    //     {
-    //         id: '1',
-    //         nameParty: "Tiệc cưới của cô dâu Trần Thị A và chú rể Nguyễn Văn B",
-    //         address: "447 Hoàng Văn Thụ, Quận Phú Nhuận, TP. HCM",
-    //         phoneAddress: "0123456789",
-    //         hostName: "Nguyễn Văn A",
-    //         email: "nguyenvana@example.com",
-    //         phoneUser: "0987654321",
-    //         idParty: "P001",
-    //         typeParty: "Tiệc cưới",
-    //         partyDate: "2024-10-15",
-    //         dateOrganization: "2024-10-20",
-    //         liveOrOnline: "Trực tiếp",
-    //         numberGuest: 150,
-    //         hall: "Sảnh A",
-    //         session: "Buổi tối",
-    //         tableNumber: 15,
-    //         spareTables: 2,
-    //         linkTo: "/party/1",
-    //         space: "Rộng rãi",
-    //         decorate: "Hoa hồng đỏ và trắng",
-    //         typeTable: "Tròn",
-    //         typeChair: "Ghế nệm bọc vải",
-    //         guestTable: "10 người/bàn",
-    //         menu: "Thực đơn 5 món Á",
-    //         drinks: "Bia Tiger, Nước ngọt Pepsi",
-    //         payerName: "Nguyễn Văn A",
-    //         paymentMethod: "Chuyển khoản",
-    //         amountPayable: "150,000,000 VND",
-    //         depositAmount: "50,000,000 VND",
-    //         depositStatus: "Đã thanh toán",
-    //         depositDay: "2024-10-10",
-    //         remainingPaid: "100,000,000 VND",
-    //         menuCostTable: "3,000,000 VND/bàn",
-    //         paymentDay: "2024-10-20",
-    //         costTable: "3,500,000 VND",
-    //         decorationCost: "15,000,000 VND",
-    //         soundStage: "20,000,000 VND",
-    //         hallRental: "30,000,000 VND",
-    //         tableRental: "7,500,000 VND",
-    //         chairRental: "4,500,000 VND",
-    //         paymentStatus: "Đã thanh toán",
-    //         snack: "Bánh ngọt, Trái cây",
-    //         vat: "10%",
-    //         drinksCost: "20,000,000 VND",
-    //         arise: "10,000,000 VND",
-    //     },
-    // ];
     const getStatusColor = (status) => {
         switch (status) {
             case 'success':
@@ -281,8 +246,6 @@ const Page = ({ params }) => {
                 return 'text-gray-500';
         }
     };
-    // console.log(totalAmount);
-    
     return (
         <div className='flex flex-col gap-6'>
             <div className='flex justify-between items-center'>
@@ -301,7 +264,7 @@ const Page = ({ params }) => {
                     {partyStatus == 'success' ? <button className='px-4 py-3 rounded bg-white flex items-center justify-center' onClick={() => router.push(`/client/form-danh-gia-gop-y/${partyPartyDetails[0].branch_id}/${partyPartyDetails[0].id}`)}>
                         <Image src={OutlineFeedBack} alt='clipBoard' objectFit='cover'></Image>
                     </button> : ''}
-                    
+
                 </div>
 
             </div>

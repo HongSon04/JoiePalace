@@ -93,7 +93,7 @@ const Page = ({ params }) => {
           null
         );
         // console.log(startDate);
-        // console.log(endDate);
+        // console.log(dataUser);
         
         
         const [
@@ -103,7 +103,6 @@ const Page = ({ params }) => {
             dataTotalAdminByYear,
             dataTotalAdminByQuarter,
             dataTotalBranch,
-          
         ] = await Promise.all([
             fetchInfoByMonth(branchId),
             fetchRevenueBranchByMonth(0),
@@ -171,14 +170,14 @@ const Page = ({ params }) => {
   const quarterlyRevenues = Object.values(dataBranchChart.total_revune_by_quarter || {}).flat();
   const monthlyRevenues = Object.values(dataBranchChart.total_revune_by_month || []);
   const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
-
+  const yearlyRevenues = Object.values(dataBranchChart.total_revune_by_year || []);
   // Tính tổng doanh thu của các quý, tháng, tuần
   const totalQuarterRevenue = quarterlyRevenues.reduce((acc, curr) => acc + curr, 0);
   const totalMonthRevenue = monthlyRevenues.reduce((acc, curr) => acc + curr, 0);
   const totalWeekRevenue = weeklyRevenues.reduce((acc, curr) => acc + curr, 0);
 
   // Tổng doanh thu
-  const yearlyRevenues = totalQuarterRevenue + totalMonthRevenue + totalWeekRevenue;
+  // const yearlyRevenues = totalQuarterRevenue + totalMonthRevenue + totalWeekRevenue;
 
   // console.log(yearlyRevenues);  // In ra tổng doanh thu
 
@@ -191,7 +190,7 @@ const Page = ({ params }) => {
       data: [
         ...weeklyRevenues,  
         ...monthlyRevenues, 
-        yearlyRevenues  
+        ...yearlyRevenues  
       ]
     }]
   };
@@ -302,7 +301,7 @@ const Page = ({ params }) => {
       <div className="container  flex gap-4 w-full h-full  p-4">
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
-            <p className="text-base font-semibold ">Khách hàng trong tháng</p>
+            <p className="text-base font-semibold ">Khách hàng mới nhất</p>
             
           </div>
           <div className="flex flex-col gap-3 h-[580px] px-[10px] overflow-y-auto hide-scrollbar">
@@ -387,7 +386,7 @@ const Page = ({ params }) => {
           </div>
         </div>
       </div>
-      <div className="flex justify-between gap-6 p-4">
+      <div className="flex  gap-6 p-4">
         <div className="w-1/2 ">
           <div className="flex items-center justify-between mb-[10px]">
             <p className="text-base  font-semibold">Yêu cầu mới nhất</p>
