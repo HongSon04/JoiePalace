@@ -338,13 +338,21 @@ const Page = () => {
     const fecthData = async () => {
       const data = await getPackageBySlug(slug);
       setDataPackage(data.data[0]);
-      handleCallData(getStageById(data.data[0].stage_id || 39));
+      handleCallData(getStageById(data.data[0].stage_id || 42));
       setListOtherServices(JSON.parse(data.data[0].other_service));
     };
     fecthData();
   }, [slug]);
 
   if (!dataPackage) return <Loading></Loading>;
+  const callApiForCeremony = async () => {
+    const decor = await getDecorById(dataPackage.decor_id);
+    const stage = await getProductById(listOtherServices[0].id);
+    const cake = await getCakeWedding(listOtherServices[1]?.id);
+    const newData = [decor[0], stage[0], cake[0]];
+    setDataToShow(newData);
+  };
+  console.log("dataToShow", dataToShow);
 
   return (
     <>
@@ -385,7 +393,7 @@ const Page = () => {
             <span
               onClick={() => {
                 setOptionIndex(0);
-                handleCallData(getStageById(dataPackage.stage_id || 39));
+                handleCallData(getStageById(dataPackage.stage_id || 42));
               }}
               className={`text-base font-semibold leading-8 ${
                 optionIndex === 0 ? "bg-gold" : "opacity-50"
@@ -396,13 +404,13 @@ const Page = () => {
             <span
               onClick={() => {
                 setOptionIndex(1);
-                handleCallData(getDecorById(dataPackage.decor_id));
+                callApiForCeremony();
               }}
               className={`text-base font-semibold leading-8 ${
                 optionIndex === 1 ? "bg-gold" : "opacity-50"
               } flex py-2 px-6 justify-center items-center rounded-full cursor-pointer transition duration-300`}
             >
-              TRANG TRÍ
+              LỄ
             </span>
             <span
               onClick={() => {
@@ -480,7 +488,7 @@ const Page = () => {
                 {dataToShow?.description}
               </span>
               <div className="w-full flex flex-wrap gap-4">
-                {optionIndex === 3 || optionIndex === 2 || optionIndex === 0 ? (
+                {optionIndex === 0 ? (
                   <div className="w-[calc(25%-16px)] aspect-w-1 aspect-h-1 bg-whiteAlpha-400 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
                     <div className="overflow-hidden">
                       <Image
@@ -492,6 +500,63 @@ const Page = () => {
                     <span className="text-sm font-normal">
                       {dataToShow?.name}
                     </span>
+                  </div>
+                ) : optionIndex === 1 ? (
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-4 flex-wrap">
+                      <h2 className="text-lg">Trang trí</h2>
+                      <div className="flex gap-4 flex-wrap">
+                        {dataToShow[0]?.products.map((product, index) => (
+                          <div
+                            key={index}
+                            className="w-[calc(25%-16px)] bg-whiteAlpha-400 p-2 gap-3 flex flex-col rounded-lg cursor-pointer"
+                          >
+                            <div className="overflow-hidden w-full h-[120px] aspect-w-1 aspect-h-1 flex justify-center items-center">
+                              <Image
+                                src={product?.images[0]}
+                                className="w-full h-full object-cover"
+                                alt={product?.name || ""}
+                              />
+                            </div>
+                            <span className="text-sm font-normal">
+                              {product?.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* row */}
+                    <div className="flex flex-col gap-4">
+                      <h2 className="text-lg">Sân Khấu</h2>
+                      <div className="w-[calc(25%-16px)] aspect-w-1 aspect-h-1 bg-whiteAlpha-400 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
+                        <div className="overflow-hidden w-full aspect-w-1 aspect-h-1">
+                          <Image
+                            src={dataToShow[1]?.images[0]}
+                            className="w-full h-full object-cover"
+                            alt={dataToShow[1]?.name || ""}
+                          />
+                        </div>
+                        <span className="text-sm font-normal">
+                          {dataToShow[1]?.name}
+                        </span>
+                      </div>
+                    </div>
+                    {/* row */}
+                    <div className="flex flex-col gap-4">
+                      <h2 className="text-lg">Bánh cưới</h2>
+                      <div className="w-[calc(25%-16px)] aspect-w-1 aspect-h-1 bg-whiteAlpha-400 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
+                        <div className="overflow-hidden">
+                          <Image
+                            src={dataToShow[2]?.images[0]}
+                            className="w-full h-full object-cover"
+                            alt={dataToShow[2]?.name || ""}
+                          />
+                        </div>
+                        <span className="text-sm font-normal">
+                          {dataToShow[2]?.name}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <RenderDetailPackage

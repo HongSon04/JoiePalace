@@ -37,7 +37,6 @@ const HeaderClient = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [nameUser, setNameUser] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [isDropdown, setIsDropdown] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -98,19 +97,19 @@ const HeaderClient = () => {
     {
       id: 2,
       name: "Tiệc của tôi",
-      link: "",
+      link: "/nguoi-dung/tiec-cuoi",
       icon: <AiOutlineUnorderedList fill="black" />,
     },
     {
       id: 3,
       name: "Gói tiệc của tôi",
-      link: "",
+      link: "/nguoi-dung/combo-cua-ban",
       icon: <BsCardChecklist fill="black" />,
     },
     {
       id: 4,
       name: "Thực đơn của tôi",
-      link: "",
+      link: "/nguoi-dung/thuc-don-cua-ban",
       icon: <MdOutlineRestaurantMenu fill="black" />,
     },
     {
@@ -136,15 +135,15 @@ const HeaderClient = () => {
             </span>
           </div>
           <button
-            onMouseOver={() => setIsDropdown(true)}
-            onMouseOut={() => setIsDropdown(false)}
+            id="buttonAccount"
             className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl relative"
           >
-            <span className="text-sm font-semibold text-black">{isLogin ? `Hi! ${nameUser}` : "Tài khoản"}</span>
+            <span className="text-sm font-semibold text-black">
+              {isLogin ? `Hi! ${nameUser}` : "Tài khoản"}
+            </span>
             <div
-              className={`absolute top-[calc(100%+2px)] left-0 bg-white shadow-lg rounded-lg w-auto ${
-                isDropdown ? "" : "location-detail"
-              } `}
+              className={`absolute top-[calc(100%+2px)] left-0 bg-white shadow-lg rounded-lg w-auto `}
+              id="menuAccountDropdown"
             >
               {isLogin ? (
                 <ul className="flex flex-col rounded-lg overflow-hidden w-[200%]">
@@ -170,7 +169,6 @@ const HeaderClient = () => {
                   <li
                     onClick={() => {
                       router.push("/client/dang-ky");
-                      setIsDropdown(false);
                     }}
                     className="bg-white text-black py-2 text-sm font-base cursor-pointer flex items-center gap-2 px-4"
                   >
@@ -184,7 +182,6 @@ const HeaderClient = () => {
                   <li
                     onClick={() => {
                       router.push("/client/dang-nhap");
-                      setIsDropdown(false);
                     }}
                     className="bg-white text-black py-2 text-sm font-base cursor-pointer flex items-center gap-2 px-4 border border-t-1"
                   >
