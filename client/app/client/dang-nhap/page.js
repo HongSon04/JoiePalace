@@ -13,6 +13,7 @@ import useApiServices from "@/app/_hooks/useApiServices";
 import { useDispatch } from "react-redux";
 import { useSession, signIn } from "next-auth/react";
 import { GetPlatform, getSessionData } from "@/app/_utils/nextAuth";
+import LoadingLoginRegis from "@/app/_components/LoadingLoginRegis";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -30,7 +31,7 @@ const Page = () => {
   const { tryCatchWrapper, makeAuthorizedRequest } = useApiServices();
   const dispatch = useDispatch();
   const platform = GetPlatform();
-
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -125,7 +126,6 @@ const Page = () => {
   const callToApiLoginSocial = async () => {
     if (isLoginCalledRef.current) return;
     isLoginCalledRef.current = true;
-
     try {
       let user = null;
       const response = await loginGoogle({
@@ -133,8 +133,7 @@ const Page = () => {
         name: data?.user?.name.toString(),
         platform: "Google",
       });
-      console.log("response", response);
-      
+
       if (response.status === 200) {
         user = decodeJwt(response.data.data.access_token);
         Cookies.set("accessToken", response.data.data.access_token, {
@@ -155,7 +154,6 @@ const Page = () => {
           })
         );
 
-        // Kiểm tra nếu chưa hiển thị toast trước đó
         toast({
           position: "top",
           type: "success",
@@ -193,6 +191,8 @@ const Page = () => {
   }
   return (
     <div className="w-screen h-screen flex relative gap-28 items-center justify-center">
+      {isLoading ? <LoadingLoginRegis /> : null}
+
       <div className="w-1/2 h-full overflow-hidden">
         <Image
           src="/img_login.png"
@@ -261,7 +261,9 @@ const Page = () => {
               className="w-fit rounded-full bg-white text-black flex items-center gap-2 py-3 px-5 m-auto"
             >
               <Image w={"auto"} h={"auto"} src="/googeIcon.svg" alt="" />
-              <span className="font-medium">Đăng nhập bằng Google</span>
+              <span className="font-medium text-black">
+                Đăng nhập bằng Google
+              </span>
             </button>
             <span className="text-center text-gold text-base font-normal">
               Bạn chưa có tài khoản?{" "}

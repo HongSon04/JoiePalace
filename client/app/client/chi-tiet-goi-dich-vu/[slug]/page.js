@@ -345,7 +345,6 @@ const Page = () => {
   }, [slug]);
 
   if (!dataPackage) return <Loading></Loading>;
-  console.log("re-render");
 
   return (
     <>
