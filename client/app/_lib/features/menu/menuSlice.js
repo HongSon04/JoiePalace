@@ -191,27 +191,27 @@ export const createMenu = createAsyncThunk(
   }
 );
 
-export const getMenuList = createAsyncThunk(
-  "menu/fetchMenuList",
-  async ({ params, signal }, { dispatch, rejectWithValue }) => {
-    try {
-      const response = await makeAuthorizedRequest(
-        API_CONFIG.MENU.GET_ALL({ params }),
-        "GET",
-        null,
-        { signal }
-      );
+  export const getMenuList = createAsyncThunk(
+    "menu/fetchMenuList",
+    async ({ params, signal }, { dispatch, rejectWithValue }) => {
+      try {
+        const response = await makeAuthorizedRequest(
+          API_CONFIG.MENU.GET_ALL({ params }),
+          "GET",
+          null,
+          { signal }
+        );
 
-      if (response.success) {
-        return response;
-      } else {
-        return rejectWithValue(response.message);
+        if (response.success) {
+          return response;
+        } else {
+          return rejectWithValue(response.message);
+        }
+      } catch (error) {
+        return rejectWithValue(error.message);
       }
-    } catch (error) {
-      return rejectWithValue(error.message);
     }
-  }
-);
+  );
 
 export const getMenuListByUserId = createAsyncThunk(
   "menu/fetchMenuListByUserId",

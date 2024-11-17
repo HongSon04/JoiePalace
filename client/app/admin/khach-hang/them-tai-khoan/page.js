@@ -188,8 +188,8 @@ const Page = () => {
                 type="submit"
                 className="button rounded-[1111px] flex gap-[5px] items-center p-3 bg-teal-400"
               >
-                  <FiUpload className="text-base" />
-                  Thêm
+                <FiUpload className="text-base" />
+                Thêm
                  
               </button>
             </div>

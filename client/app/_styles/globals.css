@@ -740,3 +740,7 @@ select {
   background-image: url(/line-group.svg);
   background-size: cover;
 }
+.bg-cloche{
+  background-image: url(/cloche.png);
+  background-size: cover;
+}

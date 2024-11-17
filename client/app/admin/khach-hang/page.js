@@ -1,7 +1,7 @@
 "use client";
 
 import AdminHeader from "@/app/_components/AdminHeader";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import "../../_styles/globals.css";
 import { PiShootingStarDuotone } from "react-icons/pi";
 import Image from "next/image";
@@ -13,7 +13,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { formatPrice } from "@/app/_utils/formaters";
 import { useSearchParams } from "next/navigation";
 import SearchForm from "@/app/_components/SearchForm";
-import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import TableSkeleton from "@/app/_components/skeletons/TableSkeleton";
 
 const Page = ({ params }) => {
   const { slug } = params;
@@ -23,78 +23,53 @@ const Page = ({ params }) => {
   const [sortOrder, setSortOrder] = useState("ASC");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page")) || 1);
-  const [sortField, setSortField] = useState("totalBookingSuccess");
+  const [sortField, setSortField] = useState("totalAmount");
 
   const {
     customers,
     pagination,
-    topUsers,
     isFetchingCustomer,
     isFetchingCustomerError,
   } = useSelector((state) => state.customers);
 
-  // Filter dữ liệu theo searchQuery và minTotalAmount
   const filteredDataUser = [...customers]
-    .filter((item) => {
-      const lowerSearchQuery = searchQuery.toLowerCase();
-      return (
-        (item.id.toString().includes(lowerSearchQuery) ||
-          item.username?.toLowerCase().includes(lowerSearchQuery) ||
-          item.phone?.toString().includes(lowerSearchQuery))
-      );
-    })
-    .sort((a, b) => {
-      if (sortOrder === "ASC") {
-        return a[sortField] > b[sortField] ? 1 : -1;
-      } else {
-        return a[sortField] < b[sortField] ? 1 : -1;
-      }
-    });
+  .filter((item) => {
+    const lowerSearchQuery = searchQuery.toLowerCase();
+    return (
+      (item.id.toString().includes(lowerSearchQuery) ||
+        item.username?.toLowerCase().includes(lowerSearchQuery) ||
+        item.phone?.toString().includes(lowerSearchQuery))
+    );
+  })
+  .sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    if (sortOrder === "ASC") {
+      return dateB - dateA;  
+    } else {
+      return dateA - dateB;  
+    }
+  });
 
-  // useEffect(() => {
-  //   const controller = new AbortController();
-  //   const { signal } = controller;
-  //   const params = {
-  //     search: searchQuery,
-  //     itemsPerPage: "all",
-  //     page: currentPage,
-  //     sortOrder,
-  //   };
-  //   dispatch(fetchAllCustomers({ params }));
 
-  //   return () => {
-  //     controller.abort(); 
-  //   };
-  // }, [dispatch, searchQuery, currentPage, sortOrder]);
+
   useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
-  
-    const fetchData = async () => {
-      try {
-        const dataUser = await makeAuthorizedRequest(
-          API_CONFIG.USER.GET_ALL({
-            itemsPerPage: "all"
-          }),
-          "GET",
-          signal 
-        );
-        console.log(dataUser);
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log("Request was aborted");
-        } else {
-          console.error("Lỗi khi gọi API:", error); 
-        }
-      }
+    const params = {
+      search: searchQuery,
+      itemsPerPage: 12,
+      page: currentPage,
+      sortOrder,
+      sortField,
     };
-  
-    fetchData();
+    dispatch(fetchAllCustomers({ params, signal }));
 
     return () => {
       controller.abort(); 
     };
-  }, []); 
+  }, [dispatch, searchQuery, currentPage, sortOrder, sortField]);
+
   const onPageChange = (page) => {
     setCurrentPage(page);
   };
@@ -107,10 +82,8 @@ const Page = ({ params }) => {
   const onSearchChange = React.useCallback((e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset trang khi thay đổi tìm kiếm
   }, []);
-
-
 
   return (
     <main className="grid gap-6 p-4 text-white">
@@ -146,44 +119,46 @@ const Page = ({ params }) => {
           </div>
 
           <div className="w-full mt-2 mb-2">
-            <table className="table w-full rounded-lg  mt-[10px]">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Tên</th>
-                  <th>Cấp độ</th>
-                  <th>Số điện thoại</th>
-                  <th>Hạng thành viên</th>
-                  <th onClick={() => toggleSortOrder("totalAmount")} style={{ cursor: "pointer" }}>
-                    Tổng chi {sortOrder === "ASC" ? "↑" : "↓"}
-                  </th>
-                  
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody className="text-center">
-                {filteredDataUser.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>{item.username || "N/A"}</td>
-                    <td>{item.memberships || "N/A"}</td>
-                    <td>{item.phone || "N/A"}</td>
-                    <td>{item.totalBookingSuccess}</td>
-                    <td>{formatPrice(item.totalAmount)}</td>
-                    <td>
-                      {item.id && (
-                        <Link
-                          href={`/admin/khach-hang/${item.id}`}
-                          className="text-teal-400 text-xs font-bold"
-                        >
-                          Chi tiết
-                        </Link>
-                      )}
-                    </td>
+            <Suspense fallback={<TableSkeleton />}>
+              <table className="table w-full rounded-lg  mt-[10px]">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Hạng thành viên</th>
+                    <th>Số điện thoại</th>
+                    <th>Tiệc đã hoàn thành</th>
+                    <th onClick={() => toggleSortOrder("totalAmount")} style={{ cursor: "pointer" }}>
+                      Tổng chi {sortOrder === "ASC" ? "↑" : "↓"}
+                    </th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-center">
+                  {filteredDataUser.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.id}</td>
+                      <td>{item.username || "N/A"}</td>
+                      <td>{item.memberships || "N/A"}</td>
+                      <td>{item.phone || "N/A"}</td>
+                      <td>{item.totalBookingSuccess}</td>
+                      <td>{formatPrice(item.totalAmount)}</td>
+                      <td>
+                        {item.id && (
+                          <Link
+                            href={`/admin/khach-hang/${item.id}`}
+                            className="text-teal-400 text-xs font-bold"
+                          >
+                            Chi tiết
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Suspense>
+            
           </div>
 
           <CustomPagination
@@ -194,7 +169,8 @@ const Page = ({ params }) => {
               base: "flex justify-center",
             }}
           />
-            {/* <div className="w-[25%] p-2 bg-whiteAlpha-100 h-full rounded-xl">
+        </div>
+          {/* <div className="w-[25%] p-2 bg-whiteAlpha-100 h-full rounded-xl">
               <div className="flex p-3 gap-[10px] items-center">
                 <PiShootingStarDuotone className="text-3xl text-yellow-500" />
                 <p className="text-base font-semibold">Top 10 khách hàng</p>
@@ -230,7 +206,6 @@ const Page = ({ params }) => {
                 )}
               </div>
             </div> */}
-        </div>
       </div>
     </main>
   );

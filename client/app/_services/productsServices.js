@@ -10,7 +10,14 @@ export const getProductById = async (id) => {
     throw new Error("Có lỗi khi lấy dữ liệu sản phẩm");
   }
 
-  console.log(response);
+  return response.data.data;
+};
+export const getProductBySlug = async (slug) => {
+  const response = await axios.get(API_CONFIG.PRODUCTS.GET_BY_SLUG(slug));
+
+  if (response.status !== 200) {
+    throw new Error("Có lỗi khi lấy dữ liệu sản phẩm");
+  }
 
   return response.data.data;
 };
