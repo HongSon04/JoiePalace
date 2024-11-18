@@ -5,6 +5,7 @@ import ClientDish from "./ClientDish";
 import React from "react";
 import Link from "next/link";
 
+
 var settings = {
   dots: true,
   infinite: false,

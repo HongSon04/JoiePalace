@@ -7,11 +7,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ButtonDiscover from "./ButtonDiscover";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 
 
 const SliderMenuDrink = ({ title, dataSlider, logo, idDish }) => {
     const sliderRef = useRef(null);
+    const router = useRouter();
 
     const nextSlide = () => {
         if (sliderRef.current) {
@@ -100,7 +102,9 @@ const SliderMenuDrink = ({ title, dataSlider, logo, idDish }) => {
                             </div>
                         </div>
                         <button
-                            className={`bg-gold flex justify-center items-center gap-1 py-2 px-3 rounded-3xl cursor-pointer `} >
+                            className={`bg-gold flex justify-center items-center gap-1 py-2 px-3 rounded-3xl cursor-pointer `}
+                            onClick={() => {router.push('/client/do-uong')}}
+                            >
                             <span className="text-[1em] flex items-center h-6">Thêm món</span>
                         </button>
                     </div>
@@ -115,7 +119,7 @@ const SliderMenuDrink = ({ title, dataSlider, logo, idDish }) => {
                                             <div className="flex justify-center items-center w-[200px] h-[200px] max-2md:w-[150px] max-2md:h-[150px] bg">
                                                 <Image
                                                     className="object-cover h-[200px] w-[200px] max-2md:w-[150px] max-2md:h-[150px]  bg-cloche"
-                                                    src={`${item.image}`}
+                                                    src={`${item.image == '' ? '/cloche.png' : item.image}`}
                                                     alt=''
                                                 />
                                             </div>

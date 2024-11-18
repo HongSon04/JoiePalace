@@ -5,7 +5,7 @@ const ButtonDiscover = ({link, name, className, ...props }) => {
   const router = useRouter();
 
   const navigation = () => {
-    router.push(link || '');
+    router.push(link || '#');
   }
 
   return (
