@@ -1,11 +1,19 @@
 import { Spinner } from "@nextui-org/react";
 import { memo } from "react";
+import { useRouter } from "next/navigation";
 
-const ButtonDiscover = ({ name, className, isLoading, ...props }) => {
+const ButtonDiscover = ({ link, name, className, isLoading, ...props }) => {
+  const router = useRouter();
+
+  const navigation = () => {
+    router.push(link || "#");
+  };
+
   return (
     <button
       className={`bg-gold flex justify-center items-center gap-1 py-2 px-3 rounded-3xl cursor-pointer ${className}`}
       {...props}
+      onClick={navigation}
     >
       {isLoading && (
         <Spinner

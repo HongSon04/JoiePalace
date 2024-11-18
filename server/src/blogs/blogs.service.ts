@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -843,14 +844,17 @@ export class BlogsService {
       }
 
       // Upload images
-      const uploadImages =
-        await this.cloudinaryService.uploadMultipleFilesToFolder(
+      let uploadImages;
+
+      if (files?.images?.length > 0) {
+        uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
-          'joiepalace/blogs',
+          'joiepalace/packages',
         );
 
-      if (!uploadImages) {
-        throw new HttpException('Upload ảnh thất bại', HttpStatus.BAD_REQUEST);
+        if (!uploadImages) {
+          throw new BadRequestException('Upload ảnh thất bại');
+        }
       }
 
       const updateBlog = await this.prismaService.blogs.update({
@@ -865,7 +869,7 @@ export class BlogsService {
           tags: {
             connect: tagsSet,
           },
-          images: uploadImages as any,
+          images: uploadImages ? uploadImages : existingBlog.images,
         },
         include: {
           tags: true,

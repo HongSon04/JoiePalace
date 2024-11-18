@@ -114,6 +114,7 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
+    
     GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
@@ -237,6 +238,8 @@ export const API_CONFIG = {
   PACKAGES: {
     CREATE: `${PACKAGES_API}/create`,
     GET_ALL: `${PACKAGES_API}/get-all`,
+    GET_ALL_BY_PARAMS: (params) =>
+      constructUrlWithParams(`${PACKAGES_API}/get-all`, params),
     GET_BY_SLUG: (slug) => `${PACKAGES_API}/get-by-slug/${slug}`,
     GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
     GET_ALL_BY_PARAMS: (params) =>

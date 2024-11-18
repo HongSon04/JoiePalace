@@ -60,9 +60,9 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'Ảnh gói tiệc, không được để trống',
-    required: false,
+    required: true,
   })
-  images?: string[];
+  images: string[];
 
   @ApiProperty({
     example: [
@@ -80,6 +80,19 @@ export class CreatePackageDto {
   })
   @IsOptional()
   note?: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Số lượng khách dự kiến',
+  })
+  @IsNotEmpty({ message: 'Số lượng khách dự kiến không được để trống' })
+  number_of_guests: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Ngân sách dự kiến cho tiệc',
+  })
+  budget?: string;
 
   @ApiProperty({
     description: 'Hiển thị gói tiệc hay không',

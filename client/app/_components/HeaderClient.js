@@ -4,8 +4,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchBranchesFromApi } from "../_services/branchesServices";
 import { useRouter } from "next/navigation";
-import { IoPersonOutline } from "react-icons/io5";
 import { HiOutlinePhone } from "react-icons/hi";
+import {
+  AiOutlineUser,
+  AiOutlineUnorderedList,
+  AiOutlineUserAdd,
+  AiOutlineLogin,
+} from "react-icons/ai";
+import { MdOutlineRestaurantMenu } from "react-icons/md";
+import { BsCardChecklist } from "react-icons/bs";
+import { signOut } from "next-auth/react";
 
 const listMenu = [
   { id: 1, name: "Địa điểm", categories: "dia-diem", href: "/#" },
@@ -21,6 +29,7 @@ const listLocation = [
   { id: 2, name: "Joice Palace Phạm Văn Đồng" },
   { id: 3, name: "Joice Palace Võ Văn Kiệt" },
 ];
+
 const HeaderClient = () => {
   const [isShowMenu, setIsShowMenu] = useState(false);
   const [screenWidth, setScreenWidth] = useState(null);
@@ -68,10 +77,48 @@ const HeaderClient = () => {
     };
   }, []);
 
+  const handleNavigation = () => {
+    signOut();
+    localStorage.removeItem("user");
+    localStorage.removeItem("refreshToken");
+    Cookies.remove("accessToken");
+  };
   const handleShowMenu = () => {
     isShowMenu ? setIsShowMenu(false) : setIsShowMenu(true);
   };
   if (!listBranches) return;
+  const listNavLogin = [
+    {
+      id: 1,
+      name: "Tài khoản của tôi",
+      link: "/client/nguoi-dung",
+      icon: <AiOutlineUser fill="black" />,
+    },
+    {
+      id: 2,
+      name: "Tiệc của tôi",
+      link: "/nguoi-dung/tiec-cuoi",
+      icon: <AiOutlineUnorderedList fill="black" />,
+    },
+    {
+      id: 3,
+      name: "Gói tiệc của tôi",
+      link: "/nguoi-dung/combo-cua-ban",
+      icon: <BsCardChecklist fill="black" />,
+    },
+    {
+      id: 4,
+      name: "Thực đơn của tôi",
+      link: "/nguoi-dung/thuc-don-cua-ban",
+      icon: <MdOutlineRestaurantMenu fill="black" />,
+    },
+    {
+      id: 5,
+      name: "Đăng xuất",
+      link: "",
+      icon: <AiOutlineLogin fill="red" />,
+    },
+  ];
   return (
     <header
       className={`fixed top-0 left-0 w-full z-40 text-white ${
@@ -88,39 +135,66 @@ const HeaderClient = () => {
             </span>
           </div>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              router.push(`/client/${!isLogin ? "dang-ky" : "nguoi-dung"}`);
-            }}
-            className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl"
+            id="buttonAccount"
+            className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl relative"
           >
-            {!isLogin ? (
-              <>
-                {" "}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                >
-                  <path
-                    d="M12.5007 9.99998C14.3423 9.99998 15.834 8.50831 15.834 6.66665C15.834 4.82498 14.3423 3.33331 12.5007 3.33331C10.659 3.33331 9.16732 4.82498 9.16732 6.66665C9.16732 8.50831 10.659 9.99998 12.5007 9.99998ZM12.5007 4.99998C13.4173 4.99998 14.1673 5.74998 14.1673 6.66665C14.1673 7.58331 13.4173 8.33331 12.5007 8.33331C11.584 8.33331 10.834 7.58331 10.834 6.66665C10.834 5.74998 11.584 4.99998 12.5007 4.99998ZM12.5007 11.6666C10.2757 11.6666 5.83398 12.7833 5.83398 15V16.6666H19.1673V15C19.1673 12.7833 14.7256 11.6666 12.5007 11.6666ZM7.50065 15C7.68398 14.4 10.259 13.3333 12.5007 13.3333C14.7506 13.3333 17.334 14.4083 17.5006 15H7.50065ZM5.00065 12.5V9.99998H7.50065V8.33331H5.00065V5.83331H3.33398V8.33331H0.833984V9.99998H3.33398V12.5H5.00065Z"
-                    fill="black"
-                  />
-                </svg>
-                <span className="text-sm font-semibold text-black">
-                  Đăng ký
-                </span>
-              </>
-            ) : (
-              <>
-                <IoPersonOutline stroke="black" />
-                <span className="text-sm font-semibold text-black">
-                  Hi! {nameUser}
-                </span>
-              </>
-            )}
+            <span className="text-sm font-semibold text-black">
+              {isLogin ? `Hi! ${nameUser}` : "Tài khoản"}
+            </span>
+            <div
+              className={`absolute top-[calc(100%+2px)] left-0 bg-white shadow-lg rounded-lg w-auto `}
+              id="menuAccountDropdown"
+            >
+              {isLogin ? (
+                <ul className="flex flex-col rounded-lg overflow-hidden w-[200%]">
+                  {listNavLogin.map((item, index) => (
+                    <li
+                      onClick={() =>
+                        item.id !== 5
+                          ? router.push(item.link)
+                          : handleNavigation()
+                      }
+                      key={item.id}
+                      className={`bg-white text-black py-2 text-sm font-base cursor-pointer flex items-center gap-2 px-4 border border-t-1 ${
+                        item.id === 5 && "text-red-500"
+                      }`}
+                    >
+                      {item.icon}
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul className="flex flex-col rounded-lg overflow-hidden w-[150%]">
+                  <li
+                    onClick={() => {
+                      router.push("/client/dang-ky");
+                    }}
+                    className="bg-white text-black py-2 text-sm font-base cursor-pointer flex items-center gap-2 px-4"
+                  >
+                    <AiOutlineUserAdd
+                      fill="black"
+                      width={"!24px"}
+                      height={"!24px"}
+                    />
+                    Đăng ký
+                  </li>
+                  <li
+                    onClick={() => {
+                      router.push("/client/dang-nhap");
+                    }}
+                    className="bg-white text-black py-2 text-sm font-base cursor-pointer flex items-center gap-2 px-4 border border-t-1"
+                  >
+                    <AiOutlineUser
+                      fill="black"
+                      width={"!24px"}
+                      height={"!24px"}
+                    />
+                    Đăng nhập
+                  </li>
+                </ul>
+              )}
+            </div>
           </button>
         </div>
         <div className="cursor-pointer">
@@ -227,10 +301,10 @@ const HeaderClient = () => {
         </div>
         <div className="flex lg:justify-center gap-16 max-lg: justify-between">
           <div>
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col !overflow-y-auto">
               {listMenu.map((menu) => (
                 <div key={menu.id}>
-                  <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
@@ -256,7 +330,7 @@ const HeaderClient = () => {
               ))}
               {!isLogin ? (
                 <>
-                  <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
@@ -265,7 +339,7 @@ const HeaderClient = () => {
                       Đăng ký
                     </Link>
                   </li>
-                  <li className="font-normal h-16 text-5xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"

@@ -1,6 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import menuBg from "@/public/Alacarte-Menu-Thumbnail.png";
 import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   selectAll: false,

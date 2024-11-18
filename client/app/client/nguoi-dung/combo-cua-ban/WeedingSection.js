@@ -2,15 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import gear from '@/public/gear.svg';
 import checked from '@/public/Checked.svg';
-import Image from "next/image";
+import { Image } from '@nextui-org/react';
 import { fetchAllPackages } from '@/app/_services/packagesServices';
-
-
+import { getProductById } from '@/app/_services/productsServices';
+import Link from 'next/link';
 
 const WeddingSection = () => {
     const [openPackIndex, setOpenPackIndex] = useState(null);
     const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
-    const [dataPackage, setDataPackage] = useState([]);
+    const [weddingPacks, setWeddingPacks] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const getUser = JSON.parse(localStorage.getItem("user"));
@@ -22,92 +23,53 @@ const WeddingSection = () => {
         const fetchData = async () => {
             try {
                 const data = await fetchAllPackages();
-                setDataPackage(data);
+                const packagesByUser = data.filter(item => item.user_id === getUser.id);
+                // console.log('packagesByUser',packagesByUser);
+                
+                // Fetch all products for each package
+                const enrichedPackages = await Promise.all(
+                    packagesByUser.map(async (item) => {
+                        const otherService = JSON.parse(item.other_service);
+                        const products = await Promise.all(
+                            otherService.map(service => getProductById(service.id))
+                        );
+
+                        return {
+                            title: item.name,
+                            price: `${item.price.toLocaleString().slice(0, 2)} Triệu VND`,
+                            details: `Thường dành cho tiệc khoảng ${item.number_of_guests || 0} khách.`,
+                            categories: [
+                                {
+                                    title: "Trang trí",
+                                    items: [item.decors?.name || "N/A"],
+                                },
+                                {
+                                    title: "Sảnh",
+                                    items: ['Tùy chọn theo trang trí tiệc'],
+                                },
+                                {
+                                    title: "Menu",
+                                    items: [item.menus?.name || "N/A"],
+                                },
+                                {
+                                    title: "Dịch vụ gói",
+                                    items: products.flat().map(product => product.name),
+                                },
+                            ],
+                        };
+                    })
+                );
+
+                setWeddingPacks(enrichedPackages);
             } catch (error) {
-                console.error('Error fetching menu data:', error);
+                console.error('Error fetching package data:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchData();
     }, []);
-
-    const weddingPacks = dataPackage.map(item => ({
-        title: item.name,
-        price: `${item.price.toLocaleString().slice(0, 2)} Triệu VND`,
-        details: "Thường dành cho tiệc khoảng 100 khách.",
-        categories: [
-            {
-                title: "Trang trí",
-                items: [
-                    'Tùy chọn theo trang trí tiệc'
-                ]
-            },
-            {
-                title: "Bàn tiệc",
-                items: [
-                    'Tùy chọn theo trang trí tiệc'
-                ]
-            },
-            {
-                title: "MC",
-                items: [
-                    'MC chuyên nghiệp'
-                ]
-            },
-            {
-                title: "Âm thanh",
-                items: [
-                    "Dàn âm thanh chất lượng cao",
-                    "Nhân viên kỹ thuật âm thanh",
-                    "DJ chuyên nghiệp"
-                ]
-            },
-            {
-                title: "Bánh cưới",
-                items: [
-                    "Dàn âm thanh chất lượng cao",
-                    "Nhân viên kỹ thuật âm thanh",
-                    "DJ chuyên nghiệp"
-                ]
-            },
-            {
-                title: "Nước uống",
-                items: [
-                    "Dàn âm thanh chất lượng cao",
-                    "Nhân viên kỹ thuật âm thanh",
-                    "DJ chuyên nghiệp"
-                ]
-            },
-        ]
-    }));
-
-
-    // const weddingPacks = [
-    //     {
-    //         title: "GÓI TIỆC CƯỚI NGỌT NGÀO",
-    //         price: "50 - 100 Triệu VND",
-    //         details: "Thường dành cho tiệc khoảng 100 khách.",
-    //         categories: [
-    //             {
-    //                 title: "Trang trí",
-    //                 items: [
-    //                     "Màu sắc tự chọn theo chủ đề",
-    //                     "Hoa tươi tự chọn",
-    //                     "Backdrop đơn giản, có thể tự thiết kế"
-    //                 ]
-    //             },
-    //             {
-    //                 title: "Âm thanh",
-    //                 items: [
-    //                     "Dàn âm thanh chất lượng cao",
-    //                     "Nhân viên kỹ thuật âm thanh",
-    //                     "DJ chuyên nghiệp"
-    //                 ]
-    //             },
-    //         ]
-    //     },
-    //     // Thêm các gói khác nếu cần
-    // ];
 
     const togglePack = (index) => {
         setOpenPackIndex(openPackIndex === index ? null : index);
@@ -118,17 +80,54 @@ const WeddingSection = () => {
         setOpenDropdownIndex(openDropdownIndex === index ? null : index);
     };
 
+    if (isLoading) {
+        return <div className='flex flex-col items-center justify-center w-full h-[50vh]'>
+        <div className='w-[200px] opacity-50'>
+            <Image
+                src='/notebook.png'
+                alt="Notebook image"
+                className="object-cover"
+            />
+        </div>
+        <div className='flex mt-4 text-lg'>
+            <p>Bạn có muốn tạo gói cho riêng mình?</p>
+            <Link href='/client/tao-combo' className='ml-2 text-gold hover:text-gold hover:underline'>
+                Tạo gói
+            </Link>
+        </div>
+    </div>
+    }
+
+    if (weddingPacks.length === 0) {
+        return (
+            <div className='flex flex-col items-center justify-center w-full h-[50vh]'>
+                <div className='w-[200px] opacity-50'>
+                    <Image
+                        src='/notebook.png'
+                        alt="Notebook image"
+                        className="object-cover"
+                    />
+                </div>
+                <div className='flex mt-4 text-lg'>
+                    <p>Bạn có muốn tạo gói cho riêng mình?</p>
+                    <Link href='/client/tao-combo' className='ml-2 text-gold hover:text-gold hover:underline'>
+                        Tạo gói
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+    const detailCombo = () => {
+        router.push('')
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {weddingPacks.map((pack, packIndex) => (
-                <div key={packIndex} className=" relative group rounded-lg shadow-lg bg-gradient-to-r from-gold to-whiteAlpha-400 p-6 text-white cursor-pointer overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 hover:shadow-xl">
-                 
-                    <div className={`transition-transform duration-500 ease-in-out ${openPackIndex === packIndex ? 'translate-y-[-8px]' : ''}`}>
+                <div key={packIndex} className="relative group rounded-lg text-white cursor-pointer overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105">
+                    <div className={`bg-gradient-to-r from-gold to-whiteAlpha-400 p-6 transition-transform duration-500 hover:shadow-xl ease-in-out ${openPackIndex === packIndex ? 'translate-y-[-8px]' : ''}`}>
                         <div className='flex justify-between items-center'>
                             <h2 className="text-lg font-bold uppercase">{pack.title}</h2>
-                            <div className="flex items-center bg-gray-800 p-2 rounded-full">
-                                <Image src={gear} alt='gear-icon' className='w-5 h-5 object-cover' />
-                            </div>
                         </div>
                         <p className="text-3xl font-semibold mt-2">{pack.price}</p>
                         <button
@@ -139,7 +138,7 @@ const WeddingSection = () => {
                         </button>
                     </div>
 
-                    {/* Expanded Details with Dropdown Effect */}
+                    {/* Expanded Details */}
                     <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openPackIndex === packIndex ? 'max-h-[500px]' : 'max-h-0'}`}>
                         <div className="mt-4 bg-whiteAlpha-500 text-black p-4 rounded-lg shadow-lg transition-opacity duration-500 ease-in-out">
                             <p className="mb-2 text-gray-800 text-base leading-5">{pack.details}</p>
@@ -150,40 +149,24 @@ const WeddingSection = () => {
                                         className="flex items-center justify-between cursor-pointer py-2 border-b border-gray-300"
                                         onClick={() => toggleDropdown(index)}
                                     >
-                                        <div className="flex gap-2 items-center">
-                                            <Image src={checked} alt='checked-icon' className='w-5 h-5' />
-                                            <h4 className="font-semibold text-gray-900">{category.title}</h4>
-                                        </div>
-                                        <button>
-                                            {openDropdownIndex === index ? (
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" viewBox="0 0 24 24">
-                                                    <path d="M12 15.75l-5-5h10l-5 5z" />
-                                                </svg>
-                                            ) : (
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" viewBox="0 0 24 24">
-                                                    <path d="M12 8.25l5 5H7l5-5z" />
-                                                </svg>
-                                            )}
-                                        </button>
+                                        <h4 className="font-semibold text-gray-900">{category.title}</h4>
+                                        <button>{openDropdownIndex === index ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 8.295L6 14.295L7.41 15.705L12 11.125L16.59 15.705L18 14.295L12 8.295Z" fill="black" />
+                                        </svg>
+                                            : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M16.59 8.295L12 12.875L7.41 8.295L6 9.705L12 15.705L18 9.705L16.59 8.295Z" fill="black" />
+                                            </svg>
+                                        }</button>
                                     </div>
-                                    {/* Dropdown content */}
                                     <div className={`transition-all duration-500 ease-in-out ${openDropdownIndex === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
-                                        <ul className="mt-2 list-disc ml-6 text-gray-700">
+                                        <ul className="mt-2 list-disc ml-6 text-white">
                                             {category.items.map((item, itemIndex) => (
-                                                <li key={itemIndex}>{item}</li>
+                                                <li key={itemIndex} className='my-3 hover:underline hover:text-yellow-400' onClick={detailCombo}>{item}</li>
                                             ))}
                                         </ul>
                                     </div>
                                 </div>
                             ))}
-
-                            <button className="mt-6 flex items-center gap-2 justify-center w-full bg-gold text-white text-base py-2 leading-5 rounded-md font-semibold transition duration-300">
-                                LIÊN HỆ NGAY <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <g id="arrow_forward">
-                                        <path id="Vector" d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z" fill="white" />
-                                    </g>
-                                </svg>
-                            </button>
                         </div>
                     </div>
                 </div>

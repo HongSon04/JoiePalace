@@ -75,13 +75,13 @@ export class MenusService {
 
       if (Number(totalPrice) !== Number(price)) {
         throw new BadRequestException(
-          'Giá của menu không trùng với tổng giá của các món ăn',
+          `Giá của menu không trùng với tổng giá của các món ăn, giá thực: ${totalPrice}`,
         );
       }
 
       // ? Upload Image if available
       const images =
-        files?.images && files.images.length > 0
+        files?.images && files?.images?.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
               'joiepalace/menu',
@@ -581,18 +581,22 @@ export class MenusService {
 
       if (Number(totalPrice) !== Number(price)) {
         throw new BadRequestException(
-          'Giá của menu không trùng với tổng giá của các món ăn',
+          `Giá của menu không trùng với tổng giá của các món ăn, giá thực: ${totalPrice}`,
         );
       }
 
-      // ? Upload Image if available
-      const images =
-        files?.images && files.images.length > 0
-          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
-              files.images,
-              'joiepalace/menu',
-            )
-          : ([] as any);
+      let uploadImages;
+      // Upload images
+      if (files?.images?.length > 0) {
+        uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
+          files.images,
+          'joiepalace/packages',
+        );
+
+        if (!uploadImages) {
+          throw new BadRequestException('Upload ảnh thất bại');
+        }
+      }
 
       const menu = await this.prismaService.menus.update({
         where: { id: Number(id) },
@@ -605,7 +609,7 @@ export class MenusService {
           products: {
             set: productsTagSet,
           },
-          images: images ? images : findMenuById.images,
+          images: uploadImages ? uploadImages : findMenuById.images,
         },
         include: {
           products: {

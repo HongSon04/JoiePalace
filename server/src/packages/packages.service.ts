@@ -41,6 +41,8 @@ export class PackagesService {
         other_service,
         note,
         is_show,
+        budget,
+        number_of_guests,
       } = createPackageDto;
 
       // Validate images
@@ -63,6 +65,7 @@ export class PackagesService {
         menu_id,
         party_type_id,
         other_service,
+        number_of_guests,
       });
 
       if (Number(price) !== totalPrice) {
@@ -97,6 +100,8 @@ export class PackagesService {
           other_service,
           note,
           is_show: String(is_show) === 'true',
+          budget: budget,
+          number_of_guests: Number(number_of_guests),
         },
         include: {
           stages: true,
@@ -249,6 +254,8 @@ export class PackagesService {
         other_service,
         note,
         is_show,
+        budget,
+        number_of_guests,
       } = updatePackageDto;
 
       // ? Find Package By Id
@@ -263,7 +270,7 @@ export class PackagesService {
       // Validate unique name and slug
       const slug = MakeSlugger(name);
       const existingPackage = await this.prismaService.packages.findFirst({
-        where: { OR: [{ name }, { slug }] },
+        where: { OR: [{ name }, { slug }], NOT: { id: Number(id) } },
       });
       if (existingPackage) {
         throw new BadRequestException('Tên gói đã tồn tại');
@@ -276,6 +283,7 @@ export class PackagesService {
         menu_id,
         party_type_id,
         other_service,
+        number_of_guests,
       });
 
       // Validate total price
@@ -287,7 +295,7 @@ export class PackagesService {
 
       let uploadImages;
       // Upload images
-      if (files.images.length > 0) {
+      if (files?.images?.length > 0) {
         uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/packages',
@@ -315,6 +323,8 @@ export class PackagesService {
           other_service,
           note,
           is_show: String(is_show) === 'true',
+          budget: budget,
+          number_of_guests: Number(number_of_guests),
         },
         include: {
           stages: true,
@@ -471,6 +481,7 @@ export class PackagesService {
     menu_id,
     party_type_id,
     other_service,
+    number_of_guests,
   }) {
     let totalPrice = 0;
 
@@ -505,7 +516,9 @@ export class PackagesService {
       if (!menu) {
         throw new NotFoundException('ID Menu không tồn tại');
       }
-      totalPrice += Number(menu.price);
+      const tableCount = Math.ceil(Number(number_of_guests) / 10);
+      console.log('tableCount', tableCount);
+      totalPrice += Number(menu.price) * tableCount;
     }
 
     // Add party type price

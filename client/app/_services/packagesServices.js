@@ -4,7 +4,7 @@ import { API_CONFIG } from "../_utils/api.config";
 
 export const fetchAllPackages = async (slug) => {
   const response = await axios.get(
-    API_CONFIG.PACKAGES.GET_ALL({
+    API_CONFIG.PACKAGES.GET_ALL_BY_PARAMS({
       itemsPerPage: 99999,
     })
   );
