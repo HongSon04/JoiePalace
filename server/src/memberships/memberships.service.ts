@@ -295,7 +295,7 @@ export class MembershipsService {
 
       let images;
 
-      if (files.images && files?.images?.length > 0) {
+      if (files?.images && files?.images?.length > 0) {
         images = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/categories',

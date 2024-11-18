@@ -824,10 +824,11 @@ export class ProductsService {
         short_description,
         price: Number(price),
         tags: { set: tagsSet },
+        images: findProduct.images,
       };
 
       // Upload images if available
-      if (files.images && files?.images?.length > 0) {
+      if (files?.images && files?.images?.length > 0) {
         const uploadImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
