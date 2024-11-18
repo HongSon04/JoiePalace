@@ -7,7 +7,7 @@ function SelectedProduct({ product }) {
     <div className="rounded-lg flex gap-3 items-start">
       <div className="relative rounded-lg overflow-hidden w-14 h-14">
         <Image
-          src={product.images.at(0)}
+          src={product?.image}
           alt={product.name}
           fill
           sizes="44px"
