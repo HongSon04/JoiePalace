@@ -65,6 +65,7 @@ export class PackagesService {
         menu_id,
         party_type_id,
         other_service,
+        number_of_guests,
       });
 
       if (Number(price) !== totalPrice) {
@@ -282,6 +283,7 @@ export class PackagesService {
         menu_id,
         party_type_id,
         other_service,
+        number_of_guests,
       });
 
       // Validate total price
@@ -479,6 +481,7 @@ export class PackagesService {
     menu_id,
     party_type_id,
     other_service,
+    number_of_guests,
   }) {
     let totalPrice = 0;
 
@@ -513,7 +516,8 @@ export class PackagesService {
       if (!menu) {
         throw new NotFoundException('ID Menu không tồn tại');
       }
-      totalPrice += Number(menu.price);
+      const tableCount = Math.ceil(Number(number_of_guests) / 10);
+      totalPrice += Number(menu.price) * tableCount;
     }
 
     // Add party type price
