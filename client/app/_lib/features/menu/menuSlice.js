@@ -1,6 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import menuBg from "@/public/Alacarte-Menu-Thumbnail.png";
 import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   selectAll: false,
@@ -191,34 +190,34 @@ export const createMenu = createAsyncThunk(
   }
 );
 
-  export const getMenuList = createAsyncThunk(
-    "menu/fetchMenuList",
-    async ({ params, signal }, { dispatch, rejectWithValue }) => {
-      try {
-        const response = await makeAuthorizedRequest(
-          API_CONFIG.MENU.GET_ALL({ params }),
-          "GET",
-          null,
-          { signal }
-        );
+export const getMenuList = createAsyncThunk(
+  "menu/fetchMenuList",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.GET_ALL(params),
+        "GET",
+        null,
+        { signal }
+      );
 
-        if (response.success) {
-          return response;
-        } else {
-          return rejectWithValue(response.message);
-        }
-      } catch (error) {
-        return rejectWithValue(error.message);
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.message);
       }
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-  );
+  }
+);
 
 export const getMenuListByUserId = createAsyncThunk(
   "menu/fetchMenuListByUserId",
   async ({ params, signal }, { dispatch, rejectWithValue }) => {
     try {
       const response = await makeAuthorizedRequest(
-        API_CONFIG.MENU.GET_ALL({ params }),
+        API_CONFIG.MENU.GET_ALL(params),
         "GET",
         null,
         { signal }

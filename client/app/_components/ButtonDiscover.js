@@ -1,12 +1,13 @@
+import { Spinner } from "@nextui-org/react";
 import { memo } from "react";
 import { useRouter } from "next/navigation";
 
-const ButtonDiscover = ({link, name, className, ...props }) => {
+const ButtonDiscover = ({ link, name, className, isLoading, ...props }) => {
   const router = useRouter();
 
   const navigation = () => {
-    router.push(link || '#');
-  }
+    router.push(link || "#");
+  };
 
   return (
     <button
@@ -14,7 +15,16 @@ const ButtonDiscover = ({link, name, className, ...props }) => {
       {...props}
       onClick={navigation}
     >
-      <span className="text-[1em] font-medium flex items-center h-6 max-lg:text-xs">
+      {isLoading && (
+        <Spinner
+          size="sm"
+          classNames={{
+            circle1: "w-12 h-12 border-b-gold",
+            circle2: "w-12 h-12 border-b-gold",
+          }}
+        />
+      )}
+      <span className="text-[1em] font-medium flex items-center h-6">
         {name ? name : "Khám phá"}
       </span>
       <svg

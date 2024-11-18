@@ -47,7 +47,7 @@ const partyTypesSlice = createSlice({
   },
 });
 
-// Fetch category dishes
+// Fetch partyTypes
 export const getPartyTypes = createAsyncThunk(
   "partyTypes/getPartyTypes",
   async ({ params = {}, signal = null }, { dispatch, rejectWithValue }) => {

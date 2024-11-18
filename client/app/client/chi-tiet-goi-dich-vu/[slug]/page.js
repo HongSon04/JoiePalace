@@ -336,10 +336,14 @@ const Page = () => {
   const [dataAll, setDataAll] = useState(null);
   const [dataOtherService, setDataOtherService] = useState(null);
   const [categories, setCategories] = useState(null);
+  const [totalMenu, setTotalMenu] = useState(0);
+  const [numberOfGuests, setNumberOfGuests] = useState(10);
+  const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
     const fecthData = async () => {
       const data = await getPackageBySlug(slug);
+      setNumberOfGuests(data?.data[0]?.number_of_guests);
       setDataPackage(data.data[0]);
       const hall = await getStageById(data.data[0].stage_id || 42);
       const decor = await getDecorById(data.data[0].decor_id);
@@ -366,9 +370,7 @@ const Page = () => {
         cake: cake[0],
         menu: menu[0],
       };
-      setDataAll(newData);
-      setDataToShow(newData?.hall);
-      setCategories([
+      const dataDrawer = [
         {
           id: 1,
           name: "Sảnh tiệc",
@@ -447,14 +449,40 @@ const Page = () => {
             });
           }),
         },
-      ]);
+      ];
+      setDataAll(newData);
+      setDataToShow(newData?.hall);
+      setCategories(dataDrawer);
+      const priceAllMenu = dataDrawer[4]?.products?.reduce((curr, menu) => {
+        return (curr += menu.price);
+      }, 0);
+      data?.data[0]?.number_of_guests
+        ? setTotalMenu(
+            priceAllMenu * Math.ceil(data?.data[0]?.number_of_guests / 10)
+          )
+        : setTotalMenu(priceAllMenu);
+      const totalCost = dataDrawer.reduce((acc, category) => {
+        const categoryTotal = category.products.reduce((catAcc, product) => {
+          let productPrice = product.price;
+
+          if (category.id === 5) {
+            const tablesNeeded = Math.ceil(
+              data?.data[0]?.number_of_guests || 10 / 10
+            );
+            productPrice *= tablesNeeded;
+          }
+
+          return catAcc + productPrice;
+        }, 0);
+
+        return acc + categoryTotal;
+      }, 0);
+      setTotalResults(totalCost);
     };
     fecthData();
   }, [slug]);
 
   if (!dataPackage && !dataToShow && !categories) return <Loading></Loading>;
-  console.log(dataToShow);
-
   return (
     <>
       <div className="w-full px-48">
@@ -567,13 +595,43 @@ const Page = () => {
             </button>
           </div>
           <div className="w-full flex gap-5">
-            <div className="bg-whiteAlpha-50 flex flex-col gap-4 p-5 rounded-2xl w-1/3 h-[70vh]">
-              <span className="text-sm font-semibold leading-5">Ghi chú</span>
-              <textarea
-                name=""
-                id=""
-                className="rounded-2xl border border-1-white resize-none w-full h-full p-2"
-              ></textarea>
+            <div className="flex flex-col gap-6 p-5 rounded-2xl w-1/3 h-auto">
+              <div
+                className={`flex flex-col gap-4 bg-whiteAlpha-50 p-5 rounded-2xl h-[${
+                  optionIndex === 2 ? "5" : "7"
+                }0vh]`}
+              >
+                <span className="text-sm font-semibold leading-5">Ghi chú</span>
+                <textarea
+                  name=""
+                  id=""
+                  className="rounded-2xl border border-1-white resize-none w-full h-full p-2"
+                ></textarea>
+              </div>
+              {optionIndex === 2 ? (
+                <div className="flex flex-col gap-4 bg-whiteAlpha-50 p-5 rounded-2xl">
+                  <span className="text-sm font-semibold leading-5 text-red-500">
+                    Giá thực đơn*
+                  </span>
+                  <span className="rounded-2xl border border-1-white resize-none w-full h-full p-2">
+                    {
+                      <>
+                        <span className="mb-4">
+                          Tiền thực đơn sẽ bằng giá thực đơn của gói nhân với số
+                          lượng bàn.
+                        </span>
+                        <br />
+                        <span className="mb-4 leading-5">
+                          Tiền thực đơn gói này là: {totalMenu.toLocaleString()}{" "}
+                          VNĐ. Với số lượng bàn của gói này là:{" "}
+                          {Math.ceil(numberOfGuests / 10)} bàn, và{" "}
+                          {numberOfGuests || 0} khách.
+                        </span>
+                      </>
+                    }
+                  </span>
+                </div>
+              ) : null}
             </div>
             <div className="w-2/3 h-full  flex flex-col gap-3 relative">
               <div className="flex gap-3 items-center">
@@ -598,7 +656,7 @@ const Page = () => {
                   </div>
                 ) : optionIndex === 1 ? (
                   <div className="w-full h-full  flex flex-col gap-3 relative">
-                    {dataToShow.map((item, index) => (
+                    {dataToShow?.map((item, index) => (
                       <>
                         <div className="flex gap-3 items-center">
                           <span className="text-3xl font-bold">
@@ -646,7 +704,7 @@ const Page = () => {
                   <div className="w-full h-full  flex flex-col gap-3 relative">
                     <>
                       <div className="w-full flex flex-col flex-wrap gap-6">
-                        {arrayMenus.map((menu, index) => (
+                        {arrayMenus?.map((menu, index) => (
                           <div key={menu?.id} className="flex flex-col gap-4">
                             <h2 className="text-lg">{menu?.name}</h2>
                             <div className="flex gap-4 flex-wrap">
@@ -767,13 +825,25 @@ const Page = () => {
                         (acc, cur) => acc + cur.price,
                         0
                       );
-
+                      if (c.id === 5) {
+                        return (
+                          <div
+                            className="flex items-center justify-between"
+                            key={c.id}
+                          >
+                            <span className="text-base">{c?.name}</span>
+                            <span className="text-base">
+                              {totalMenu.toLocaleString("vn-VN")} VNĐ
+                            </span>
+                          </div>
+                        );
+                      }
                       return (
                         <div
                           className="flex items-center justify-between"
                           key={c.id}
                         >
-                          <span className="text-base">{c.name}</span>
+                          <span className="text-base">{c?.name}</span>
                           <span className="text-base">
                             {total.toLocaleString("vn-VN")} VNĐ
                           </span>
@@ -793,14 +863,13 @@ const Page = () => {
                     Tổng dự chi
                   </h3>
                   <span className="text-white font-semibold text-xl mt-2">
-                    {categories
-                      ?.reduce(
-                        (acc, cur) =>
-                          acc +
-                          cur.products.reduce((acc, cur) => acc + cur.price, 0),
-                        0
-                      )
-                      .toLocaleString("vn-VN") + " VNĐ"}
+                    {/* {categories?.reduce(
+                      (acc, cur) =>
+                        acc +
+                        cur.products.reduce((acc, cur) => acc + cur.price, 0),
+                      0
+                    )} */}
+                    {totalResults.toLocaleString()} VNĐ
                   </span>
                 </div>
                 <ChevronDownIcon

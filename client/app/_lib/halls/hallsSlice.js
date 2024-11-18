@@ -143,11 +143,11 @@ const hallsSlice = createSlice({
 });
 
 export const fetchHalls = createAsyncThunk(
-  "halls/fetchHall",
-  async (payload, { dispatch, rejectWithValue }) => {
+  "halls/fetchHalls",
+  async (params, { dispatch, rejectWithValue }) => {
     try {
       const response = await makeAuthorizedRequest(
-        API_CONFIG.STAGES.GET_ALL(payload.id),
+        API_CONFIG.STAGES.GET_ALL(params),
         "GET"
       );
 

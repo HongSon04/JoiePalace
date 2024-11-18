@@ -5,8 +5,8 @@ function Loading() {
     <div className="fixed inset-0 bg-blackAlpha-50 backdrop-blur-lg flex-center min-h-full flex-col z-50">
       <Spinner
         classNames={{
-          circle1: "w-12 h-12 border-b-gold",
-          circle2: "w-12 h-12 border-b-gold",
+          circle1: "w-12 h-12 border-b-white",
+          circle2: "w-12 h-12 border-b-white",
         }}
       />
 

@@ -16,6 +16,7 @@ import packagesSlice from "./features/packages/packagesSlice";
 import stagesSlice from "./features/stages/stagesSlice";
 import decorsSlice from "./decors/decorsSlice";
 import hallsSlice from "./halls/hallsSlice";
+import beaveragesSlice from "./features/beaverages/beaveragesSlice";
 
 const store = configureStore({
   reducer: {
@@ -35,6 +36,7 @@ const store = configureStore({
     stages: stagesSlice.reducer,
     decors: decorsSlice.reducer,
     halls: hallsSlice.reducer,
+    beaverages: beaveragesSlice.reducer,
   },
 });
 
