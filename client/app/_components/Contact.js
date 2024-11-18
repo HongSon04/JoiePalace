@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import ButtonDiscover from "./ButtonDiscover";
+import { Button } from "@nextui-org/react";
 import InputIndex from "./InputIndexClient";
 import { fetchBranchesFromApi } from "../_services/branchesServices";
 import { fecthAllPartyTypes } from "../_services/partyTypesServices";
@@ -11,6 +12,8 @@ import { formatDate } from "../_utils/format";
 import useCustomToast from "../_hooks/useCustomToast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPackageById } from "../_services/packageServices";
+import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
+import IconButton from "./IconButton";
 
 const formSchema = z.object({
   name: z.string().min(2, "Vui lòng nhập Họ và tên!"),
@@ -35,6 +38,7 @@ const Contact = () => {
   const toast = useCustomToast();
   const router = useRouter();
   const [userInfo, setUserInfo] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -121,6 +125,7 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const validationErrors = {};
     try {
       formSchema.parse(formData);
@@ -169,6 +174,7 @@ const Contact = () => {
       });
       setErrors(validationErrors);
     }
+    setIsLoading(false);
   };
 
   if (!listBranches.length || !listPartyTypes.length) return null;
@@ -316,7 +322,36 @@ const Contact = () => {
         styles="overflow-hidden"
       />
       <div className="w-full flex justify-end">
-        <ButtonDiscover type="submit" name="Gửi" className="w-auto px-6" />
+        {/* <ButtonDiscover type="submit" name="Gửi" className="w-auto px-6" /> */}
+        <IconButton
+          className={`w-auto px-6 text-white flex items-center gap-2 rounded-full !bg-gold py-${
+            isLoading ? "3" : "0"
+          } h-auto ${isLoading ? "select-none" : ""}`}
+          onClick={handleSubmit}
+        >
+          {!isLoading ? (
+            <div className="w-full h-full flex items-center gap-2 justify-center !py-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  d="M7.52867 11.5286L8.47133 12.4712L12.9427 7.9999L8.47133 3.52856L7.52867 4.47123L10.3907 7.33323H4V8.66656H10.3907L7.52867 11.5286Z"
+                  fill="white"
+                />
+              </svg>
+              <span className="font-medium">Gửi</span>
+            </div>
+          ) : (
+            <>
+              <div className="w-8 h-8 border-4 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+              <span>Đang xử lí</span>
+            </>
+          )}
+        </IconButton>
       </div>
     </form>
   );

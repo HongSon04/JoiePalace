@@ -238,7 +238,7 @@ function Conference() {
                             {menu?.description ? menu?.description : "Trung tâm Sự kiện White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp. Chúng tôi mang đến sự khác biệt với việc cung cấp đa dạng các thực đơn phù hợp với nhu cầu của  khách hàng."}
                         </p>
                         {categoriesMenu.map((i, index) => (
-                            <Link className="flex items-end text-gold mb-5 hover:text-gold " href={`#menu${i.slug}`}>
+                            <Link key={index} className="flex items-end text-gold mb-5 hover:text-gold " href={`#menu${i.slug}`}>
                                 <div className="font-medium text-2xl leading-[40px] font-gilroy border-b-1 border-gold mr-8 max-2md:text-xl">{i.name}</div>
                                 <p className="font-normal text-base leading-6 text-left font-inter max-2md:text-[13px]">( {i.countDishes} Món ) Loại</p>
                             </Link>

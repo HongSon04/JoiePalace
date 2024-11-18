@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { Image } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 
 const WeddingPackages = ({ dataPackage }) => {
+  const route = useRouter();
   const [openSection, setOpenSection] = useState({});
   const [selected, setSelected] = useState(null);
   const [packageFocus, setPackageFocus] = useState(0);
@@ -219,7 +221,12 @@ const WeddingPackages = ({ dataPackage }) => {
               </div>
             ))}
             <div className="flex justify-center items-center gap-4">
-              <button className="flex justify-center items-center gap-2 bg-gold text-white px-4 py-2 rounded-lg font-semibold ">
+              <button
+                onClick={(e) =>
+                  route.push(`/client/chi-tiet-goi-dich-vu/${pkg.slug}`)
+                }
+                className="flex justify-center items-center gap-2 bg-gold text-white px-4 py-2 rounded-lg font-semibold "
+              >
                 LIÊN HỆ NGAY{" "}
                 <svg
                   width="20"

@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useRouter } from "next/navigation";
 
-const ButtonDiscover = ({link, name, className, ...props }) => {
+const ButtonDiscover = ({link, name, className, childrend, ...props }) => {
   const router = useRouter();
 
   const navigation = () => {
