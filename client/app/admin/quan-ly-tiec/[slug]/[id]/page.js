@@ -130,6 +130,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
     const [selectOtherServices, setSelectOtherServices] = useState(null);
     const [selectOtherDishes, setSelectOtherDishes] = useState([]);
+    const [bookingDetails, setBookingDetails] = useState(null);
 
     const [foods, setFoods] = useState({
         nuocUong: [],
@@ -146,6 +147,40 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const [detailCostTable, setDetailCostTable] = useState([]);
 
     const [branch_id, setBranch_id] = useState();
+  
+    const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
+        resolver: zodResolver(organizationSchema),
+        defaultValues: {
+            other_services: null,
+            customerAndChair: 10,
+            total_amount: 0,
+            depositAmount: 0,
+            spare_table_count: 0,
+        },
+    });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await Promise.all([
+                    fetchAllMenus(),
+                    fetchAllPartyTypes(),
+                    fetchAllDecors(),
+                    fetchAllServices(), 
+                ]);
+                await fetchDataDetailsParty();
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu:', error);
+            }
+        };
+        fetchData();
+    }, [id, reset]);
+    useEffect(() => {
+        // Kiểm tra xem cả hai dịch vụ đã có dữ liệu chưa và bookingDetails đã có giá trị
+        if (otherServices[0]?.options.length > 1 && extraServices[0]?.options.length > 1 && bookingDetails) {
+            checkServices(bookingDetails);
+        }
+    }, [otherServices, extraServices, bookingDetails]);
 
     const fetchLimitStages = async (stageId) => {
         try {
@@ -294,13 +329,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const fetchPackageForExtraServices = async () => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.PRODUCTS.GET_SERVICES(), 'GET');
-
+            console.log('Dữ liệu từ API cho dịch vụ phát sinh:', response.data); // Kiểm tra dữ liệu từ API
             if (response.statusCode === 200) {
-                if (typeof response.data !== 'object') {
-                    console.error('Dữ liệu không hợp lệ:', response.data);
-                    return;
-                }
-
                 const categories = Object.entries(response.data).map(([categoryName, services]) => ({
                     category: categoryName,
                     items: services.map(service => ({
@@ -309,23 +339,25 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         price: service.price,
                     })),
                 }));
-
+    
                 const optionsWithDefault = [
                     { category: 'Chọn dịch vụ', items: [{ value: '', label: 'Không chọn' }] },
                     ...categories,
                 ];
-
+    
                 setExtraServices(prev => [{ ...prev[0], options: optionsWithDefault }]);
             } else {
                 console.error('Không có dữ liệu hợp lệ');
             }
         } catch (error) {
-            console.error('Lỗi khi lấy dịch vụ khác:', error);
+            console.error('Lỗi khi lấy dịch vụ phát sinh:', error);
         }
     };
+    
     const fetchPackageForOtherServices = async () => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.CATEGORIES.GET_BY_ID(9), 'GET');
+            console.log('Dữ liệu từ API cho dịch vụ khác:', response.data); // Kiểm tra dữ liệu từ API
             const childrenServices = response.data[0]?.childrens || [];
             if (childrenServices.length === 0) {
                 console.error('Không có dịch vụ con nào trong childrenServices');
@@ -338,13 +370,12 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     price: product.price,
                 }))
             );
-            setOtherServices(prev => {
-                const newOptions = [
-                    { category: 'Chọn dịch vụ', items: [{ value: '', label: 'Không chọn' }] },
-                    ...options,
-                ];
-                return [{ ...prev[0], options: newOptions }];
-            });
+    
+            const optionsWithDefault = [
+                { category: 'Chọn dịch vụ', items: [{ value: '', label: 'Không chọn' }] },
+                ...options,
+            ];
+            setOtherServices(prev => [{ ...prev[0], options: optionsWithDefault }]);
         } catch (error) {
             console.error('Lỗi khi lấy dịch vụ khác:', error);
         }
@@ -354,55 +385,62 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_BY_ID(packageId), 'GET');
             const packageData = response.data[0];
-            
-            // Xử lý other_service từ packageData
+
             if (packageData.other_service) {
                 const otherServicesFromAPI = JSON.parse(packageData.other_service);
-                const otherServiceOptions = otherServicesFromAPI.map(service => ({
-                    id: Number(service.id),
-                    name: service.name,
-                    price: service.price, // Chuyển đổi sang số
-                    quantity: service.quantity,
-                }));
-                setSelectOtherDishes(prev => [...prev, ...otherServiceOptions]);
+                const updatedOtherDishes = otherServicesFromAPI.map(service => {
+                    const option = otherServices[0]?.options.find(opt => opt.value === service.id);
+                    return {
+                        id: service.id,
+                        name: option ? option.label : 'Không xác định',
+                        price: option ? option.price : 0,
+                        quantity: service.quantity,
+                    };
+                });
+                setSelectOtherDishes(prev => [...prev, ...updatedOtherDishes]);
             }
 
-            // Xử lý extra_service từ packageData
             if (packageData.extra_service) {
                 const extraServicesFromAPI = JSON.parse(packageData.extra_service);
-                const extraServiceOptions = extraServicesFromAPI.map(service => ({
-                    id: Number(service.id),
-                    name: service.name,
-                    price: service.price, // Chuyển đổi sang số
-                    quantity: service.quantity,
-                }));
-                setSelectExtraDishes(prev => [...prev, ...extraServiceOptions]);
+                const updatedExtraDishes = extraServicesFromAPI.map(service => { 
+                    const option = extraServices[0]?.options.find(opt => opt.value === service.id);
+                    return {
+                        id: service.id,
+                        name: option ? option.label : 'Không xác định',
+                        price: option ? option.price : 0,
+                        quantity: service.quantity,
+                    };
+                });
+                setSelectExtraDishes(prev => [...prev, ...updatedExtraDishes]);
             }
         } catch (error) {
-            console.log(error);
+            console.error('Lỗi khi lấy gói dịch vụ:', error);
         }
     };
-    const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
-        resolver: zodResolver(organizationSchema),
-        defaultValues: {
-            other_services: null,
-            customerAndChair: 10,
-            total_amount: 0,
-            depositAmount: 0,
-            spare_table_count: 0,
-        },
-    });
 
+    const fetchAllServices = async () => {
+        try {
+            await Promise.all([
+                fetchPackageForExtraServices(),
+                fetchPackageForOtherServices(),
+            ]);
+        } catch (err) {
+            console.error('Lỗi khi lấy dịch vụ:', err);
+        }
+    };
+    
     const fetchDataDetailsParty = async () => {
         try {
+            await fetchAllServices();
             const response = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.GET_BY_ID(id), 'GET');
             const partyData = response.data[0];
             if (partyData) {
-                const paymentStatusMethod = partyData.payment_status;
                 await fetchAllStages(partyData.branch_id);
+                const decorOptions = await fetchAllDecors();
+
+                const paymentStatusMethod = partyData.payment_status;
                 const bookingDetails = partyData.booking_details[0] || {};
                 const selectedMenuId = bookingDetails.menu_id || selectedMenu;
-                const decorOptions = await fetchAllDecors();
                 // Kiểm tra package_id
                 if (partyData.package_id) {
                     await fetchPackageByID(partyData.package_id);
@@ -415,6 +453,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         }
                     }
                 }
+                setBookingDetails(bookingDetails);
+                checkServices(bookingDetails);
                 checkSelectedDecor(decorOptions, partyData);
                 // Xử lý party types
                 if (!selectPartyTypes) {
@@ -423,29 +463,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     if (selectedPartyTypeOption) {
                         setPartyPrice(selectedPartyTypeOption.price);
                     }
-                }
-
-                if (partyData.other_service) {
-                    const otherServicesFromAPI = JSON.parse(partyData.other_service);
-                    const otherServiceOptions = otherServicesFromAPI.map(service => ({
-                        id: Number(service.id), 
-                        quantity: service.quantity,
-                        name: service.name,
-                        price: service.price,
-                    }));
-                    setSelectOtherDishes(prev => [...prev, ...otherServiceOptions]);
-                }
-    
-                // Xử lý extra_service từ partyData
-                if (partyData.extra_service) {
-                    const extraServicesFromAPI = JSON.parse(partyData.extra_service);
-                    const extraServiceOptions = extraServicesFromAPI.map(service => ({
-                        id: Number(service.id), 
-                        quantity: service.quantity,
-                        name: service.name,
-                        price: service.price,
-                    }));
-                    setSelectExtraDishes(prev => [...prev, ...extraServiceOptions]);
                 }
 
                 // Cập nhật giá trị khác
@@ -557,10 +574,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
         if (Array.isArray(partyData.booking_details) && partyData.booking_details.length > 0) {
             const selectedDecorId = partyData.booking_details[0].decor_id;
-            console.log('Selected Decor ID:', selectedDecorId);
 
             const selectedDecorOption = decorOptions.find(option => option.value === selectedDecorId);
-            console.log('Selected Decor Option:', selectedDecorOption);
 
             if (selectedDecorOption) {
                 setSelectedDecors(selectedDecorOption.value);
@@ -571,6 +586,75 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             }
         }
     };
+    const checkServices = (bookingDetails) => {
+        const allOtherOptions = otherServices[0]?.options || [];
+        const allExtraOptions = extraServices[0]?.options || [];
+    
+        console.log('Tất cả tùy chọn dịch vụ khác:', allOtherOptions);
+        console.log('Tất cả tùy chọn dịch vụ phát sinh:', allExtraOptions);
+        console.log('Dữ liệu bookingDetails:', bookingDetails); // Kiểm tra giá trị của bookingDetails
+    
+        // Kiểm tra và phân tích cú pháp chuỗi JSON thành mảng
+        let otherServicesData = [];
+        let extraServicesData = [];
+    
+        // Kiểm tra other_service
+        if (bookingDetails.other_service) {
+            try {
+                // Nếu là chuỗi, phân tích cú pháp
+                if (typeof bookingDetails.other_service === 'string') {
+                    otherServicesData = JSON.parse(bookingDetails.other_service);
+                } else {
+                    // Nếu đã là đối tượng, gán trực tiếp
+                    otherServicesData = bookingDetails.other_service;
+                }
+            } catch (error) {
+                console.error('Lỗi khi phân tích cú pháp other_service:', error);
+            }
+        }
+    
+        // Kiểm tra extra_service
+        if (bookingDetails.extra_service) {
+            try {
+                // Nếu là chuỗi, phân tích cú pháp
+                if (typeof bookingDetails.extra_service === 'string') {
+                    extraServicesData = JSON.parse(bookingDetails.extra_service);
+                } else {
+                    // Nếu đã là đối tượng, gán trực tiếp
+                    extraServicesData = bookingDetails.extra_service;
+                }
+            } catch (error) {
+                console.error('Lỗi khi phân tích cú pháp extra_service:', error);
+            }
+        }
+    
+        // Kiểm tra xem otherServicesData có phải là mảng không
+        const updatedOtherDishes = Array.isArray(otherServicesData) ? otherServicesData.map(service => {
+            const option = allOtherOptions.find(opt => opt.value === service.id);
+            return {
+                id: service.id,
+                name: option ? option.label : 'Không xác định',
+                price: option ? option.price : 0,
+                quantity: service.quantity,
+            };
+        }) : [];
+    
+        setSelectOtherDishes(updatedOtherDishes);
+    
+        // Kiểm tra xem extraServicesData có phải là mảng không
+        const updatedExtraDishes = Array.isArray(extraServicesData) ? extraServicesData.map(service => {
+            const option = allExtraOptions.find(opt => opt.value === service.id);
+            return {
+                id: service.id,
+                name: option ? option.label : 'Không xác định',
+                price: option ? option.price : 0,
+                quantity: service.quantity,
+            };
+        }) : [];
+    
+        setSelectExtraDishes(updatedExtraDishes);
+    };
+    
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -699,37 +783,28 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             setSelectService(null);
             return;
         }
-    
+
         const options = services.flatMap(service =>
             service.options.flatMap(option => option.items ? option.items : option)
         );
-    
+
         const selectedOption = options.find(item => item.value == packageId);
-    
+
         if (!selectedOption) {
             console.error('Tùy chọn không hợp lệ:', packageId);
             return;
         }
-    
+
         const existingDish = selectedDishesState.find(dish => dish.id == packageId);
-    
+
         if (existingDish) {
-            handleChangeQuantity(packageId, selectedDishesState, setSelectedDishesState, 1); 
+            handleChangeQuantity(packageId, selectedDishesState, setSelectedDishesState, 1);
         } else {
             setSelectedDishesState([...selectedDishesState, { id: Number(packageId), name: selectedOption.label, price: selectedOption.price, quantity: 1 }]);
         }
-    
+
         setSelectService(packageId);
     };
-    
-    useEffect(() => {
-        fetchPackageForExtraServices()
-        fetchPackageForOtherServices()
-        fetchAllMenus();
-        fetchAllPartyTypes()
-        fetchAllDecors();
-        fetchDataDetailsParty();
-    }, [id, reset]);
 
     const onSubmit = async (data) => {
         const formattedOtherDishes = selectOtherDishes.map(dish => ({
@@ -744,7 +819,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         const totalOtherServicesPrice = selectOtherDishes.reduce((total, dish) => {
             return total + (dish.price * dish.quantity);
         }, 0);
-    
+
         const totalExtraServicesPrice = selectExtraDishes.reduce((total, dish) => {
             return total + (dish.price * dish.quantity);
         }, 0);
@@ -842,8 +917,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             toast("error", "Cập nhật thất bại", message);
         }
     };
-    console.log(selectExtraDishes)
-    console.log(selectOtherDishes)
+
+
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
@@ -967,8 +1042,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                             />
                         ))}
                         {selectOtherDishes.length > 0 &&
-                            selectOtherDishes.map(dish => (
-                                <div key={dish.id} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                            selectOtherDishes.map((dish, index) => (
+                                <div key={`${dish.id}-${index}`} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                                     <div className="flex flex-col">
                                         <span className="text-base font-semibold text-white">{dish.name}</span>
                                         <span className="text-gray-400">Số lượng: <span className='text-base font-semibold'>{dish.quantity}</span></span>
@@ -1016,8 +1091,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                             />
                         ))}
                         {selectExtraDishes.length > 0 &&
-                            selectExtraDishes.map(dish => (
-                                <div key={dish.id} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                            selectExtraDishes.map((dish, index) => (
+                                <div key={`${dish.id}-${index}`} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                                     <div className="flex flex-col">
                                         <span className="text-base font-semibold text-white">{dish.name}</span>
                                         <span className="text-gray-400">Số lượng: <span className='text-base font-semibold'>{dish.quantity}</span></span>
