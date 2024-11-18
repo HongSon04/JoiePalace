@@ -914,7 +914,7 @@ export class BookingsService {
 
       // ? Upload Image If Exist
       let uploadImages = [];
-      if (files?.images && files.images.length > 0) {
+      if (files?.images && files?.images?.length > 0) {
         uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/booking',

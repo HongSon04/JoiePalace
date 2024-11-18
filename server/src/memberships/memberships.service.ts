@@ -66,14 +66,14 @@ export class MembershipsService {
       }
 
       const images =
-        files.images && files.images.length > 0
+        files.images && files?.images?.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
               'joiepalace/categories',
             )
           : ([] as any);
 
-      if (files.images && files.images.length > 0 && !images) {
+      if (files.images && files?.images?.length > 0 && !images) {
         throw new BadRequestException('Upload ảnh thất bại');
       }
 
@@ -295,7 +295,7 @@ export class MembershipsService {
 
       let images;
 
-      if (files.images && files.images.length > 0) {
+      if (files?.images && files?.images?.length > 0) {
         images = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/categories',

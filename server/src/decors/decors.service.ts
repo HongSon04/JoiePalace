@@ -520,21 +520,22 @@ export class DecorsService {
         products: {
           set: productsTagSet,
         },
+        images: decor.images,
       };
 
-      if (files.images) {
-        const imagesDecor =
-          await this.cloudinaryService.uploadMultipleFilesToFolder(
-            files.images,
-            'joiepalace/decors',
-          );
+      let uploadImages;
+      // Upload images
+      if (files?.images?.length > 0) {
+        uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
+          files.images,
+          'joiepalace/packages',
+        );
 
-        if (!imagesDecor.length) {
-          throw new BadRequestException('Upload hình ảnh thất bại');
+        if (!uploadImages) {
+          throw new BadRequestException('Upload ảnh thất bại');
         }
-        // Delete old images
-        await this.cloudinaryService.deleteMultipleImagesByUrl(decor.images);
-        dataToUpdate.images = imagesDecor;
+
+        dataToUpdate.images = uploadImages;
       }
 
       const updatedDecor = await this.prismaService.decors.update({
