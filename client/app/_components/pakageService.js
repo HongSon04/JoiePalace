@@ -21,6 +21,7 @@ const WeddingPackages = ({ dataPackage }) => {
     }));
   };
 
+
   useEffect(() => {
     const servicePakages = async (data) => {
       // Use Promise.all to handle the asynchronous mapping
@@ -28,7 +29,7 @@ const WeddingPackages = ({ dataPackage }) => {
         data.map(async (item) => {
           const otherService = JSON.parse(item.other_service);
           const products = await Promise.all(
-            otherService.map((service) => getProductById(service.id))
+            otherService.map(service => getProductById(service.id))
           );
 
           return {
@@ -39,7 +40,9 @@ const WeddingPackages = ({ dataPackage }) => {
               {
                 id: 1,
                 name: "Trang trí",
-                content: [{ id: 1, content: item.decors.name }],
+                content: [
+                  { id: 1, content: item.decors.name },
+                ],
               },
               {
                 id: 2,
@@ -53,14 +56,16 @@ const WeddingPackages = ({ dataPackage }) => {
               {
                 id: 3,
                 name: "Menu",
-                content: [{ id: 1, content: item.menus.name }],
+                content: [
+                  { id: 1, content: item.menus.name },
+                ],
               },
               {
                 id: 4,
                 name: "Dịch vụ gói",
-                content: products.flat().map((product) => ({
+                content: products.flat().map(product => ({
                   id: product.id,
-                  content: product.name,
+                  content: product.name
                 })),
               },
             ],
@@ -77,7 +82,8 @@ const WeddingPackages = ({ dataPackage }) => {
     }
   }, [dataPackage]);
 
-  console.log("orther_service", orther_service);
+
+  console.log('orther_service', orther_service);
 
   const listItemPackages = [
     // ...orther_service
@@ -124,7 +130,7 @@ const WeddingPackages = ({ dataPackage }) => {
           ],
         },
       ],
-    },
+    }
   ];
 
   if (!dataPackage) return null;
@@ -150,17 +156,13 @@ const WeddingPackages = ({ dataPackage }) => {
           <div
             key={pkg.id}
             onClick={() => setPackageFocus(index)}
-            className={`overflow-y-hidden min-h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${
-              packageFocus === index ? "border border-gold" : ""
-            }`}
+            className={`overflow-y-hidden min-h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${packageFocus === index ? "border border-gold" : ""
+              }`}
           >
             <div className="affterLine mr-[290px] z-10"></div>
             {packageFocus === index && (
               <div className="absolute max-md:hidden z-20">
-                <div className="relative bottom-[100px]">
-                  {" "}
-                  <Image src="/premium.png" alt="Premium" />
-                </div>
+                <div className="relative bottom-[100px]"> <Image src="/premium.png" alt="Premium" /></div>
               </div>
             )}
             <h2 className="text-lg font-bold text-center z-20">{pkg?.name}</h2>
@@ -199,11 +201,10 @@ const WeddingPackages = ({ dataPackage }) => {
                   </button>
                   {service.content && (
                     <div
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        openSection[`${pkg.id}-${service.name}`]
-                          ? "max-h-40 opacity-100"
-                          : "max-h-0 opacity-0"
-                      }`}
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${openSection[`${pkg.id}-${service.name}`]
+                        ? "max-h-40 opacity-100"
+                        : "max-h-0 opacity-0"
+                        }`}
                     >
                       <ul className="text-left space-y-2 pl-4 py-2">
                         {service.content.map((item) => (
@@ -215,7 +216,7 @@ const WeddingPackages = ({ dataPackage }) => {
                 </div>
               ))}
               <div className="flex justify-center items-center gap-4 mt-3">
-                <button className="flex justify-center items-center gap-2 bg-gold text-white px-4 py-2 rounded-lg font-semibold ">
+                <button onClick={() => route.push(`/client/chi-tiet-goi-dich-vu/${pkg.slug}`)} className="flex justify-center items-center gap-2 bg-gold text-white px-4 py-2 rounded-lg font-semibold ">
                   LIÊN HỆ NGAY{" "}
                   <svg
                     width="20"
