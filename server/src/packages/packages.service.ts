@@ -270,7 +270,7 @@ export class PackagesService {
       // Validate unique name and slug
       const slug = MakeSlugger(name);
       const existingPackage = await this.prismaService.packages.findFirst({
-        where: { OR: [{ name }, { slug }] },
+        where: { OR: [{ name }, { slug }], NOT: { id: Number(id) } },
       });
       if (existingPackage) {
         throw new BadRequestException('Tên gói đã tồn tại');
@@ -295,7 +295,7 @@ export class PackagesService {
 
       let uploadImages;
       // Upload images
-      if (files.images.length > 0) {
+      if (files?.images?.length > 0) {
         uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/packages',
@@ -517,6 +517,7 @@ export class PackagesService {
         throw new NotFoundException('ID Menu không tồn tại');
       }
       const tableCount = Math.ceil(Number(number_of_guests) / 10);
+      console.log('tableCount', tableCount);
       totalPrice += Number(menu.price) * tableCount;
     }
 

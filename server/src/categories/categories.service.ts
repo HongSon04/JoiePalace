@@ -52,14 +52,14 @@ export class CategoriesService {
 
       // Upload images if available
       const images =
-        files.images && files.images.length > 0
+        files.images && files?.images?.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
               'joiepalace/categories',
             )
           : ([] as any);
 
-      if (files.images && files.images.length > 0 && !images) {
+      if (files.images && files?.images?.length > 0 && !images) {
         throw new BadRequestException('Upload ảnh thất bại');
       }
 
@@ -451,14 +451,14 @@ export class CategoriesService {
 
       // Upload images if available
       const images =
-        files.images && files.images.length > 0
+        files.images && files?.images?.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
               'joiepalace/categories',
             )
           : ([] as any);
 
-      if (files.images && files.images.length > 0 && !images) {
+      if (files.images && files?.images?.length > 0 && !images) {
         throw new BadRequestException('Upload ảnh thất bại');
       }
 

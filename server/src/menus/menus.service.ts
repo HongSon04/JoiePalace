@@ -81,7 +81,7 @@ export class MenusService {
 
       // ? Upload Image if available
       const images =
-        files?.images && files.images.length > 0
+        files?.images && files?.images?.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
               'joiepalace/menu',
@@ -587,7 +587,7 @@ export class MenusService {
 
       // ? Upload Image if available
       const images =
-        files?.images && files.images.length > 0
+        files?.images && files?.images?.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
               'joiepalace/menu',

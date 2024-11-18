@@ -827,7 +827,7 @@ export class ProductsService {
       };
 
       // Upload images if available
-      if (files.images && files.images.length > 0) {
+      if (files.images && files?.images?.length > 0) {
         const uploadImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,
