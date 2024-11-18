@@ -144,7 +144,7 @@ const categoriesSlice = createSlice({
       .addCase(fetchCategoriesBySlug.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
-        console.log("action.payload", action.payload);
+        // console.log("action.payload", action.payload);
         state.categories = action.payload;
         state.error = null;
       })
@@ -241,7 +241,7 @@ export const fetchParentCategory = createAsyncThunk(
       { signal }
     );
 
-    console.log(response);
+    // console.log(response);
 
     if (response.success) {
       dispatch(fetchingParentCategorySuccess(response.data));
@@ -301,7 +301,7 @@ export const addCategory = createAsyncThunk(
     );
 
     if (response.success) {
-      console.log("response in thunk -> ", response);
+      // console.log("response in thunk -> ", response);
 
       dispatch(addingCategorySuccess(response.data.at(0)));
       return response;

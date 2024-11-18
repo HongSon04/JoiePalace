@@ -40,6 +40,7 @@ export const API_CONFIG = {
   STAGE_CATEGORY_SLUG: "san-khau",
   WEDDING_CAKE_SLUG: "banh-cuoi",
   EXTRA_SERVICES_SLUG: "dich-vu-them",
+  BEAVERAGE_CATEGORY_SLUG: "nuoc-uong",
 
   // AUTH API
   AUTH: {

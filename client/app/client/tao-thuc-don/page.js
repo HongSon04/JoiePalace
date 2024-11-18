@@ -40,6 +40,8 @@ import { formData } from "zod-form-data";
 import { createMenu } from "@/app/_lib/features/menu/menuSlice";
 import { formatPrice } from "@/app/_utils/formaters";
 import LoadingContent from "@/app/_components/LoadingContent";
+import { decodeRandomName, generateMenuName } from "@/app/_utils/helpers";
+import { FaRandom } from "react-icons/fa";
 
 const MAX_FILE_SIZE = 5000000;
 function checkFileType(file) {
@@ -170,6 +172,8 @@ function Page() {
 
       const response = await dispatch(createMenu(formData)).unwrap();
 
+      console.log(response);
+
       if (response.success) {
         toast({
           position: "top-right",
@@ -184,7 +188,7 @@ function Page() {
           isClosable: true,
           status: "error",
           title: "Đã có lỗi xảy ra khi lưu thực đơn",
-          description: "Vui lòng thử lại sau",
+          description: response.error.message || "Vui lòng thử lại sau",
         });
       }
 
@@ -219,12 +223,26 @@ function Page() {
   };
 
   const handleAddDish = (dish) => {
+    const limit = 3;
+
     const { slug: categorySlug } = dish.category;
     if (categoryDishes[categorySlug]) {
-      setCategoryDishes({
-        ...categoryDishes,
-        [categorySlug]: [...categoryDishes[categorySlug], dish],
-      });
+      if (categoryDishes[categorySlug].length >= limit) {
+        toast({
+          position: "top-right",
+          isClosable: true,
+          title: "Đã đạt giới hạn",
+          description: `Bạn chỉ có thể chọn tối đa ${limit} món ăn cho mỗi danh mục`,
+          status: "warning",
+        });
+
+        return;
+      } else {
+        setCategoryDishes({
+          ...categoryDishes,
+          [categorySlug]: [...categoryDishes[categorySlug], dish],
+        });
+      }
     } else {
       setCategoryDishes({
         ...categoryDishes,
@@ -302,7 +320,8 @@ function Page() {
   React.useEffect(() => {
     const handleBeforeUnload = (event) => {
       // You can customize the message shown in the confirmation dialog
-      const message = "Are you sure you want to leave this page?";
+      const message =
+        "Bạn có chắc là muốn rời trang không? Thực đơn của bạn vẫn chưa được lưu!";
       event.returnValue = message; // For most browsers
       return message; // For some older browsers
     };
@@ -327,6 +346,10 @@ function Page() {
   if (isFetchingCategories) {
     return <Loading />;
   }
+
+  const handleGenerateName = () => {
+    setValue("name", decodeRandomName(generateMenuName()).userFriendlyName);
+  };
 
   return (
     <>
@@ -402,6 +425,13 @@ function Page() {
                       {...register("name")}
                       onChange={handleInputChange}
                     />
+                    <Button
+                      startContent={<FaRandom className="w-4 h-4 text-white" />}
+                      className="bg-whiteAlpha-100 text-white"
+                      onClick={handleGenerateName}
+                    >
+                      Chọn tên ngẫu nhiên
+                    </Button>
                     <AnimatePresence>
                       {errors["name"] && (
                         <motion.div

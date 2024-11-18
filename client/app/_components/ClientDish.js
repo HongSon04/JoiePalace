@@ -86,6 +86,8 @@ function ClientDish({
       price,
     };
 
+    delete data?.images;
+
     try {
       const result = await dispatch(updateMenu({ data, id: menu.id })).unwrap();
 
@@ -115,7 +117,11 @@ function ClientDish({
       try {
         const result = await dispatch(
           getMenuListByUserId({
-            params: { user_id: storedUser.id, is_show: false },
+            params: {
+              user_id: storedUser.id,
+              itemsPerPage: 9999,
+              is_show: false,
+            },
           })
         ).unwrap();
 
@@ -181,7 +187,7 @@ function ClientDish({
           >
             Khám phá
           </Link>
-          {removable && (
+          {!hideActions && removable && (
             <Tooltip
               content="Xóa món ăn"
               className={`backdrop-blur-sm text-white ${tooltipClassName}`}
@@ -196,7 +202,8 @@ function ClientDish({
               </Button>
             </Tooltip>
           )}
-          {addable &&
+          {!hideActions &&
+            addable &&
             (isAdded && !usePopover ? (
               <Tooltip
                 content="Xóa món ăn"

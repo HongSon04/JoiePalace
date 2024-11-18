@@ -3,14 +3,11 @@
 import ClientDish from "@/app/_components/ClientDish";
 import CustomPagination from "@/app/_components/CustomPagination";
 import { fetchCategoryDishes } from "@/app/_lib/features/dishes/dishesSlice";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Button, Skeleton } from "@nextui-org/react";
+import { Skeleton } from "@nextui-org/react";
 import { Col, Row } from "antd";
-import React, { use } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Error from "./Error";
-import { getUserFromLocalStorage } from "@/app/_lib/features/authentication/accountSlice";
-import { getMenuListByUserId } from "@/app/_lib/features/menu/menuSlice";
 
 function DishList({ category, userMenuList, isLogedIn }) {
   const dispatch = useDispatch();

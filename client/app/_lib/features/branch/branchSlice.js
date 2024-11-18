@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 // const getCurrentBranchFromLocalStorage = () => {
 //   if (typeof window !== "undefined" && window.localStorage) {
@@ -14,6 +15,9 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMessage: null,
+  isFetchingBranches: false,
+  isFetchingBranchesError: false,
+  error: null,
 };
 
 const branchSlice = createSlice({
@@ -44,7 +48,46 @@ const branchSlice = createSlice({
       state.errorMessage = null;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getBranches.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getBranches.fulfilled, (state, action) => {
+        state.branches = action.payload.data;
+        state.isFetchingBranches = false;
+        state.isFetchingBranchesError = false;
+        state.errorMessage = null;
+      })
+      .addCase(getBranches.rejected, (state, action) => {
+        state.isFetchingBranches = false;
+        state.isFetchingBranchesError = true;
+        state.errorMessage = action.payload;
+      });
+  },
 });
+
+export const getBranches = createAsyncThunk(
+  "branch/getBranches",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.BRANCHES.GET_ALL(params),
+        "GET",
+        null,
+        { signal }
+      );
+
+      if (response.success) {
+        return response;
+      } else {
+        return response;
+      }
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const {
   fetchBranchesSuccess,

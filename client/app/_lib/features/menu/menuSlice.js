@@ -196,7 +196,7 @@ export const getMenuList = createAsyncThunk(
   async ({ params, signal }, { dispatch, rejectWithValue }) => {
     try {
       const response = await makeAuthorizedRequest(
-        API_CONFIG.MENU.GET_ALL({ params }),
+        API_CONFIG.MENU.GET_ALL(params),
         "GET",
         null,
         { signal }
@@ -218,7 +218,7 @@ export const getMenuListByUserId = createAsyncThunk(
   async ({ params, signal }, { dispatch, rejectWithValue }) => {
     try {
       const response = await makeAuthorizedRequest(
-        API_CONFIG.MENU.GET_ALL({ params }),
+        API_CONFIG.MENU.GET_ALL(params),
         "GET",
         null,
         { signal }

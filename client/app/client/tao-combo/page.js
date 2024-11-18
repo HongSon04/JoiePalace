@@ -8,6 +8,7 @@ import { getMenuList } from "@/app/_lib/features/menu/menuSlice";
 import {
   fetchingPartyTypesFailure,
   fetchingPartyTypesSuccess,
+  getPartyTypes,
 } from "@/app/_lib/features/partyTypes/partyTypesSlice";
 import { fetchProductByCategorySlug } from "@/app/_lib/features/products/productsSlice";
 import { fetchStages } from "@/app/_lib/features/stages/stagesSlice";
@@ -39,13 +40,15 @@ import {
   Bars3Icon,
   ChevronDownIcon,
   ExclamationCircleIcon,
+  MinusIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Divider, Skeleton } from "@nextui-org/react";
-import { Col, Row } from "antd";
+import { Checkbox, Divider, Skeleton } from "@nextui-org/react";
+import { Col, Row, Image } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import NextImage from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { IoSaveOutline } from "react-icons/io5";
@@ -57,52 +60,17 @@ import SelectedProduct from "@/app/_components/SelectedProduct";
 import { createPackage } from "@/app/_lib/features/packages/packagesSlice";
 import Uploader from "@/app/_components/Uploader";
 import Link from "next/link";
-
-const partySizes = [
-  {
-    id: "50",
-    name: "Dưới 50 khách",
-  },
-  {
-    id: "50-100",
-    name: "50 - 100 khách",
-  },
-  {
-    id: "100-200",
-    name: "100 - 200 khách",
-  },
-  {
-    id: "200-500",
-    name: "200 - 500 khách",
-  },
-  {
-    id: ">500",
-    name: "Trên 500 khách",
-  },
-];
-
-const budgets = [
-  {
-    id: "50-100",
-    name: "50 triệu - 100 triệu",
-  },
-  {
-    id: "100-300",
-    name: "Trên 100 triệu - 300 triệu",
-  },
-  {
-    id: "300-500",
-    name: "Trên 300 triệu - 500 triệu",
-  },
-  {
-    id: "500-1000",
-    name: "Trên 500 triệu -  1 tỷ",
-  },
-  {
-    id: "1000",
-    name: "Trên 1 tỷ",
-  },
-];
+import { getBranches } from "@/app/_lib/features/branch/branchSlice";
+import {
+  decodeWeddingPackageName,
+  generateUniqueWeddingPackageName,
+} from "@/app/_utils/helpers";
+import { FaRandom } from "react-icons/fa";
+import { formatPrice } from "@/app/_utils/formaters";
+import {
+  getBeaverageById,
+  getBeaverages,
+} from "@/app/_lib/features/beaverages/beaveragesSlice";
 
 const categories = [
   {
@@ -111,22 +79,18 @@ const categories = [
   },
   {
     id: 2,
-    name: "Trang trí",
+    name: "Lễ",
   },
   {
     id: 3,
-    name: "Sân khấu",
-  },
-  {
-    id: 4,
-    name: "Bánh cưới",
-  },
-  {
-    id: 5,
     name: "Thực đơn",
   },
   {
-    id: 6,
+    id: 4,
+    name: "Đồ uống",
+  },
+  {
+    id: 5,
     name: "Dịch vụ khác",
   },
 ];
@@ -137,11 +101,16 @@ const schema = z.object({
       required_error: "Quý khách vui lòng chọn loại tiệc",
     })
     .nonempty("Quý khách vui lòng chọn loại tiệc"),
+  branch: z
+    .string({
+      required_error: "Quý khách vui lòng chọn chi nhánh",
+    })
+    .nonempty("Quý khách vui lòng chọn chi nhánh"),
   partySize: z
     .string({
-      required_error: "Quý khách vui lòng chọn số lượng khách",
+      required_error: "Quý khách vui lòng chọn số lượng khách mời dự kiến",
     })
-    .nonempty("Quý khách vui lòng chọn số lượng khách"),
+    .nonempty("Quý khách vui lòng chọn số lượng khách mời dự kiến"),
   budget: z
     .string({
       required_error: "Quý khách vui lòng chọn mức dự chi",
@@ -156,12 +125,12 @@ const schema = z.object({
     .string({
       required_error: "Mô tả một ít về combo của quý khách nhé!",
     })
-    .min(1, { message: "Chúng ta có thể gọi combo này là gì?" }),
+    .min(1, { message: "Mô tả một ít về combo của quý khách nhé!" }),
   short_description: z
     .string({
       required_error: "Mô tả ngắn gọn về combo của quý khách",
     })
-    .min(1, { message: "Chúng ta có thể gọi combo này là gì?" }),
+    .min(1, { message: "Mô tả ngắn gọn về combo của quý khách" }),
 });
 
 const initialServiceState = {
@@ -176,6 +145,10 @@ const getNameByKey = (key) => {
   switch (key) {
     case "hall":
       name = "Sảnh";
+      break;
+
+    case "ceremony":
+      name = "Lễ";
       break;
 
     case "decor":
@@ -200,6 +173,10 @@ const getNameByKey = (key) => {
 
     case "partyType":
       name = "Phí dịch vụ";
+      break;
+
+    case "beaverages":
+      name = "Đồ uống";
 
     default:
   }
@@ -212,7 +189,7 @@ const parsedState = (state) => {
   try {
     parsedState = JSON.parse(state);
   } catch (e) {
-    console.log("");
+    return;
   }
 
   return parsedState;
@@ -235,11 +212,23 @@ const checkFileSize = (file) => {
   return false;
 };
 
+const getBudget = (budget, unit = "million") => {
+  if (unit === "million") {
+    return {
+      text: `${budget} triệu`,
+      value: budget * 1000000,
+    };
+  } else if (unit === "billion") {
+    return {
+      text: `${budget} tỷ`,
+      value: budget * 1000000000,
+    };
+  }
+};
+
 function Page() {
   const [files, setFiles] = React.useState([]);
-  const [partySize, setPartySize] = React.useState("");
-  const [budget, setBudget] = React.useState("");
-  const [partyType, setPartyType] = React.useState("");
+  const searchParams = useSearchParams();
   const { partyTypes, isFetchingPartyTypes, isFetchingPartyTypesError } =
     useSelector((store) => store.partyTypes);
   const { stages, isFetchingStages, isFetchingStagesError } = useSelector(
@@ -271,6 +260,28 @@ function Page() {
   const { isCreatingPakage, isCreatingPakageError } = useSelector(
     (store) => store.packages
   );
+  const { branches, isFetchingBranches, isFetchingBranchesError } = useSelector(
+    (store) => store.branch
+  );
+  const {
+    beaverages: beaveragesList,
+    isFetchingBeaverages,
+    isFetchingBeaveragesError,
+  } = useSelector((store) => store.beaverages);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset,
+    setValue,
+    getValues,
+    getFieldState,
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
   const toast = useToast();
   const dispatch = useDispatch();
   const drawerStriggerRef = React.useRef();
@@ -282,40 +293,110 @@ function Page() {
   const [menuId, setMenuId] = React.useState(initialServiceState);
   const [cakeId, setCakeId] = React.useState(initialServiceState);
   const [extraServicesId, setExtraServicesId] = React.useState({});
+  const [branchId, setBranchId] = React.useState();
+  const [priceUnit, setPriceUnit] = React.useState("million");
   const [tabIndex, setTabIndex] = React.useState(0);
   const [note, setNote] = React.useState("");
-  const [isImagesEmpty, setIsImagesEmpty] = React.useState(false);
-  const [isImageOverSize, setIsImageOverSize] = React.useState(false);
+  const [isNextImagesEmpty, setIsNextImagesEmpty] = React.useState(false);
+  const [isNextImageOverSize, setIsNextImageOverSize] = React.useState(false);
   const [isFormatAccepted, setIsFormatAccepted] = React.useState(false);
   const [limitFilesLength, setLimitFilesLength] = React.useState(false);
   const [submitTriggered, setSubmitTriggered] = React.useState(false);
   const [isLogedin, setIsLogedIn] = React.useState(false);
+  const [beaverages, setBeaverages] = React.useState({});
+  const [isSkipWarning, setIsSkipWarning] = React.useState(false);
+
+  const handleIncrement = React.useCallback((productId) => {
+    setBeaverages((prevQuantities) => ({
+      ...prevQuantities,
+      [productId]: (prevQuantities[productId] || 0) + 1,
+    }));
+  }, []);
+
+  const handleDecrement = React.useCallback((productId) => {
+    setBeaverages((prevQuantities) => {
+      const newQuantities = { ...prevQuantities };
+      if (newQuantities[productId] > 1) {
+        newQuantities[productId] -= 1;
+      } else {
+        delete newQuantities[productId];
+      }
+      return newQuantities;
+    });
+  }, []);
+
+  const handleQuantityChange = React.useCallback((productId, value) => {
+    const quantity = Math.max(Number(value), 0);
+    setBeaverages((prevQuantities) => {
+      const newQuantities = { ...prevQuantities };
+      if (quantity > 0) {
+        newQuantities[productId] = quantity;
+      } else {
+        delete newQuantities[productId];
+      }
+      return newQuantities;
+    });
+  }, []);
+
+  const handleRandomName = () => {
+    const name = generateUniqueWeddingPackageName();
+    setValue("name", decodeWeddingPackageName(name).userFriendlyName);
+  };
 
   const drawerData = React.useMemo(() => {
     return {
-      partyType: [parsedState(partyType)],
+      partyType: [parsedState(getValues("partyType"))],
       hall: [parsedState(hallId)],
       decor: [parsedState(decorId)],
       stage: [parsedState(stageId)],
       menu: [parsedState(menuId)],
       cake: [parsedState(cakeId)],
       extraServices: [...Object.values(extraServicesId)],
+      beaverages: beaveragesList,
     };
-  }, [hallId, decorId, stageId, menuId, cakeId, extraServicesId]);
+  }, [
+    hallId,
+    decorId,
+    stageId,
+    menuId,
+    cakeId,
+    extraServicesId,
+    beaveragesList,
+    getValues,
+  ]);
 
   const total = React.useMemo(() => {
-    return Object.values(drawerData).reduce((acc, item) => {
-      if (Array.isArray(item)) {
-        if (item.length === 0) return acc;
-
+    return Object.keys(drawerData).reduce((acc, key) => {
+      if (Array.isArray(drawerData[key])) {
         return (
-          acc + item.reduce((acc, item) => (item ? acc + item.price : 0), 0)
+          acc +
+          drawerData[key].reduce((innerAcc, item) => {
+            if (item) {
+              switch (key) {
+                case "menu":
+                  return (
+                    innerAcc +
+                    item.price * Math.ceil(Number(getValues("partySize")) / 10)
+                  );
+                  break;
+
+                case "beaverages":
+                  return innerAcc + item.price * (beaverages[item.id] || 0);
+
+                default:
+                  return innerAcc + item.price;
+                  break;
+              }
+            }
+
+            return innerAcc;
+          }, 0)
         );
       }
 
-      return acc + item.price;
+      return acc + (drawerData[key]?.price || 0);
     }, 0);
-  }, [drawerData]);
+  }, [drawerData, getValues("partySize")]);
 
   const handleFileChange = (newFiles) => {
     setFiles(newFiles);
@@ -345,17 +426,6 @@ function Page() {
   // Drawer
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    reset,
-    setValue,
-  } = useForm({
-    resolver: zodResolver(schema),
-  });
-
   const onInputChange = (e) => {
     setValue(e.target.name, e.target.value);
   };
@@ -363,14 +433,14 @@ function Page() {
   const onSubmit = async (data) => {
     setSubmitTriggered(true);
     if (files.length <= 0) {
-      setIsImagesEmpty(true);
+      setIsNextImagesEmpty(true);
       return;
     } else if (files.length > 5) {
       setLimitFilesLength(true);
       return;
     }
 
-    if (!isFormatAccepted || isImageOverSize) {
+    if (!isFormatAccepted || isNextImageOverSize) {
       return;
     }
 
@@ -421,32 +491,54 @@ function Page() {
 
     const formData = new FormData();
 
+    console.log(menuId);
+
+    console.log("data -> ", data);
+
     formData.append("name", data.name);
     formData.append("description", data.description);
     formData.append("short_description", data.short_description);
-    formData.append("party_type_id", parsedState(partyType).id);
-    formData.append("menu_id", parsedState(menuId).id);
-    formData.append("decor_id", parsedState(decorId).id);
-    formData.append("stage_id", parsedState(hallId).id);
+    formData.append("party_type_id", parsedState(data.partyType).id);
+    formData.append("menu_id", parsedState(menuId) && parsedState(menuId).id);
+    formData.append(
+      "decor_id",
+      parsedState(decorId) && parsedState(decorId).id
+    );
+    formData.append("stage_id", parsedState(decorId) && parsedState(hallId).id);
     formData.append("is_show", false);
     formData.append("price", total.toString());
+    formData.append("budget", data.budget);
+    formData.append("number_of_guests", data.partySize);
     formData.append(
       "other_service",
       JSON.stringify([
-        { id: parsedState(stageId).id, quantity: 1 },
-        { id: parsedState(cakeId).id, quantity: 1 },
+        { id: parsedState(stageId) && parsedState(stageId).id, quantity: 1 },
+        { id: parsedState(cakeId) && parsedState(cakeId).id, quantity: 1 },
         ...Object.values(extraServicesId).map((item) => ({
           id: item.id,
           quantity: 1,
+        })),
+        ...beaveragesList.map((i) => ({
+          id: i.id,
+          quantity: beaverages[i.id] || 0,
         })),
       ])
     );
     files.forEach((file) => {
       formData.append("images", file);
     });
-    // console.log(
-    //   formData.forEach((value, key) => console.log(`${key} -> ${value}`))
-    // );
+
+    console.log(
+      formData.forEach((value, key) => console.log(`${key} -> ${value}`))
+    );
+
+    toast({
+      title: "Combo của quý khách đang được tạo",
+      description: "Vui lòng đợi trong giây lát",
+      status: "info",
+      position: "top-right",
+      duration: 5000,
+    });
 
     try {
       const response = await dispatch(createPackage(formData)).unwrap();
@@ -487,7 +579,7 @@ function Page() {
 
   const handleSaveCombo = React.useCallback(() => {
     if (typeof window !== "undefined") {
-      if (drawerData && !errors) {
+      if (drawerData) {
         localStorage.setItem("combo", JSON.stringify(drawerData));
         toast({
           title: "Lưu thành công",
@@ -505,9 +597,103 @@ function Page() {
 
   React.useEffect(() => {
     const fetchData = async () => {
+      const result = await Promise.all(
+        Object.keys(beaverages).map((key) => {
+          return dispatch(getBeaverageById(key)).unwrap();
+        })
+      );
+
+      dispatch(
+        getBeaverages(
+          result.flat().map((b) => ({ ...b, quantity: beaverages[b.id] }))
+        )
+      );
+    };
+
+    fetchData();
+
+    return () => {};
+  }, [beaverages]);
+
+  React.useEffect(() => {
+    if (typeof window == undefined) return;
+
+    const storeUser = window.localStorage.getItem("user");
+    if (storeUser) setIsLogedIn(true);
+
+    // const params = new URLSearchParams(window.location.search);
+    // const partySize = params.get("partySize") || "";
+    // const budget = params.get("budget") || "";
+    // const partyType = params.get("partyType") || "";
+
+    // setValue("partySize", partySize);
+    // setValue("budget", budget);
+    // setValue("partyType", partyType);
+  }, []);
+
+  // React.useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   const partySize = params.get("partySize") || "";
+  //   const budget = params.get("budget") || "";
+  //   const partyTypeId = params.get("partyType") || "";
+  //   const branchId = params.get("branch") || "";
+
+  //   setValue("partySize", partySize);
+  //   setValue("budget", budget);
+
+  //   if (branchId && branches.length > 0) {
+  //     const branch = branches.find((b) => b.id == branchId);
+
+  //     if (branch) {
+  //       setValue("branch", JSON.stringify(branch));
+  //     }
+  //   }
+
+  //   if (partyTypeId && partyTypes.length > 0) {
+  //     const partyType = partyTypes.find((type) => type.id == partyTypeId);
+
+  //     if (partyType) {
+  //       setValue("partyType", JSON.stringify(partyType));
+  //     }
+  //   }
+  // }, [partyTypes]);
+
+  // React.useEffect(() => {
+  //   const subscription = watch((value, { name, type }) => {
+  //     const params = new URLSearchParams(window.location.search);
+  //     if (value.partySize) params.set("partySize", value.partySize);
+  //     if (value.budget) params.set("budget", value.budget);
+  //     if (value.partyType) {
+  //       const parsedPartyType = parsedState(value.partyType);
+  //       params.set("partyType", parsedPartyType.id);
+  //     }
+  //     if (value.branch) {
+  //       const parsedBranch = parsedState(value.branch);
+  //       params.set("branch", parsedBranch.id);
+  //     }
+  //     router.replace(`?${params.toString()}`);
+  //   });
+  //   return () => subscription.unsubscribe();
+  // }, []);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
       try {
-        const data = await fecthAllPartyTypes();
-        dispatch(fetchingPartyTypesSuccess(data));
+        const [branches, partyTypes] = await Promise.all([
+          dispatch(getBranches({})).unwrap(),
+          dispatch(getPartyTypes({})).unwrap(),
+        ]);
+
+        // console.log("party types -> ", partyTypes);
+        // console.log("branches -> ", branches);
+
+        if (branches.success) {
+          // console.log("Fetch branches successfully");
+        }
+
+        if (partyTypes.success) {
+          // console.log("Fetch party types successfully");
+        }
       } catch (error) {
         console.log(error);
       }
@@ -524,31 +710,69 @@ function Page() {
 
       switch (tabIndex) {
         case 0:
-          result = await dispatch(fetchHalls({})).unwrap();
+          try {
+            const branch_id = parsedState(getValues("branch")).id;
+
+            console.log(branch_id);
+
+            result = await dispatch(
+              fetchHalls({
+                branch_id,
+              })
+            ).unwrap();
+          } catch (error) {
+            console.log(error);
+          }
           break;
 
         case 1:
-          result = await dispatch(fetchDecors({})).unwrap();
+          try {
+            const result = await Promise.all([
+              dispatch(fetchDecors({})).unwrap(),
+              dispatch(fetchStages({})).unwrap(),
+              dispatch(
+                fetchProductByCategorySlug({
+                  slug: API_CONFIG.WEDDING_CAKE_SLUG,
+                })
+              ).unwrap(),
+            ]);
+          } catch (error) {
+            console.log(error);
+          }
           break;
 
         case 2:
-          result = await dispatch(fetchStages({})).unwrap();
+          try {
+            result = await dispatch(
+              getMenuList({ params: { itemsPerPage: 9999 } })
+            ).unwrap();
+          } catch (error) {
+            console.log(error);
+          }
           break;
 
         case 3:
-          result = await dispatch(
-            fetchProductByCategorySlug({ slug: API_CONFIG.WEDDING_CAKE_SLUG })
-          ).unwrap();
+          try {
+            result = await dispatch(
+              fetchProductByCategorySlug({
+                slug: API_CONFIG.BEAVERAGE_CATEGORY_SLUG,
+              })
+            ).unwrap();
+          } catch (error) {
+            console.log(error);
+          }
           break;
 
         case 4:
-          result = await dispatch(getMenuList({})).unwrap();
-          break;
+          try {
+            result = await dispatch(
+              fetchCategoriesBySlug({ slug: API_CONFIG.EXTRA_SERVICES_SLUG })
+            ).unwrap();
+          } catch (error) {
+            console.log(error);
+          }
 
-        case 5:
-          result = await dispatch(
-            fetchCategoriesBySlug({ slug: API_CONFIG.EXTRA_SERVICES_SLUG })
-          ).unwrap();
+          break;
 
         default:
           break;
@@ -566,7 +790,7 @@ function Page() {
     fetchData();
 
     return () => {};
-  }, [tabIndex]);
+  }, [tabIndex, branchId]);
 
   React.useEffect(() => {
     if (submitTriggered && Object.keys(errors).length > 0) {
@@ -580,9 +804,9 @@ function Page() {
 
   React.useEffect(() => {
     if (files.some((file) => file.size > MAX_FILE_SIZE)) {
-      setIsImageOverSize(true);
+      setIsNextImageOverSize(true);
     } else {
-      setIsImageOverSize(false);
+      setIsNextImageOverSize(false);
     }
 
     if (files.some((file) => !checkFileType(file))) {
@@ -593,12 +817,23 @@ function Page() {
   }, [files]);
 
   React.useEffect(() => {
-    if (typeof window !== undefined) {
-      const storeUser = window.localStorage.getItem("user");
+    if (isSkipWarning) return;
 
-      if (storeUser) setIsLogedIn(true);
+    const toastId = "budget-warning";
+
+    if (!toast.isActive(toastId)) {
+      if (total > getBudget(getValues("budget"), priceUnit).value)
+        toast({
+          id: toastId,
+          title: "Cảnh báo vượt quá mức dự chi",
+          description:
+            "Tổng chi phí của gói tiệc đang vượt quá mức dự chi\n. Đây chỉ là cảnh báo, quý khách vẫn có thể tiếp tục tạo combo",
+          status: "warning",
+          position: "top-right",
+          isClosable: true,
+        });
     }
-  }, []);
+  }, [total, getValues("budget"), isSkipWarning]);
 
   const renderNoteArea = () => {
     return (
@@ -618,7 +853,7 @@ function Page() {
   };
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       {!isLogedin ? (
         <section className="px-48 pb-16 pt-36 relative !font-gilroy flex flex-center flex-col">
           <h1 className="text-2xl text-gold text-center mt-11">
@@ -635,7 +870,7 @@ function Page() {
         <>
           {/* HERO SECTION */}
           <section className="px-48 pb-16 pt-36 relative !font-gilroy">
-            <Image
+            <NextImage
               src={pattern}
               alt="joie palace pattern"
               className="absolute left-0 top-1/2 -translate-y-1/2"
@@ -660,10 +895,10 @@ function Page() {
                   {partyTypes && (
                     <FormInput
                       register={register}
-                      errorMessage={errors?.name?.message}
+                      errorMessage={errors?.partyType?.message}
                       wrapperClassName="!mt-0"
                       theme="dark"
-                      label="Quý khách dự định tổ chức tiệc..."
+                      label="Quý khách định tổ chức loại tiệc..."
                       ariaLabel="Loại tiệc"
                       id="partyType"
                       name="partyType"
@@ -678,8 +913,35 @@ function Page() {
                           name: p.name,
                         })),
                       ]}
-                      onChange={(e) => setPartyType(e.target.value)}
-                      value={partyType}
+                      onChange={onInputChange}
+                      value={watch("partyType")}
+                      className={
+                        "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
+                      }
+                    ></FormInput>
+                  )}
+                  {branches && (
+                    <FormInput
+                      register={register}
+                      errorMessage={errors?.branch?.message}
+                      theme="dark"
+                      label="Quý khách dự định tổ chức tiệc ở..."
+                      ariaLabel="Địa điểm tổ chức tiệc / chi nhánh nhà hàng"
+                      id="branch"
+                      name="branch"
+                      type="select"
+                      options={[
+                        {
+                          id: "",
+                          name: "Chọn chi nhánh",
+                        },
+                        ...branches.map((p) => ({
+                          id: JSON.stringify(p),
+                          name: p.name,
+                        })),
+                      ]}
+                      onChange={onInputChange}
+                      value={watch("branch")}
                       className={
                         "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
                       }
@@ -688,776 +950,931 @@ function Page() {
                   <FormInput
                     register={register}
                     errors={errors}
-                    errorMessage={errors?.name?.message}
+                    errorMessage={errors?.partySize?.message}
                     theme="dark"
                     label="Với số lượng khách mời khoảng..."
+                    placeholder="Ví dụ: 500"
                     ariaLabel="Số lượng khách mời"
                     id="partySize"
                     name="partySize"
-                    type="select"
-                    options={[
-                      {
-                        id: "",
-                        name: "Chọn số lượng khách mời",
-                      },
-                      ...partySizes,
-                    ]}
-                    onChange={(e) => setPartySize(e.target.value)}
-                    value={partySize}
+                    type="text"
+                    onChange={onInputChange}
+                    value={watch("partySize")}
                     className={
                       "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
                     }
                   ></FormInput>
-                  <FormInput
-                    register={register}
-                    errors={errors}
-                    errorMessage={errors?.name?.message}
-                    theme="dark"
-                    label="Số tiền quý khách dự kiến chi khoảng..."
-                    ariaLabel="Mức dự chi"
-                    id="budget"
-                    name="budget"
-                    type="select"
-                    options={[
-                      {
-                        id: "",
-                        name: "Chọn số lượng khách mời",
-                      },
-                      ...budgets,
-                    ]}
-                    onChange={(e) => setBudget(e.target.value)}
-                    value={budget}
-                    className={
-                      "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
-                    }
-                  ></FormInput>
+                  <div className="flex flex-col">
+                    <div className="flex gap-3">
+                      <FormInput
+                        register={register}
+                        errors={errors}
+                        errorMessage={errors?.budget?.message}
+                        placeholder="Ví dụ: 500"
+                        theme="dark"
+                        label="Với mức dự chi khoảng..."
+                        ariaLabel="Mức dự chi"
+                        id="budget"
+                        name="budget"
+                        type="text"
+                        onChange={onInputChange}
+                        value={watch("budget")}
+                        className={
+                          "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
+                        }
+                      ></FormInput>
+                      <FormInput
+                        register={register}
+                        errorMessage={"Vui lòng chọn đơn vị"}
+                        theme="dark"
+                        label="Đơn vị"
+                        ariaLabel="Đơn vị cho mức dự chi"
+                        id="priceUnit"
+                        name="priceUnit"
+                        type="select"
+                        options={[
+                          {
+                            id: "million",
+                            name: "Triệu",
+                          },
+                          {
+                            id: "billion",
+                            name: "Tỷ",
+                          },
+                        ]}
+                        onChange={(e) => setPriceUnit(e.target.value)}
+                        value={priceUnit}
+                        className={
+                          "!bg-whiteAlpha-100 hover:bg-whiteAlpha-200 focus:bg-whiteAlpha-200"
+                        }
+                      ></FormInput>
+                    </div>
+                  </div>
+                  <Checkbox
+                    isSelected={isSkipWarning}
+                    onValueChange={setIsSkipWarning}
+                    color={"default"}
+                    classNames={{
+                      base: "mt-3",
+                      label: "text-gray-400",
+                    }}
+                  >
+                    Bỏ qua cảnh báo vượt quá mức dự chi
+                  </Checkbox>
 
-                  {partyType && partySize && budget && (
-                    <AnimatePresence mode="wait" initial={false}>
-                      <motion.a
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        className="w-full rounded-full bg-gold hover:brightness-105 py-2 px-3 mt-5 text-center hover:text-white transition flex flex-center gap-3"
-                        href="#creator"
-                      >
-                        <ArrowRightIcon className="w-6 h-6 text-white" />
-                        Tiếp tục
-                      </motion.a>
-                    </AnimatePresence>
-                  )}
+                  {getValues("partyType") &&
+                    getValues("partySize") &&
+                    getValues("budget") &&
+                    getValues("branch") && (
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.a
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 20 }}
+                          className="w-full rounded-full bg-gold hover:brightness-105 py-2 px-3 mt-5 text-center hover:text-white transition flex flex-center gap-3"
+                          href="#creator"
+                        >
+                          <ArrowRightIcon className="w-6 h-6 text-white" />
+                          Tiếp tục
+                        </motion.a>
+                      </AnimatePresence>
+                    )}
                 </form>
               </Col>
             </Row>
           </section>
 
           {/* COMBO SECTION */}
-          {partyType && partySize && budget && (
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              id="creator"
-              className="px-48 py-16 relative !font-gilroy"
-            >
-              <Tabs
-                variant={"unstyled"}
-                position={"relative"}
-                align="center"
-                index={tabIndex}
-                onChange={handleTabChange}
-                isLazy
+          {watch("partySize") &&
+            getValues("budget") &&
+            getValues("partyType") &&
+            getValues("branch") && (
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                id="creator"
+                className="px-48 py-16 relative !font-gilroy"
               >
-                <TabList className="p-2 rounded-full bg-whiteAlpha-100 w-fit items-center gap-3">
-                  <Tab
-                    key={"generalInformations"}
-                    color={"white"}
-                    className="aria-[selected=true]:text-white aria-[selected=true]:opacity-100 aria-[selected=true]:bg-gold bg-transparent opacity-45 transition flex items-center gap-2 uppercase font-semibold flex-center text-center rounded-full py-2 px-6 leading-8"
-                  >
-                    Thông tin chung
-                  </Tab>
-                  {categories.map((category, index) => (
+                <Tabs
+                  variant={"unstyled"}
+                  position={"relative"}
+                  align="center"
+                  index={tabIndex}
+                  onChange={handleTabChange}
+                  isLazy
+                >
+                  <TabList className="p-2 rounded-full bg-whiteAlpha-100 w-fit items-center gap-3">
+                    {categories.map((category, index) => (
+                      <Tab
+                        key={index}
+                        color={"white"}
+                        className="aria-[selected=true]:text-white aria-[selected=true]:opacity-100 aria-[selected=true]:bg-gold bg-transparent opacity-45 transition flex items-center gap-2 uppercase font-semibold flex-center text-center rounded-full py-2 px-6 leading-8"
+                      >
+                        {category.name}
+                      </Tab>
+                    ))}
                     <Tab
-                      key={index}
+                      key={"generalInformations"}
                       color={"white"}
                       className="aria-[selected=true]:text-white aria-[selected=true]:opacity-100 aria-[selected=true]:bg-gold bg-transparent opacity-45 transition flex items-center gap-2 uppercase font-semibold flex-center text-center rounded-full py-2 px-6 leading-8"
                     >
-                      {category.name}
+                      Thông tin chung
                     </Tab>
-                  ))}
-                  <Button
-                    ref={drawerStriggerRef}
-                    onClick={onOpen}
-                    variant={"unstyled"}
-                    className="!rounded-full !text-white !bg-gold !flex !flex-center"
-                  >
-                    <Bars3Icon className="w-6 h-6"></Bars3Icon>
-                  </Button>
-                </TabList>
+                    <Button
+                      ref={drawerStriggerRef}
+                      onClick={onOpen}
+                      variant={"unstyled"}
+                      className="!rounded-full !text-white !bg-gold !flex !flex-center"
+                    >
+                      <Bars3Icon className="w-6 h-6"></Bars3Icon>
+                    </Button>
+                  </TabList>
 
-                {isFetchingCategoriesError ||
-                  isFetchingDecorsError ||
-                  isFetchingHallsError ||
-                  isFetchingMenuListError ||
-                  isFetchingProductsError ||
-                  (isFetchingStagesError && (
-                    <div className="flex flex-col">
-                      <p className="text-gray-400">
-                        Có lỗi xảy ra khi tải dữ liệu, vui lòng thử lại sau
-                      </p>
-                      <Button className="text-gray bg-transparent hover:bg-transparent underline text-gray-400">
-                        Thử lại
-                      </Button>
-                    </div>
-                  ))}
+                  {isFetchingCategoriesError ||
+                    isFetchingDecorsError ||
+                    isFetchingHallsError ||
+                    isFetchingMenuListError ||
+                    isFetchingProductsError ||
+                    (isFetchingStagesError && (
+                      <div className="flex flex-col">
+                        <p className="text-gray-400">
+                          Có lỗi xảy ra khi tải dữ liệu, vui lòng thử lại sau
+                        </p>
+                        <Button className="text-gray bg-transparent hover:bg-transparent underline text-gray-400">
+                          Thử lại
+                        </Button>
+                      </div>
+                    ))}
 
-                {isFetchingPartyTypes ||
-                isFetchingStages ||
-                isFetchingDecors ||
-                isFetchingCategories ||
-                isFetchingMenuList ||
-                isFetchingHalls ||
-                isFetchingProducts ? (
-                  <PanelSkeleton />
-                ) : (
-                  <TabPanels className="mt-6">
-                    {/* THÔNG TIN CHUNG PANEL */}
-                    <TabPanel key={"generalInformations"}>
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="w-full flex gap-5"
-                      >
-                        {/* UPLOADER */}
-                        <div className="w-1/3 text-left">
-                          <Uploader
-                            register={register}
-                            errors={errors}
-                            files={files}
-                            setFiles={setFiles}
-                            onFileChange={handleFileChange}
-                          />
-                          <AnimatePresence>
-                            {isImagesEmpty && (
-                              <motion.div
-                                key={"isImagesEmpty"}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="text-red-400 text-sm font-normal mt-2 mb-2"
-                              >
-                                <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
-                                {
-                                  "Hãy chọn ít nhất một ảnh cho thực đơn của bạn nhé!"
-                                }
-                              </motion.div>
-                            )}
-                            {isImageOverSize && (
-                              <motion.div
-                                key={"isImageOverSize"}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="text-red-400 text-sm font-normal mt-2 mb-2"
-                              >
-                                <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
-                                {"Hãy chọn ảnh có dung lượng nhỏ hơn 5MB nhé!"}
-                              </motion.div>
-                            )}
-                            {!isFormatAccepted && (
-                              <motion.div
-                                key={"isFormatAccepted"}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="text-red-400 text-sm font-normal mt-2 mb-2"
-                              >
-                                <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
-                                {
-                                  "Vui lòng chọn ảnh có định dạng jpg, jpeg hoặc png!"
-                                }
-                              </motion.div>
-                            )}
-                            {limitFilesLength && (
-                              <motion.div
-                                key={"limitFilesLength"}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="text-red-400 text-sm font-normal mt-2 mb-2"
-                              >
-                                <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
-                                {
-                                  "Chỉ được chọn tối đa 5 ảnh cho mỗi combo của bạn!"
-                                }
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
+                  {isFetchingPartyTypes ||
+                  isFetchingStages ||
+                  isFetchingDecors ||
+                  isFetchingCategories ||
+                  isFetchingMenuList ||
+                  isFetchingHalls ||
+                  isFetchingProducts ? (
+                    <PanelSkeleton />
+                  ) : (
+                    <TabPanels className="mt-6">
+                      {/* SẢNH PANEL */}
+                      <TabPanel key={"hall"}>
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: 50,
+                          }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 50 }}
+                          className="w-full flex gap-5"
+                        >
+                          {/* NOTE AREA */}
+                          {renderNoteArea()}
 
-                        {/* PANEL MAIN */}
-                        <div className="w-2/3 h-full  flex flex-col gap-3 relative">
-                          <div className="flex gap-3 items-center h-full relative">
-                            <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
-                            <span className="text-xl font-bold ml-4">
-                              Thông tin cơ bản
-                            </span>
-                          </div>
-                          <span className="text-sm font-normal text-left">
-                            Mô tả rõ hơn về gói dịch vụ của quý khách
-                          </span>
-                          <div className="w-full flex flex-wrap gap-4">
-                            <FormInput
-                              register={register}
-                              errors={errors}
-                              name={"name"}
-                              placeholder="Tên gói dịch vụ"
-                              value={watch("name")}
-                              onChange={onInputChange}
-                              theme="light"
-                              className="bg-whiteAlpha-100 focus:bg-whiteAlpha-100 focus:brightness-105 hover:bg-whiteAlpha-100 hover:brightness-110"
-                            />
-                            <FormInput
-                              register={register}
-                              errors={errors}
-                              name={"short_description"}
-                              placeholder="Mô tả ngắn"
-                              value={watch("short_description")}
-                              onChange={onInputChange}
-                              type="textarea"
-                              rows={2}
-                              theme="light"
-                              className="bg-whiteAlpha-100 focus:bg-whiteAlpha-100 focus:brightness-105 hover:bg-whiteAlpha-100 hover:brightness-110"
-                            />
-                            <FormInput
-                              register={register}
-                              errors={errors}
-                              name={"description"}
-                              placeholder="Mô tả chi tiết"
-                              value={watch("description")}
-                              type="textarea"
-                              onChange={onInputChange}
-                              theme="light"
-                              className="bg-whiteAlpha-100 focus:bg-whiteAlpha-100 focus:brightness-105 hover:bg-whiteAlpha-100 hover:brightness-110"
-                            />
-                          </div>
-                          <div className="w-full mt-6 flex justify-end">
-                            <Button
-                              onClick={handleNextTab}
-                              variant={"unstyled"}
-                              className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
-                            >
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M2.91797 10H16.943"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <span className="text-sm leading-5 font-medium ">
-                                Tiếp tục
+                          {/* PANEL MAIN */}
+                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                            <div className="flex gap-3 items-center h-full relative">
+                              <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                              <span className="text-xl font-bold ml-4">
+                                Sảnh tiệc
                               </span>
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </TabPanel>
-
-                    {/* SẢNH PANEL */}
-                    <TabPanel key={"hall"}>
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="w-full flex gap-5"
-                      >
-                        {/* NOTE AREA */}
-                        {renderNoteArea()}
-
-                        {/* PANEL MAIN */}
-                        <div className="w-2/3 h-full  flex flex-col gap-3 relative">
-                          <div className="flex gap-3 items-center h-full relative">
-                            <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
-                            <span className="text-xl font-bold ml-4">
-                              Sảnh tiệc
+                            </div>
+                            <span className="text-sm font-normal text-left">
+                              Sảnh tiệc có sức chứa cho khoảng 100 khách
                             </span>
-                          </div>
-                          <span className="text-sm font-normal text-left">
-                            Sảnh tiệc có sức chứa cho khoảng 100 khách
-                          </span>
-                          <div className="w-full flex flex-wrap gap-4">
-                            {halls &&
-                              halls.map((hall, index) => (
-                                <ServiceItem
-                                  service={hall}
-                                  key={index}
-                                  compairState={hallId}
-                                  onChange={handleHallIndexChange}
-                                />
-                              ))}
-                          </div>
-                          <div className="w-full mt-6 flex justify-end">
-                            <Button
-                              onClick={handleNextTab}
-                              variant={"unstyled"}
-                              className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
-                            >
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
+                            <div className="w-full flex flex-wrap gap-4">
+                              {halls &&
+                                halls.map((hall, index) => (
+                                  <ServiceItem
+                                    service={hall}
+                                    key={index}
+                                    compairState={hallId}
+                                    onChange={handleHallIndexChange}
+                                  />
+                                ))}
+                            </div>
+                            <div className="w-full mt-6 flex justify-end">
+                              <Button
+                                onClick={handleNextTab}
+                                variant={"unstyled"}
+                                className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
                               >
-                                <path
-                                  d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M2.91797 10H16.943"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <span className="text-sm leading-5 font-medium ">
-                                Tiếp tục
-                              </span>
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </TabPanel>
-
-                    {/* TRANG TRÍ PANEL */}
-                    <TabPanel key={"decor"}>
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="w-full flex gap-5"
-                      >
-                        {/* NOTE AREA */}
-                        {renderNoteArea()}
-
-                        {/* PANEL MAIN */}
-                        <div className="w-2/3 h-full  flex flex-col gap-3 relative">
-                          <div className="flex gap-3 items-center h-full relative">
-                            <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
-                            <span className="text-xl font-bold ml-4">
-                              Trang trí
-                            </span>
-                          </div>
-                          <span className="text-sm font-normal text-left">
-                            Các gói trang trí phù hợp cho tiệc của quý khách
-                          </span>
-                          <div className="w-full flex flex-wrap gap-4">
-                            {decors &&
-                              decors.map((decor) => (
-                                <ServiceItem
-                                  service={decor}
-                                  key={decor.id}
-                                  compairState={decorId}
-                                  onChange={(e) => setDecorId(e.target.value)}
-                                />
-                              ))}
-                          </div>
-                          <div className="w-full mt-6 flex justify-end">
-                            <Button
-                              onClick={handleNextTab}
-                              variant={"unstyled"}
-                              className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
-                            >
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M2.91797 10H16.943"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <span className="text-sm leading-5 font-medium ">
-                                Tiếp tục
-                              </span>
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </TabPanel>
-
-                    {/* SÂN KHẤU PANEL */}
-                    <TabPanel key={"decor"}>
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="w-full flex gap-5"
-                      >
-                        {/* NOTE AREA */}
-                        {renderNoteArea()}
-
-                        {/* PANEL MAIN */}
-                        <div className="w-2/3 h-full  flex flex-col gap-3 relative">
-                          <div className="flex gap-3 items-center h-full relative">
-                            <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
-                            <span className="text-xl font-bold ml-4">
-                              Sân khấu
-                            </span>
-                          </div>
-                          <span className="text-sm font-normal text-left">
-                            Lựa chọn gói sân khấu phù hợp cho tiệc của quý khách
-                          </span>
-                          <div className="w-full flex flex-wrap gap-4">
-                            {stages &&
-                              stages.map((stage) => (
-                                <ServiceItem
-                                  service={stage}
-                                  key={stage.id}
-                                  compairState={stageId}
-                                  onChange={(e) => setStageId(e.target.value)}
-                                />
-                              ))}
-                          </div>
-                          <div className="w-full mt-6 flex justify-end">
-                            <Button
-                              onClick={handleNextTab}
-                              variant={"unstyled"}
-                              className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
-                            >
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M2.91797 10H16.943"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <span className="text-sm leading-5 font-medium ">
-                                Tiếp tục
-                              </span>
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </TabPanel>
-
-                    {/* BÁNH CƯỚI PANEL */}
-                    <TabPanel key={"weddingCake"}>
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="w-full flex gap-5"
-                      >
-                        {/* NOTE AREA */}
-                        {renderNoteArea()}
-
-                        {/* PANEL MAIN */}
-                        <div className="w-2/3 h-full  flex flex-col gap-3 relative">
-                          <div className="flex gap-3 items-center h-full relative">
-                            <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
-                            <span className="text-xl font-bold ml-4">
-                              Bánh cưới
-                            </span>
-                          </div>
-                          <span className="text-sm font-normal text-left">
-                            Lựa chọn chiếc bánh cưới ưng ý nhất cho tiệc cưới
-                            của quý khách
-                          </span>
-                          <div className="w-full flex flex-wrap gap-4">
-                            {products &&
-                              products.map((product) => (
-                                <ServiceItem
-                                  service={product}
-                                  key={product.id}
-                                  compairState={cakeId}
-                                  onChange={(e) => setCakeId(e.target.value)}
-                                />
-                              ))}
-                          </div>
-                          <div className="w-full mt-6 flex justify-end">
-                            <Button
-                              onClick={handleNextTab}
-                              variant={"unstyled"}
-                              className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
-                            >
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M2.91797 10H16.943"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <span className="text-sm leading-5 font-medium ">
-                                Tiếp tục
-                              </span>
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </TabPanel>
-
-                    {/* THỰC ĐƠN PANEL */}
-                    <TabPanel key={"menu"}>
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="w-full flex gap-5"
-                      >
-                        {/* NOTE AREA */}
-                        {renderNoteArea()}
-
-                        {/* PANEL MAIN */}
-                        <div className="w-2/3 h-full  flex flex-col gap-3 relative">
-                          <div className="flex gap-3 items-center h-full relative">
-                            <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
-                            <span className="text-xl font-bold ml-4">
-                              Bánh cưới
-                            </span>
-                          </div>
-                          <span className="text-sm font-normal text-left">
-                            Lựa chọn chiếc bánh cưới ưng ý nhất cho tiệc cưới
-                            của quý khách
-                          </span>
-                          <div className="w-full flex flex-wrap gap-4">
-                            {menuList &&
-                              menuList.map((menu) => (
-                                <ServiceItem
-                                  service={menu}
-                                  key={menu.id}
-                                  compairState={menuId}
-                                  onChange={(e) => setMenuId(e.target.value)}
-                                />
-                              ))}
-                          </div>
-                          <div className="w-full mt-6 flex justify-end">
-                            <Button
-                              onClick={handleNextTab}
-                              variant={"unstyled"}
-                              className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
-                            >
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M2.91797 10H16.943"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <span className="text-sm leading-5 font-medium ">
-                                Tiếp tục
-                              </span>
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </TabPanel>
-
-                    {/* EXTRA SERVICES PANEL */}
-                    <TabPanel key={"extraServices"}>
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          y: 50,
-                        }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="w-full flex gap-5"
-                      >
-                        {/* NOTE AREA */}
-                        {renderNoteArea()}
-
-                        {/* PANEL MAIN */}
-                        <div className="w-2/3 h-full  flex flex-col gap-3 relative">
-                          {extraServices &&
-                            extraServices.map((category, index) => (
-                              <div key={index} className="text-left">
-                                <div className="flex gap-3 items-center h-full relative">
-                                  <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
-                                  <span className="text-xl font-bold ml-4">
-                                    {category.name}
-                                  </span>
-                                </div>
-                                <span className="text-sm font-normal text-left mt-3 block">
-                                  Lựa chọn các dịch vụ đi kèm
+                                <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                  <path
+                                    d="M2.91797 10H16.943"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                <span className="text-sm leading-5 font-medium ">
+                                  Tiếp tục
                                 </span>
-                                <div className="w-full flex flex-wrap gap-4 mt-5">
-                                  {category.products &&
-                                    category.products.map((product) => (
-                                      <ServiceItem
-                                        name={category.slug}
-                                        service={product}
-                                        key={product.id}
-                                        compairState={
-                                          extraServicesId[category.slug]
-                                            ? JSON.stringify(
-                                                extraServicesId[category.slug]
-                                              )
-                                            : "{}"
-                                        }
-                                        onChange={() =>
-                                          handleExtraServicesChange({
-                                            service: product,
-                                            category,
-                                          })
-                                        }
-                                      />
-                                    ))}
-                                </div>
-                              </div>
-                            ))}
-                          <div className="w-full mt-6 flex justify-end">
-                            <Button
-                              onClick={handleSubmit(onSubmit)}
-                              variant={"unstyled"}
-                              className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
-                              isLoading={isCreatingPakage}
-                            >
-                              <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 20 20"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <path
-                                  d="M2.91797 10H16.943"
-                                  stroke="white"
-                                  strokeWidth="1.5"
-                                  strokeMiterlimit="10"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <span className="text-sm leading-5 font-medium ">
-                                Tạo và liên hệ ngay
-                              </span>
-                            </Button>
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    </TabPanel>
-                  </TabPanels>
-                )}
-              </Tabs>
-            </motion.section>
-          )}
+                        </motion.div>
+                      </TabPanel>
+
+                      {/* LỄ PANEL */}
+                      <TabPanel key={"ceremony"}>
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: 50,
+                          }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 50 }}
+                          className="w-full flex gap-5"
+                        >
+                          {/* NOTE AREA */}
+                          {renderNoteArea()}
+
+                          <div className="w-2/3">
+                            {/* Trang trí */}
+                            <div className="flex flex-col gap-3 relative">
+                              <div className="flex gap-3 items-center h-full relative">
+                                <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                                <span className="text-xl font-bold ml-4">
+                                  Trang trí
+                                </span>
+                              </div>
+                              <span className="text-sm font-normal text-left">
+                                Các gói trang trí phù hợp cho tiệc của quý khách
+                              </span>
+                              <div className="w-full flex flex-wrap gap-4">
+                                {decors &&
+                                  decors.map((decor) => (
+                                    <ServiceItem
+                                      type={"decor"}
+                                      service={decor}
+                                      key={decor.id}
+                                      compairState={decorId}
+                                      onChange={(e) =>
+                                        setDecorId(e.target.value)
+                                      }
+                                    />
+                                  ))}
+                              </div>
+                              <div className="w-full mt-6 flex justify-end">
+                                <Button
+                                  onClick={handleNextTab}
+                                  variant={"unstyled"}
+                                  className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                                >
+                                  <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 20 20"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                      stroke="white"
+                                      strokeWidth="1.5"
+                                      strokeMiterlimit="10"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                    <path
+                                      d="M2.91797 10H16.943"
+                                      stroke="white"
+                                      strokeWidth="1.5"
+                                      strokeMiterlimit="10"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                  <span className="text-sm leading-5 font-medium ">
+                                    Tiếp tục
+                                  </span>
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Sân khấu */}
+                            <div className="flex flex-col gap-3 relative">
+                              <div className="flex gap-3 items-center h-full relative">
+                                <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                                <span className="text-xl font-bold ml-4">
+                                  Sân khấu
+                                </span>
+                              </div>
+                              <span className="text-sm font-normal text-left">
+                                Lựa chọn gói sân khấu phù hợp cho tiệc của quý
+                                khách
+                              </span>
+                              <div className="w-full flex flex-wrap gap-4">
+                                {stages &&
+                                  stages.map((stage) => (
+                                    <ServiceItem
+                                      type={"decor"}
+                                      service={stage}
+                                      key={stage.id}
+                                      compairState={stageId}
+                                      onChange={(e) =>
+                                        setStageId(e.target.value)
+                                      }
+                                    />
+                                  ))}
+                              </div>
+                              <div className="w-full mt-6 flex justify-end">
+                                <Button
+                                  onClick={handleNextTab}
+                                  variant={"unstyled"}
+                                  className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                                >
+                                  <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 20 20"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                      stroke="white"
+                                      strokeWidth="1.5"
+                                      strokeMiterlimit="10"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                    <path
+                                      d="M2.91797 10H16.943"
+                                      stroke="white"
+                                      strokeWidth="1.5"
+                                      strokeMiterlimit="10"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                  <span className="text-sm leading-5 font-medium ">
+                                    Tiếp tục
+                                  </span>
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* PANEL MAIN */}
+                            <div className="flex flex-col gap-3 relative">
+                              <div className="flex gap-3 items-center h-full relative">
+                                <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                                <span className="text-xl font-bold ml-4">
+                                  Bánh cưới
+                                </span>
+                              </div>
+                              <span className="text-sm font-normal text-left">
+                                Lựa chọn chiếc bánh cưới ưng ý nhất cho tiệc
+                                cưới của quý khách
+                              </span>
+                              <div className="w-full flex flex-wrap gap-4">
+                                {products &&
+                                  products.map((product) => (
+                                    <ServiceItem
+                                      type={"decor"}
+                                      service={product}
+                                      key={product.id}
+                                      compairState={cakeId}
+                                      onChange={(e) =>
+                                        setCakeId(e.target.value)
+                                      }
+                                    />
+                                  ))}
+                              </div>
+                              <div className="w-full mt-6 flex justify-end">
+                                <Button
+                                  onClick={handleNextTab}
+                                  variant={"unstyled"}
+                                  className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                                >
+                                  <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 20 20"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                      stroke="white"
+                                      strokeWidth="1.5"
+                                      strokeMiterlimit="10"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                    <path
+                                      d="M2.91797 10H16.943"
+                                      stroke="white"
+                                      strokeWidth="1.5"
+                                      strokeMiterlimit="10"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                  <span className="text-sm leading-5 font-medium ">
+                                    Tiếp tục
+                                  </span>
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </TabPanel>
+
+                      {/* THỰC ĐƠN PANEL */}
+                      <TabPanel key={"menu"}>
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: 50,
+                          }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 50 }}
+                          className="w-full flex gap-5"
+                        >
+                          {/* NOTE AREA */}
+                          {renderNoteArea()}
+
+                          {/* PANEL MAIN */}
+                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                            <div className="flex gap-3 items-center h-full relative">
+                              <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                              <span className="text-xl font-bold ml-4">
+                                Thực đơn
+                              </span>
+                            </div>
+                            <span className="text-sm font-normal text-left">
+                              Lựa chọn thực đơn phù hợp cho tiệc của quý khách
+                            </span>
+                            <div className="w-full flex flex-wrap gap-4">
+                              {menuList &&
+                                menuList.map((menu) => (
+                                  <ServiceItem
+                                    type="menu"
+                                    service={menu}
+                                    key={menu.id}
+                                    compairState={menuId}
+                                    onChange={(e) => setMenuId(e.target.value)}
+                                  />
+                                ))}
+                            </div>
+                            <div className="w-full mt-6 flex justify-end">
+                              <Button
+                                onClick={handleNextTab}
+                                variant={"unstyled"}
+                                className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                              >
+                                <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                  <path
+                                    d="M2.91797 10H16.943"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                <span className="text-sm leading-5 font-medium ">
+                                  Tiếp tục
+                                </span>
+                              </Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </TabPanel>
+
+                      {/* ĐỒ UỐNG PANEL */}
+                      <TabPanel key={"beaverage"}>
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: 50,
+                          }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 50 }}
+                          className="w-full flex gap-5"
+                        >
+                          {/* NOTE AREA */}
+                          {renderNoteArea()}
+
+                          {/* PANEL MAIN */}
+                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                            <div className="flex gap-3 items-center h-full relative">
+                              <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                              <span className="text-xl font-bold ml-4">
+                                Đồ uống
+                              </span>
+                            </div>
+                            <span className="text-sm font-normal text-left">
+                              Quý khách có thể lựa chọn nhiều loại đồ uống phù
+                              hợp
+                            </span>
+                            <div className="w-full mt-3 columns-2">
+                              {products &&
+                                products.map((b) => (
+                                  <div
+                                    className="flex w-full mb-8 gap-3"
+                                    key={b.id}
+                                  >
+                                    <div className="relative rounded-lg overflow-hidden">
+                                      <Image
+                                        src={b.images.at(0)}
+                                        alt={b.name}
+                                        width={100}
+                                        height={100}
+                                      />
+                                    </div>
+                                    <div className="flex flex-col">
+                                      <span className="text-md font-semibold text-start">
+                                        {b.name}
+                                      </span>
+                                      <span className="text-sm font-normal text-start mt-3">
+                                        {formatPrice(b.price)}
+                                      </span>
+                                      <div className="flex items-center mt-3 p-2 rounded-lg bg-whiteAlpha-100 w-fit">
+                                        <Button
+                                          variant={"unstyled"}
+                                          onClick={() => handleDecrement(b.id)}
+                                          className="!flex !flex-center !w-fit !h-fit !min-w-0 !min-h-0"
+                                        >
+                                          <MinusIcon className="w-4 h-4 text-gold" />
+                                        </Button>
+                                        <input
+                                          type="number"
+                                          value={beaverages[b.id] || 0}
+                                          onChange={(e) =>
+                                            handleQuantityChange(
+                                              b.id,
+                                              e.target.value
+                                            )
+                                          }
+                                          className="w-12 text-center"
+                                        />
+                                        <Button
+                                          variant={"unstyled"}
+                                          onClick={() => handleIncrement(b.id)}
+                                          className="!flex !flex-center !w-fit !h-fit !min-w-0 !min-h-0"
+                                        >
+                                          <PlusIcon className="w-4 h-4 text-gold" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                            <div className="w-full mt-6 flex justify-end">
+                              <Button
+                                onClick={handleNextTab}
+                                variant={"unstyled"}
+                                className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                              >
+                                <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                  <path
+                                    d="M2.91797 10H16.943"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                <span className="text-sm leading-5 font-medium ">
+                                  Tiếp tục
+                                </span>
+                              </Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </TabPanel>
+
+                      {/* EXTRA SERVICES PANEL */}
+                      <TabPanel key={"extraServices"}>
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: 50,
+                          }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 50 }}
+                          className="w-full flex gap-5"
+                        >
+                          {/* NOTE AREA */}
+                          {renderNoteArea()}
+
+                          {/* PANEL MAIN */}
+                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                            {extraServices &&
+                              extraServices.map((category, index) => (
+                                <div key={index} className="text-left">
+                                  <div className="flex gap-3 items-center h-full relative">
+                                    <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                                    <span className="text-xl font-bold ml-4">
+                                      {category.name}
+                                    </span>
+                                  </div>
+                                  <span className="text-sm font-normal text-left mt-3 block">
+                                    Lựa chọn các dịch vụ đi kèm
+                                  </span>
+                                  <div className="w-full flex flex-wrap gap-4 mt-5">
+                                    {category.products &&
+                                      category.products.map((product) => (
+                                        <ServiceItem
+                                          name={category.slug}
+                                          service={product}
+                                          key={product.id}
+                                          compairState={
+                                            extraServicesId[category.slug]
+                                              ? JSON.stringify(
+                                                  extraServicesId[category.slug]
+                                                )
+                                              : "{}"
+                                          }
+                                          onChange={() =>
+                                            handleExtraServicesChange({
+                                              service: product,
+                                              category,
+                                            })
+                                          }
+                                        />
+                                      ))}
+                                  </div>
+                                </div>
+                              ))}
+                            <div className="w-full mt-6 flex justify-end">
+                              <Button
+                                onClick={handleNextTab}
+                                variant={"unstyled"}
+                                className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                              >
+                                <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                  <path
+                                    d="M2.91797 10H16.943"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                <span className="text-sm leading-5 font-medium ">
+                                  Tiếp tục
+                                </span>
+                              </Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </TabPanel>
+
+                      {/* THÔNG TIN CHUNG PANEL */}
+                      <TabPanel key={"generalInformations"}>
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: 50,
+                          }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 50 }}
+                          className="w-full flex gap-5"
+                        >
+                          {/* UPLOADER */}
+                          <div className="w-1/3 text-left">
+                            <Uploader
+                              register={register}
+                              errors={errors}
+                              files={files}
+                              setFiles={setFiles}
+                              onFileChange={handleFileChange}
+                            />
+                            <AnimatePresence>
+                              {isNextImagesEmpty && (
+                                <motion.div
+                                  key={"isNextImagesEmpty"}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className="text-red-400 text-sm font-normal mt-2 mb-2"
+                                >
+                                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                                  {
+                                    "Hãy chọn ít nhất một ảnh cho thực đơn của bạn nhé!"
+                                  }
+                                </motion.div>
+                              )}
+                              {isNextImageOverSize && (
+                                <motion.div
+                                  key={"isNextImageOverSize"}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className="text-red-400 text-sm font-normal mt-2 mb-2"
+                                >
+                                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                                  {
+                                    "Hãy chọn ảnh có dung lượng nhỏ hơn 5MB nhé!"
+                                  }
+                                </motion.div>
+                              )}
+                              {!isFormatAccepted && (
+                                <motion.div
+                                  key={"isFormatAccepted"}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className="text-red-400 text-sm font-normal mt-2 mb-2"
+                                >
+                                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                                  {
+                                    "Vui lòng chọn ảnh có định dạng jpg, jpeg hoặc png!"
+                                  }
+                                </motion.div>
+                              )}
+                              {limitFilesLength && (
+                                <motion.div
+                                  key={"limitFilesLength"}
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className="text-red-400 text-sm font-normal mt-2 mb-2"
+                                >
+                                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                                  {
+                                    "Chỉ được chọn tối đa 5 ảnh cho mỗi combo của bạn!"
+                                  }
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+
+                          {/* PANEL MAIN */}
+                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                            <div className="flex gap-3 items-center h-full relative">
+                              <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
+                              <span className="text-xl font-bold ml-4">
+                                Thông tin cơ bản
+                              </span>
+                            </div>
+                            <span className="text-sm font-normal text-left">
+                              Rất tốt, bây giờ hãy điền thông tin cơ bản cho
+                              combo của quý khách!
+                            </span>
+                            <div className="w-full flex flex-wrap gap-4">
+                              <div className="flex gap-3 items-end w-full">
+                                <FormInput
+                                  register={register}
+                                  errors={errors}
+                                  errorMessage={errors?.name?.message}
+                                  name={"name"}
+                                  wrapperClassName="!mt-0 flex-1"
+                                  placeholder={`Ví dụ: ${
+                                    decodeWeddingPackageName(
+                                      generateUniqueWeddingPackageName()
+                                    ).userFriendlyName
+                                  }`}
+                                  value={watch("name")}
+                                  onChange={onInputChange}
+                                  theme="light"
+                                  className="bg-whiteAlpha-100 focus:bg-whiteAlpha-100 focus:brightness-105 hover:bg-whiteAlpha-100 hover:brightness-110 !h-[44px]"
+                                />
+                                <Button
+                                  className="!bg-whiteAlpha-100 hover:!bg-whiteAlpha-200 rounded-lg !h-[44px]"
+                                  onClick={handleRandomName}
+                                >
+                                  <FaRandom className="text-white w-5 h-5" />
+                                </Button>
+                              </div>
+                              <FormInput
+                                register={register}
+                                errors={errors}
+                                errorMessage={
+                                  errors?.short_description?.message
+                                }
+                                name={"short_description"}
+                                placeholder="Mô tả ngắn"
+                                value={watch("short_description")}
+                                onChange={onInputChange}
+                                type="textarea"
+                                rows={2}
+                                theme="light"
+                                wrapperClassName="!mt-0"
+                                className="bg-whiteAlpha-100 focus:bg-whiteAlpha-100 focus:brightness-105 hover:bg-whiteAlpha-100 hover:brightness-110"
+                              />
+                              <FormInput
+                                register={register}
+                                errors={errors}
+                                errorMessage={errors?.description?.message}
+                                name={"description"}
+                                placeholder="Mô tả chi tiết"
+                                value={watch("description")}
+                                type="textarea"
+                                onChange={onInputChange}
+                                theme="light"
+                                wrapperClassName="!mt-0"
+                                className="bg-whiteAlpha-100 focus:bg-whiteAlpha-100 focus:brightness-105 hover:bg-whiteAlpha-100 hover:brightness-110"
+                              />
+                            </div>
+                            <div className="w-full mt-6 flex justify-end">
+                              <Button
+                                type="submit"
+                                variant={"unstyled"}
+                                className="!bg-gold !rounded-full !flex !items-center !gap-2 !p-3 !text-white"
+                                isLoading={isCreatingPakage}
+                              >
+                                <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12.0234 4.94141L17.0818 9.99974L12.0234 15.0581"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                  <path
+                                    d="M2.91797 10H16.943"
+                                    stroke="white"
+                                    strokeWidth="1.5"
+                                    strokeMiterlimit="10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                <span className="text-sm leading-5 font-medium ">
+                                  Tạo và liên hệ ngay
+                                </span>
+                              </Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </TabPanel>
+                    </TabPanels>
+                  )}
+                </Tabs>
+              </motion.section>
+            )}
 
           <Footer></Footer>
 
@@ -1487,27 +1904,49 @@ function Page() {
                           {getNameByKey(key)}
                         </h2>
                         <div className="flex flex-col gap-5 mt-5">
-                          {drawerData[key].map((product) => {
+                          {drawerData[key].map((product, index) => {
                             if (!product) return null;
                             return (
-                              <SelectedProduct
-                                product={product}
-                                key={product.id}
-                              />
+                              <SelectedProduct product={product} key={index} />
                             );
                           })}
                         </div>
                         <Divider className="mt-5 bg-gold" />
-                        <div className="text-base font-semibold text-end text-white mt-3">
-                          {drawerData[key] &&
-                            drawerData[key].length > 0 &&
-                            drawerData[key]
-                              .reduce((acc, cur) => {
-                                if (!cur) return acc;
-                                return acc + cur.price;
-                              }, 0)
-                              .toLocaleString("vn-VN")}{" "}
-                          VNĐ
+                        <div className="text-base text-end text-white mt-3">
+                          {drawerData[key] && drawerData[key].length > 0 && (
+                            <div>
+                              {key === "menu" ? (
+                                <div>
+                                  {(
+                                    drawerData[key].reduce((acc, cur) => {
+                                      if (!cur) return acc;
+                                      return acc + cur.price;
+                                    }, 0) *
+                                    Math.ceil(Number(watch("partySize")) / 10)
+                                  ).toLocaleString("vn-VN") + "VNĐ"}
+                                  <div className="text-md text-end text-gray-400 mt-1">
+                                    {`Đây là số tiền dựa trên số bàn ước tính: ${Math.ceil(
+                                      watch("partySize") / 10
+                                    )}`}
+                                  </div>
+                                </div>
+                              ) : key === "beaverages" ? (
+                                drawerData[key]
+                                  .reduce((acc, cur) => {
+                                    if (!cur) return acc;
+                                    return acc + cur.price * cur.quantity;
+                                  }, 0)
+                                  .toLocaleString("vn-VN")
+                              ) : (
+                                drawerData[key]
+                                  .reduce((acc, cur) => {
+                                    if (!cur) return acc;
+                                    return acc + cur.price;
+                                  }, 0)
+                                  .toLocaleString("vn-VN") + "VNĐ"
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -1539,7 +1978,9 @@ function Page() {
                       transition={{ duration: 0.3 }}
                     >
                       <motion.div animate={{ opacity: 1 }}>
-                        <p className="text-xl">Các khoảng chi</p>
+                        <p className="text-xl underline underline-offset-4">
+                          Các khoảng chi
+                        </p>
                         <div className="flex flex-col w-full gap-4 mt-5">
                           {Object.keys(drawerData).map((key) => {
                             if (
@@ -1548,10 +1989,25 @@ function Page() {
                             )
                               return null;
 
-                            const total = drawerData[key].reduce(
-                              (acc, cur) => acc + cur?.price,
-                              0
-                            );
+                            const total = drawerData[key].reduce((acc, cur) => {
+                              switch (key) {
+                                case "menu":
+                                  return (
+                                    acc +
+                                    cur?.price *
+                                      Math.ceil(watch("partySize") / 10)
+                                  );
+                                  break;
+
+                                case "beaverages":
+                                  return acc + cur?.price * cur?.quantity;
+                                  break;
+
+                                default:
+                                  return acc + cur?.price;
+                                  break;
+                              }
+                            }, 0);
 
                             return (
                               <div
@@ -1618,7 +2074,7 @@ function Page() {
                     <Button
                       variant={"unstyled"}
                       className="!bg-gold hover:brightness-90 transition !rounded-full !text-white !px-8 !py-2 !w-full !flex !flex-center items-center gap-3 !font-normal group"
-                      onClick={handleSubmit(onSubmit)}
+                      type="submit"
                       isLoading={isCreatingPakage}
                     >
                       {!isCreatingPakage && (
@@ -1633,7 +2089,7 @@ function Page() {
           )}
         </>
       )}
-    </>
+    </form>
   );
 }
 

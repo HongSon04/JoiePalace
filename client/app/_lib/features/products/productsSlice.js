@@ -166,7 +166,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProductByCategorySlug.fulfilled, (state, action) => {
         state.isFetchingProducts = false;
-        console.log("fetchProductByCategorySlug payload -> ", action.payload);
+        // console.log("fetchProductByCategorySlug payload -> ", action.payload);
         state.products = action.payload.data;
         state.pagination = action.payload.pagination;
         state.isFetchingProductsError = false;

@@ -3,260 +3,257 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Heavy.otf") format("opentype");
   font-weight: 800;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Heavy Italic.otf") format("opentype");
   font-weight: 950;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Black.otf") format("opentype");
   font-weight: 800;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Black Italic.otf") format("opentype");
   font-weight: 900;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy XBold.otf") format("opentype");
   font-weight: 800;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy XBold Italic.otf") format("opentype");
   font-weight: 800;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Bold Italic.otf") format("opentype");
   font-weight: 700;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy SemiBold.otf") format("opentype");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy SemiBold Italic.otf") format("opentype");
   font-weight: 600;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Regular.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Light.otf") format("opentype");
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Light Italic.otf") format("opentype");
   font-weight: 300;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Xlight.otf") format("opentype");
   font-weight: 200;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Xlight Italic.otf") format("opentype");
   font-weight: 200;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Thin.otf") format("opentype");
   font-weight: 100;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Gilroy';
+  font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Thin Italic.otf") format("opentype");
   font-weight: 100;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Beautique Display';
-  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Regular.otf') format('opentype');
+  font-family: "Beautique Display";
+  src: url("../../fonts/BeautiqueDisplay/BeautiqueDisplay-Regular.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Beautique Display';
-  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Bold.otf') format('opentype');
+  font-family: "Beautique Display";
+  src: url("../../fonts/BeautiqueDisplay/BeautiqueDisplay-Bold.otf") format("opentype");
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Beautique Display';
-  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Italic.otf') format('opentype');
+  font-family: "Beautique Display";
+  src: url("../../fonts/BeautiqueDisplay/BeautiqueDisplay-Italic.otf") format("opentype");
   font-weight: normal;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Beautique Display';
-  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-BoldItalic.otf') format('opentype');
+  font-family: "Beautique Display";
+  src: url("../../fonts/BeautiqueDisplay/BeautiqueDisplay-BoldItalic.otf") format("opentype");
   font-weight: bold;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Beautique Display';
-  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Light.otf') format('opentype');
+  font-family: "Beautique Display";
+  src: url("../../fonts/BeautiqueDisplay/BeautiqueDisplay-Light.otf") format("opentype");
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Beautique Display';
-  src: url('../../fonts/BeautiqueDisplay/BeautiqueDisplay-Medium.otf') format('opentype');
+  font-family: "Beautique Display";
+  src: url("../../fonts/BeautiqueDisplay/BeautiqueDisplay-Medium.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Regular.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Italic.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-Italic.ttf") format("truetype");
   font-weight: normal;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Medium.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-MediumItalic.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-MediumItalic.ttf") format("truetype");
   font-weight: 500;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-SemiBold.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-SemiBoldItalic.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-SemiBoldItalic.ttf") format("truetype");
   font-weight: 600;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Bold.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-Bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-BoldItalic.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-BoldItalic.ttf") format("truetype");
   font-weight: bold;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-ExtraBold.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-ExtraBold.ttf") format("truetype");
   font-weight: 800;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-ExtraBoldItalic.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-ExtraBoldItalic.ttf") format("truetype");
   font-weight: 800;
   font-style: italic;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-Black.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-Black.ttf") format("truetype");
   font-weight: 900;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Montserrat Alternates';
-  src: url('../../fonts/Montserrat_Alternates/MontserratAlternates-BlackItalic.ttf') format('truetype');
+  font-family: "Montserrat Alternates";
+  src: url("../../fonts/Montserrat_Alternates/MontserratAlternates-BlackItalic.ttf") format("truetype");
   font-weight: 900;
   font-style: italic;
 }
 
 /* Add more font weights and styles as needed */
 
-
-
-
 *,
 *:before,
 *:after {
   box-sizing: border-box;
-  font-family: 'Gilroy', sans-serif;
+  font-family: "Gilroy", sans-serif;
   transition: all 0.1s ease;
 }
 
@@ -307,13 +304,12 @@ body {
 }
 
 @layer components {
-
   .example {
-    @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px]
+    @apply w-full h-[96px] border-l-2 border-red-600 p-[10px] bg-whiteAlpha-200 mb-[10px];
   }
 
   .bg-primary {
-    background-color: #022C25 !important;
+    background-color: #022c25 !important;
   }
 
   .admin-panel {
@@ -338,11 +334,11 @@ body {
   }
 
   .icon-button {
-    @apply flex-center rounded-full glass hover:bg-whiteAlpha-300
+    @apply flex-center rounded-full glass hover:bg-whiteAlpha-300;
   }
 
   .silver-gradient {
-    background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+    background: linear-gradient(135deg, #c0c0c0, #a9a9a9);
   }
 
   .no-border,
@@ -351,19 +347,19 @@ body {
   }
 
   .glass-button {
-    @apply glass rounded-full px-4 py-2 text-white font-semibold hover:bg-whiteAlpha-300 hover:text-gray-100
+    @apply glass rounded-full px-4 py-2 text-white font-semibold hover:bg-whiteAlpha-300 hover:text-gray-100;
   }
 
   .select {
-    @apply bg-whiteAlpha-200 rounded-xl px-4 py-2 text-white text-base hover:bg-whiteAlpha-300 hover:text-gray-100
+    @apply bg-whiteAlpha-200 rounded-xl px-4 py-2 text-white text-base hover:bg-whiteAlpha-300 hover:text-gray-100;
   }
 
   .option {
-    @apply bg-whiteAlpha-200 rounded-md px-4 py-2 text-gray-600 font-normal hover:bg-whiteAlpha-300 hover:text-gray-100
+    @apply bg-whiteAlpha-200 rounded-md px-4 py-2 text-gray-600 font-normal hover:bg-whiteAlpha-300 hover:text-gray-100;
   }
 
   .abs-center {
-    @apply absolute inset-0 flex-center
+    @apply absolute inset-0 flex-center;
   }
 }
 
@@ -374,7 +370,7 @@ body {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: #B5905B;
+  background-color: #b5905b;
   z-index: 2;
 }
 
@@ -494,8 +490,6 @@ body {
   }
 }
 
-
-
 /* custom scrollbar  */
 ::-webkit-scrollbar {
   width: 4px;
@@ -557,7 +551,7 @@ body {
 }
 
 .bg-image-tintuc {
-  background-image: url('/banner-news-detail.png');
+  background-image: url("/banner-news-detail.png");
   background-size: cover;
 }
 
@@ -571,13 +565,13 @@ body {
 }
 
 .bg-confence::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('/Diwa-background_page-0001.jpg');
+  background-image: url("/Diwa-background_page-0001.jpg");
   background-size: cover;
   opacity: 0.2;
   z-index: -1;
@@ -592,11 +586,10 @@ select {
   border: none;
   background: white;
   border-radius: 10px;
-  color: gray
+  color: gray;
 }
 
 /* tag*/
-
 
 .status {
   padding: 6px;
@@ -604,28 +597,28 @@ select {
 }
 
 .da-dat-coc {
-  background-color: #FEEBCB;
-  color: #ED8936;
+  background-color: #feebcb;
+  color: #ed8936;
 }
 
 .da-thanh-toan {
-  background-color: #C6F6D5;
-  color: #48BB78;
+  background-color: #c6f6d5;
+  color: #48bb78;
 }
 
 .chua-thanh-toan {
-  background-color: #FEFCBF;
-  color: #B7791F;
+  background-color: #fefcbf;
+  color: #b7791f;
 }
 
 .da-hoan-tien {
-  background-color: #38B2AC;
-  color: #B2F5EA;
+  background-color: #38b2ac;
+  color: #b2f5ea;
 }
 
 .da-huy {
-  background-color: #FED7D7;
-  color: #F56565;
+  background-color: #fed7d7;
+  color: #f56565;
 }
 
 .tag {
@@ -643,22 +636,22 @@ select {
 
 .tag-copper {
   background-color: rgba(0, 0, 0, 0.24);
-  color: #A25915;
+  color: #a25915;
 }
 
 .tag-silver {
   background-color: #333333;
-  color: #C0C0C0;
+  color: #c0c0c0;
 }
 
 .tag-gold {
-  background-color: #FFAE00;
+  background-color: #ffae00;
   color: white;
 }
 
 .tag-vip {
   background-color: rgba(0, 0, 0, 0.92);
-  color: #FFAE00;
+  color: #ffae00;
 }
 
 .bgfeedbackYellow::after {
@@ -681,7 +674,6 @@ select {
   right: 20px;
 }
 
-
 /* Default padding for mobile */
 .responsive-container {
   padding: 30px 10px;
@@ -700,7 +692,6 @@ select {
     padding: 60px 192px;
   }
 }
-
 
 .custom-dots-line {
   display: flex;
