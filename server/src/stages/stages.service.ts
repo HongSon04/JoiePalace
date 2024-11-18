@@ -188,7 +188,7 @@ export class StagesService {
         price: Number(price),
       };
 
-      if (files.images && files.images.length > 0) {
+      if (files.images && files?.images?.length > 0) {
         const stagesImages =
           await this.cloudinaryService.uploadMultipleFilesToFolder(
             files.images,

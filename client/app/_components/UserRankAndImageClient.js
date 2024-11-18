@@ -9,8 +9,8 @@ const UserRankAndImageClient = ({ userImage, rankImage, title, isLoading }) => {
                 <>
                     <div className="relative w-12 h-12 sm:w-16 sm:h-16 lg:w-12 lg:h-12 bg-gray-300 animate-pulse rounded-full"></div>
                     <div className="flex gap-2 items-center">
-                        <div className="relative w-6 h-3 sm:w-8 sm:h-4 lg:w-10 lg:h-8 bg-gray-300 animate-pulse rounded"></div>
-                        <span className="text-sm text-gray-400">Loading...</span>
+                        <div className="relative w-3 h-3 sm:w-4 sm:h-4 lg:w-8 lg:h-8 bg-gray-300 animate-pulse rounded-full"></div>
+                        <span className="h-4 w-[50px] bg-gray-300 animate-pulse rounded"></span>
                     </div>
                 </>
             ) : (

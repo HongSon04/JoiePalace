@@ -52,14 +52,14 @@ export class CategoriesService {
 
       // Upload images if available
       const images =
-        files.images && files.images.length > 0
+        files.images && files?.images?.length > 0
           ? await this.cloudinaryService.uploadMultipleFilesToFolder(
               files.images,
               'joiepalace/categories',
             )
           : ([] as any);
 
-      if (files.images && files.images.length > 0 && !images) {
+      if (files.images && files?.images?.length > 0 && !images) {
         throw new BadRequestException('Upload ảnh thất bại');
       }
 
@@ -450,16 +450,17 @@ export class CategoriesService {
       }
 
       // Upload images if available
-      const images =
-        files.images && files.images.length > 0
-          ? await this.cloudinaryService.uploadMultipleFilesToFolder(
-              files.images,
-              'joiepalace/categories',
-            )
-          : ([] as any);
+      let uploadImages;
 
-      if (files.images && files.images.length > 0 && !images) {
-        throw new BadRequestException('Upload ảnh thất bại');
+      if (files?.images?.length > 0) {
+        uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
+          files.images,
+          'joiepalace/packages',
+        );
+
+        if (!uploadImages) {
+          throw new BadRequestException('Upload ảnh thất bại');
+        }
       }
 
       // Initialize tagsSet
@@ -493,7 +494,7 @@ export class CategoriesService {
             : findCategories.category_id
               ? Number(findCategories.category_id)
               : null,
-          images: images.length > 0 ? images : findCategories.images,
+          images: uploadImages ? uploadImages : findCategories.images,
           tags: { set: tagsSet },
         },
         include: {

@@ -166,18 +166,25 @@ const Page = () => {
                 <span className='text-2xl font-bold leading-[22px] text-white'>Tài khoản</span>
                 <div className='flex items-center gap-[30px]'>
                     <span className='text-base font-semibold'>Hạng thành viên:</span>
-                    <div className='flex items-center gap-2'>
-                        <div className="relative w-6 h-[14px]">
-                            <Image
-                                src={rank?.imageRank}
-                                layout="fill"
-                                alt="rank-img"
-                                objectFit="cover"
-                                quality={100}
-                            />
+                    {rank?.imageRank ?
+                        <div className='flex items-center gap-2'>
+                            <div className="relative w-6 h-[14px]">
+                                <Image
+                                    src={rank?.imageRank}
+                                    layout="fill"
+                                    alt="rank-img"
+                                    objectFit="cover"
+                                    quality={100}
+                                />
+                            </div>
+                            <span className='text-xs text-white'>{rank?.title}</span>
                         </div>
-                        <span className='text-xs text-white'>{rank?.title}</span>
-                    </div>
+                        : <div className='flex items-center gap-2'>
+                            <div className="relative w-[14px] h-[14px] animate-spin">
+                                <div className="w-full h-full bg-gray-300 rounded-full"></div>
+                            </div>
+                            <span className='text-xs text-white animate-pulse bg-gray-300 rounded w-10 h-4'></span>
+                        </div>}
                 </div>
             </div>
 

@@ -12,6 +12,7 @@ import {
 
 import Link from "next/link";
 import { Result } from "postcss";
+import { Image } from '@nextui-org/react';
 
 const page = () => {
   const [user, setUser] = useState();
@@ -119,11 +120,11 @@ const page = () => {
         return {
           id: item.id,
           nameParty: item.name,
-          address: item.company_name,
+          address: item.company_name || 'Tiệc cá nhân',
           phoneAddress: item.phone,
           hostName: user?.name,
           email: user?.email,
-          phoneUser: user?.phone,
+          phoneUser: item.phone,
           idParty: `P${item.id}`,
           partyDate: formatDate(item.created_at),
           dateOrganization: formatDate(item.organization_date),
@@ -160,9 +161,8 @@ const page = () => {
             : "",
           remainingPaid:
             item.total_amount && item.depositAmount
-              ? `${
-                  parseInt(item.total_amount) - parseInt(item.depositAmount)
-                } VND`
+              ? `${parseInt(item.total_amount) - parseInt(item.depositAmount)
+              } VND`
               : "0 VND",
           paymentDay: item.organization_date
             ? item.organization_date.split("T")[0]
@@ -302,9 +302,16 @@ const page = () => {
           </div>
         ))
       ) : (
-        <p className="text-white leading-6 text-xl font-medium">
-          Không có tiệc đã đặt.
-        </p>
+        <div className='absolute'>
+          <div className='relative left-[400px] top-[263px]  w-[100px] h-[100px]'>
+            <div>  <Image
+              src='/notebook.png'
+              alt="user-img"
+              fill
+              className="w-[200px] opacity-50"
+            /></div>
+          </div>
+        </div>
       )}
     </div>
   );

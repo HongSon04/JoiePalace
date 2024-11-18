@@ -16,12 +16,14 @@ const DetailUserClient = ({
                 // Show loading placeholders
                 <>
                     <div className="flex justify-between items-center mb-3 gap-[22px]">
-                        <div className="h-6 w-1/2 bg-gray-300 animate-pulse rounded"></div>
-                        <div className="h-4 w-1/4 bg-gray-300 animate-pulse rounded"></div>
+                        <div className="h-6 w-[100px] bg-gray-300 animate-pulse rounded"></div>
+                        <Link className="mt-auto underline text-xs sm:text-sm lg:text-base font-normal hover:text-gold text-gold cursor-pointer" 
+                        href={'/client/nguoi-dung/tai-khoan'}
+                        >Xem thêm</Link>
                     </div>
 
                     <div className="flex flex-col gap-4 sm:flex-row justify-between text-base">
-                        <div className="h-4 w-1/2 bg-gray-300 animate-pulse rounded"></div>
+                        <div className="h-4 w-[200px] bg-gray-300 animate-pulse rounded"></div>
                         <div className="h-4 w-[100px] bg-gray-300 animate-pulse rounded"></div>
                     </div>
 

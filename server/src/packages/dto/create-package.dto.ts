@@ -60,9 +60,9 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'Ảnh gói tiệc, không được để trống',
-    required: false,
+    required: true,
   })
-  images?: string[];
+  images: string[];
 
   @ApiProperty({
     example: [
@@ -82,10 +82,11 @@ export class CreatePackageDto {
   note?: string;
 
   @ApiProperty({
-    required: false,
+    required: true,
     description: 'Số lượng khách dự kiến',
   })
-  number_of_guests?: string;
+  @IsNotEmpty({ message: 'Số lượng khách dự kiến không được để trống' })
+  number_of_guests: string;
 
   @ApiProperty({
     required: false,
