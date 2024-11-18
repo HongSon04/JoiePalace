@@ -60,9 +60,9 @@ export class CreatePackageDto {
 
   @ApiProperty({
     description: 'Ảnh gói tiệc, không được để trống',
-    required: false,
+    required: true,
   })
-  images?: string[];
+  images: string[];
 
   @ApiProperty({
     example: [
