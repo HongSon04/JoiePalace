@@ -16,8 +16,6 @@ const RenderDetailPackage = ({
   spaceIndex,
 }) => {
   if (!dataToShow || !dataToShow?.products) return null;
-  console.log(optionIndex);
-  console.log("dataToShowsdfsds", dataToShow);
 
   const renderProductItem = (item, index) => (
     <div
