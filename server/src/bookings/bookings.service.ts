@@ -1088,12 +1088,12 @@ export class BookingsService {
             Number(otherServiceAmount),
         );
 
-        // if (Number(amount) !== totalAmount) {
-        //   throw new HttpException(
-        //     `Lỗi tính toán, tổng tiền phải là ${totalAmount}`,
-        //     HttpStatus.BAD_REQUEST,
-        //   );
-        // }
+        if (Number(amount) !== totalAmount) {
+          throw new HttpException(
+            `Lỗi tính toán, tổng tiền phải là ${totalAmount}`,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
         // Calculate Fees
         const fee = 10 / 100; // 10%
         const totalFee = totalAmount * fee; // 10%
