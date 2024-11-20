@@ -1,4 +1,3 @@
-import { stages } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
   HttpException,
@@ -904,7 +903,7 @@ export class BookingsService {
         updated_at: updatedAtMenu,
         ...menuFormat
       } = menu;
-      (menuFormat as any).total_amount = totalMenuAmount;
+
       // ? Format Party Type
       const {
         created_at: createdAtPartyType,
@@ -1079,9 +1078,9 @@ export class BookingsService {
         // Total calculation
         const totalAmount = Number(
           Number(decor.price) +
-            Number(totalMenuAmount) +
             Number(stage.price) +
             Number(party_types.price) +
+            Number(totalMenuAmount) +
             Number(tableAmount) +
             Number(chairAmount) +
             Number(spareChairAmount) +
