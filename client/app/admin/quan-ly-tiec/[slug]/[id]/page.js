@@ -147,7 +147,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const [detailCostTable, setDetailCostTable] = useState([]);
 
     const [branch_id, setBranch_id] = useState();
-  
+
     const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
         defaultValues: {
@@ -166,7 +166,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     fetchAllMenus(),
                     fetchAllPartyTypes(),
                     fetchAllDecors(),
-                    fetchAllServices(), 
+                    fetchAllServices(),
                 ]);
                 await fetchDataDetailsParty();
             } catch (error) {
@@ -175,8 +175,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         };
         fetchData();
     }, [id, reset]);
+    
     useEffect(() => {
-        // Kiểm tra xem cả hai dịch vụ đã có dữ liệu chưa và bookingDetails đã có giá trị
         if (otherServices[0]?.options.length > 1 && extraServices[0]?.options.length > 1 && bookingDetails) {
             checkServices(bookingDetails);
         }
@@ -339,12 +339,12 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                         price: service.price,
                     })),
                 }));
-    
+
                 const optionsWithDefault = [
                     { category: 'Chọn dịch vụ', items: [{ value: '', label: 'Không chọn' }] },
                     ...categories,
                 ];
-    
+
                 setExtraServices(prev => [{ ...prev[0], options: optionsWithDefault }]);
             } else {
                 console.error('Không có dữ liệu hợp lệ');
@@ -353,7 +353,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             console.error('Lỗi khi lấy dịch vụ phát sinh:', error);
         }
     };
-    
+
     const fetchPackageForOtherServices = async () => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.CATEGORIES.GET_BY_ID(9), 'GET');
@@ -370,7 +370,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     price: product.price,
                 }))
             );
-    
+
             const optionsWithDefault = [
                 { category: 'Chọn dịch vụ', items: [{ value: '', label: 'Không chọn' }] },
                 ...options,
@@ -385,33 +385,40 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_BY_ID(packageId), 'GET');
             const packageData = response.data[0];
-
+    
+            // Cập nhật các trường khác từ packageData
+            setSelectedMenu(packageData.menu_id);
+            await fetchFoodsByMenuId(packageData.menu_id);
+            setSelectPartyTypes(packageData.party_type_id);
+            setSelectStages(packageData.stage_id);
+            setSelectedDecors(packageData.decor_id);
+    
+            // Xử lý other_service nếu có
             if (packageData.other_service) {
                 const otherServicesFromAPI = JSON.parse(packageData.other_service);
-                const updatedOtherDishes = otherServicesFromAPI.map(service => {
-                    const option = otherServices[0]?.options.find(opt => opt.value === service.id);
-                    return {
-                        id: service.id,
-                        name: option ? option.label : 'Không xác định',
-                        price: option ? option.price : 0,
-                        quantity: service.quantity,
-                    };
-                });
-                setSelectOtherDishes(prev => [...prev, ...updatedOtherDishes]);
+                const updatedOtherDishes = otherServicesFromAPI.map((service) => ({
+                    id: service.id,
+                    name: service.name || 'Không xác định',
+                    price: service.price || 0,
+                    quantity: service.quantity,
+                }));
+                setSelectOtherDishes(updatedOtherDishes);
+            } else {
+                setSelectOtherDishes([]);
             }
-
+    
+            // Xử lý extra_service nếu có
             if (packageData.extra_service) {
                 const extraServicesFromAPI = JSON.parse(packageData.extra_service);
-                const updatedExtraDishes = extraServicesFromAPI.map(service => { 
-                    const option = extraServices[0]?.options.find(opt => opt.value === service.id);
-                    return {
-                        id: service.id,
-                        name: option ? option.label : 'Không xác định',
-                        price: option ? option.price : 0,
-                        quantity: service.quantity,
-                    };
-                });
-                setSelectExtraDishes(prev => [...prev, ...updatedExtraDishes]);
+                const updatedExtraDishes = extraServicesFromAPI.map((service) => ({
+                    id: service.id,
+                    name: service.name || 'Không xác định',
+                    price: service.price || 0,
+                    quantity: service.quantity,
+                }));
+                setSelectExtraDishes(updatedExtraDishes);
+            } else {
+                setSelectExtraDishes([]);
             }
         } catch (error) {
             console.error('Lỗi khi lấy gói dịch vụ:', error);
@@ -428,7 +435,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             console.error('Lỗi khi lấy dịch vụ:', err);
         }
     };
-    
+
     const fetchDataDetailsParty = async () => {
         try {
             await fetchAllServices();
@@ -589,15 +596,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     const checkServices = (bookingDetails) => {
         const allOtherOptions = otherServices[0]?.options || [];
         const allExtraOptions = extraServices[0]?.options || [];
-    
+
         console.log('Tất cả tùy chọn dịch vụ khác:', allOtherOptions);
         console.log('Tất cả tùy chọn dịch vụ phát sinh:', allExtraOptions);
-        console.log('Dữ liệu bookingDetails:', bookingDetails); // Kiểm tra giá trị của bookingDetails
-    
-        // Kiểm tra và phân tích cú pháp chuỗi JSON thành mảng
+        console.log('Dữ liệu bookingDetails:', bookingDetails); 
+        
         let otherServicesData = [];
         let extraServicesData = [];
-    
+
         // Kiểm tra other_service
         if (bookingDetails.other_service) {
             try {
@@ -612,7 +618,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 console.error('Lỗi khi phân tích cú pháp other_service:', error);
             }
         }
-    
+
         // Kiểm tra extra_service
         if (bookingDetails.extra_service) {
             try {
@@ -627,7 +633,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 console.error('Lỗi khi phân tích cú pháp extra_service:', error);
             }
         }
-    
+
         // Kiểm tra xem otherServicesData có phải là mảng không
         const updatedOtherDishes = Array.isArray(otherServicesData) ? otherServicesData.map(service => {
             const option = allOtherOptions.find(opt => opt.value === service.id);
@@ -638,9 +644,9 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 quantity: service.quantity,
             };
         }) : [];
-    
+
         setSelectOtherDishes(updatedOtherDishes);
-    
+
         // Kiểm tra xem extraServicesData có phải là mảng không
         const updatedExtraDishes = Array.isArray(extraServicesData) ? extraServicesData.map(service => {
             const option = allExtraOptions.find(opt => opt.value === service.id);
@@ -651,10 +657,10 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                 quantity: service.quantity,
             };
         }) : [];
-    
+
         setSelectExtraDishes(updatedExtraDishes);
     };
-    
+
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -834,10 +840,10 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         const total_table_price_backup = data.spare_table_count * table_price;
 
         // Tổng tiền ghế chính
-        const total_chair_price = data.tables * data.customerAndChair * chair_price;
+        const total_chair_price = data.tables * 10 * chair_price;
 
         // Tổng tiền ghế dự phòng
-        const total_chair_price_backup = data.spare_table_count * data.customerAndChair * chair_price;
+        const total_chair_price_backup = data.spare_table_count * 10 * chair_price;
 
         // Tổng tiền menu (cho bàn chính)
         const total_menus = data.tables * menuPrice;
@@ -873,49 +879,49 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             status: selectStatusBookings,
         }
 
-        console.log("total_chair_price_backup" + total_chair_price_backup)
-        console.log("total_chair_price" + total_chair_price)
-        console.log("total_table_price" + total_table_price)
-        console.log("total_table_price_backup" + total_table_price_backup)
-        console.log("menus" + total_menus)
-        console.log("decorPrice" + decorPrice)
+        console.log("Tổng tiền bàn chính" + total_table_price)
+        console.log("Tổng tiền bàn phụ" + total_table_price_backup)
+        console.log("Tổng tiền ghế chính" + total_chair_price)
+        console.log("Tổng tiền ghế dự phòng " + total_chair_price_backup)
+        console.log("Tổng tiền menu cho bàn chính" + total_menus)
+        console.log("Tổng tiền menu cho bàn phụ" + total_menus_backup)
+        console.log("DecorPrice" + decorPrice)
         console.log("partyPrice" + partyPrice)
         console.log("stagePrice" + stagePrice)
-        console.log("total_menus_backup" + total_menus_backup)
-        try {
-            const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE(id), "PATCH", dataform);
+        // try {
+        //     const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE(id), "PATCH", dataform);
 
-            if (updateBranches.success) {
-                dispatch(fetchBranchSuccess(updateBranches.data));
-                toast({
-                    title: "Cập nhật thành công",
-                    description: "Đã sử lý thông tin cập nhật của khách",
-                    type: "success",
-                });
-                // setTimeout(() => {
-                //     window.location.reload();
-                // }, 3000);
-            } else {
-                const { statusCode, message } = updateBranches.error || {};
-                if (statusCode == 401) {
-                    toast({
-                        title: "Phiên đăng nhập đã hết hạn",
-                        description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
-                        type: "error",
-                    });
-                } else {
-                    toast({
-                        title: "Cập nhật thất bại",
-                        description: message || "Yêu cầu chưa được cập nhật trạng thái",
-                        type: "error",
-                    });
-                }
-            }
-        } catch (error) {
-            console.log(error);
-            const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
-            toast("error", "Cập nhật thất bại", message);
-        }
+        //     if (updateBranches.success) {
+        //         dispatch(fetchBranchSuccess(updateBranches.data));
+        //         toast({
+        //             title: "Cập nhật thành công",
+        //             description: "Đã sử lý thông tin cập nhật của khách",
+        //             type: "success",
+        //         });
+        //         // setTimeout(() => {
+        //         //     window.location.reload();
+        //         // }, 3000);
+        //     } else {
+        //         const { statusCode, message } = updateBranches.error || {};
+        //         if (statusCode == 401) {
+        //             toast({
+        //                 title: "Phiên đăng nhập đã hết hạn",
+        //                 description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
+        //                 type: "error",
+        //             });
+        //         } else {
+        //             toast({
+        //                 title: "Cập nhật thất bại",
+        //                 description: message || "Yêu cầu chưa được cập nhật trạng thái",
+        //                 type: "error",
+        //             });
+        //         }
+        //     }
+        // } catch (error) {
+        //     console.log(error);
+        //     const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
+        //     toast("error", "Cập nhật thất bại", message);
+        // }
     };
 
 
