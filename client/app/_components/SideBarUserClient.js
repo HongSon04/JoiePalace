@@ -42,7 +42,7 @@ const SideBarUserClient = () => {
                         >
                             <Link
                                 href={Array.isArray(item.links) ? item.links[0] : item.links}
-                                className={`font-Montserrat text-center md:text-left block py-3 px-6 leading-[22px] text-sm ${isActive ? 'text-white font-bold' : item.color} hover:text-white`}
+                                className={`font-Montserrat text-center md:text-left block py-3 px-6 leading-[22px] text-base ${isActive ? 'text-white font-bold' : item.color} hover:text-white`}
                             >
                                 {item.title}
                             </Link>

@@ -1,45 +1,11 @@
 "use client";
 
-import {
-  PlusIcon,
-  TrashIcon,
-  EllipsisVerticalIcon as VerticalDotsIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import {
-  Button,
-  Chip,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  dish,
-} from "@nextui-org/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { Suspense } from "react";
-import { formatDateTime } from "@/app/_utils/formaters";
-import { capitalize } from "@/app/_utils/helpers";
-import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
-import { SearchIcon } from "@/app/_components/SearchIcon";
-import { useDispatch, useSelector } from "react-redux";
-import useApiServices from "@/app/_hooks/useApiServices";
-import { CONFIG } from "@/app/_utils/config";
 import CustomPagination from "@/app/_components/CustomPagination";
-import { z } from "zod";
+import FormInput from "@/app/_components/FormInput";
+import { SearchIcon } from "@/app/_components/SearchIcon";
+import Uploader from "@/app/_components/Uploader";
+import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
 import {
   addingDish,
   addingDishFailure,
@@ -52,17 +18,43 @@ import {
   fetchingCategoryDishesSuccess,
   setSelectedDish,
 } from "@/app/_lib/features/dishes/dishesSlice";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import useCustomToast from "@/app/_hooks/useCustomToast";
+import { fetchingProductsFailure } from "@/app/_lib/products/productsSlice";
 import { API_CONFIG } from "@/app/_utils/api.config";
-import Image from "next/image";
-import Loading from "../loading";
+import { CONFIG } from "@/app/_utils/config";
+import {
+  PlusIcon,
+  TrashIcon,
+  EllipsisVerticalIcon as VerticalDotsIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "@nextui-org/react";
 import { Col, Row } from "antd";
-import Uploader from "@/app/_components/Uploader";
-import FormInput from "@/app/_components/FormInput";
+import Image from "next/image";
+import React, { Suspense } from "react";
+import { useForm } from "react-hook-form";
 import { IoSaveOutline } from "react-icons/io5";
-import { fetchingProducts, fetchingProductsFailure } from "@/app/_lib/products/productsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { z } from "zod";
+import Loading from "../loading";
 
 const statusColorMap = {
   active: "success",
@@ -133,10 +125,13 @@ function DishesTable({ dishCategory, categories }) {
     fetchData();
 
     return () => {};
-  }, [currentPage, dishCategory?.id]);  // Cập nhật khi trang hoặc category thay đổi
+  }, [currentPage, dishCategory?.id]); // Cập nhật khi trang hoặc category thay đổi
 
   // Fetch dishes by categoryId
-  const fetchCategoryDishes = async (categoryId, params = { page: currentPage }) => {
+  const fetchCategoryDishes = async (
+    categoryId,
+    params = { page: currentPage }
+  ) => {
     dispatch(fetchingCategoryDishes());
 
     const data = await makeAuthorizedRequest(
@@ -156,7 +151,7 @@ function DishesTable({ dishCategory, categories }) {
 
   // Fetch all dishes if no categoryId is passed
   const fetchingProducts = async (params = { page: currentPage }) => {
-    dispatch(fetchingCategoryDishes());  // Có thể đổi thành `fetchingProducts` nếu cần
+    dispatch(fetchingCategoryDishes()); // Có thể đổi thành `fetchingProducts` nếu cần
 
     const data = await makeAuthorizedRequest(
       API_CONFIG.PRODUCTS.GET_ALL(params),
@@ -165,11 +160,11 @@ function DishesTable({ dishCategory, categories }) {
     );
 
     if (data.success) {
-      dispatch(fetchingProductsSuccess(data));  // Thay đổi thành `fetchingProductsSuccess`
+      dispatch(fetchingProductsSuccess(data)); // Thay đổi thành `fetchingProductsSuccess`
     }
 
     if (data.error) {
-      dispatch(fetchingProductsFailure(data));  // Thay đổi thành `fetchingProductsFailure`
+      dispatch(fetchingProductsFailure(data)); // Thay đổi thành `fetchingProductsFailure`
     }
   };
 
