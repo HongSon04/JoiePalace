@@ -14,8 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import useApiServices from "@/app/_hooks/useApiServices";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import useCustomToast from "@/app/_hooks/useCustomToast";
-import { fetchFeedbacksFailure, fetchBranchSuccess } from "@/app/_lib/features/feedbacks/feedbacksSlice";
+import { fetchFeedbacksFailure } from "@/app/_lib/features/feedbacks/feedbacksSlice";
 import AdminThemChiNhanhInputAndImg from "./AdminThemChiNhanhInputAndImgForADD";
+import { fetchBranchSuccess } from "@/app/_lib/features/branch/branchSlice";
 
 const fieldsConfig = {
   contact: [
@@ -48,7 +49,7 @@ const branchSchema = z.object({
   stage: z.array(z.instanceof(File)).optional(),
 });
 
-function ChiNhanhAddPage() {
+function Page() {
   const { isError } = useSelector((store) => store.branch);
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
@@ -66,6 +67,7 @@ function ChiNhanhAddPage() {
   });
 
   const onImagesChange = (name, files) => {
+    if (!name || !files) return;
     setImagesData((prev) => ({ ...prev, [name]: files }));
     setValue(name, files, { shouldValidate: true });
   };
@@ -171,4 +173,4 @@ function ChiNhanhAddPage() {
   );
 }
 
-export default ChiNhanhAddPage;
+export default Page;

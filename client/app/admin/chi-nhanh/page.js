@@ -5,9 +5,6 @@ import { Stack, Box } from '@chakra-ui/react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import Branches from '../yeu-cau/Branches';
-export const metadata = {
-  title: 'Chi nhánh',
-};
 
 function Page() {
   return (

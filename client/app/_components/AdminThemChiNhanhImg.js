@@ -5,7 +5,7 @@ import { Box, Image, Button, Text } from '@chakra-ui/react';
 
 const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialImages = [] }) => {
   const [imageFiles, setImageFiles] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState(initialImages); 
+  const [imagePreviews, setImagePreviews] = useState(Array.isArray(initialImages) ? initialImages : []);
   const imagesRef = useRef(imagePreviews);
 
   // Update the images reference and notify parent component when image previews change
@@ -16,24 +16,27 @@ const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialIma
     }
   }, [imagePreviews, onImagesChange, name, imageFiles]);
 
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
+const handleImageUpload = (event) => {
+  const files = Array.from(event.target.files);
+  const newImagePreviews = files.map((file) => URL.createObjectURL(file));
 
-    const newImagePreviews = files.map((file) => URL.createObjectURL(file));
+  setImagePreviews((prevImages) => [...prevImages, ...newImagePreviews]);
+  setImageFiles((prevFiles) => {
+    const updatedFiles = [...prevFiles, ...files];
+    onImagesChange(name, updatedFiles); 
+    return updatedFiles;
+  });
+};
 
-    setImagePreviews((prevImages) => [...prevImages, ...newImagePreviews]);
-    setImageFiles((prevFiles) => [...prevFiles, ...files]);
-    onImagesChange(name, [...imageFiles, ...files]);
-  };
-
-  const handleDeleteImage = (index) => {
-    setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
-    const updatedFiles = imageFiles.filter((_, i) => i !== index);
-    setImageFiles(updatedFiles);
-    
-    // Notify parent component about the updated list of files
-    onImagesChange(name, updatedFiles);
-  };
+const handleDeleteImage = (index) => {
+  setImagePreviews((prevPreviews) => {
+    const updatedPreviews = prevPreviews.filter((_, i) => i !== index);
+    onImagesChange(name, imageFiles.filter((_, i) => i !== index)); // Cập nhật trước khi thay đổi
+    return updatedPreviews;
+  });
+  
+  setImageFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+};
 
   return (
     <div className="flex-1 p-4 bg-whiteAlpha-200 rounded-lg h-fit">

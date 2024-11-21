@@ -67,26 +67,20 @@ function Page() {
   const fetchBranchData = useCallback(async () => {
     try {
       const response = await fetchBranchBySlug(slug);
-      const branchData = response[0];
-      reset(branchData);
-      setBranchDetail(branchData)
-      setImagesData({
-        images: Array.isArray(branchData.images)
-        ? branchData.images
-        : branchData.images?.split(",") || [],
-      slogan_images: Array.isArray(branchData.slogan_images)
-        ? branchData.slogan_images
-        : branchData.slogan_images?.split(",") || [],
-      diagram_images: Array.isArray(branchData.diagram_images)
-        ? branchData.diagram_images
-        : branchData.diagram_images?.split(",") || [],
-      equipment_images: Array.isArray(branchData.equipment_images)
-        ? branchData.equipment_images
-        : branchData.equipment_images?.split(",") || [],
-      stages: Array.isArray(branchData.stages)
-        ? branchData.stages
-        : branchData.stages?.split(",") || [],
-      });
+      if (response && response.length > 0) {
+        const branchData = response[0];
+        reset(branchData);
+        setBranchDetail(branchData);
+        setImagesData({
+          images: Array.isArray(branchData.images) ? branchData.images : branchData.images?.split(",") || [],
+          slogan_images: Array.isArray(branchData.slogan_images) ? branchData.slogan_images : branchData.slogan_images?.split(",") || [],
+          diagram_images: Array.isArray(branchData.diagram_images) ? branchData.diagram_images : branchData.diagram_images?.split(",") || [],
+          equipment_images: Array.isArray(branchData.equipment_images) ? branchData.equipment_images : branchData.equipment_images?.split(",") || [],
+          stages: Array.isArray(branchData.stages) ? branchData.stages : branchData.stages?.split(",") || [],
+        });
+      } else {
+        throw new Error("No branch data found");
+      }
     } catch (error) {
       console.error("Error fetching branch data: ", error);
     }
@@ -129,7 +123,7 @@ function Page() {
   const handleDelete = (section, index) => {
     setImagesData((prevImagesData) => {
       if (!prevImagesData[section]) {
-        return prevImagesData;
+        return prevImagesData; 
       }
       const updatedSectionData = prevImagesData[section].filter((_, i) => i !== index);
       return {
@@ -138,14 +132,13 @@ function Page() {
       };
     });
   };
-  console.log(imagesData)
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <AdminHeader showSearchForm={false} title="Chi tiết chi nhánh" />
       <Stack alignItems="start" spacing="8" direction="row" className="mt-5">
         <h1 className="text-base leading-6 font-normal text-gray-400">
-          Chi nhánh / {branchDetail.name}
-        </h1>
+            Chi nhánh / {branchDetail.name || "Loading..."}
+      </h1>
       </Stack>
       <div className="flex flex-col gap-6 w-full mt-6">
         <div className="flex gap-5">
@@ -165,7 +158,7 @@ function Page() {
             inputId="input-image-upload-carousel"
             onImagesChange={onImagesChange}
             name="images"
-            initialImages={imagesData.images}
+            initialImages={imagesData.images || []}
           />
         </div>
 
@@ -185,7 +178,7 @@ function Page() {
             inputId="input-image-upload-description"
             onImagesChange={onImagesChange}
             name="slogan_images"
-            initialImages={imagesData.slogan_images}
+            initialImages={imagesData.slogan_images || []}
           />
         </div>
 
@@ -204,7 +197,7 @@ function Page() {
             inputId="input-image-upload-diagram"
             onImagesChange={onImagesChange}
             name="diagram_images"
-            initialImages={imagesData.diagram_images}
+            initialImages={imagesData.diagram_images|| []}
           />
         </div>
 
@@ -223,7 +216,7 @@ function Page() {
             inputId="input-image-upload-equipment"
             onImagesChange={onImagesChange}
             name="equipment_images"
-            initialImages={imagesData.equipment_images}
+            initialImages={imagesData.equipment_images|| []}
           />
         </div>
         <AdminThemChiNhanhInputAndImg name='stages' title="Sảnh" height="290px"     inputId="input-image-upload-map" input={false} branchData={imagesData.stages} 

@@ -11,11 +11,11 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
     const [stages, setStages] = useState([]);
 
     useEffect(() => {
-        if (branchData.length > 0) {
+        if (Array.isArray(branchData) && branchData.length > 0) {
             setImages(branchData.flatMap((item) => item.images.map((img) => img.split(','))).flat());
             setNames(branchData.flatMap((item) => Array(item.images.length).fill(item.name)));
             setDescriptions(branchData.flatMap((item) => Array(item.images.length).fill(item.description)));
-            setStages(branchData.flatMap((item, index) => Array(item.images.length).fill(item.name)));
+            setStages(branchData.flatMap((item) => Array(item.images.length).fill(item.name)));
         }
     }, [branchData]);
 
@@ -23,8 +23,8 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
         const files = Array.from(event.target.files);
         const newImages = [];
         const newStages = [];
-
-        files.forEach((file, index) => {
+    
+        const readers = files.map((file, index) => {
             const reader = new FileReader();
             reader.onload = () => {
                 newImages.push(reader.result);
@@ -37,27 +37,33 @@ const AdminThemChiNhanhInputAndImg = ({ name, title, height, inputId, input = tr
                 }
             };
             reader.readAsDataURL(file);
+            return reader;
         });
     };
-
     const handleNameChange = (index, value) => {
-        const updatedNames = [...names];
-        updatedNames[index] = value;
-        setNames(updatedNames);
+        if (index < names.length) {
+            const updatedNames = [...names];
+            updatedNames[index] = value;
+            setNames(updatedNames);
+        }
     };
 
     const handleDescriptionChange = (index, value) => {
-        const updatedDescriptions = [...descriptions];
-        updatedDescriptions[index] = value;
-        setDescriptions(updatedDescriptions);
-    };
-
+        if (index < descriptions.length) {
+            const updatedDescriptions = [...descriptions];
+            updatedDescriptions[index] = value;
+            setDescriptions(updatedDescriptions);
+        }
+    }
+    
     const handleDelete = (index) => {
-        setImages((prevImages) => prevImages.filter((_, i) => i !== index));
-        setNames((prevNames) => prevNames.filter((_, i) => i !== index));
-        setDescriptions((prevDescriptions) => prevDescriptions.filter((_, i) => i !== index));
-        setStages((prevStages) => prevStages.filter((_, i) => i !== index));
-        onDelete(index);
+        if (index < images.length) {
+            setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+            setNames((prevNames) => prevNames.filter((_, i) => i !== index));
+            setDescriptions((prevDescriptions) => prevDescriptions.filter((_, i) => i !== index));
+            setStages((prevStages) => prevStages.filter((_, i) => i !== index));
+            onDelete(index);
+        }
     };
 
     const renderImageItem = (item, index) => (

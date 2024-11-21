@@ -21,13 +21,14 @@ import { organizationSchema } from './organizationSchema';
 import { DropdownField } from './DropdownField';
 import { DropDownSelect2 } from './DropDownSelect2';
 import { FoodsTitle, TitleSpanInfo } from './ServiceMethod';
+import { useRouter } from 'next/router';
 
 const Page = ({ params }) => {
     const { id } = params;
     const { makeAuthorizedRequest } = useApiServices();
     const [currentBranch, setCurrentBranch] = useState(null);
     const toast = useCustomToast();
-
+    const router = useRouter();
     const dispatch = useDispatch();
     const headers = ['Dịch vụ', 'Mô tả', 'Thành tiền (VND)'];
 
@@ -176,7 +177,6 @@ const Page = ({ params }) => {
         fetchData();
 
     }, [id, reset]);
-
 
 
     const fetchLimitStages = async (stageId) => {
@@ -676,7 +676,7 @@ const Page = ({ params }) => {
     const handleMenuChange = async (event) => {
         const selectedMenuId = event.target.value;
         setSelectedMenu(selectedMenuId);
-        const selectedMenuOption = menus[0].options.find(option => option.value === parseInt(selectedMenuId));
+        const selectedMenuOption = menus[0].options.find(option => String(option.value) === parseInt(selectedMenuId));
 
         if (selectedMenuOption) {
             setMenuPrice(selectedMenuOption.price);
@@ -723,9 +723,8 @@ const Page = ({ params }) => {
     const handleStageChange = (event) => {
         const selectedStageId = event.target.value;
         setSelectStages(selectedStageId);
-    
-        console.log('Selected stage ID:', selectedStageId); 
-    
+        fetchLimitStages(selectedStageId);
+
         const selectedStage = stages[0]?.options.find(option => String(option.value) === String(selectedStageId));
     
         if (selectedStage) {
@@ -741,7 +740,7 @@ const Page = ({ params }) => {
         const selectedDecorId = Number(event.target.value);
         setSelectedDecors(selectedDecorId);
 
-        const selectedDecorOption = decors[0].options.find(option => option.value === selectedDecorId);
+        const selectedDecorOption = decors[0].options.find(option => String(option.value) === selectedDecorId);
         if (selectedDecorOption) {
             setDecorPrice(selectedDecorOption.price);
         } else {
@@ -752,7 +751,7 @@ const Page = ({ params }) => {
         const selectedPartyTypeId = event.target.value;
         setSelectPartyTypes(selectedPartyTypeId);
 
-        const selectedPartyTypeOption = partyTypes[0].options.find(option => option.value === parseInt(selectedPartyTypeId));
+        const selectedPartyTypeOption = partyTypes[0].options.find(option => String(option.value) === parseInt(selectedPartyTypeId));
 
         if (selectedPartyTypeOption) {
             setPartyPrice(selectedPartyTypeOption.price);
@@ -908,9 +907,8 @@ const Page = ({ params }) => {
                     description: "Đã sử lý thông tin cập nhật của khách",
                     type: "success",
                 });
-                // setTimeout(() => {
-                //     window.location.reload();
-                // }, 3000);
+                router.reload();
+
             } else {
                 const { statusCode, message } = updateBranches.error || {};
                 if (statusCode == 401) {
@@ -933,7 +931,7 @@ const Page = ({ params }) => {
             toast("error", "Cập nhật thất bại", message);
         }
     };
-    console.log(stagePrice)
+
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />

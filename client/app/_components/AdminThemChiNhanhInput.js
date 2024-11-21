@@ -1,7 +1,7 @@
 import React from 'react';
 import { Controller } from 'react-hook-form';
 
-const AdminThemChiNhanhInput = ({ fields, title, heightTextarea, control, data }) => {
+const AdminThemChiNhanhInput = ({ fields = [], title, heightTextarea, control, data }) => {
   return (
     <div className="p-4 w-[363px] bg-whiteAlpha-200 rounded-lg h-fit">
       <div className='flex gap-3 flex-col'>
