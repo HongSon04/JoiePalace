@@ -42,7 +42,7 @@ const branchSchema = z.object({
   equipment_description: z.string().optional(),
 });
 
-function ChiNhanhAddPage() {
+function Page() {
   const { slug } = useParams();
   const { makeAuthorizedRequest } = useApiServices();
   const {
@@ -244,4 +244,4 @@ function ChiNhanhAddPage() {
   );
 }
 
-export default ChiNhanhAddPage;
+export default Page;
