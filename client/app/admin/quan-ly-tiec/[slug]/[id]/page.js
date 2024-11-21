@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HeaderSelect from '../HeaderSelect';
 import RequestBreadcrumbsForQuanLyTiec from './RequestBreadcrumbsForQuanLyTiec';
 import InputDetailCustomer from './InputDetailCustomer';
@@ -11,7 +11,7 @@ import ButtonCustomAdmin from '@/app/_components/ButtonCustomAdmin';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useApiServices from '@/app/_hooks/useApiServices';
-import { API_CONFIG, makeAuthorizedRequest } from '@/app/_utils/api.config';
+import { API_CONFIG } from '@/app/_utils/api.config';
 import { inputInfoUser, inputOrganization, inputsCost } from './InputData';
 import { buttons } from './buttons';
 import useCustomToast from '@/app/_hooks/useCustomToast';
@@ -22,7 +22,7 @@ import { DropdownField } from './DropdownField';
 import { DropDownSelect2 } from './DropDownSelect2';
 import { FoodsTitle, TitleSpanInfo } from './ServiceMethod';
 
-const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
+const Page = ({ params }) => {
     const { id } = params;
     const { makeAuthorizedRequest } = useApiServices();
     const [currentBranch, setCurrentBranch] = useState(null);
@@ -166,7 +166,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
                     fetchAllMenus(),
                     fetchAllPartyTypes(),
                     fetchAllDecors(),
-                    fetchAllServices(),
+                    fetchAllServices(), 
                 ]);
                 await fetchDataDetailsParty();
             } catch (error) {
@@ -174,13 +174,10 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             }
         };
         fetchData();
+
     }, [id, reset]);
-    
-    useEffect(() => {
-        if (otherServices[0]?.options.length > 1 && extraServices[0]?.options.length > 1 && bookingDetails) {
-            checkServices(bookingDetails);
-        }
-    }, [otherServices, extraServices, bookingDetails]);
+
+
 
     const fetchLimitStages = async (stageId) => {
         try {
@@ -385,14 +382,14 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_BY_ID(packageId), 'GET');
             const packageData = response.data[0];
-    
+
             // Cập nhật các trường khác từ packageData
             setSelectedMenu(packageData.menu_id);
             await fetchFoodsByMenuId(packageData.menu_id);
             setSelectPartyTypes(packageData.party_type_id);
             setSelectStages(packageData.stage_id);
             setSelectedDecors(packageData.decor_id);
-    
+
             // Xử lý other_service nếu có
             if (packageData.other_service) {
                 const otherServicesFromAPI = JSON.parse(packageData.other_service);
@@ -406,7 +403,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             } else {
                 setSelectOtherDishes([]);
             }
-    
+
             // Xử lý extra_service nếu có
             if (packageData.extra_service) {
                 const extraServicesFromAPI = JSON.parse(packageData.extra_service);
@@ -572,6 +569,11 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             console.error('Error fetching party details:', error);
         }
     };
+    useEffect(() => {
+        if (otherServices[0]?.options.length > 1 && extraServices[0]?.options.length > 1 && bookingDetails) {
+            checkServices(bookingDetails);
+        }
+    }, [otherServices, extraServices, bookingDetails]);
 
     const checkSelectedDecor = (decorOptions, partyData) => {
         if (!Array.isArray(decorOptions) || decorOptions.length === 0) {
@@ -599,8 +601,8 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
 
         console.log('Tất cả tùy chọn dịch vụ khác:', allOtherOptions);
         console.log('Tất cả tùy chọn dịch vụ phát sinh:', allExtraOptions);
-        console.log('Dữ liệu bookingDetails:', bookingDetails); 
-        
+        console.log('Dữ liệu bookingDetails:', bookingDetails);
+
         let otherServicesData = [];
         let extraServicesData = [];
 
@@ -718,25 +720,21 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         handleServiceChange(event, otherServices, selectOtherDishes, setSelectOtherDishes, setSelectOtherServices);
     };
 
-    // Tạo object mới chứa id và quantity
-    const createPayload = () => {
-        return selectExtraDishes.map(dish => ({
-            id: dish.id,
-            quantity: dish.quantity
-        }));
-    };
-
     const handleStageChange = (event) => {
         const selectedStageId = event.target.value;
         setSelectStages(selectedStageId);
-        fetchLimitStages(selectedStageId);
-
-        const selectedStage = stages[0]?.options.find(option => option.value === selectedStageId);
+    
+        console.log('Selected stage ID:', selectedStageId); 
+    
+        const selectedStage = stages[0]?.options.find(option => String(option.value) === String(selectedStageId));
+    
         if (selectedStage) {
             setLimitStages(selectedStage.capacity_max || 0);
-            setStagePrice(selectedStage.price);
+            setStagePrice(selectedStage.price || 0);
+            console.log('Updated stage price:', selectedStage.price);
         } else {
             setStagePrice(0);
+            console.warn('No stage found for the selected ID:', selectedStageId); 
         }
     };
     const handleDecorChange = (event) => {
@@ -829,6 +827,7 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         const totalExtraServicesPrice = selectExtraDishes.reduce((total, dish) => {
             return total + (dish.price * dish.quantity);
         }, 0);
+
         // Định nghĩa các giá trị đơn giá
         const table_price = 200000; // Giá mỗi bàn
         const chair_price = 50000; // Giá mỗi ghế
@@ -852,7 +851,17 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         const total_menus_backup = data.spare_table_count * menuPrice;
 
         // Tính tổng tiền amount
-        const total_amount_all = total_table_price + total_table_price_backup + total_chair_price + total_chair_price_backup + decorPrice + partyPrice + stagePrice + total_menus + total_menus_backup + totalOtherServicesPrice;
+        const total_amount_all =
+            total_table_price +
+            total_table_price_backup +
+            total_chair_price +
+            total_chair_price_backup +
+            decorPrice +
+            partyPrice +
+            stagePrice +
+            total_menus +
+            total_menus_backup +
+            totalOtherServicesPrice;
 
         console.log(total_amount_all)
 
@@ -868,7 +877,6 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
             email: data.email,
             company_name: data.company_name,
             number_of_guests: data.customer,
-
             table_count: data.tables,
             spare_table_count: data.spare_table_count,
             amount: total_amount_all,
@@ -888,43 +896,44 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
         console.log("DecorPrice" + decorPrice)
         console.log("partyPrice" + partyPrice)
         console.log("stagePrice" + stagePrice)
-        // try {
-        //     const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE(id), "PATCH", dataform);
+        console.log(selectOtherDishes)
+        console.log("Tổng số tiền của other_service" + totalOtherServicesPrice)
+        try {
+            const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE(id), "PATCH", dataform);
 
-        //     if (updateBranches.success) {
-        //         dispatch(fetchBranchSuccess(updateBranches.data));
-        //         toast({
-        //             title: "Cập nhật thành công",
-        //             description: "Đã sử lý thông tin cập nhật của khách",
-        //             type: "success",
-        //         });
-        //         // setTimeout(() => {
-        //         //     window.location.reload();
-        //         // }, 3000);
-        //     } else {
-        //         const { statusCode, message } = updateBranches.error || {};
-        //         if (statusCode == 401) {
-        //             toast({
-        //                 title: "Phiên đăng nhập đã hết hạn",
-        //                 description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
-        //                 type: "error",
-        //             });
-        //         } else {
-        //             toast({
-        //                 title: "Cập nhật thất bại",
-        //                 description: message || "Yêu cầu chưa được cập nhật trạng thái",
-        //                 type: "error",
-        //             });
-        //         }
-        //     }
-        // } catch (error) {
-        //     console.log(error);
-        //     const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
-        //     toast("error", "Cập nhật thất bại", message);
-        // }
+            if (updateBranches.success) {
+                dispatch(fetchBranchSuccess(updateBranches.data));
+                toast({
+                    title: "Cập nhật thành công",
+                    description: "Đã sử lý thông tin cập nhật của khách",
+                    type: "success",
+                });
+                // setTimeout(() => {
+                //     window.location.reload();
+                // }, 3000);
+            } else {
+                const { statusCode, message } = updateBranches.error || {};
+                if (statusCode == 401) {
+                    toast({
+                        title: "Phiên đăng nhập đã hết hạn",
+                        description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
+                        type: "error",
+                    });
+                } else {
+                    toast({
+                        title: "Cập nhật thất bại",
+                        description: message || "Yêu cầu chưa được cập nhật trạng thái",
+                        type: "error",
+                    });
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            const { message } = error.response?.data || { message: "Đã xảy ra lỗi" };
+            toast("error", "Cập nhật thất bại", message);
+        }
     };
-
-
+    console.log(stagePrice)
     return (
         <div>
             <HeaderSelect title={'Quản lý tiệc'} slugOrID={id} />
@@ -1180,4 +1189,4 @@ const ChiTietTiecCuaChiNhanhPage = ({ params }) => {
     );
 };
 
-export default ChiTietTiecCuaChiNhanhPage;
+export default Page;

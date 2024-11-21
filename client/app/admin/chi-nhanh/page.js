@@ -9,7 +9,7 @@ export const metadata = {
   title: 'Chi nhánh',
 };
 
-function PageChiNhanh() {
+function Page() {
   return (
     <Box>
     <AdminHeader showBackButton={false}  title={'Chi nhánh'} />
@@ -30,4 +30,4 @@ function PageChiNhanh() {
   );
 }
 
-export default PageChiNhanh;
+export default Page;
