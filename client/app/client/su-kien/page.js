@@ -1,7 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import mouseIcon from "../../../public/mouse.svg";
 import { motion } from "framer-motion";
 import { Image } from "@chakra-ui/react";
@@ -10,11 +9,26 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "@/app/_styles/client.css";
 import Footer from "@/app/_components/FooterClient";
-import CustomSliderMenu from "@/app/_components/CustomSliderMenu";
+import dynamic from "next/dynamic";
 
+const CustomSliderMenu = dynamic(() => import("@/app/_components/CustomSliderMenu"), {
+  ssr: false,
+});
+
+const ScrollFullPage = dynamic(() => import("@/app/_components/ScrollFullPage"), {
+  ssr: false,
+});
+
+const isBrowser = typeof window !== "undefined";
 
 
 function Event() {
+
+  useEffect(() => {
+    if (isBrowser) {
+      console.log("Client-side logic here");
+    }
+  }, []);
   
   return (
     <div className="m-auto h-full" id="fullpage">

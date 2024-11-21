@@ -1,7 +1,6 @@
 "use client";
 import { Image } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import Footer from "@/app/_components/FooterClient";
 import TextFade from "@/app/_components/TextFade";
 import MultiCarousel from "@/app/_components/MultiCarouselSlider";
@@ -17,6 +16,7 @@ import WeddingPackages from "@/app/_components/pakageService";
 import ToolCreactCombo from "./_components/ToolCreactCombo";
 import Loading from "./loading";
 import { getAllPackages } from "./_services/packageServices";
+import dynamic from "next/dynamic";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -124,6 +124,10 @@ const offers = [
     image: "/images-client/offers/offer3.png",
   },
 ];
+const ScrollFullPage = dynamic(() => import("@/app/_components/ScrollFullPage"), {
+  ssr: false,
+})
+const isBrowser = typeof window !== "undefined";
 function Home() {
   const [timeAutoPlay, setTimeAutoPlay] = useState(false);
   const carouselRef = useRef();
@@ -134,6 +138,11 @@ function Home() {
       setTimeAutoPlay(true);
     }, 5000);
   };
+  useEffect(() => {
+    if (isBrowser) {
+      console.log("Client-side logic here");
+    }
+  }, []);
   useEffect(() => {
     const callApi = async () => {
       const res = await getAllPackages();
@@ -242,9 +251,8 @@ function Home() {
                   className={`location-image-bg absolute top-0 left-0 w-full h-full scale-150 pointer-events-none overflow-hidden`}
                 >
                   <Image
-                    src={`/images-client/locations/venues-placeholder-${
-                      index + 1
-                    }-scaled.jpg`}
+                    src={`/images-client/locations/venues-placeholder-${index + 1
+                      }-scaled.jpg`}
                     w={"100%"}
                     h={"100%"}
                     className="object-cover"
@@ -464,9 +472,8 @@ function Home() {
               {events.map((event, indexEvent) => (
                 <div
                   key={indexEvent}
-                  className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${
-                    indexEvent === 0 ? "flex-col-reverse" : "flex-col"
-                  } gap-6 overflow-y-scroll cursor-pointer`}
+                  className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${indexEvent === 0 ? "flex-col-reverse" : "flex-col"
+                    } gap-6 overflow-y-scroll cursor-pointer`}
                 >
                   {event.map((item, indexItem) => (
                     <div

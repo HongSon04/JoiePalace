@@ -6,6 +6,7 @@ import { useToast } from "@chakra-ui/react";
 import { updateMenu } from "../_lib/features/menu/menuSlice";
 import { formatDate } from "../_utils/format";
 import Image from "next/image";
+import Link from "next/link";
 
 function AddToMenuButton({
     dish,
@@ -46,7 +47,7 @@ function AddToMenuButton({
             price,
             images: dish.images, 
         };
-        console.log('data menu update---->',data);
+        // console.log('data menu update---->',data);
         
         try {
             const result = await dispatch(updateMenu({ id: menu.id, data })).unwrap();
@@ -73,7 +74,7 @@ function AddToMenuButton({
             console.error(error);
         }
     };
-    console.log(dish);
+    // console.log(dish);
     
     return (
         <>
