@@ -1,15 +1,28 @@
 "use client";
-import { useRef } from "react";
-
-import ScrollFullPage from "@/app/_components/ScrollFullPage";
+import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import mouseIcon from "../../../public/mouse.svg";
 import { motion } from "framer-motion";
 import { Image } from "@chakra-ui/react";
 import Footer from "@/app/_components/FooterClient";
-import CustomSliderMenu from "@/app/_components/CustomSliderMenu";
 
+const CustomSliderMenu = dynamic(() => import("@/app/_components/CustomSliderMenu"), {
+  ssr: false,
+});
+
+const ScrollFullPage = dynamic(() => import("@/app/_components/ScrollFullPage"), {
+  ssr: false,
+});
+
+const isBrowser = typeof window !== "undefined";
 
 function Conference() {
+  useEffect(() => {
+    if (isBrowser) {
+      console.log("Client-side logic here");
+    }
+  }, []);
+
   return (
     <div className="m-auto h-full" id="fullpage">
       <ScrollFullPage>

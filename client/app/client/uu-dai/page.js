@@ -3,13 +3,13 @@
 import ButtonDiscover from "@/app/_components/ButtonDiscover";
 import Footer from "@/app/_components/FooterClient";
 import IconButton from "@/app/_components/IconButton";
-import ScrollFullPage from "@/app/_components/ScrollFullPage";
 import TextFade from "@/app/_components/TextFade";
 import { Image } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import "@/app/_styles/client.css";
+import dynamic from "next/dynamic";
 
 const offers = [
   {
@@ -35,6 +35,11 @@ const offers = [
     image: "/images-client/offers/offer3.png",
   },
 ];
+
+const ScrollFullPage = dynamic(() => import("@/app/_components/ScrollFullPage"), {
+  ssr: false,
+});
+const isBrowser = typeof window !== "undefined";
 const OfferPage = () => {
   const carouselRef = useRef();
   const carouselRef2 = useRef();
@@ -48,6 +53,13 @@ const OfferPage = () => {
       setTimeAutoPlay(true);
     }, 5000);
   };
+
+  useEffect(() => {
+    if (isBrowser) {
+      console.log("Client-side logic here");
+    }
+  }, []);
+
   useEffect(() => {
     delay();
   }, []);
