@@ -36,7 +36,7 @@ const WeddingSection = () => {
 
                         return {
                             title: item.name,
-                            price: `${item.price.toLocaleString().slice(0, 3)} Triệu VND`,
+                            price: `${Math.ceil(item.price / 1000000).toLocaleString()} Triệu VND`,
                             details: `Thường dành cho tiệc khoảng ${item.number_of_guests || 0} khách.`,
                             categories: [
                                 {
