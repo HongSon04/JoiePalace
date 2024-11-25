@@ -82,9 +82,6 @@ const WeddingPackages = ({ dataPackage }) => {
     }
   }, [dataPackage]);
 
-
-  console.log('orther_service', orther_service);
-
   const listItemPackages = [
     // ...orther_service
     {

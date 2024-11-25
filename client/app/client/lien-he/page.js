@@ -36,7 +36,7 @@ const LienHe = () => {
             },
           }}
           styles="w-screen flex flex-col items-center lg:flex-row gap-10"
-          replayeffect={true}
+          replayEffect={true}
         >
           <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col gap-10">
             <h1 className="uppercase text-gold font-bold text-5xl leading-[100%]">

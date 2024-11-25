@@ -16,7 +16,6 @@ import { BsCardChecklist } from "react-icons/bs";
 import { signOut } from "next-auth/react";
 
 const listMenu = [
-  { id: 1, name: "Địa điểm", categories: "dia-diem", href: "/#" },
   { id: 2, name: "Sự kiện", categories: "su-kien", href: "su-kien" },
   { id: 3, name: "Hội nghị", categories: "hoi-nghi", href: "hoi-nghi" },
   { id: 4, name: "Tiệc cưới", categories: "tiec-cuoi", href: "tiec-cuoi" },
@@ -304,7 +303,7 @@ const HeaderClient = () => {
             <ul className="flex flex-col !overflow-y-auto">
               {listMenu.map((menu) => (
                 <div key={menu.id}>
-                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-3xl flex items-center max-lg:text-2xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
@@ -330,7 +329,7 @@ const HeaderClient = () => {
               ))}
               {!isLogin ? (
                 <>
-                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-3xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
@@ -339,7 +338,7 @@ const HeaderClient = () => {
                       Đăng ký
                     </Link>
                   </li>
-                  <li className="font-normal h-16 text-4xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
+                  <li className="font-normal h-16 text-3xl flex items-center max-lg:text-3xl max-lg:h-12 max-sm:text-2xl max-sm:h-8">
                     <Link
                       onClick={handleShowMenu}
                       className="hover:text-[#C0995A]"
@@ -354,11 +353,11 @@ const HeaderClient = () => {
           </div>
           <span className="w-[1px] h-full bg-white"></span>
           <div className="max-lg:hidden w-[40%]">
-            <ul className="flex flex-wrap gap-4">
+            <ul className="flex flex-wrap gap-8">
               {listBranches.map((location) => (
                 <li
                   key={location.id}
-                  className="font-normal w-[48%] h-16 text-3xl flex items-center"
+                  className="font-normal w-fit h-16 text-2xl flex items-center"
                 >
                   <Link
                     onClick={handleShowMenu}

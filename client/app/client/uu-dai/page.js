@@ -132,7 +132,7 @@ const OfferPage = () => {
                     </div>
                   </TextFade>
                 </div>
-                <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
+                <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-fit backdrop-blur-lg bg-white/10 py-16 px-8 rounded-lg overflow-hidden">
                   <TextFade
                     settings={{
                       hidden: { opacity: 0, x: 50 },
@@ -146,7 +146,7 @@ const OfferPage = () => {
                       },
                     }}
                     replayEffect={false}
-                    styles="h-full flex flex-col justify-center gap-[50px] gap-16 "
+                    styles="h-fit flex flex-col justify-center gap-[50px] gap-16 "
                   >
                     <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-4">
                       {offer.title}
