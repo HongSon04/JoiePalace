@@ -16,6 +16,7 @@ import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
 import {
   fetchingRequestFailure,
+  fetchingRequestsFailure,
   fetchingSelectedRequest,
   fetchingSelectedRequestFailure,
   fetchingSelectedRequestSuccess,
@@ -23,7 +24,6 @@ import {
   updatingRequestSuccess,
 } from "@/app/_lib/features/requests/requestsSlice";
 import { API_CONFIG } from "@/app/_utils/api.config";
-import { partyTypes } from "@/app/_utils/config";
 import Loading from "@/app/admin/loading";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -162,7 +162,7 @@ function RequestDetail({ id }) {
           description: "Yêu cầu chưa được cập nhật",
           type: "error",
         });
-        dispatch(fetchingRequestFailure());
+        dispatch(fetchingRequestsFailure());
       }
     }
     // }
