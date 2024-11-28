@@ -1,4 +1,4 @@
-import dishImagePlaceholder from "@/public/alacarte-menu-thumbnail.png";
+import dishImagePlaceholder from "@/public/Alacarte-Menu-Thumbnail.png";
 import imageUploaderPlaceholder from "@/public/imageUploaderPlaceholder.svg";
 import clientPattern from "@/public/line-group.svg";
 import clientDishImagePlaceholder from "@/public/clientDishPlaceholder.png";
