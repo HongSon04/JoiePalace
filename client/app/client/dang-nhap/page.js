@@ -173,7 +173,6 @@ const Page = () => {
         });
       }
     } catch (error) {
-      console.error("Đã xảy ra lỗi:", error);
       toast({
         position: "top",
         type: "error",

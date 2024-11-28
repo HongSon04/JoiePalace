@@ -8,8 +8,7 @@ export const getAllPackages = async () => {
   if (response.status !== 201 && response.status !== 200) {
     throw new Error("Có lỗi xảy ra khi lấy dữ liệu");
   }
-  console.log("responsekaka", response);
-  
+
   return { data: response.data.data };
 };
 export const getPackageBySlug = async (slug) => {

@@ -108,7 +108,7 @@ const requestsSlice = createSlice({
       .addCase(updateRequestStatus.rejected, (state, action) => {
         state.isUpdatingRequest = false;
         state.isUpdatingRequestError = true;
-        state.error = action.payload; 
+        state.error = action.payload;
       })
       .addCase(fetchRequestsByBranch.pending, (state) => {
         state.isFetchingRequests = true;
@@ -117,15 +117,14 @@ const requestsSlice = createSlice({
       .addCase(fetchRequestsByBranch.fulfilled, (state, action) => {
         state.isFetchingRequests = false;
         state.isFetchingRequestsError = false;
-        state.requests = action.payload.data; 
+        state.requests = action.payload.data;
         state.pagination = action.payload.pagination;
       })
       .addCase(fetchRequestsByBranch.rejected, (state, action) => {
         state.isFetchingRequests = false;
         state.isFetchingRequestsError = true;
         state.error = action.payload;
-      })
-
+      });
   },
 });
 
@@ -185,7 +184,7 @@ export const updateRequestStatus = createAsyncThunk(
 export const fetchRequestsByBranch = createAsyncThunk(
   "requests/fetchRequestsByBranch",
   async ({ params, branchId, signal }, { dispatch, rejectWithValue }) => {
-    dispatch(fetchingRequests()); 
+    dispatch(fetchingRequests());
 
     try {
       const response = await makeAuthorizedRequest(
@@ -200,7 +199,9 @@ export const fetchRequestsByBranch = createAsyncThunk(
           ? response.data.filter((booking) => booking.branch_id === branchId)
           : response.data;
 
-        dispatch(fetchingRequestsSuccess({ ...response, data: filteredBookings }));
+        dispatch(
+          fetchingRequestsSuccess({ ...response, data: filteredBookings })
+        );
         return filteredBookings;
       } else {
         dispatch(fetchingRequestsFailure(response));
