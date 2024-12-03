@@ -465,7 +465,32 @@ const Page = ({ params }) => {
                 if (partyData.package_id) {
                     await fetchPackageByID(partyData.package_id);
                 } else {
-                    setSelectStages(partyData.stage_id || '')
+                    if(partyData.stage_id){
+                        setSelectStages(partyData.stage_id)
+                        const options = stages[0]?.options || [];
+                        const selectedStage = options.find(option => String(option.value) === String(partyData.stage_id));
+                      
+                        if (selectedStage) {
+                            setSelectStages(selectedStage.value);
+                            setStagePrice(selectedStage.price || 0);
+                            setLimitStages(selectedStage.capacity_max || 0);
+                        } else {
+                            
+                            const firstStage = options[0];
+                            if (firstStage) {
+                                setSelectStages(firstStage.value);
+                                setStagePrice(firstStage.price || 0);
+                                setLimitStages(firstStage.capacity_max || 0);
+                            }
+                        }
+                    }else {
+                        const firstStage = stages[0]?.options[0];
+                        if (firstStage) {
+                            setSelectStages(firstStage.value);
+                            setStagePrice(firstStage.price || 0);
+                            setLimitStages(firstStage.capacity_max || 0);
+                        }
+                    }
                     if (bookingDetails.menu_id) {
                         setSelectedMenu(bookingDetails.menu_id);
                         const selectedMenuOption = menus[0].options.find(option => option.value === bookingDetails.menu_id);
@@ -711,9 +736,12 @@ const Page = ({ params }) => {
     }, [id, reset]);
     
     useEffect(() => {
-        if (menus[0]?.options.length > 0) {
-            fetchDataDetailsParty();
+        async function getMenu() {
+            if (menus[0]?.options.length > 0) {
+                await fetchDataDetailsParty();
+            }
         }
+        getMenu()
     }, [menus]);
 
     const handleMenuChange = async (event) => {

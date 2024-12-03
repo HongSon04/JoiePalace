@@ -242,7 +242,29 @@ export const deleteStage = createAsyncThunk(
     }
   }
 );
+export const fetchStagesAll = createAsyncThunk(
+  "stages/fetchStages",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const stages = await makeAuthorizedRequest(
+        API_CONFIG.STAGES.GET_ALL(params),
+        "GET",
+        null,
+        { signal }
+      );
 
+      if (stages.success) {
+        dispatch(fetchingStagesSuccess(stages));
+        return stages;
+      } else {
+        dispatch(fetchingStagesFailure(stages.error.message));
+        return rejectWithValue(stages.error.message);
+      }
+    } catch (error) {
+      return rejectWithValue('Network error');
+    }
+  }
+);
 export const {
   fetchingStages,
   fetchingStagesSuccess,
