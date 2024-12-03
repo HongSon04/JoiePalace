@@ -124,9 +124,12 @@ const offers = [
     image: "/images-client/offers/offer3.png",
   },
 ];
-const ScrollFullPage = dynamic(() => import("@/app/_components/ScrollFullPage"), {
-  ssr: false,
-})
+const ScrollFullPage = dynamic(
+  () => import("@/app/_components/ScrollFullPage"),
+  {
+    ssr: false,
+  }
+);
 const isBrowser = typeof window !== "undefined";
 function Home() {
   const [timeAutoPlay, setTimeAutoPlay] = useState(false);
@@ -139,15 +142,8 @@ function Home() {
     }, 5000);
   };
   useEffect(() => {
-    if (isBrowser) {
-      console.log("Client-side logic here");
-    }
-  }, []);
-  useEffect(() => {
     const callApi = async () => {
       const res = await getAllPackages();
-      console.log(res.data);
-
       setDataPackage(res.data.slice(0, 3));
     };
     delay();
@@ -158,7 +154,6 @@ function Home() {
   };
 
   if (!dataPackage) return <Loading></Loading>;
-  console.log("dataPackage", dataPackage);
 
   return (
     <>
@@ -251,8 +246,9 @@ function Home() {
                   className={`location-image-bg absolute top-0 left-0 w-full h-full scale-150 pointer-events-none overflow-hidden`}
                 >
                   <Image
-                    src={`/images-client/locations/venues-placeholder-${index + 1
-                      }-scaled.jpg`}
+                    src={`/images-client/locations/venues-placeholder-${
+                      index + 1
+                    }-scaled.jpg`}
                     w={"100%"}
                     h={"100%"}
                     className="object-cover"
@@ -278,7 +274,7 @@ function Home() {
                       {location.name}
                     </span>
                   </TextFade>
-                  <div className="location-detail w-full h-full flex flex-col justify-between absolute top-0 left-0 pl-24 py-1">
+                  <div className="location-detail w-full h-full flex flex-col justify-between absolute top-0 left-0 pl-24 py-8">
                     <div className="flex flex-col gap-3">
                       <span className="uppercase text-5xl font-normal">
                         JOIE PALACE
@@ -316,7 +312,7 @@ function Home() {
             replayEffect={true}
             styles="absolute z-10 w-screen top-[0%] left-[10%] "
           >
-            <span className="uppercase text-gold absolute text-4xl sm:text-6xl font-bold leading-[100%]">
+            <span className="uppercase text-gold absolute text-4xl sm:text-6xl font-bold leading-[100%] bg-blackAlpha-200 p-4 rounded-lg backdrop-blur-xl">
               dịch vụ
             </span>
           </TextFade>
@@ -329,7 +325,7 @@ function Home() {
             autoPlay={timeAutoPlay}
             customButtons={false}
           >
-            {services.map((service, index) => (
+            {services.map((service) => (
               <div key={service.id} className="w-screen h-screen flex relative">
                 <div className="w-[73%] h-full overflow-hidden relative">
                   <Image
@@ -472,8 +468,9 @@ function Home() {
               {events.map((event, indexEvent) => (
                 <div
                   key={indexEvent}
-                  className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${indexEvent === 0 ? "flex-col-reverse" : "flex-col"
-                    } gap-6 overflow-y-scroll cursor-pointer`}
+                  className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${
+                    indexEvent === 0 ? "flex-col-reverse" : "flex-col"
+                  } gap-6 overflow-y-scroll cursor-pointer`}
                 >
                   {event.map((item, indexItem) => (
                     <div
@@ -596,7 +593,7 @@ function Home() {
                       </div>
                     </TextFade>
                   </div>
-                  <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-full backdrop-blur-lg bg-white/10 py-16 px-8 overflow-hidden">
+                  <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-fit translate-y-[25%] backdrop-blur-lg bg-white/10 py-16 px-8 overflow-hidden">
                     <TextFade
                       settings={{
                         hidden: { opacity: 0, x: 50 },
@@ -610,7 +607,7 @@ function Home() {
                         },
                       }}
                       replayEffect={true}
-                      styles="h-full flex flex-col justify-between"
+                      styles="h-fit flex flex-col justify-between gap-[56px]"
                     >
                       <span className="uppercase font-normal text-4xl leading-[54px] line-clamp-3">
                         {offer.title}

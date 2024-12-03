@@ -21,7 +21,7 @@ import { organizationSchema } from './organizationSchema';
 import { DropdownField } from './DropdownField';
 import { DropDownSelect2 } from './DropDownSelect2';
 import { FoodsTitle, TitleSpanInfo } from './ServiceMethod';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const Page = ({ params }) => {
     const { id } = params;
@@ -152,32 +152,13 @@ const Page = ({ params }) => {
     const { control, handleSubmit, setValue, reset, formState: { errors }, trigger } = useForm({
         resolver: zodResolver(organizationSchema),
         defaultValues: {
-            other_services: null,
             customerAndChair: 10,
             total_amount: 0,
             depositAmount: 0,
+            table_count: 0,
             spare_table_count: 0,
         },
     });
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                await Promise.all([
-                    fetchAllMenus(),
-                    fetchAllPartyTypes(),
-                    fetchAllDecors(),
-                    fetchAllServices(), 
-                ]);
-                await fetchDataDetailsParty();
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu:', error);
-            }
-        };
-        fetchData();
-
-    }, [id, reset]);
-
 
     const fetchLimitStages = async (stageId) => {
         try {
@@ -195,6 +176,9 @@ const Page = ({ params }) => {
             if (!response.data || response.data.length === 0) {
                 console.warn('No stages available.');
                 setStages([{ title: 'Sảnh', type: 'select', options: [{ value: '', label: 'Chưa có sảnh', capacity_max: 0 }] }]);
+                setSelectStages('');
+                setLimitStages(0);
+                setStagePrice(0);
                 return;
             }
 
@@ -206,17 +190,16 @@ const Page = ({ params }) => {
             }));
 
             setStages([{ title: 'Sảnh', type: 'select', options }]);
-
             if (options.length === 1) {
-                setSelectStages(options[0].value);
-                setLimitStages(options[0].capacity_max || 0);
-                setStagePrice(options[0].price || 0);
-            } else {
-                if (!selectStages && options.length > 0) {
-                    setSelectStages(options[0].value);
-                    setLimitStages(options[0].capacity_max || 0);
-                    setStagePrice(options[0].price || 0);
-                }
+            const firstStage = options[0];
+            setSelectStages(firstStage.value);
+            setLimitStages(firstStage.capacity_max || 0);
+            setStagePrice(firstStage.price || 0);
+            } else if (!selectStages) {
+                const firstStage = options[0];
+                setSelectStages(firstStage.value);
+                setLimitStages(firstStage.capacity_max || 0);
+                setStagePrice(firstStage.price || 0);
             }
         } catch (error) {
             console.error('Error fetching stages:', error);
@@ -230,7 +213,7 @@ const Page = ({ params }) => {
                 label: menu.name,
                 price: menu.price,
             }));
-
+    
             setMenus([{ ...menus[0], options: menuOptions }]);
             if (!selectedMenu && menuOptions.length) {
                 const firstMenu = menuOptions[0];
@@ -242,6 +225,7 @@ const Page = ({ params }) => {
             console.error('Error fetching menus:', error);
         }
     };
+    
     const fetchFoodsByMenuId = async (menuId) => {
         if (!menuId) {
             return;
@@ -326,7 +310,6 @@ const Page = ({ params }) => {
     const fetchPackageForExtraServices = async () => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.PRODUCTS.GET_SERVICES(), 'GET');
-            console.log('Dữ liệu từ API cho dịch vụ phát sinh:', response.data); // Kiểm tra dữ liệu từ API
             if (response.statusCode === 200) {
                 const categories = Object.entries(response.data).map(([categoryName, services]) => ({
                     category: categoryName,
@@ -354,7 +337,6 @@ const Page = ({ params }) => {
     const fetchPackageForOtherServices = async () => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.CATEGORIES.GET_BY_ID(9), 'GET');
-            console.log('Dữ liệu từ API cho dịch vụ khác:', response.data); // Kiểm tra dữ liệu từ API
             const childrenServices = response.data[0]?.childrens || [];
             if (childrenServices.length === 0) {
                 console.error('Không có dịch vụ con nào trong childrenServices');
@@ -382,14 +364,46 @@ const Page = ({ params }) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_BY_ID(packageId), 'GET');
             const packageData = response.data[0];
-
+    
             // Cập nhật các trường khác từ packageData
             setSelectedMenu(packageData.menu_id);
             await fetchFoodsByMenuId(packageData.menu_id);
             setSelectPartyTypes(packageData.party_type_id);
             setSelectStages(packageData.stage_id);
             setSelectedDecors(packageData.decor_id);
-
+    
+            // Lấy giá của menu
+            const selectedMenuOption = menus[0].options.find(option => option.value === packageData.menu_id);
+            if (selectedMenuOption) {
+                setMenuPrice(selectedMenuOption.price);
+            } else {
+                setMenuPrice(0); // Nếu không tìm thấy, đặt giá là 0
+            }
+    
+            // Lấy giá của stage
+            const selectedStageOption = stages[0].options.find(option =>  String(option.value) === String(packageData.stage_id));
+            if (selectedStageOption) {
+                  setStagePrice(selectedStageOption ? selectedStageOption.price : 0);
+            } else {
+                setStagePrice(0); // Nếu không tìm thấy, đặt giá là 0
+            }
+    
+            // Lấy giá của decor
+            const selectedDecorOption = decors[0].options.find(option => option.value === packageData.decor_id);
+            if (selectedDecorOption) {
+                setDecorPrice(selectedDecorOption.price);
+            } else {
+                setDecorPrice(0); // Nếu không tìm thấy, đặt giá là 0
+            }
+    
+            // Lấy giá của party type
+            const selectedPartyTypeOption = partyTypes[0].options.find(option => option.value === packageData.party_type_id);
+            if (selectedPartyTypeOption) {
+                setPartyPrice(selectedPartyTypeOption.price);
+            } else {
+                setPartyPrice(0); // Nếu không tìm thấy, đặt giá là 0
+            }
+    
             // Xử lý other_service nếu có
             if (packageData.other_service) {
                 const otherServicesFromAPI = JSON.parse(packageData.other_service);
@@ -403,7 +417,7 @@ const Page = ({ params }) => {
             } else {
                 setSelectOtherDishes([]);
             }
-
+    
             // Xử lý extra_service nếu có
             if (packageData.extra_service) {
                 const extraServicesFromAPI = JSON.parse(packageData.extra_service);
@@ -421,7 +435,7 @@ const Page = ({ params }) => {
             console.error('Lỗi khi lấy gói dịch vụ:', error);
         }
     };
-
+    
     const fetchAllServices = async () => {
         try {
             await Promise.all([
@@ -445,18 +459,47 @@ const Page = ({ params }) => {
                 const paymentStatusMethod = partyData.payment_status;
                 const bookingDetails = partyData.booking_details[0] || {};
                 const selectedMenuId = bookingDetails.menu_id || selectedMenu;
+                const options = stages[0]?.options || [];
                 // Kiểm tra package_id
                 if (partyData.package_id) {
                     await fetchPackageByID(partyData.package_id);
-                } else {
-                    setSelectStages(partyData.stage_id || '')
-                    if (!selectedMenu) {
-                        setSelectedMenu(bookingDetails.menu_id);
-                        if (bookingDetails.menu_id) {
-                            await fetchFoodsByMenuId(bookingDetails.menu_id);
+                } 
+                    if(partyData.stage_id){
+                        setSelectStages(partyData.stage_id)
+                        const selectedStage = options.find(option => String(option.value) === String(partyData.stage_id));
+                      
+                        if (selectedStage) {
+                            setSelectStages(selectedStage.value);
+                            setStagePrice(selectedStage.price || 0);
+                            setLimitStages(selectedStage.capacity_max || 0);
+                        } else {
+                            const firstStage = options[0];
+                            if (firstStage) {
+                                setSelectStages(firstStage.value);
+                                setStagePrice(firstStage.price || 0);
+                                setLimitStages(firstStage.capacity_max || 0);
+                            }
+                        }
+                    }else {
+                        const firstStage = options[0];
+                        if (firstStage) {
+                            setSelectStages(firstStage.value);
+                            setStagePrice(firstStage.price || 0);
+                            setLimitStages(firstStage.capacity_max || 0);
                         }
                     }
-                }
+                    if (bookingDetails.menu_id) {
+                        setSelectedMenu(bookingDetails.menu_id);
+                        const selectedMenuOption = menus[0].options.find(option => option.value === bookingDetails.menu_id);
+                        if (selectedMenuOption) {
+                            setSelectedMenu(bookingDetails.menu_id);
+                            setMenuPrice(selectedMenuOption.price);
+                        } else {
+                            setMenuPrice(0); 
+                        }
+                        await fetchFoodsByMenuId(bookingDetails.menu_id);
+                       
+                    }
                 setBookingDetails(bookingDetails);
                 checkServices(bookingDetails);
                 checkSelectedDecor(decorOptions, partyData);
@@ -474,7 +517,7 @@ const Page = ({ params }) => {
                 setBranch_id(partyData.branch_id);
                 setPartyPrice(partyData.party_types?.price || partyPrice);
                 setStagePrice(partyData.stages?.price || 0);
-
+                
                 const depositStatus = bookingDetails.deposit_status;
                 const isDepositSuccessful = depositStatus === 'success';
 
@@ -544,7 +587,7 @@ const Page = ({ params }) => {
                     email: partyData.email || partyData.users?.email,
                     phone: partyData.phone || partyData.users?.phone,
                     customerAndChair: 10,
-                    tables: Number(bookingDetails.table_count) || 0,
+                    table_count: Number(bookingDetails.table_count) || 0,
                     spare_table_count: Number(bookingDetails.spare_table_count) || 0,
                     customer: Number(partyData.number_of_guests) || 0,
                     partyDate: partyData.created_at.slice(0, 10) || '',
@@ -598,10 +641,6 @@ const Page = ({ params }) => {
     const checkServices = (bookingDetails) => {
         const allOtherOptions = otherServices[0]?.options || [];
         const allExtraOptions = extraServices[0]?.options || [];
-
-        console.log('Tất cả tùy chọn dịch vụ khác:', allOtherOptions);
-        console.log('Tất cả tùy chọn dịch vụ phát sinh:', allExtraOptions);
-        console.log('Dữ liệu bookingDetails:', bookingDetails);
 
         let otherServicesData = [];
         let extraServicesData = [];
@@ -673,21 +712,52 @@ const Page = ({ params }) => {
         }
     }, []);
 
-    const handleMenuChange = async (event) => {
-        const selectedMenuId = event.target.value;
-        setSelectedMenu(selectedMenuId);
-        const selectedMenuOption = menus[0].options.find(option => String(option.value) === parseInt(selectedMenuId));
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await Promise.all([
+                    fetchAllMenus(),
+                    fetchAllPartyTypes(),
+                    fetchAllDecors(),
+                    fetchAllServices(),
+                ]);
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu:', error);
+            }
+        };
+        fetchData();
+    }, [id, reset]);
+    
+    useEffect(() => {
+        async function getMenu() {
+            if (menus[0]?.options.length > 0) {
+                await fetchDataDetailsParty();
+            }
+        }
+        getMenu()
+    }, [menus]);
 
+    const handleMenuChange = async (event) => {
+        const selectedMenuId = event.target.value; 
+        console.log('Selected Menu ID:', selectedMenuId); 
+        setSelectedMenu(selectedMenuId);
+        
+        // Chuyển đổi selectedMenuId sang số nguyên
+        const selectedMenuOption = menus[0].options.find(option => option.value === Number(selectedMenuId));
+    
         if (selectedMenuOption) {
+            console.log('Selected Menu Option:', selectedMenuOption); 
             setMenuPrice(selectedMenuOption.price);
         } else {
+            console.log('No matching option found'); 
             setMenuPrice(0);
         }
-
+    
         if (selectedMenuId) {
             await fetchFoodsByMenuId(selectedMenuId);
         }
     };
+
 
     const handleChangeQuantity = (id, selectedDishesState, setSelectedDishesState, change) => {
         setSelectedDishesState(selectedDishesState.map(dish =>
@@ -730,17 +800,15 @@ const Page = ({ params }) => {
         if (selectedStage) {
             setLimitStages(selectedStage.capacity_max || 0);
             setStagePrice(selectedStage.price || 0);
-            console.log('Updated stage price:', selectedStage.price);
         } else {
             setStagePrice(0);
-            console.warn('No stage found for the selected ID:', selectedStageId); 
         }
     };
     const handleDecorChange = (event) => {
         const selectedDecorId = Number(event.target.value);
         setSelectedDecors(selectedDecorId);
 
-        const selectedDecorOption = decors[0].options.find(option => String(option.value) === selectedDecorId);
+        const selectedDecorOption = decors[0].options.find(option => option.value === selectedDecorId);
         if (selectedDecorOption) {
             setDecorPrice(selectedDecorOption.price);
         } else {
@@ -832,19 +900,19 @@ const Page = ({ params }) => {
         const chair_price = 50000; // Giá mỗi ghế
 
         // Tổng tiền bàn chính
-        const total_table_price = data.tables * table_price;
+        const total_table_price = data.table_count * table_price;
 
         // Tổng tiền bàn dự phòng
         const total_table_price_backup = data.spare_table_count * table_price;
 
         // Tổng tiền ghế chính
-        const total_chair_price = data.tables * 10 * chair_price;
+        const total_chair_price = data.table_count * 10 * chair_price;
 
         // Tổng tiền ghế dự phòng
         const total_chair_price_backup = data.spare_table_count * 10 * chair_price;
 
         // Tổng tiền menu (cho bàn chính)
-        const total_menus = data.tables * menuPrice;
+        const total_menus = data.table_count * menuPrice;
 
         //Tổng tiền menu cho bàn phụ
         const total_menus_backup = data.spare_table_count * menuPrice;
@@ -860,7 +928,8 @@ const Page = ({ params }) => {
             stagePrice +
             total_menus +
             total_menus_backup +
-            totalOtherServicesPrice;
+            totalOtherServicesPrice + 
+            (data.is_deposit ? totalExtraServicesPrice : 0);
 
         console.log(total_amount_all)
 
@@ -876,7 +945,7 @@ const Page = ({ params }) => {
             email: data.email,
             company_name: data.company_name,
             number_of_guests: data.customer,
-            table_count: data.tables,
+            table_count: data.table_count,
             spare_table_count: data.spare_table_count,
             amount: total_amount_all,
             other_service: formattedOtherDishes,
@@ -885,6 +954,12 @@ const Page = ({ params }) => {
             is_deposit: selectStatusDeposit,
             status: selectStatusBookings,
         }
+
+        console.log("Giá tiền menu" + menuPrice)
+        console.log("Menu" + selectedMenu)
+        console.log(data.table_count)
+        console.log(data.spare_table_count)
+
 
         console.log("Tổng tiền bàn chính" + total_table_price)
         console.log("Tổng tiền bàn phụ" + total_table_price_backup)
@@ -897,6 +972,7 @@ const Page = ({ params }) => {
         console.log("stagePrice" + stagePrice)
         console.log(selectOtherDishes)
         console.log("Tổng số tiền của other_service" + totalOtherServicesPrice)
+
         try {
             const updateBranches = await makeAuthorizedRequest(API_CONFIG.BOOKINGS.UPDATE(id), "PATCH", dataform);
 
@@ -907,8 +983,7 @@ const Page = ({ params }) => {
                     description: "Đã sử lý thông tin cập nhật của khách",
                     type: "success",
                 });
-                router.reload();
-
+                // router.refresh()
             } else {
                 const { statusCode, message } = updateBranches.error || {};
                 if (statusCode == 401) {
