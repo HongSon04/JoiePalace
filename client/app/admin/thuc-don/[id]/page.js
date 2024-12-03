@@ -5,7 +5,7 @@ import CustomInput from "@/app/_components/CustomInput";
 import Dish from "@/app/_components/Dish";
 import SaveIcon from "@/app/_components/SaveIcon";
 import FileUploadButton from "@/app/_components/Uploader";
-import { fetchMenu } from "@/app/_lib/features/menu/menuSlice";
+import { getMenu } from "@/app/_lib/features/menu/menuSlice";
 import { dishCategories } from "@/app/_utils/config";
 import { formatPrice } from "@/app/_utils/formaters";
 import { capitalize } from "@/app/_utils/helpers";
@@ -96,7 +96,7 @@ function Page() {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    dispatch(fetchMenu(id));
+    dispatch(getMenu(id));
   }, [dispatch, id]);
 
   // FORM HANDLING

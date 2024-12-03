@@ -30,8 +30,17 @@ import CustomCalendar from "@/app/_components/Calendar";
 import { formatPrice } from "@/app/_utils/formaters";
 import { FaRegCalendarCheck } from "react-icons/fa6";
 import CustomPagination from "@/app/_components/CustomPagination";
-import { formatDate } from "@/app/_utils/format"; 
+import TableBookingsPending from "./TableBookingsPending";
+import TableStageStatus from "./TableStageStatus";
+const formatDate = (dateInput) => {
+  const date = new Date(dateInput);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
 const Page = ({ params }) => {
+  
   const { slug } = params;
   const [allInfo, setallInfo] = useState(null);
   const [allBooking, setAllBooking] = useState(null);
@@ -51,6 +60,7 @@ const Page = ({ params }) => {
   const [itemsPerPage, setItemsPerPage] = useState(4); 
   const [start_Date, setStartDate] = useState(null);
   const [end_Date, setEndDate] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('week');
   function getCurrentMonthAndWeekDates() {
     const currentDate = new Date();
     const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -80,56 +90,7 @@ const Page = ({ params }) => {
   }
   
   
-  // Hàm tính toán ngày bắt đầu và kết thúc cho 7 ngày tới
-  const getDefaultDateRange = () => {
-    const today = new Date();
-    const startDate = today;
-    const endDate = new Date(today);
-    endDate.setDate(today.getDate() + 7);  
-
-    return {
-      start_Date: formatDate(startDate),
-      end_Date: formatDate(endDate),
-    };
-  };
-  const handleDateFilterChange = (value) => {
-    const today = new Date();
-    let newStartDate = null;
-    let newEndDate = null;
   
-    switch (value) {
-      case "7 ngày tới":
-        newStartDate = today;
-        newEndDate = new Date(today);
-        newEndDate.setDate(today.getDate() + 7);
-        break;
-      case "14 ngày tới":
-        newStartDate = today;
-        newEndDate = new Date(today);
-        newEndDate.setDate(today.getDate() + 14);
-        break;
-      case "1 tháng tới":
-        newStartDate = today;
-        newEndDate = new Date(today);
-        newEndDate.setMonth(today.getMonth() + 1);
-        break;
-      case "3 tháng tới":
-        newStartDate = today;
-        newEndDate = new Date(today);
-        newEndDate.setMonth(today.getMonth() + 3);
-        break;
-      case "6 tháng tới":
-        newStartDate = today;
-        newEndDate = new Date(today);
-        newEndDate.setMonth(today.getMonth() + 6);
-        break;
-      default:
-        break;
-    }
-  
-    setStartDate(newStartDate ? formatDate(newStartDate) : null);
-    setEndDate(newEndDate ? formatDate(newEndDate) : null);
-  };
   
   
   useEffect(() => {
@@ -154,27 +115,27 @@ const Page = ({ params }) => {
           "GET",
           null
         );
-        console.log(start_Date);
-        console.log(end_Date);
+      
+        // console.log(endOfWeek);
+        // console.log(end_Date);
         const allBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: idBranch,
             status : "pending",
             itemsPerPage: 4,
-            startDate: start_Date || getDefaultDateRange().start_Date, 
-            endDate: end_Date || getDefaultDateRange().end_Date, 
+            startDate: startOfWeek,
+            endDate: endOfWeek,
           }),
           "GET",
           null
         );
-        // console.log(dataBooking);
+        // console.log(getDefaultDateRange().start_Date);
         
         const dataBookingByBranch = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            branch_id: branchId,
-            startDate: startOfWeek,
-            endDate: endOfWeek,
-            status : "pending"
+            branch_id: idBranch,
+            status : "pending",
+            is_deposit: false
           }),
           "GET",
           null
@@ -300,11 +261,7 @@ const Page = ({ params }) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("vi-VN");
   }
-  function formatDateTime(dateString) {
-    const date = new Date(dateString);
-    const formattedTime = date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
-    return `${formattedTime}`;
-  }
+
   const { month  } = getCurrentMonthAndWeekDates();
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
@@ -316,11 +273,11 @@ const Page = ({ params }) => {
       setItemsPerPage(allBooking.pagination.itemsPerPage);
     }
   }, [allBooking]);
-  // Hàm xử lý thay đổi trang
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+  const requestData = dataBookingByBranch.data;
+  // console.log(requestData);
+  const handlePeriodChange = (event) => {
+    setSelectedPeriod(event.target.value);
   };
-  // console.log(allBooking.data);
   return (
     <main className="grid gap-6  text-white ">
       <AdminHeader
@@ -445,140 +402,17 @@ const Page = ({ params }) => {
         </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
           <div className="flex justify-between items-start mb-[10px]">
-            <p className="text-base  font-semibold">Tiệc sắp diễn ra</p>
-            <select className="w-[300px] select" onChange={(e) => handleDateFilterChange(e.target.value)}>
-              <option className="option" value="7 ngày tới">7 ngày tới</option>
-              <option className="option" value="14 ngày tới">14 ngày tới</option>
-              <option className="option" value="1 tháng tới">1 tháng tới</option>
-              <option className="option" value="3 tháng tới">3 tháng tới</option>
-              <option className="option" value="6 tháng tới">6 tháng tới</option>
-            </select>
+            <TableBookingsPending />
           </div>
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>Sảnh</th>
-                <th>Ngày tổ chức</th>
-                <th>Ca tổ chức</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {allBooking && Array.isArray(allBooking.data) && allBooking.data.length > 0 ? (
-                allBooking.data.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.booking_details?.[0]?.stage_detail?.name || "N/A"}</td>
-                    <td>{item.expired_at ? formatDate(item.expired_at) : "N/A"}</td>
-                    <td>{item.shift || "N/A"}</td>
-                    <td>
-                      <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
-                        <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="text-center">Không có dữ liệu.</td>
-                </tr>
-              )}
-            </tbody>
-
-
-          </table>
-          {allBooking && allBooking.pagination && allBooking.pagination.lastPage && (
-            <div className="flex justify-center mt-4">
-              <CustomPagination
-                page={currentPage} 
-                total={allBooking.pagination.lastPage} 
-                onChange={handlePageChange} 
-                classNames={{
-                  base: "flex justify-center",
-                }}
-              />
-            </div>
-          )}
+         
           
         </div>
       </div>
-       <div className="w-full p-4">
-        <div className="flex items-center justify-between mb-[10px]">
-          <p className="text-base  font-semibold">Trạng thái các sảnh</p>
-          <p className="text-base  font-semibold">Ca sáng - 20/12/2024</p>
+      {slug === 'ho-chi-minh' && (
+        <div className="w-full p-4">
+          <TableStageStatus />
         </div>
-        <div className="overflow-y-auto max-h-72">
-          <table className="table w-full table-auto rounded-lg">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tên chủ tiệc</th>
-                <th>Kiểu tiệc</th>
-                <th>Chi nhánh</th>
-                <th>Sảnh</th>
-                <th>Ngày đặt</th>
-                <th>Ngày tổ chức</th>
-                <th>Giờ tổ chức</th>
-                <th>Trạng thái</th>
-                <th>Sl bàn(chính thức + dự phòng)</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {dataBookingByBranch.length > 0 ? (
-                dataBookingByBranch.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.id || "N/A"}</td>
-                    <td>{item.users ? item.users.username : "N/A"}</td>
-                    <td>{item.name || "N/A"}</td>
-                    <td>{item.branches ? item.branches.name : "N/A"}</td>
-                    <td>{item.stages ? item.stages.name : "N/A"}</td>
-                    <td>{item.created_at ? formatDate(item.created_at) : "N/A"}</td>
-                    <td>{item.expired_at ? formatDate(item.expired_at) : "N/A"}</td>
-                    <td>{item.expired_at ? formatDateTime(item.expired_at) : "N/A"}</td>
-                    <td>
-                      <li className={`status ${
-                            item.is_deposit 
-                                ? item.status === 'pending' ? 'chua-thanh-toan' :
-                                  item.status === 'processing' ? 'da-hoan-tien' :
-                                  item.status === 'success' ? 'da-thanh-toan ' :
-                                  item.status === 'cancel' ? 'da-huy' :
-                                  ''
-                                : 'da-dat-coc' 
-                        }`}>
-                            {item.is_deposit 
-                                ? item.status === 'pending' ? 'Đang chờ' :
-                                  item.status === 'processing' ? 'Đang xử lý' :
-                                  item.status === 'success' ? 'Thành công' :
-                                  item.status === 'cancel' ? 'Đã hủy' :
-                                  ''
-                                : 'Chưa đặt cọc'
-                            }
-                      </li>
-                    </td>
-
-                    <td>
-                      {item.booking_details && item.booking_details.length > 0 ? 
-                        `${item.booking_details[0].table_count != null ? item.booking_details[0].table_count : 'N/A'} + ${item.booking_details[0].spare_table_count != null ? item.booking_details[0].spare_table_count : 'N/A'}` 
-                        : 'N/A'}
-                    </td>
-
-
-                    <td>
-                      <Link href={`/admin/quan-ly-tiec/${slug}/${item.id}`} className="text-teal-400 text-xs font-bold">
-                        Xem thêm
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr className="h-72">
-                  <td colSpan="11" className="text-center">Không có dữ liệu.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
       <div className="flex  gap-6 p-4">
         <div className="w-1/2 ">
           <div className="flex items-center justify-between mb-[10px]">
@@ -598,12 +432,12 @@ const Page = ({ params }) => {
                 </tr>
               </thead>
               <tbody>
-                {dataBooking.length > 0 ? (
-                  dataBooking.map((item, index) => (
+                {Array.isArray(requestData) && requestData.length > 0 ? (
+                  requestData.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.users ? item.users.username : "N/A"}</td>
-                      <td>{item.branches ? item.branches.name : "N/A"}</td> 
-                      <td>{item.phone || "N/A"}</td> 
+                    <td>{item.users ? item.users.username : "N/A"}</td>
+                    <td>{item.branches ? item.branches.name : "N/A"}</td>
+                    <td>{item.phone || "N/A"}</td>
                       <td>
                         <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
                           <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
@@ -613,52 +447,70 @@ const Page = ({ params }) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="text-center  h-[357px]">Không có dữ liệu.</td>
+                    <td colSpan={4} className="text-center h-[357px]">Không có dữ liệu.</td>
                   </tr>
                 )}
+
               </tbody>
             </table>
           </div>
         </div>
-        {slug === "ho-chi-minh" &&
-          <div className=" w-1/2">
-            <div className="flex items-center justify-between mb-[10px]">
-              <p className="text-base  font-semibold">Doanh thu tổng / năm</p>
-              <select className="w-[300px] select">
-                <option className="option" value="">7 ngay toi</option>
-              </select>
-            </div>
-
-            <div className="p-4 bg-blackAlpha-100 rounded-xl ">
-              <div className="grid grid-cols-1 gap-4 h-[387px] overflow-y-auto hide-scrollbar items-start">
-                {slug === "ho-chi-minh" ? (
-                  <>
-                    <div className="p-2 bg-blackAlpha-100 rounded-xl">
-                      <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                        <p className=" text-base">Doanh thu theo tuần</p>
-                      </div>
-                      <Chart data={dataByWeek} chartType="line" />
-                    </div>
-                    <div className="p-2 bg-blackAlpha-100 rounded-xl">
-                      <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                        <p className=" text-base">Doanh thu theo tháng</p>
-                      </div>
-                      <Chart data={dataByMonth} chartType="line" />
-                    </div>
-                    <div className="p-2 bg-blackAlpha-100 rounded-xl">
-                      <div className="flex items-center justify-between gap-[10px] mb-[10px]">
-                        <p className=" text-base">Doanh thu theo năm</p>
-                      </div>
-                      <Chart data={dataByYear} chartType="line" />
-                    </div>
-                  </>
-                ) : (
-                  <Chart data={dataBranch} chartType="bar" />
-                )}
-              </div>
-            </div>
+        {slug === "ho-chi-minh" && (
+        <div className="w-1/2">
+          <div className="flex items-center justify-between mb-[10px]">
+            <p className="text-base font-semibold">Doanh thu tổng / năm</p>
+            <select 
+              className="w-[150px] select"
+              value={selectedPeriod} 
+              onChange={handlePeriodChange} 
+            >
+              <option className="option" value="week">Tuần</option>
+              <option className="option" value="month">Tháng</option>
+              <option className="option" value="year">Năm</option>
+            </select>
           </div>
-        }
+
+          {selectedPeriod === "week" && (
+            <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                <p className=" text-base">Doanh thu theo tuần</p>
+              </div>
+              <Chart data={dataByWeek} chartType="line" />
+            </div>
+          )}
+          {selectedPeriod === "month" && (
+            <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                <p className=" text-base">Doanh thu theo tháng</p>
+              </div>
+              <Chart data={dataByMonth} chartType="line" />
+            </div>
+          )}
+          {selectedPeriod === "year" && (
+            <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+                <p className=" text-base">Doanh thu theo năm</p>
+              </div>
+              <Chart data={dataByYear} chartType="line" />
+            </div>
+          )}
+      
+         
+        </div>
+      )}
+      {slug !== "ho-chi-minh" && (
+        <div className="w-1/2">
+          <div className="flex justify-between gap-[10px] items-center mb-[10px]">
+            <p className="text-base font-semibold ">Doanh thu tổng</p>
+          </div>
+          <div className="p-2 bg-blackAlpha-100 rounded-xl">
+            <div className="flex items-center justify-between gap-[10px] mb-[10px]">
+              <p className=" text-base">Doanh thu theo năm</p>
+            </div>
+            <Chart data={dataBranch} chartType="bar" />
+          </div>
+        </div> 
+      )}
       </div>
      
     </main>
