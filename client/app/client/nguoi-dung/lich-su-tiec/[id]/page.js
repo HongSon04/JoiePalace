@@ -46,6 +46,8 @@ const Page = ({ params }) => {
                 console.log('fetchData', fetchData);
 
                 setPartyDetails(fetchData)
+                // console.log('Do dai cua fetchData', fetchData.length);
+
                 if (fetchData.length > 0) {
                     const parties = await Promise.all(fetchData.map(async (item) => {
                         const dataDetailBooking = item.booking_details;
@@ -62,14 +64,20 @@ const Page = ({ params }) => {
                         const dataMenu = dataDetailBooking[0]?.menu_detail;
 
                         const otherService = dataDetailBooking[0]?.other_service;
-                        const products = await Promise.all(
-                            otherService.map(service => getProductById(service.id))
-                        );
+                        // console.log('otherService',otherService);
+                        let dataOtherService = [];
+                        if (otherService != null) {
+                            const products = await Promise.all(
+                                otherService.map(service => getProductById(service.id))
+                            );
 
-                        const dataOtherService = products.flat().map((product, index) => ({
-                            name: product.name,
-                            quantity: otherService[index].quantity
-                        }));
+                             dataOtherService = products.flat().map((product, index) => ({
+                                name: product.name,
+                                quantity: otherService[index].quantity
+                            }));
+                        }else{
+                            dataOtherService = [];
+                        }
 
                         // Nước uống
                         const drinkShow = dataMenus?.products.filter((item) => {
@@ -112,14 +120,14 @@ const Page = ({ params }) => {
 
 
                         // Chi phí dịch vụ thêm (chỉ tính khi is_deposit là true)
-                        if (item.status) {
-                            const extraServicesCost = item.extra_services?.reduce((total, service) => {
-                                if (service.is_deposit) {
-                                    return total + (service.price * service.quantity);
-                                }
-                                return total;
-                            }, 0) || 0;
-                        }
+                        // if (item.status ) {
+                        //     const extraServicesCost = item.extra_services?.reduce((total, service) => {
+                        //         if (service.is_deposit) {
+                        //             return total + (service.price * service.quantity);
+                        //         }
+                        //         return total;
+                        //     }, 0) || 0;
+                        // }
 
 
 
@@ -218,6 +226,9 @@ const Page = ({ params }) => {
                             statusParty: item.status
                         };
                     }));
+                    console.log('vao dc roi');
+
+
                     setParty(parties);
                 }
 
@@ -228,6 +239,7 @@ const Page = ({ params }) => {
 
         getData();
     }, [id]);
+    console.log('detail party', party);
 
     const formatDate = (dateString) => {
         const options = { day: '2-digit', month: '2-digit', year: 'numeric' };

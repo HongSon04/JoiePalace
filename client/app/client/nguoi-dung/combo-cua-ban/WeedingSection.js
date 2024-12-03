@@ -6,12 +6,14 @@ import { Image } from '@nextui-org/react';
 import { fetchAllPackages } from '@/app/_services/packagesServices';
 import { getProductById } from '@/app/_services/productsServices';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const WeddingSection = () => {
     const [openPackIndex, setOpenPackIndex] = useState(null);
     const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
     const [weddingPacks, setWeddingPacks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         const getUser = JSON.parse(localStorage.getItem("user"));

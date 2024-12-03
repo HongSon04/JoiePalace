@@ -19,8 +19,11 @@ function News() {
     const fetchData = async () => {
       setLoading(true);
       const DataBlog = await fecthAllBlog();
+      const datablogNew = DataBlog.reverse();
       const newBlog = DataBlog;
-      const new3Blog = DataBlog.slice(0, 3).reverse();
+      const new3Blog = datablogNew.slice(0, 3); 
+      // console.log('new3Blog', new3Blog);
+      
       setNew3Blog(new3Blog);
       setCountNumberPage(Math.ceil(DataBlog.length / 6));
       setNewBlog(newBlog);

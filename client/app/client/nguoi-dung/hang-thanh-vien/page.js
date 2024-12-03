@@ -7,6 +7,7 @@ import silverCrown from '@/public/silverCrown.svg';
 import goldCrown from '@/public/goldCrown.svg';
 import platinum from '@/public/platinum.svg';
 import { fetchAllBookingByUserId, fetchBookingById } from '@/app/_services/bookingServices';
+import { useRouter } from 'next/navigation';
 
 const membershipTiers = [
     {
@@ -42,6 +43,7 @@ const membershipTiers = [
 const Page = () => {
     const [total_amountUser, setTotalAmountUser] = useState(0);
     const [activeTier, setActiveTier] = useState(membershipTiers[0]);
+    const router = useRouter();
 
     useEffect(() => {
         const getData = async () => {

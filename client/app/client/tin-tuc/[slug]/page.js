@@ -21,6 +21,8 @@ const Blog = () => {
   useEffect(() => {
     const getBlog = async (slug) => {
       const blogDataSlug = await fetchBlogDataBySlug(slug);
+      // console.log(blogDataSlug);
+      
       setBlog(blogDataSlug);
     };
     getBlog(slug);
@@ -139,7 +141,7 @@ const Blog = () => {
       <section className="h-[80vh] bg-cover relative">
         <div className="absolute w-full">
           <div className="relative top-[250px] min-h-[100px] w-4/6 m-auto max-xl:w-5/6">
-            <div className="w-[550px] max-sm:w-full">
+            <div className="w-[550px] max-sm:w-full bg-blackAlpha-500 p-5 rounded">
               <h1 className="text-4xl uppercase max-sm:text-xl">
                 {contentBanner[0]?.title}
               </h1>
@@ -195,14 +197,14 @@ const Blog = () => {
             {parentDiv1.map((blog, index) => (
               <Link
                 className="hover:text-white"
-                href={`${blog.slug}`}
+                href={`/client/tin-tuc/${blog.slug}`}
                 key={index}
               >
                 <div className="w-[296px] max-lg:w-[200px] max-md:w-[150px] max-sm:w-[100px] leading-10 max-sm:leading-5 mb-20">
                   <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70">
                     <Image
                       src={
-                        blog.images ||
+                        blog.images[0] ||
                         "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                       }
                       alt={blog.title || ""}

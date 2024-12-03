@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { API_CONFIG } from "@/app/_utils/api.config";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
+import { useRouter } from "next/navigation";
 
 const NotificationsPage = () => {
     const { makeAuthorizedRequest } = useApiServices();
@@ -11,47 +12,48 @@ const NotificationsPage = () => {
     const [listIdNotification, setListIdNotification] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const toast = useCustomToast();
-
+    const router = useRouter();
 
     useEffect(() => {
         const getFeedbacks = async () => {
             const getUser = JSON.parse(localStorage.getItem("user"));
             if (getUser) {
                 setUser(getUser);
+                const data = await makeAuthorizedRequest(
+                    API_CONFIG.NOTIFICATIONS.GET_BY_ID(getUser.id),
+                    'GET',
+                    '',
+                    null,
+                    '/client/dang-nhap'
+                );
+
+                if (data.success) {
+                    // setNotifications(data.data);
+                    const datanotifications = data.data;
+                    const notifications = datanotifications.map(notification => {
+                        const data = {
+                            message: notification.content,
+                            time: calculateTimeAgo(notification.created_at),
+                            status: getStatusFromType(notification.type),
+                            avatar: '/userImage.png',
+                        };
+                        return data;
+                    });
+
+                    const notificationIs_read = datanotifications
+                        .filter(notification => notification.is_read == false)
+                        .map(notification => notification.id);
+                    setListIdNotification(notificationIs_read);
+                    setNotifications(notifications);
+
+                } else {
+                    console.error("Error fetching feedbacks:", data);
+                    return [];
+                }
             } else {
                 router.push('/');
             }
-            const data = await makeAuthorizedRequest(
-                API_CONFIG.NOTIFICATIONS.GET_BY_ID(getUser.id),
-                'GET',
-                '',
-                null,
-                '/client/dang-nhap'
-            );
 
-            if (data.success) {
-                // setNotifications(data.data);
-                const datanotifications = data.data;
-                const notifications = datanotifications.map(notification => {
-                    const data = {
-                        message: notification.content,
-                        time: calculateTimeAgo(notification.created_at),
-                        status: getStatusFromType(notification.type),
-                        avatar: '/userImage.png',
-                    };
-                    return data;
-                });
-
-                const notificationIs_read = datanotifications
-                    .filter(notification => notification.is_read == false)
-                    .map(notification => notification.id);
-                setListIdNotification(notificationIs_read);
-                setNotifications(notifications);
-
-            } else {
-                console.error("Error fetching feedbacks:", data);
-                return [];
-            }
         };
         getFeedbacks();
     }, []);
@@ -144,6 +146,7 @@ const NotificationsPage = () => {
                 return 'Không xác định';
         }
     };
+    console.log('notifications', notifications);
 
     return (
         <div className="flex flex-col gap-8 p-5 min-h-screen ">
@@ -193,7 +196,7 @@ const NotificationsPage = () => {
                         </div>
                     </div>
                 )}
-            </div>  
+            </div>
         </div>
     );
 };

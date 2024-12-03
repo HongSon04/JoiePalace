@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchBranchesFromApi } from "../_services/branchesServices";
 import { useRouter } from "next/navigation";
 import { HiOutlinePhone } from "react-icons/hi";
+import Cookies from "js-cookie";
 import {
   AiOutlineUser,
   AiOutlineUnorderedList,

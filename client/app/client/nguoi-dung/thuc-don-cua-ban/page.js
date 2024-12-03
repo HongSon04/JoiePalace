@@ -37,9 +37,9 @@ const Page = () => {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-bold leading-6">Thực đơn của bạn</h1>
-      <div className="flex gap-8">
+      <div className="flex gap-8 flex-wrap">
         {menuDataByIDUser.length > 0 ? (
-          menuDataByIDUser.map((menu) => {
+          menuDataByIDUser.map((menu) => {  
             // Extract items for each category
             const appetizers = menu.products["mon-khai-vi"] || [];
             const mainDishes = menu.products["mon-chinh"] || [];
