@@ -70,7 +70,7 @@ export class MailService {
     }
   }
 
-  // ! Gừi mail nhắc lịch tiền cọc
+  // ! Gửi mail nhắc lịch tiền cọc
   async remindDeposit(
     name: string,
     email: string,
