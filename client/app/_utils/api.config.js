@@ -95,6 +95,7 @@ export const API_CONFIG = {
     GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
     GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
     GET_BY_ID: (id) => `${STAGES}/get/${id}`,
+    DESTROY: (id) => `${STAGES}/destroy/${id}`,
   },
 
   // CATEGORIES API

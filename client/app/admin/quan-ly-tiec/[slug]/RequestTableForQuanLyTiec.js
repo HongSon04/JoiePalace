@@ -658,7 +658,6 @@ function RequestTable() {
   }, [currentPage, pagination.lastPage]);
 
   console.log(pathname);
-
   return (
     <Table
       aria-label="Example table with custom cells, pagination and sorting"

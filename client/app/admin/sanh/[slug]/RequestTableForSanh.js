@@ -29,14 +29,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
-import { updateRequestStatus } from "@/app/_lib/features/requests/requestsSlice";
+import { fetchRequests, updateRequestStatus } from "@/app/_lib/features/requests/requestsSlice";
 import { CONFIG } from "@/app/_utils/config";
 import { capitalize } from "@/app/_utils/helpers";
 import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
 import CustomPagination from "@/app/_components/CustomPagination";
 import LoadingContent from "@/app/_components/LoadingContent";
 import SearchForm from "@/app/_components/SearchForm";
-import { fetchStagesAll } from "@/app/_lib/features/stages/stagesSlice";
+import { deleteStageByID, fetchStagesAll } from "@/app/_lib/features/stages/stagesSlice";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
@@ -57,17 +57,20 @@ const columns = [
 ];
 
 function RequestTable() {
+  const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const {
-    requests,
+    stages,
     pagination,
-    isFetchingRequests,
-    isFetchingRequestsError,
-    isUpdatingRequest,
+    isFetchingStages,
+    isFetchingStagesError,
+    isUpdatingStage,
+    isUpdatingRequestError,
     error,
-  } = useSelector((store) => store.requests);
+  } = useSelector((store) => store.stages);
   const dispatch = useDispatch();
+  const { makeAuthorizedRequest } = useApiServices();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
   const [date, setDate] = React.useState({
@@ -79,7 +82,7 @@ function RequestTable() {
     ),
   });
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [requestStatus, setRequestStatus] = React.useState("processing");
+  const [requestStatus, setRequestStatus] = React.useState("false");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
 
@@ -119,14 +122,15 @@ function RequestTable() {
       router.push("/auth/chon-chi-nhanh");
     }
     const params = {
-      page: currentPage,
+      // status: requestStatus,
+      // page: currentPage,
       branch_id: currentBranch.id,
-      itemsPerPage,
+      // itemsPerPage,
+      // startDate: formattedStartDate,
+      // endDate: formattedEndDate,
     };
 
     dispatch(fetchStagesAll({ params }));
-    
-    console.log(dispatch(fetchStagesAll({ params })))
 
     return () => {};
   }, [
@@ -153,9 +157,10 @@ function RequestTable() {
     const controller = new AbortController();
 
     const params = {
-      page: currentPage,
+      // status: requestStatus,
+      // page: currentPage,
       branch_id: currentBranch.id,
-      itemsPerPage,
+      // itemsPerPage,
       search: searchQuery,
     };
 
@@ -214,10 +219,13 @@ function RequestTable() {
           });
 
           const params = {
-            page: currentPage,
+            // status: requestStatus,
+            // page: currentPage,
             branch_id: currentBranch.id,
-            itemsPerPage,
+            // itemsPerPage,
             search: searchQuery,
+            // startDate: formattedStartDate,
+            // endDate: formattedEndDate,
           };
           // Fetch the requests again to update the state
           dispatch(fetchStagesAll({ params }));
@@ -251,6 +259,7 @@ function RequestTable() {
     ]
   );
 
+
   const handleCancelRequest = React.useCallback(
     async (id) => {
       const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
@@ -275,9 +284,9 @@ function RequestTable() {
           updateRequestStatus({
             requestId: id,
             requestData: {
-              is_deposit: false,
-              is_confirm: false,
-              status: "cancel",
+              // is_deposit: false,
+              // is_confirm: false,
+              status: "true",
             },
           })
         ).unwrap();
@@ -290,14 +299,17 @@ function RequestTable() {
           });
 
           const params = {
-            page: currentPage,
+            // status: requestStatus,
+            // page: currentPage,
             branch_id: currentBranch.id,
-            itemsPerPage,
+            // itemsPerPage,
             search: searchQuery,
+            // startDate: formattedStartDate,
+            // endDate: formattedEndDate,
           };
           // Fetch the requests again to update the state
           dispatch(
-            fetchStagesAll({
+            fetchRequests({
               params,
             })
           );
@@ -331,6 +343,69 @@ function RequestTable() {
     ]
   );
 
+  const handleDeleteStages = React.useCallback(
+    async (id) => {
+      const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+  
+      if (!currentBranch) {
+        toast({
+          title: "Lỗi",
+          description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
+          type: "error",
+        });
+        router.push("/auth/chon-chi-nhanh");
+        return;
+      }
+  
+      const confirm = window.confirm(
+        `Bạn có chắc chắn muốn xóa sảnh #${id} này không ?`
+      );
+      if (!confirm) return;
+  
+      try {
+        const response = await dispatch(deleteStageByID({ id })).unwrap();
+        console.log("Delete response:", response);
+        
+        if (response && response.statusCode === 200) {
+          toast({
+            title: "Xóa thành công",
+            description: response.message || "Sảnh đã được xóa",
+            type: "success",
+          });
+          const params = {
+            branch_id: currentBranch.id,
+            search: searchQuery,
+          };
+          dispatch(fetchStagesAll({ params }));
+        } else {
+          // Xử lý các lỗi khác nếu có
+          const { statusCode, message } = response || {};
+          toast({
+            title: "Xóa thất bại",
+            description: message || "Yêu cầu cần xem xét lại",
+            type: "error",
+          });
+        }
+      } catch (error) {
+        console.error("Error during deletion:", error);
+        toast({
+          title: "Chức năng đã xảy ra lỗi",
+          description: "Đã xảy ra lỗi khi xóa sảnh",
+          type: "error",
+        });
+      }
+    },
+    [
+      date,
+      formattedEndDate,
+      formattedStartDate,
+      requestStatus,
+      searchQuery,
+      itemsPerPage,
+      currentPage,
+    ]
+  );
+
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -347,113 +422,102 @@ function RequestTable() {
     );
   }, [visibleColumns]);
   const sortedItems = React.useMemo(() => {
-    return [...requests].sort((a, b) => {
+    return [...stages].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, requests]);
-  
+  }, [sortDescriptor, stages]);
+
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
       switch (columnKey) {
         case "price":
-
-          // return new Intl.NumberFormat('vi-VN', {
-          //   style: 'currency',
-          //   currency: 'VND',
-          // }).format(item.price || 0);
-
-          return item.price
-        case "capacity_min":
-          return item.capacity_min
-        case 'capacity_max':
-        return item.capacity_max
-        case "name":
-          return item.name
-        // case "status":
-            // <select
-            //   name="status"
-            //   value={cellValue}
-            //   className="select relative z-50"
-            //   onClick={(e) => e.stopPropagation()}
-            //   onMouseDown={(e) => e.stopPropagation()}
-            // >
-            //   {CONFIG.BOOKING_STATUS.map((status) => (
-            //     <option value={status.key} key={status.key} className="option">
-            //       {status.label}
-            //     </option>
-            //   ))}
-            // </select>  
-        //     switch (cellValue) {
-        //       case "pending":
-        //         return (
-        //           <Chip variant="flat" color="warning">
-        //             Chưa xử lý
-        //           </Chip>
-        //         );
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(item.price || 0);
   
-        //       case "processing":
-        //         return (
-        //           <Chip variant="flat" color="primary">
-        //             Đang xử lý
-        //           </Chip>
-        //         );
-        //       case "success":
-        //         return (
-        //           <Chip variant="flat" color="primary">
-        //             Sử lý thành công
-        //           </Chip>
-        //         );
-        //       case "cancel":
-        //         return (
-        //           <Chip variant="flat" color="danger">
-        //             Đã hủy
-        //           </Chip>
-        //         );
-        //     }
+        case "capacity_min":
+          return item.capacity_min; // Fallback if undefined
+        case "capacity_max":
+          return item.capacity_max; // Fallback if undefined
+        case "name":
+          return item.name; // Fallback if undefined
+        // case "status":
+        //   switch (cellValue) {
+        //     case "pending":
+        //       return (
+        //         <Chip variant="flat" color="warning">
+        //           Chưa xử lý
+        //         </Chip>
+        //       );
+  
+        //     case "processing":
+        //       return (
+        //         <Chip variant="flat" color="primary">
+        //           Đang xử lý
+        //         </Chip>
+        //       );
+  
+        //     case "success":
+        //       return (
+        //         <Chip variant="flat" color="success">
+        //           Sử lý thành công
+        //         </Chip>
+        //       );
+  
+        //     case "cancel":
+        //       return (
+        //         <Chip variant="flat" color="danger">
+        //           Đã hủy
+        //         </Chip>
+        //       );
+  
+        //     default:
+        //       return <Chip variant="flat" color="default">{cellValue}</Chip>; // Fallback for unknown status
+        //   }
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>
-                  <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => handleUpdateStatus(item.id)}
-                  className={`${
-                    item.status === "processing" ? "hidden" : ""
-                  }`}
-                >
-                  {`Cập nhật trạng thái "Đang xử lý"`}
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => handleCancelRequest(item.id)}
-                  className={`text-red-400 ${
-                    item.status === "cancel" ? "hidden" : ""
-                  }`}
-                >
-                  {`Cập nhật trạng thái "Hủy"`}
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    <VerticalDotsIcon className="text-default-300" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem>
+                    <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleUpdateStatus(item.id)}
+                    className={`text-blue-500 ${item.status === "processing" ? "hidden" : ""}`}
+                  >
+                    {`Cập nhật trạng thái "Đang xử lý"`}
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleDeleteStages(item.id)}
+                    className="text-red-400"
+                  >
+                    {`Xóa sảnh`}
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
           );
+  
         default:
-          return cellValue;
+          return cellValue; // Fallback for unhandled cases
       }
     },
-    [handleUpdateStatus, pathname]
+    [handleUpdateStatus, handleDeleteStages, pathname]
   );
+  
+
 
   const onItemsPerPageChange = React.useCallback((e) => {
     setItemsPerPage(Number(e.target.value));
@@ -575,26 +639,25 @@ function RequestTable() {
     requestStatus,
   ]);
 
-  const bottomContent = React.useMemo(() => {
-    return (
-      <CustomPagination
-        page={currentPage}
-        total={pagination.lastPage}
-        onChange={onPageChange}
-        classNames={{
-          base: "flex justify-center",
-        }}
-      />
-    );
-  }, [currentPage, pagination.lastPage]);
+  // const bottomContent = React.useMemo(() => {
+  //   return (
+  //     <CustomPagination
+  //       page={currentPage}
+  //       total={pagination.lastPage}
+  //       onChange={onPageChange}
+  //       classNames={{
+  //         base: "flex justify-center",
+  //       }}
+  //     />
+  //   );
+  // }, [currentPage, pagination.lastPage]);
 
   console.log(pathname);
-
   return (
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
-      bottomContent={bottomContent}
+      // bottomContent={bottomContent}
       bottomContentPlacement="inside"
       classNames={{
         thead:
@@ -635,10 +698,10 @@ function RequestTable() {
       </TableHeader>
       <TableBody
         emptyContent={
-          isFetchingRequestsError ? error : "Không tìm thấy yêu cầu"
+          isFetchingStagesError ? error : "Không tìm thấy yêu cầu"
         }
         items={sortedItems}
-        isLoading={isFetchingRequests || isUpdatingRequest}
+        isLoading={isFetchingStages || isUpdatingStage}
         loadingContent={<LoadingContent />}
       >
         {(item) => (
@@ -647,8 +710,7 @@ function RequestTable() {
             onContextMenu={(e) => {
               e.preventDefault();
               if (item.status === "cancel") return;
-
-              handleCancelRequest(item.id);
+              handleDeleteStages(item.id);
             }}
           >
             {(columnKey) => (
