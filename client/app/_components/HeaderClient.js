@@ -97,19 +97,19 @@ const HeaderClient = () => {
     {
       id: 2,
       name: "Tiệc của tôi",
-      link: "/nguoi-dung/tiec-cuoi",
+      link: "/client/nguoi-dung/tiec-cuoi",
       icon: <AiOutlineUnorderedList fill="black" />,
     },
     {
       id: 3,
       name: "Gói tiệc của tôi",
-      link: "/nguoi-dung/combo-cua-ban",
+      link: "/client/nguoi-dung/combo-cua-ban",
       icon: <BsCardChecklist fill="black" />,
     },
     {
       id: 4,
       name: "Thực đơn của tôi",
-      link: "/nguoi-dung/thuc-don-cua-ban",
+      link: "/client/nguoi-dung/thuc-don-cua-ban",
       icon: <MdOutlineRestaurantMenu fill="black" />,
     },
     {

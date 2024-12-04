@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const SideBarUserClient = () => {
+const SideBarUserClient = ({ unreadNotifications }) => {
     const pathName = usePathname();
 
     const links = [
@@ -40,12 +40,17 @@ const SideBarUserClient = () => {
                             key={index}
                             className={`rounded-lg ${isActive ? 'bg-gold' : ''} hover:bg-gold hover:shadow-lg transition-all duration-300 ease-in-out text-sm`}
                         >
-                            <Link
-                                href={Array.isArray(item.links) ? item.links[0] : item.links}
-                                className={`font-Montserrat text-center md:text-left block py-3 px-6 leading-[22px] text-base ${isActive ? 'text-white font-bold' : item.color} hover:text-white`}
-                            >
-                                {item.title}
-                            </Link>
+                            <div className='relative'>
+                                {item.title === 'Thông báo' && unreadNotifications > 0 && (
+                                    <div className='h-3 w-3 rounded-full bg-red-500 absolute right-0'></div>
+                                )}
+                                <Link
+                                    href={Array.isArray(item.links) ? item.links[0] : item.links}
+                                    className={`font-Montserrat text-center md:text-left block py-3 px-6 leading-[22px] text-base ${isActive ? 'text-white font-bold' : item.color} hover:text-white`}
+                                >
+                                    {item.title}
+                                </Link>
+                            </div>
                         </li>
                     );
                 })}

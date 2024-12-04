@@ -38,6 +38,7 @@ import LoadingContent from "@/app/_components/LoadingContent";
 import SearchForm from "@/app/_components/SearchForm";
 import { fetchStagesAll } from "@/app/_lib/features/stages/stagesSlice";
 
+
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
@@ -588,7 +589,7 @@ function RequestTable() {
     );
   }, [currentPage, pagination.lastPage]);
 
-  console.log(pathname);
+  // console.log(pathname);
 
   return (
     <Table

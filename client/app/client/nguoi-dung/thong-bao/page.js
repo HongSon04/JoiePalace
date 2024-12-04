@@ -5,6 +5,8 @@ import { API_CONFIG } from "@/app/_utils/api.config";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { setNotificationCount } from '@/app/_lib/decors/decorsSlice';
 
 const NotificationsPage = () => {
     const { makeAuthorizedRequest } = useApiServices();
@@ -13,6 +15,7 @@ const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
     const toast = useCustomToast();
     const router = useRouter();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const getFeedbacks = async () => {
@@ -45,7 +48,7 @@ const NotificationsPage = () => {
                         .map(notification => notification.id);
                     setListIdNotification(notificationIs_read);
                     setNotifications(notifications);
-
+                    dispatch(setNotificationCount(notificationIs_read.length));
                 } else {
                     console.error("Error fetching feedbacks:", data);
                     return [];
@@ -53,7 +56,6 @@ const NotificationsPage = () => {
             } else {
                 router.push('/');
             }
-
         };
         getFeedbacks();
     }, []);
@@ -69,7 +71,7 @@ const NotificationsPage = () => {
                 null,
                 '/client/dang-nhap'
             );
-            console.log(response);
+            // console.log(response);
 
             if (response?.success) {
                 toast({
@@ -79,6 +81,7 @@ const NotificationsPage = () => {
                     description: 'Đã đánh dấu đọc thành công',
                     closable: true,
                 });
+                dispatch(setNotificationCount(0));
             } else {
                 toast({
                     position: "top",
