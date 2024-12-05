@@ -78,26 +78,30 @@ const TableStageStatus = () => {
       const startOfWeek = getDefaultDateRange().start_Date;
       const endOfWeek = getDefaultDateRange().end_Date;
       // console.log(startOfWeek);
-      // console.log(endOfWeek);
+      console.log(branchId);
       
       const bookingByBranchData = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.GET_ALL({
           branch_id: branchId,
-          status:  ["pending", "processing"] , 
+          // status:  ["pending", "processing"] , 
+          status: "pending",
           startDate : startOfWeek,
-          endDate : endOfWeek  
+          endDate : endOfWeek,
+          itemsPerPage: 100
         }),
         'GET',
         null
       );      
+      console.log(bookingByBranchData);
+      
       const stageByBranchData = await makeAuthorizedRequest(
-        API_CONFIG.STAGES.GET_ALL_BY_BRANCH({
+        API_CONFIG.STAGES.GET_ALL({
           branch_id: branchId
         }),
         'GET',
         null
       );
-      // console.log(stageByBranchData);
+      console.log(stageByBranchData);
       setSlug(slug);
       setDataStage(stageByBranchData);
       setDataBookingByBranch(bookingByBranchData);
@@ -177,7 +181,7 @@ const TableStageStatus = () => {
         <p className="text-base  font-semibold">Trạng thái các sảnh</p>
         <p className="text-base  font-semibold">{currentShift} - {currentDate}</p>
       </div>
-      <div className='overflow-y-auto h-[380px]'>
+      <div className='overflow-y-auto max-h-[380px]'>
         <table className="table w-full">
           <thead>
             <tr>

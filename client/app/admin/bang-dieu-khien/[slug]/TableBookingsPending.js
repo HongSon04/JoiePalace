@@ -91,6 +91,8 @@ const TableBookingsPending = () => {
       const bookingByBranchData = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.GET_ALL({
           branch_id: branchId,
+          is_deposit: true,
+          is_confirm: true,
           status: 'pending',
           startDate: startDate,
           endDate: endDate

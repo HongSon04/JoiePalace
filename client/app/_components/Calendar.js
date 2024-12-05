@@ -90,12 +90,12 @@ export default function CustomCalendar() {
           // Chuyển đổi expiredAt thành DateTime và bỏ giờ, phút, giây
           const dateTime = DateTime.fromISO(expiredAt).startOf('day');
           if (!dateTime.isValid) {
-            console.error("Invalid DateTime from expired_at:", expiredAt);
+            // console.error("Invalid DateTime from expired_at:", expiredAt);
             return null; // Trả về null nếu không hợp lệ
           }
           return dateTime; // Trả về đối tượng DateTime hợp lệ
         } catch (error) {
-          console.error("Error parsing expired_at:", expiredAt, error);
+          // console.error("Error parsing expired_at:", expiredAt, error);
           return null;
         }
       }
@@ -112,14 +112,14 @@ export default function CustomCalendar() {
     return [startDate, endDate]; // Trả về phạm vi ngày dưới dạng chuỗi ISO
   }).filter(Boolean); // Lọc bỏ các phạm vi không hợp lệ
 
-  console.log("Disabled Ranges:", disabledRanges); // Kiểm tra disabledRanges
+  // console.log("Disabled Ranges:", disabledRanges); // Kiểm tra disabledRanges
 
 
   // Hàm kiểm tra ngày không khả dụng
   let isDateUnavailable = (date) => {
     // Kiểm tra nếu date không hợp lệ (trong trường hợp sử dụng DateTime từ Luxon)
     if (!date || !(date instanceof Date || date.isValid)) {
-      console.error("Invalid date:", date);
+      // console.error("Invalid date:", date);
       return true; // Trả về true nếu ngày không hợp lệ (vô hiệu hóa)
     }
 

@@ -408,7 +408,7 @@ const Page = ({ params }) => {
           
         </div>
       </div>
-      {slug === 'ho-chi-minh' && (
+      {slug !== 'ho-chi-minh' && (
         <div className="w-full p-4">
           <TableStageStatus />
         </div>

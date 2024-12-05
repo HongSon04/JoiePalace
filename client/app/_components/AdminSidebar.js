@@ -31,6 +31,7 @@ import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import categoryIcon from "@/public/admin-sidebar/danh-muc.svg";
+import StageIcon from "@/public/admin-sidebar/sanh.svg";
 import logo from "@/public/logo-dark.png";
 import { useDispatch, useSelector } from "react-redux";
 import { API_CONFIG } from "../_utils/api.config";
@@ -202,8 +203,14 @@ function AdminSidebarNav() {
         icon: blogIcon,
         className: "",
       },
+      {
+        title: "Sảnh",
+        path: `/admin/sanh/${currentBranch?.slug}`,
+        icon: StageIcon,
+        className: "",
+      },
     ];
-  }, [currentBranch]);
+  }, [currentBranch]);  
 
   const subOptions = React.useMemo(() => {
     return [

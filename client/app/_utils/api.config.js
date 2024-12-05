@@ -95,6 +95,7 @@ export const API_CONFIG = {
     GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
     GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
     GET_BY_ID: (id) => `${STAGES}/get/${id}`,
+    DESTROY: (id) => `${STAGES}/destroy/${id}`,
   },
 
   // CATEGORIES API
@@ -197,6 +198,7 @@ export const API_CONFIG = {
       constructUrlWithParams(`${BOOKING_API}/get-all`, params),
     UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
     GET_BY_ID: (id) => `${BOOKING_API}/get/${id}`,
+    GET_BOOKING_LIST: (id) => `${BOOKING_API}/get-booking-list/${id}`,
     UPDATE: (id) => `${BOOKING_API}/update/${id}`,
     UPDATE_STATUS: (id) => `${BOOKING_API}/update-status/${id}`,
     DELETE: (id) => `${BOOKING_API}/delete/${id}`,

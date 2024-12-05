@@ -158,6 +158,42 @@ const stagesSlice = createSlice({
         state.isDeletingStageError = true;
         state.error = action.payload;
       });
+    builder
+      .addCase(deleteStageByID.pending, (state) => {
+        state.isDeletingStage = true;
+        state.isDeletingStageError = false;
+        state.error = null;
+      })
+      .addCase(deleteStageByID.fulfilled, (state) => {
+        state.isDeletingStage = false;
+        state.isDeletingStageError = false;
+        state.error = null;
+      })
+      .addCase(deleteStageByID.rejected, (state, action) => {
+        state.isDeletingStage = false;
+        state.isDeletingStageError = true;
+        state.error = action.payload;
+      });
+
+    builder
+      .addCase(fetchStagesAll.pending, (state) => {
+        state.isFetchingStages = true;
+        state.isFetchingStagesError = false;
+        state.error = null;
+      })
+      .addCase(fetchStagesAll.fulfilled, (state, action) => {
+        state.isFetchingStages = false;
+        console.log(action.payload);
+        state.stages = action.payload;
+        // state.pagination = action.payload.pagination;
+        state.isFetchingStagesError = false;
+        state.error = null;
+      })
+      .addCase(fetchStagesAll.rejected, (state, action) => {
+        state.isFetchingStages = false;
+        state.isFetchingStagesError = true;
+        state.error = action.payload;
+      });
   },
 });
 
@@ -243,6 +279,50 @@ export const deleteStage = createAsyncThunk(
   }
 );
 
+export const fetchStagesAll = createAsyncThunk(
+  "stages/fetchStagesAll",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const stages = await makeAuthorizedRequest(
+        API_CONFIG.STAGES.GET_ALL(params),
+        "GET",
+        null,
+        { signal }
+      );
+
+      if (stages.success) {
+        dispatch(fetchingStagesSuccess(stages));
+        return stages.data;
+      } else {
+        dispatch(fetchingStagesFailure(stages.error.message));
+        return rejectWithValue(stages.error.message);
+      }
+    } catch (error) {
+      return rejectWithValue('Network error');
+    }
+  }
+);
+
+export const deleteStageByID = createAsyncThunk(
+  "stages/deleteStageByID",
+  async ({ id }, { dispatch, rejectWithValue }) => {
+    dispatch(deletingStage());
+
+    const response = await makeAuthorizedRequest(
+      API_CONFIG.STAGES.DESTROY(id),
+      "DELETE"
+    );
+    console.log("API response:", response);
+    // Kiểm tra xem response có tồn tại và có thuộc tính success
+    if (response && response.success) {
+      dispatch(deletingStageSuccess());
+      return response; // Trả về dữ liệu nếu xóa thành công
+    } else {
+      dispatch(deletingStageFailure());
+      return rejectWithValue(response); // Trả về phản hồi lỗi
+    }
+  }
+);
 export const {
   fetchingStages,
   fetchingStagesSuccess,
