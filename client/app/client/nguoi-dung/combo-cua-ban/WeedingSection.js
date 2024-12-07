@@ -84,14 +84,14 @@ const WeddingSection = () => {
 
     if (isLoading) {
         return <div className='flex flex-col items-center justify-center w-full h-[50vh]'>
-        <div className='w-[200px] opacity-50'>
+        <div className='w-[200px] max-sm:w-[100px] opacity-50'>
             <Image
                 src='/notebook.png'
                 alt="Notebook image"
                 className="object-cover"
             />
         </div>
-        <div className='flex mt-4 text-lg'>
+        <div className='flex mt-4 text-lg max-sm:text-[13px] max-sm:flex-col  max-sm:items-center'>
             <p>Bạn có muốn tạo gói cho riêng mình?</p>
             <Link href='/client/tao-combo' className='ml-2 text-gold hover:text-gold hover:underline'>
                 Tạo gói
@@ -103,14 +103,14 @@ const WeddingSection = () => {
     if (weddingPacks.length === 0) {
         return (
             <div className='flex flex-col items-center justify-center w-full h-[50vh]'>
-                <div className='w-[200px] opacity-50'>
+                <div className='w-[200px]  max-sm:w-[100px] opacity-50'>
                     <Image
                         src='/notebook.png'
                         alt="Notebook image"
                         className="object-cover"
                     />
                 </div>
-                <div className='flex mt-4 text-lg'>
+                <div className='flex mt-4 text-lg  max-sm:text-[13px] max-sm:flex-col  max-sm:items-center'>
                     <p>Bạn có muốn tạo gói cho riêng mình?</p>
                     <Link href='/client/tao-combo' className='ml-2 text-gold hover:text-gold hover:underline'>
                         Tạo gói

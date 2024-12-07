@@ -103,8 +103,8 @@ const Page = () => {
   };
 
   return (
-    <div className='flex flex-col gap-[30px] p-4'>
-      <span className='text-2xl font-bold leading-[22px] text-white'>Đổi mật khẩu</span>
+    <div className='flex flex-col gap-[30px] p-4 max-sm:p-0'>
+      <span className='text-2xl font-bold leading-[22px] text-white max-sm:text-center'>Đổi mật khẩu</span>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='flex flex-col gap-[30px] w-full'>
           {/* Current Password Field */}
@@ -140,7 +140,7 @@ const Page = () => {
             trigger={trigger}
           />
 
-          <div className='flex gap-[20px] justify-end w-full'>
+          <div className='flex gap-[20px] justify-end w-full max-sm:justify-between'>
             {/* <button
               type="button"
               className='flex items-center gap-[10px] px-4 py-[10px] bg-gray-200 text-black rounded-full text-sm hover:bg-gray-300 transition-all duration-300'

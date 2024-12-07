@@ -95,9 +95,9 @@ const HeaderClient = () => {
       icon: <AiOutlineUser fill="black" />,
     },
     {
-      id: 2,
+      id: 2, 
       name: "Tiệc của tôi",
-      link: "/client/nguoi-dung/tiec-cuoi",
+      link: "/client/nguoi-dung/lich-su-tiec",
       icon: <AiOutlineUnorderedList fill="black" />,
     },
     {
@@ -127,7 +127,7 @@ const HeaderClient = () => {
     >
       <div className="py-4 px-5 w-full h-[90px] flex flex-row-reverse justify-between items-center bg-transparent">
         <div className="h-full flex items-center gap-4 flex-row-reverse">
-          <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer">
+          <div className="flex items-center h-full px-4 gap-2 hover:text-[#C0995A] cursor-pointer max-sm:hidden ">
             <HiOutlinePhone className="!text-2xl" />
 
             <span className="uppercase text-base font-normal cursor-pointer hover:text-[#C0995A] max-lg:hidden">
@@ -136,13 +136,13 @@ const HeaderClient = () => {
           </div>
           <button
             id="buttonAccount"
-            className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl relative"
+            className="px-4 bg-white py-3 text-black flex justify-center items-center gap-4 rounded-xl relative max-sm:p-2"
           >
             <span className="text-sm font-semibold text-black">
               {isLogin ? `Hi! ${nameUser}` : "Tài khoản"}
             </span>
             <div
-              className={`absolute top-[calc(100%+2px)] left-0 bg-white shadow-lg rounded-lg w-auto `}
+              className={`absolute top-[calc(100%+2px)] left-0 bg-white shadow-lg rounded-lg w-auto max-sm:hidden`}
               id="menuAccountDropdown"
             >
               {isLogin ? (

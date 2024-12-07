@@ -90,7 +90,7 @@ const Page = () => {
 
     return (
         <div className='flex flex-col gap-[30px] text-white '>
-            <h2 className='text-2xl font-bold'>Thành viên</h2>
+            <h2 className='text-2xl font-bold max-sm:text-center'>Thành viên</h2>
             {/* Tiers Display Section */}
             <div className='relative flex justify-between items-center'>
                 {membershipTiers.map((tier, index) => (

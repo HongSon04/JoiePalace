@@ -211,11 +211,11 @@ const Blog = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="max-md:text-base max-sm:text-[5px] ">
+                  <p className="max-md:text-base max-sm:text-[10px] ">
                     Tin Tức Mới Nhất \{" "}
                     {formatDate(blog.created_at) || "2024-06-20"}
                   </p>
-                  <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                  <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
                       "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
@@ -241,11 +241,11 @@ const Blog = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="max-md:text-base max-sm:text-[5px] ">
+                  <p className="max-md:text-base max-sm:text-[10px] ">
                     Tin Tức Mới Nhất \{" "}
                     {formatDate(blog.created_at) || "2024-06-20"}
                   </p>
-                  <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                  <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
                       "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
@@ -270,11 +270,11 @@ const Blog = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="max-md:text-base max-sm:text-[5px] ">
+                  <p className="max-md:text-base max-sm:text-[10px] ">
                     Tin Tức Mới Nhất \{" "}
                     {formatDate(blog.created_at) || "2024-06-20"}
                   </p>
-                  <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                  <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
                       "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
@@ -286,13 +286,13 @@ const Blog = () => {
         <>
           {/* Pagination */}
           <nav
-            className="flex items-center justify-start mt-4"
+            className="flex items-center justify-center mt-4"
             aria-label="Pagination"
           >
             <button
               onClick={handlePreviousPage}
               disabled={numberpage === 1}
-              className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === 1 ? "opacity-50 cursor-not-allowed" : ""
+              className={`bg-white rounded text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === 1 ? "opacity-50 cursor-not-allowed" : ""
                 }`}
             >
               <svg
@@ -319,7 +319,7 @@ const Blog = () => {
                     setNumberPage(item);
                   }
                 }}
-                className={`min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${item === numberpage
+                className={`min-h-[38px] rounded min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${item === numberpage
                     ? "bg-gold text-white"
                     : "bg-white text-black hover:bg-gold hover:text-white"
                   }`}

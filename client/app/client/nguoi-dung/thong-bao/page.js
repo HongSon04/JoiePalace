@@ -118,7 +118,7 @@ const NotificationsPage = () => {
         switch (status) {
             case 'Đặt tiệc':
                 return 'text-green-500';
-            case 'Thanh toán':
+            case 'Cập nhật':
                 return 'text-sky-300';
             case 'Thanh toán cọc':
                 return 'text-red-300';
@@ -149,10 +149,9 @@ const NotificationsPage = () => {
                 return 'Không xác định';
         }
     };
-    console.log('notifications', notifications);
 
     return (
-        <div className="flex flex-col gap-8 p-5 min-h-screen ">
+        <div className="flex flex-col gap-8 p-5 max-sm:p-0 min-h-screen ">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-white">Thông báo</h1>

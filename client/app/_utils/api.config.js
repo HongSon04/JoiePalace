@@ -1,10 +1,10 @@
 // HOST URL
-const HOST = `https://joieplace.live/api`;
-const MEMBERSHIPS = `https://joieplace.live/memberships`;
+const HOST = `http://joieplace.live/api`;
+const MEMBERSHIPS = `http://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
-const AUTH_API = `${HOST}/auth`;
+const AUTH_API = `${HOST}/auth`;  
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
@@ -95,6 +95,7 @@ export const API_CONFIG = {
     GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
     GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
     GET_BY_ID: (id) => `${STAGES}/get/${id}`,
+    DESTROY: (id) => `${STAGES}/destroy/${id}`,
   },
 
   // CATEGORIES API
