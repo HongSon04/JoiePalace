@@ -1,20 +1,21 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import ClientDish from "@/app/_components/ClientDish";
 import ClientDishesSection from "@/app/_components/ClientDishesSection";
-import Dish from "@/app/_components/Dish";
 import Footer from "@/app/_components/FooterClient";
 import Uploader from "@/app/_components/Uploader";
-import useCustomToast from "@/app/_hooks/useCustomToast";
 import {
   fetchCategoriesBySlug,
   setSelectedCategory,
 } from "@/app/_lib/features/categories/categoriesSlice";
+import { createMenu } from "@/app/_lib/features/menu/menuSlice";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import { CONFIG } from "@/app/_utils/config";
+import { formatPrice } from "@/app/_utils/formaters";
+import { decodeRandomName, generateMenuName } from "@/app/_utils/helpers";
 import Loading from "@/app/loading";
 import { useToast } from "@chakra-ui/react";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -26,22 +27,17 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Col, Row } from "antd";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { FaRandom } from "react-icons/fa";
 import { FaLink } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 import { z } from "zod";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import { formData } from "zod-form-data";
-import { createMenu } from "@/app/_lib/features/menu/menuSlice";
-import { formatPrice } from "@/app/_utils/formaters";
-import LoadingContent from "@/app/_components/LoadingContent";
-import { decodeRandomName, generateMenuName } from "@/app/_utils/helpers";
-import { FaRandom } from "react-icons/fa";
 
 const MAX_FILE_SIZE = 5000000;
 function checkFileType(file) {
@@ -52,13 +48,6 @@ function checkFileType(file) {
   }
   return false;
 }
-
-const checkFileSize = (file) => {
-  if (file?.size) {
-    return file.size <= MAX_FILE_SIZE;
-  }
-  return false;
-};
 
 const schema = z.object({
   name: z
@@ -337,12 +326,6 @@ function Page() {
     };
   }, [isSaved]);
 
-  // LATER: Remove this
-  React.useEffect(() => {
-    console.log(errors);
-    console.log(categoryDishes);
-  }, [errors, categoryDishes]);
-
   if (isFetchingCategories) {
     return <Loading />;
   }
@@ -419,7 +402,7 @@ function Page() {
                       type="text"
                       name="name"
                       id="name"
-                      className="bg-transparent text-white placeholder:text-gray-400 text-5xl font-bold px-3 py-2 rounded-lg placeholder:opacity-40 w-full outline-none focus:bg-whiteAlpha-100"
+                      className="bg-transparent text-white placeholder:text-gray-400 text-2xl font-bold px-3 py-2 rounded-lg placeholder:opacity-40 w-full outline-none focus:bg-whiteAlpha-100"
                       placeholder="TÊN THỰC ĐƠN"
                       value={watch("name")}
                       {...register("name")}
@@ -427,7 +410,7 @@ function Page() {
                     />
                     <Button
                       startContent={<FaRandom className="w-4 h-4 text-white" />}
-                      className="bg-whiteAlpha-100 text-white"
+                      className="bg-whiteAlpha-100 text-white mt-3"
                       onClick={handleGenerateName}
                     >
                       Chọn tên ngẫu nhiên

@@ -33,12 +33,11 @@ const formSchema = z
           const hasUpperCase = /[A-Z]/.test(value);
           const hasLowerCase = /[a-z]/.test(value);
           const hasNumber = /[0-9]/.test(value);
-          const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-          return hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+          return hasUpperCase && hasLowerCase && hasNumber;
         },
         {
           message:
-            "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt",
+            "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường và một số",
         }
       ),
     confirm_password: z
@@ -105,33 +104,50 @@ const Page = () => {
     setLoading(true);
     // main
     try {
-      const { email } = token && decodeJwt(token);
+      const email = JSON.parse(localStorage.getItem("reset_email"));
+
+      if (!token) {
+        throw new Error("Token không hợp lệ");
+      }
 
       const submitData = {
         ...data,
         token,
         email,
       };
+
       const result = await tryCatchWrapper(() => resetPassword(submitData), {
         message: "Vui lòng kiểm tra lại thông tin!",
       });
 
-      if (result.success) {
+      console.log("result -> ", result);
+
+      if (!result) {
+        throw new Error("Có lỗi xảy ra");
+      }
+
+      if (result.status === 200 || result.status === 201) {
         toast({
-          title: "Gửi mail thành công!",
-          description: "Quý khách vui lòng kiểm tra email",
+          title: "Đổi mật khẩu thành công!",
+          description: "Quý khách có thể đăng nhập bằng mật khẩu mới",
           status: "success",
           position: "top-right",
         });
       } else {
         toast({
-          title: "Gửi mail thất bại!",
+          title: "Đổi mật khẩu thất bại!",
           description: result?.error || "Vui lòng thử lại sau",
           status: "error",
           position: "top-right",
         });
       }
     } catch (error) {
+      toast({
+        title: "Có sự cố khi đổi mật khẩu!",
+        description: error?.message || "Vui lòng thử lại sau",
+        status: "error",
+        position: "top-right",
+      });
     } finally {
       setLoading(false);
     }

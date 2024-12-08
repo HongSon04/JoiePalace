@@ -14,7 +14,11 @@ import pizza from "@/public/local_pizza.svg";
 import restaurant from "@/public/restaurant.svg";
 import setMeal from "@/public/set_meal.svg";
 import textSnippet from "@/public/text_snippet.svg";
-import { PlusIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
+import {
+  ExclamationCircleIcon,
+  PlusIcon,
+  SquaresPlusIcon,
+} from "@heroicons/react/24/outline";
 import { Button, Chip, useDisclosure } from "@nextui-org/react";
 import { Col, Row } from "antd";
 import Image from "next/image";
@@ -30,6 +34,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import DishesModal from "../[id]/DishesModal";
 import Breadcrumbs from "./Breadcrumbs";
+import { AnimatePresence, motion } from "framer-motion";
+import useRoleGuard from "@/app/_hooks/useRoleGuard";
 
 const schema = z.object({
   name: z.string({ required_error: "Tên thực đơn không được để trống" }),
@@ -44,21 +50,51 @@ const schema = z.object({
   }),
 });
 
+const MAX_FILE_SIZE = 5000000;
+function checkFileType(file) {
+  if (file?.name) {
+    const fileType = file.name.split(".").pop();
+    if (fileType === "jpg" || fileType === "jpeg" || fileType === "png")
+      return true;
+  }
+  return false;
+}
+
 function Page() {
+  const { isLoading } = useRoleGuard();
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [dishCategory, setDishCategory] = React.useState([]);
   const [selectedMenuDishes, setSelectedMenuDishes] = React.useState([]);
-  const [imageSrc, setImageSrc] = React.useState(""); // State to store image source
-  const [appetizer, setAppetizer] = React.useState([]); // Array of dishes
-  const [mainCourse, setMainCourse] = React.useState([]); // Array of dishes
-  const [dessert, setDessert] = React.useState([]); // Array of dishes
-
+  const [imageSrc, setImageSrc] = React.useState("");
+  const [appetizer, setAppetizer] = React.useState([]);
+  const [mainCourse, setMainCourse] = React.useState([]);
+  const [dessert, setDessert] = React.useState([]);
+  const [isImagesEmpty, setIsImagesEmpty] = React.useState(false);
+  const [isImageOverSize, setIsImageOverSize] = React.useState(false);
+  const [isFormatAccepted, setIsFormatAccepted] = React.useState(false);
+  const [isDishesEmpty, setIsDishesEmpty] = React.useState(true);
   const [menuDishes, setMenuDishes] = React.useState({
     appetizer,
     mainCourse,
     dessert,
   });
   const [files, setFiles] = React.useState([]);
+  const pathname = usePathname();
+  const router = useRouter();
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+    getValues,
+  } = useForm();
+  const { status } = useSelector((store) => store.menu);
+  const dispatch = useDispatch();
 
   const handleFileChange = (files) => {
     setFiles(files);
@@ -73,11 +109,6 @@ function Page() {
     });
   };
 
-  const pathname = usePathname();
-  const router = useRouter();
-  const params = useParams();
-  const searchParams = useSearchParams();
-
   const createQueryString = useCallback(
     (name, value) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -87,6 +118,17 @@ function Page() {
     },
     [searchParams]
   );
+
+  // Function to handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setValue(name, value);
+  };
+
+  // Function to handle form submission
+  const onSubmit = (data) => {
+    console.log(data);
+  };
 
   React.useEffect(() => {
     const dishCategory = searchParams.get("dishesCategory");
@@ -100,33 +142,6 @@ function Page() {
       dessert,
     });
   }, [appetizer, mainCourse, dessert]);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-    reset,
-    getValues,
-  } = useForm();
-
-  const { status } = useSelector((store) => store.menu);
-
-  const dispatch = useDispatch();
-
-  // FORM HANDLING
-
-  // Function to handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setValue(name, value);
-  };
-
-  // Function to handle form submission
-  const onSubmit = (data) => {
-    console.log(data);
-  };
 
   return (
     <div>
@@ -145,14 +160,54 @@ function Page() {
       <>
         <div className="flex gap-5 mt-8 w-fit">
           {/* IMAGE & UPLOADER */}
-          <Uploader
-            id={"menu-images"}
-            name={"menu-images"}
-            register={register}
-            files={files}
-            setFiles={setFiles}
-            onFileChange={handleFileChange}
-          />
+          <div className="flex flex-col">
+            <Uploader
+              id={"menu-images"}
+              name={"menu-images"}
+              register={register}
+              files={files}
+              setFiles={setFiles}
+              onFileChange={handleFileChange}
+            />
+            <AnimatePresence>
+              {isImagesEmpty && (
+                <motion.div
+                  key={"isImagesEmpty"}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-red-400 text-sm font-normal mt-2 mb-2"
+                >
+                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                  {"Hãy chọn ít nhất một ảnh cho thực đơn của bạn nhé!"}
+                </motion.div>
+              )}
+              {isImageOverSize && (
+                <motion.div
+                  key={"isImageOverSize"}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-red-400 text-sm font-normal mt-2 mb-2"
+                >
+                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                  {"Hãy chọn ảnh có dung lượng nhỏ hơn 5MB nhé!"}
+                </motion.div>
+              )}
+              {!isFormatAccepted && (
+                <motion.div
+                  key={"isFormatAccepted"}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-red-400 text-sm font-normal mt-2 mb-2"
+                >
+                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                  {"Vui lòng chọn ảnh có định dạng jpg, jpeg hoặc png!"}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           {/* FORM */}
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -169,8 +224,7 @@ function Page() {
                 register={register}
                 errors={errors}
                 theme="dark"
-                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
-                theme="dark"
+                brna
                 name="name"
                 value={watch("name")}
                 label=""
@@ -178,6 +232,7 @@ function Page() {
                 ariaLabel={"Tên thực đơn"}
                 onChange={handleInputChange}
                 placeholder="Ex: Thực đơn tiệc cưới"
+                wrapperClassName="!mt-0"
               ></FormInput>
             </div>
             {/* MAX OF DISHES */}
@@ -196,6 +251,7 @@ function Page() {
                 label=""
                 type="number"
                 onChange={handleInputChange}
+                wrapperClassName="!mt-0"
               ></FormInput>
             </div>
             {/* MAX OF APPETIZER */}
@@ -215,6 +271,7 @@ function Page() {
                 type="number"
                 ariaLabel={"Số lượng món khai vị"}
                 onChange={handleInputChange}
+                wrapperClassName="!mt-0"
               ></FormInput>
             </div>
             {/* MAX OF MAIN COURSE */}
@@ -233,6 +290,7 @@ function Page() {
                 type="number"
                 ariaLabel={"Số lượng món chính"}
                 onChange={handleInputChange}
+                wrapperClassName="!mt-0"
               ></FormInput>
             </div>
             {/* MAX OF DESSERT */}
@@ -251,6 +309,7 @@ function Page() {
                 label=""
                 ariaLabel={"Số lượng món tráng miệng"}
                 onChange={handleInputChange}
+                wrapperClassName="!mt-0"
               ></FormInput>
             </div>
             {/* MENU DESCRIPTION */}
@@ -271,6 +330,7 @@ function Page() {
                 ariaLabel={"Số lượng món khai vị"}
                 onChange={handleInputChange}
                 placeholder="Ex: Thực đơn giành cho chú rể Nguyễn Văn A và cô dâu Trần Thị B"
+                wrapperClassName="!mt-0"
               ></FormInput>
             </div>
             <footer className="flex justify-end">
@@ -279,6 +339,7 @@ function Page() {
                 size="medium"
                 color="primary"
                 startContent={<SaveIcon width={20} height={20} />}
+                type="submit"
                 onClick={handleSubmit}
               >
                 Lưu

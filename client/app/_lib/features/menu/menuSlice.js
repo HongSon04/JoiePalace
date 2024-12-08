@@ -7,18 +7,26 @@ const initialState = {
   status: "idle",
   error: null,
   menu: {},
+
   isFetchingMenu: false,
   isFetchingMenuError: false,
+
   isFetchingMenuList: false,
   isFetchingMenuListError: false,
+
   isCreatingMenu: false,
   isCreatingMenuError: false,
+
   isUpdatingMenu: false,
   isUpdatingMenuError: false,
+
+  isDeletingMenu: false,
+  isDeletingMenuError: false,
+
   pagination: {},
 };
 
-const checkboxSlice = createSlice({
+const menuSlice = createSlice({
   name: "menu",
   initialState,
   reducers: {
@@ -161,6 +169,53 @@ const checkboxSlice = createSlice({
         state.isUpdatingMenu = false;
         state.isUpdatingMenuError = true;
       });
+
+    builder
+      .addCase(deleteMenu.pending, (state) => {
+        state.isDeletingMenu = true;
+        state.isDeletingMenuError = false;
+      })
+      .addCase(deleteMenu.fulfilled, (state, action) => {
+        state.isDeletingMenu = false;
+        state.menuList = state.menuList.filter(
+          (item) => item.id !== action.payload.id
+        );
+      })
+      .addCase(deleteMenu.rejected, (state) => {
+        state.isDeletingMenu = false;
+        state.isDeletingMenuError = true;
+      });
+
+    builder
+      .addCase(getDeletedMenuList.pending, (state) => {
+        state.isFetchingMenuList = true;
+        state.isFetchingMenuError = false;
+      })
+      .addCase(getDeletedMenuList.fulfilled, (state, action) => {
+        state.isFetchingMenuList = false;
+        state.menuList = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(getDeletedMenuList.rejected, (state) => {
+        state.isFetchingMenuList = false;
+        state.isFetchingMenuError = true;
+      });
+
+    builder
+      .addCase(destroyMenu.pending, (state) => {
+        state.isDeletingMenu = true;
+        state.isDeletingMenuError = false;
+      })
+      .addCase(destroyMenu.fulfilled, (state, action) => {
+        state.isDeletingMenu = false;
+        state.menuList = state.menuList.filter(
+          (item) => item.id !== action.payload.id
+        );
+      })
+      .addCase(destroyMenu.rejected, (state) => {
+        state.isDeletingMenu = false;
+        state.isDeletingMenuError = true;
+      });
   },
 });
 
@@ -186,6 +241,28 @@ export const createMenu = createAsyncThunk(
     } catch (error) {
       dispatch(createMenuError(error));
       return rejectWithValue(error);
+    }
+  }
+);
+
+export const getDeletedMenuList = createAsyncThunk(
+  "menu/fetchDeletedMenuList",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.GET_ALL_DELETED(params),
+        "GET",
+        null,
+        { signal }
+      );
+
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -279,6 +356,47 @@ export const updateMenu = createAsyncThunk(
   }
 );
 
+export const deleteMenu = createAsyncThunk(
+  "menu/deleteMenu",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.DELETE(id),
+        "DELETE"
+      );
+
+      if (response.success) {
+        dispatch(getMenuList());
+        return response;
+      } else {
+        return response;
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const destroyMenu = createAsyncThunk(
+  "menu/destroyMenu",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.DESTROY(id),
+        "DELETE"
+      );
+
+      if (response.success) {
+        return response;
+      } else {
+        return response;
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const {
   toggleSelectAll,
   toggleCheckbox,
@@ -291,5 +409,5 @@ export const {
   createMenuRequest,
   createMenuSuccess,
   createMenuError,
-} = checkboxSlice.actions;
-export default checkboxSlice;
+} = menuSlice.actions;
+export default menuSlice;

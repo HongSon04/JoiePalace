@@ -1,5 +1,5 @@
 // HOST URL
-const HOST = `https://joieplace.live/api`;
+const HOST = `http://joieplace.live/api`;
 const MEMBERSHIPS = `https://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
@@ -62,7 +62,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${USER_API}/get/${id}`,
     GET_BY_BRANCH_ID: (id) => `${USER_API}/get-all-by-branch-id/${id}`,
     CHANGE_PASSWORD: `${USER_API}/change-password`,
-    RESET_PASSWORD: `${USER_API}/forgot-passwod`,
+    RESET_PASSWORD: `${USER_API}/forgot-password`,
     FORGOT_PASSWORD: `${USER_API}/forgot-password`,
     CHANGE_PROFILE: `${USER_API}/change-profile`,
     DELETE: (id) => `${USER_API}/delete/${id}`,
@@ -114,7 +114,6 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
-    
     GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
@@ -230,7 +229,8 @@ export const API_CONFIG = {
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
-    GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
+    GET_BY_ID: (id, params) =>
+      constructUrlWithParams(`${NOTIFICATIONS_API}/get/${id}`, params),
     IS_READ: `${NOTIFICATIONS_API}/update-is-read`,
   },
 
