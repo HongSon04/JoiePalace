@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   stages: [],
+  stagesBookingStatus: [],
   pagination: {
     page: 1,
     total: 0,
@@ -42,6 +43,15 @@ const stagesSlice = createSlice({
       state.isFetchingStages = false;
       state.stages = action.payload.data;
       state.pagination = action.payload.pagination;
+      console.log(action.payload)
+
+      state.isFetchingStagesError = false;
+      state.error = null;
+    },
+    fetchingBookingStatusSuccess: (state, action) => {
+      state.isFetchingStages = false;
+      state.stagesBookingStatus = action.payload.data; 
+      console.log(action.payload)
       state.isFetchingStagesError = false;
       state.error = null;
     },
@@ -183,13 +193,31 @@ const stagesSlice = createSlice({
       })
       .addCase(fetchStagesAll.fulfilled, (state, action) => {
         state.isFetchingStages = false;
-        console.log(action.payload);
         state.stages = action.payload;
         // state.pagination = action.payload.pagination;
         state.isFetchingStagesError = false;
         state.error = null;
       })
       .addCase(fetchStagesAll.rejected, (state, action) => {
+        state.isFetchingStages = false;
+        state.isFetchingStagesError = true;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(fetchStagesBooking.pending, (state) => {
+        state.isFetchingStages = true;
+        state.isFetchingStagesError = false;
+        state.error = null;
+      })
+      .addCase(fetchStagesBooking.fulfilled, (state, action) => {
+        state.isFetchingStages = false;
+        // state.stages = action.payload;
+        state.stagesBookingStatus = action.payload;
+        // state.pagination = action.payload.pagination;
+        state.isFetchingStagesError = false;
+        state.error = null;
+      })
+      .addCase(fetchStagesBooking.rejected, (state, action) => {
         state.isFetchingStages = false;
         state.isFetchingStagesError = true;
         state.error = action.payload;
@@ -312,20 +340,43 @@ export const deleteStageByID = createAsyncThunk(
       API_CONFIG.STAGES.DESTROY(id),
       "DELETE"
     );
-    console.log("API response:", response);
-    // Kiểm tra xem response có tồn tại và có thuộc tính success
     if (response && response.success) {
       dispatch(deletingStageSuccess());
-      return response; // Trả về dữ liệu nếu xóa thành công
+      return response;
     } else {
       dispatch(deletingStageFailure());
-      return rejectWithValue(response); // Trả về phản hồi lỗi
+      return rejectWithValue(response);
     }
   }
 );
+
+export const fetchStagesBooking = createAsyncThunk(
+  "stages/fetchStagesBooking",
+  async ({ params, signal }, { dispatch, rejectWithValue }) => {
+    try {
+      const stages = await makeAuthorizedRequest(
+        API_CONFIG.BOOKINGS.GET_BOOKING_LIST(params),
+        "GET",
+        null,
+        { signal }
+      );
+
+      if (stages.success) {
+        dispatch(fetchingBookingStatusSuccess(stages));
+        return stages.data;
+      } else {
+        return rejectWithValue(stages.error.message);
+      }
+    } catch (error) {
+      return rejectWithValue('Network error');
+    }
+  }
+);
+
 export const {
   fetchingStages,
   fetchingStagesSuccess,
+  fetchingBookingStatusSuccess,
   fetchingStagesFailure,
 
   updatingStage,

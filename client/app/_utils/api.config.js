@@ -1,5 +1,6 @@
 // HOST URL
-const HOST = `https://joieplace.live/api`;
+// const HOST = `https://joieplace.live/api`;
+const HOST = `http://joieplace.live/api`;
 const MEMBERSHIPS = `https://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
@@ -96,6 +97,7 @@ export const API_CONFIG = {
     GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
     GET_BY_ID: (id) => `${STAGES}/get/${id}`,
     DESTROY: (id) => `${STAGES}/destroy/${id}`,
+    UPDATE: (id) => `${STAGES}/update/${id}`,
   },
 
   // CATEGORIES API
