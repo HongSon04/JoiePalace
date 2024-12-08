@@ -50,7 +50,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
-const columns = [
+const columns = [ 
   { name: "ID", uid: "id", sortable: true },
   { name: "Tên sảnh", uid: "name", sortable: true },
   { name: "Giá tiền", uid: "price", sortable: true },
@@ -216,9 +216,7 @@ function RequestTable() {
           updateRequestStatus({
             requestId: id,
             requestData: {
-              is_deposit: false,
-              is_confirm: false,
-              status: "processing",
+              status: "true",
             },
           })
         ).unwrap();
@@ -241,6 +239,8 @@ function RequestTable() {
           };
           // Fetch the requests again to update the state
           dispatch(fetchStagesAll({ params }));
+          dispatch(fetchStagesBooking({ params: currentBranch.id }));
+
         } else {
           const { statusCode, message } = data?.error;
 
@@ -304,6 +304,8 @@ function RequestTable() {
             branch_id: currentBranch.id,
             search: searchQuery,
           };
+          dispatch(fetchStagesBooking({ params: currentBranch.id }));
+
           dispatch(fetchStagesAll({ params }));
         } else {
           // Xử lý các lỗi khác nếu có
@@ -359,7 +361,6 @@ function RequestTable() {
     });
   }, [sortDescriptor, stages]);
 
-  console.log(stagesBookingStatus)
   const renderCell = React.useCallback(
     (item, columnKey, stagesBookingStatus) => {
       const cellValue = item[columnKey];
@@ -379,15 +380,18 @@ function RequestTable() {
         case "name":
           return item.name;
           case "status":
-            return cellValue === false ? (
-              <Chip variant="flat" color="warning">
-                Chưa sử dụng
+            const bookingStatus = stagesBookingStatus.find(booking => 
+              booking.stages.some(stage => stage.id === item.id)
+            );
+    
+            return bookingStatus ? (
+              <Chip variant="flat" color={bookingStatus.status ? "success" : "warning"}>
+                {bookingStatus.status ? "Đang sử dụng" : "Chưa sử dụng"}
               </Chip>
             ) : (
-              <Chip variant="flat" color="success">
-                Đang sử dụng
-              </Chip>
+              <span>Chưa có dữ liệu</span>
             );
+    
             case "shift":
                return cellValue === "Sáng" ? (
                 <Chip
@@ -405,14 +409,12 @@ function RequestTable() {
                 </Chip>
               );
               case "organization_date":
-              return (
-                <div>
-                  {stagesBookingStatus.map((booking, i) => {
-                    <span className="text-white" key={i}>{booking.shift}</span>
-                  })}
-                </div>
-              );
-              
+                const booking = stagesBookingStatus.find(booking => booking.stage_id === item.id);
+                return booking ? (
+                  <span>{format(new Date(booking.organization_date), "dd-MM-yyyy")}</span>
+                ) : (
+                  <span>Chưa có dữ liệu</span>
+                );
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
