@@ -154,7 +154,7 @@ const WeddingPackages = ({ dataPackage }) => {
           <div
             key={pkg.id}
             onClick={() => setPackageFocus(index)}
-            className={`overflow-x-hidden h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${packageFocus === index ? "border border-gold" : " border border-gray-600"
+            className={`overflow-x-hidden  h-[500px] p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${packageFocus === index ? "border border-gold" : " border border-gray-600"
               }`}
           >
             <div className="affterLine mr-[290px] z-10"></div>
@@ -215,7 +215,7 @@ const WeddingPackages = ({ dataPackage }) => {
               ))}
               <div className="flex justify-center items-center gap-4 mt-3">
                 <button onClick={() => route.push(`/client/chi-tiet-goi-dich-vu/${pkg.slug}`)} className="flex justify-center items-center gap-2 bg-gold text-white px-4 py-2 rounded-lg font-semibold max-md:text-[18px]">
-                  LIÊN HỆ 
+                  LIÊN HỆ NGAY
                   <svg
                     width="20"
                     height="20"
@@ -241,7 +241,7 @@ const WeddingPackages = ({ dataPackage }) => {
                     />
                   </svg>
                 </button>
-                <button className="flex justify-center items-center gap-2 bg-whiteAlpha-200 text-white px-4 py-2 rounded-lg font-semibold ">
+                {/* <button className="flex justify-center items-center gap-2 bg-whiteAlpha-200 text-white px-4 py-2 rounded-lg font-semibold ">
                   <svg
                     width="20"
                     height="20"
@@ -254,7 +254,7 @@ const WeddingPackages = ({ dataPackage }) => {
                       fill="white"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

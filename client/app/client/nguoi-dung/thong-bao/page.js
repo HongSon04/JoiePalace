@@ -116,16 +116,28 @@ const NotificationsPage = () => {
     // Hàm xác định màu sắc chữ theo trạng thái
     const getStatusColor = (status) => {
         switch (status) {
+            case 'Tạo đặt tiệc':
+                return 'text-green-500'; 
             case 'Đặt tiệc':
                 return 'text-green-500';
+            case 'Đặt tiệc thành công':
+                return 'text-blue-500'; 
+            case 'Hủy đặt tiệc':
+                return 'text-yellow-300';
             case 'Cập nhật':
                 return 'text-sky-300';
+            case 'Thanh toán':
+                return 'text-green-600'; 
             case 'Thanh toán cọc':
                 return 'text-red-300';
-            case 'Hủy tiệc':
-                return 'text-yellow-300';
+            case 'Thanh toán cọc thành công':
+                return 'text-blue-400';
+            case 'Hủy cọc':
+                return 'text-yellow-400';
             case 'Tiệc sắp diễn ra':
                 return 'text-cyan-300';
+            case 'Phản hồi':
+                return 'text-gray-500'; 
             default:
                 return 'text-gray-500';
         }
@@ -133,18 +145,28 @@ const NotificationsPage = () => {
 
     const getStatusFromType = (type) => {
         switch (type) {
+            case 'booking_created':
+                return 'Tạo đặt tiệc';
             case 'booking_confirm':
                 return 'Đặt tiệc';
+            case 'booking_success':
+                return 'Đặt tiệc thành công';
+            case 'booking_cancel':
+                return 'Hủy đặt tiệc';
             case 'booking_updated':
                 return 'Cập nhật';
             case 'payment_confirmed':
                 return 'Thanh toán';
             case 'deposit_payment':
                 return 'Thanh toán cọc';
-            case 'booking_canceled':
-                return 'Hủy tiệc';
+            case 'deposit_success':
+                return 'Thanh toán cọc thành công';
+            case 'deposit_cancel':
+                return 'Hủy cọc';
             case 'event_upcoming':
                 return 'Tiệc sắp diễn ra';
+            case 'feedback':
+                return 'Phản hồi';
             default:
                 return 'Không xác định';
         }

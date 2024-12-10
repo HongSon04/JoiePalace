@@ -55,7 +55,7 @@ const ToolCreactCombo = () => {
     );
 
     return (
-        <div className="select-none flex h-screen max-lg:h-fit max-lg:py-10 justify-between items-center px-[200px] max-xl:px-[100px] max-lg:px-[50px]">
+        <div className="select-none flex h-screen max-lg:h-fit max-lg:py-10 justify-between items-center px-[200px] max-xl:px-[100px] max-lg:px-[30px]">
             {/* Left Section */}
             <div className="text-left max-w-[380px]  max-lg:max-w-[55%] max-sm:max-w-[100%]">
                 <h2 className="text-[48px] max-lg:text-[24px]  font-bold text-gold mb-4 uppercase font-gilroy">TẠO GÓI TIỆC</h2>
@@ -65,19 +65,19 @@ const ToolCreactCombo = () => {
                 <ButtonDiscover name={'Tạo ngay'} link={'/client/tao-combo'}></ButtonDiscover>
             </div>
             <div className="relative bottom-10 right-24  max-lg:right-4 max-sm:hidden">
-                <div className="max-xl:w-48 max-lg:w-32 w-64 h-auto shadow-lg right-10">
+                <div className="max-xl:w-48 max-lg:w-40 w-64 h-auto shadow-lg right-10">
                     <Image
                         src="/combo.png"
                         alt=""
                     />
                 </div>
-                <div className="max-xl:w-48 max-lg:w-32 absolute top-10 -right-44  w-64 h-auto shadow-lg  ">
+                <div className="max-xl:w-48 max-lg:w-40 absolute top-10 -right-44 max-md:left-[32px] w-64 h-auto shadow-lg  ">
                     <Image
                         src="/combo.png"
                         alt=""
                     />
                 </div>
-                <div className="max-xl:w-48 max-lg:w-32 absolute top-10 max-lg:top-20  right-44 w-64 h-auto shadow-lg ">
+                <div className="max-xl:w-48 max-lg:w-40 absolute top-10 max-lg:top-20  max-md:right-[68px]  right-44 w-64 h-auto shadow-lg ">
                     <Image
                         src="/combo.png"
                         alt=""

@@ -162,7 +162,7 @@ const Page = () => {
       </form>
       {isModalOpen && (
         <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-          <div className='bg-white rounded-lg p-6 w-1/3'>
+          <div className='bg-white rounded-lg p-6 w-1/3 max-md:w-[80%];'>
             <h2 className='text-lg font-bold mb-4 text-black'>Xác nhận đổi mật khẩu</h2>
             <p className='text-black'>Bạn có chắc chắn muốn đổi mật khẩu không?</p>
             <div className='flex justify-end mt-4'>
