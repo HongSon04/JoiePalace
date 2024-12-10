@@ -8,7 +8,7 @@ export const organizationSchema = z.object({
         .regex(/^\d+$/, { message: "Số điện thoại phải là số" })
         .min(10, { message: "Số điện thoại phải có ít nhất 10 ký tự" }),
     username: z.string().min(1, { message: "Họ và Tên là bắt buộc" }),
-    tables: z
+    table_count: z
         .coerce.number()
         .int({ message: "Số lượng bàn chính phải là số nguyên" })
         .min(1, { message: "Số lượng bàn chính phải lớn hơn 0" }),

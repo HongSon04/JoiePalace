@@ -3,7 +3,7 @@ import {
   ApiBody,
   ApiExcludeEndpoint,
   ApiOperation,
-  ApiTags
+  ApiTags,
 } from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
 import { ConfirmBookingMailDto } from './dto/ConfirmBookingMail.dto';
@@ -28,6 +28,7 @@ export class MailController {
 
   // ! Send Mail To Subcribe User
   @ApiOperation({ summary: 'Gửi mail cho người đăng ký nhận thông báo' })
+  @isPublic()
   @Post('send-mail-to-sub-user')
   async sendMailToSubcribeUser(@Body() body: sendMailToSubcribeUserDto) {
     await this.mailService.sendMailToSubcribeUser(body);
@@ -35,6 +36,7 @@ export class MailController {
 
   // ! Send Mail Forgot Password
   @ApiOperation({ summary: 'Gửi mail quên mật khẩu' })
+  @isPublic()
   @ApiBody({
     schema: {
       type: 'object',

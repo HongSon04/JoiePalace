@@ -36,28 +36,29 @@ import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
 import CustomPagination from "@/app/_components/CustomPagination";
 import LoadingContent from "@/app/_components/LoadingContent";
 import SearchForm from "@/app/_components/SearchForm";
+import { deleteStageByID, fetchStagesAll, fetchStagesBooking } from "@/app/_lib/features/stages/stagesSlice";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
-  "total_amount",
-  "created_at",
+  "price",
+  "capacity_min",
+  "capacity_max",
   "status",
-  "amount_booking",
+  "shift",
   "organization_date",
-  "amount_to_be_paid",
   "actions",
 ];
 
-const columns = [
+const columns = [ 
   { name: "ID", uid: "id", sortable: true },
-  { name: "Chủ tiệc / Loại tiệc", uid: "name", sortable: true },
-  { name: "Ngày đặt", uid: "created_at", sortable: true },
-  { name: "Tổng giá trị", uid: "total_amount", sortable: true },
-  { name: "Tiền cọc", uid: "amount_booking", sortable: true },
-  { name: "Ngày dự kiến", uid: "organization_date", sortable: true },
-  { name: "Số tiền cần phải thanh toán", uid: "amount_to_be_paid", sortable: true },
+  { name: "Tên sảnh", uid: "name", sortable: true },
+  { name: "Giá tiền", uid: "price", sortable: true },
+  { name: "Số lượng tối thiểu", uid: "capacity_min", sortable: true },
+  { name: "Số lượng tối đa", uid: "capacity_max", sortable: true },
   { name: "Trạng thái", uid: "status", sortable: true },
+  { name: "Khung giờ hoạt động", uid: "shift", sortable: true },
+  { name: "Ngày tổ chức", uid: "organization_date", sortable: true },
   { name: "Hành động", uid: "actions" },
 ];
 
@@ -66,14 +67,17 @@ function RequestTable() {
   const pathname = usePathname();
   const router = useRouter();
   const {
-    requests,
+    stages,
+    stagesBookingStatus,
     pagination,
-    isFetchingRequests,
-    isFetchingRequestsError,
-    isUpdatingRequest,
+    isFetchingStages,
+    isFetchingStagesError,
+    isUpdatingStage,
     isUpdatingRequestError,
     error,
-  } = useSelector((store) => store.requests);
+  } = useSelector((store) => store.stages);
+  
+  
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -87,7 +91,7 @@ function RequestTable() {
     ),
   });
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [requestStatus, setRequestStatus] = React.useState("processing");
+  const [requestStatus, setRequestStatus] = React.useState("false");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
 
@@ -127,17 +131,16 @@ function RequestTable() {
       router.push("/auth/chon-chi-nhanh");
     }
     const params = {
-      is_confirm: false,
-      is_deposit: false,
-      status: requestStatus,
-      page: currentPage,
+      // status: requestStatus,
+      // page: currentPage,
       branch_id: currentBranch.id,
-      itemsPerPage,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
+      // itemsPerPage,
+      // startDate: formattedStartDate,
+      // endDate: formattedEndDate,
     };
 
-    dispatch(fetchRequests({ params }));
+    dispatch(fetchStagesAll({ params }));
+    dispatch(fetchStagesBooking({ params: currentBranch.id }));
 
     return () => {};
   }, [
@@ -164,18 +167,16 @@ function RequestTable() {
     const controller = new AbortController();
 
     const params = {
-      is_confirm: false,
-      is_deposit: false,
-      status: requestStatus,
-      page: currentPage,
+      // status: requestStatus,
+      // page: currentPage,
       branch_id: currentBranch.id,
-      itemsPerPage,
+      // itemsPerPage,
       search: searchQuery,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
     };
 
-    dispatch(fetchRequests({ signal: controller.signal, params }));
+    dispatch(fetchStagesAll({ signal: controller.signal, params }));
+    dispatch(fetchStagesBooking({ signal: controller.signal, params: currentBranch.id }));
+    
 
     return () => {
       controller.abort();
@@ -215,9 +216,7 @@ function RequestTable() {
           updateRequestStatus({
             requestId: id,
             requestData: {
-              is_deposit: false,
-              is_confirm: false,
-              status: "processing",
+              status: "true",
             },
           })
         ).unwrap();
@@ -230,18 +229,18 @@ function RequestTable() {
           });
 
           const params = {
-            is_confirm: false,
-            is_deposit: false,
-            status: requestStatus,
-            page: currentPage,
+            // status: requestStatus,
+            // page: currentPage,
             branch_id: currentBranch.id,
-            itemsPerPage,
+            // itemsPerPage,
             search: searchQuery,
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
+            // startDate: formattedStartDate,
+            // endDate: formattedEndDate,
           };
           // Fetch the requests again to update the state
-          dispatch(fetchRequests({ params }));
+          dispatch(fetchStagesAll({ params }));
+          dispatch(fetchStagesBooking({ params: currentBranch.id }));
+
         } else {
           const { statusCode, message } = data?.error;
 
@@ -272,78 +271,58 @@ function RequestTable() {
     ]
   );
 
-  const handleCancelRequest = React.useCallback(
+  const handleDeleteStages = React.useCallback(
     async (id) => {
       const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
+  
       if (!currentBranch) {
         toast({
           title: "Lỗi",
           description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
           type: "error",
         });
-  
         router.push("/auth/chon-chi-nhanh");
+        return;
       }
+  
       const confirm = window.confirm(
-        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Hủy"?`
+        `Bạn có chắc chắn muốn xóa sảnh #${id} này không ?`
       );
-
       if (!confirm) return;
-
-      if (confirm) {
-        const data = await dispatch(
-          updateRequestStatus({
-            requestId: id,
-            requestData: {
-              is_deposit: false,
-              is_confirm: false,
-              status: "cancel",
-            },
-          })
-        ).unwrap();
-
-        if (data.success) {
+  
+      try {
+        const response = await dispatch(deleteStageByID({ id })).unwrap();
+        console.log("Delete response:", response);
+        
+        if (response && response.statusCode === 200) {
           toast({
-            title: "Cập nhật thành công",
-            description: `Yêu cầu đã được cập nhật trạng thái "Hủy"`,
+            title: "Xóa thành công",
+            description: response.message || "Sảnh đã được xóa",
             type: "success",
           });
-
           const params = {
-            is_confirm: false,
-            is_deposit: false,
-            status: requestStatus,
-            page: currentPage,
             branch_id: currentBranch.id,
-            itemsPerPage,
             search: searchQuery,
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
           };
-          // Fetch the requests again to update the state
-          dispatch(
-            fetchRequests({
-              params,
-            })
-          );
-        } else {
-          const { statusCode, message } = data?.error;
+          dispatch(fetchStagesBooking({ params: currentBranch.id }));
 
-          if (statusCode == 401) {
-            toast({
-              title: "Phiên đăng nhập đã hết hạn",
-              description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
-              type: "error",
-            });
-          } else {
-            toast({
-              title: "Cập nhật thất bại",
-              description: message || "Yêu cầu chưa được cập nhật trạng thái",
-              type: "error",
-            });
-          }
+          dispatch(fetchStagesAll({ params }));
+        } else {
+          // Xử lý các lỗi khác nếu có
+          const { statusCode, message } = response || {};
+          toast({
+            title: "Xóa thất bại",
+            description: message || "Yêu cầu cần xem xét lại",
+            type: "error",
+          });
         }
+      } catch (error) {
+        console.error("Error during deletion:", error);
+        toast({
+          title: "Chức năng đã xảy ra lỗi",
+          description: "Đã xảy ra lỗi khi xóa sảnh",
+          type: "error",
+        });
       }
     },
     [
@@ -373,156 +352,107 @@ function RequestTable() {
     );
   }, [visibleColumns]);
   const sortedItems = React.useMemo(() => {
-    return [...requests].sort((a, b) => {
+    return [...stages].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, requests]);
+  }, [sortDescriptor, stages]);
 
   const renderCell = React.useCallback(
-    (item, columnKey) => {
+    (item, columnKey, stagesBookingStatus) => {
       const cellValue = item[columnKey];
-
+      console.log(item)
+      console.log(stagesBookingStatus)
       switch (columnKey) {
-        case "shift":
-          return cellValue === "Sáng" ? (
-            <Chip
-              className="text-gray-800 bg-white"
-              startContent={<BsSun size={12} className="text-gray-800" />}
-            >
-              {cellValue}
-            </Chip>
-          ) : (
-            <Chip
-              className="text-white bg-blackAlpha-500"
-              startContent={<BsMoon size={12} className="text-white" />}
-            >
-              {cellValue}
-            </Chip>
-          );
-        case "total_amount":
-          // const totalAmount = item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0)
+        case "price":
           return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND',
-          }).format(item.booking_details.total_amount || 0);
-
-          // return item.booking_details.total_amount
-        case "amount_booking":
-          const amount_booking = item.booking_details?.map((detail) => detail.deposits?.amount ? `${detail.deposits.amount}` : "Chưa có tiền cọc")
-          return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(amount_booking);
-
-        case 'amount_to_be_paid':
-          const bookingDetails = item.booking_details?.[0];
-          const totalAmount_paid = bookingDetails?.total_amount || 0;
-          const depositAmount = bookingDetails?.deposits?.amount || 0;
-          const amountPaid = totalAmount_paid - depositAmount;
-
-          return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(amountPaid);
-
-        case "deposit_amount":
-        case "created_at": return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
-        case "organization_date":
-          return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
-        case "name":
-          return (
-            <User
-              avatarProps={{ radius: "lg", src: item.avatar }}
-              description={item.email}
-              name={cellValue}
-            >
-              {item.email}
-            </User>
-          );
-        case "status":
-            // <select
-            //   name="status"
-            //   value={cellValue}
-            //   className="select relative z-50"
-            //   onClick={(e) => e.stopPropagation()}
-            //   onMouseDown={(e) => e.stopPropagation()}
-            // >
-            //   {CONFIG.BOOKING_STATUS.map((status) => (
-            //     <option value={status.key} key={status.key} className="option">
-            //       {status.label}
-            //     </option>
-            //   ))}
-            // </select>  
-            switch (cellValue) {
-              case "pending":
-                return (
-                  <Chip variant="flat" color="warning">
-                    Chưa xử lý
-                  </Chip>
-                );
+          }).format(item.price || 0);
   
-              case "processing":
-                return (
-                  <Chip variant="flat" color="primary">
-                    Đang xử lý
-                  </Chip>
+        case "capacity_min":
+          return item.capacity_min;
+        case "capacity_max":
+          return item.capacity_max;
+        case "name":
+          return item.name;
+          case "status":
+            const bookingStatus = stagesBookingStatus.find(booking => 
+              booking.stages.some(stage => stage.id === item.id)
+            );
+    
+            return bookingStatus ? (
+              <Chip variant="flat" color={bookingStatus.status ? "success" : "warning"}>
+                {bookingStatus.status ? "Đang sử dụng" : "Chưa sử dụng"}
+              </Chip>
+            ) : (
+              <span>Chưa có dữ liệu</span>
+            );
+    
+            case "shift":
+               return cellValue === "Sáng" ? (
+                <Chip
+                  className="text-gray-800 bg-white"
+                  startContent={<BsSun size={12} className="text-gray-800" />}
+                >
+                  {cellValue}
+                </Chip>
+              ) : (
+                <Chip
+                  className="text-white bg-blackAlpha-500"
+                  startContent={<BsMoon size={12} className="text-white" />}
+                >
+                  {cellValue}
+                </Chip>
+              );
+              case "organization_date":
+                const booking = stagesBookingStatus.find(booking => booking.stage_id === item.id);
+                return booking ? (
+                  <span>{format(new Date(booking.organization_date), "dd-MM-yyyy")}</span>
+                ) : (
+                  <span>Chưa có dữ liệu</span>
                 );
-              case "success":
-                return (
-                  <Chip variant="flat" color="primary">
-                    Sử lý thành công
-                  </Chip>
-                );
-              case "cancel":
-                return (
-                  <Chip variant="flat" color="danger">
-                    Đã hủy
-                  </Chip>
-                );
-            }
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>
-                  <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => handleUpdateStatus(item.id)}
-                  className={`${
-                    item.status === "processing" ? "hidden" : ""
-                  }`}
-                >
-                  {`Cập nhật trạng thái "Đang xử lý"`}
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => handleCancelRequest(item.id)}
-                  className={`text-red-400 ${
-                    item.status === "cancel" ? "hidden" : ""
-                  }`}
-                >
-                  {`Cập nhật trạng thái "Hủy"`}
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    <VerticalDotsIcon className="text-default-300" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem>
+                    <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleUpdateStatus(item.id)}
+                    className={`text-blue-500 ${item.status === "processing" ? "hidden" : ""}`}
+                  >
+                    {`Cập nhật trạng thái "Đang xử lý"`}
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleDeleteStages(item.id)}
+                    className="text-red-400"
+                  >
+                    {`Xóa sảnh`}
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
           );
+  
         default:
-          return cellValue;
+          return cellValue; // Fallback for unhandled cases
       }
     },
-    [handleUpdateStatus, pathname]
+    [handleUpdateStatus, handleDeleteStages, pathname]
   );
+  
+
 
   const onItemsPerPageChange = React.useCallback((e) => {
     setItemsPerPage(Number(e.target.value));
@@ -644,25 +574,25 @@ function RequestTable() {
     requestStatus,
   ]);
 
-  const bottomContent = React.useMemo(() => {
-    return (
-      <CustomPagination
-        page={currentPage}
-        total={pagination.lastPage}
-        onChange={onPageChange}
-        classNames={{
-          base: "flex justify-center",
-        }}
-      />
-    );
-  }, [currentPage, pagination.lastPage]);
+  // const bottomContent = React.useMemo(() => {
+  //   return (
+  //     <CustomPagination
+  //       page={currentPage}
+  //       total={pagination.lastPage}
+  //       onChange={onPageChange}
+  //       classNames={{
+  //         base: "flex justify-center",
+  //       }}
+  //     />
+  //   );
+  // }, [currentPage, pagination.lastPage]);
 
   console.log(pathname);
   return (
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
-      bottomContent={bottomContent}
+      // bottomContent={bottomContent}
       bottomContentPlacement="inside"
       classNames={{
         thead:
@@ -703,10 +633,10 @@ function RequestTable() {
       </TableHeader>
       <TableBody
         emptyContent={
-          isFetchingRequestsError ? error : "Không tìm thấy yêu cầu"
+          isFetchingStagesError ? error : "Không tìm thấy yêu cầu"
         }
         items={sortedItems}
-        isLoading={isFetchingRequests || isUpdatingRequest}
+        isLoading={isFetchingStages || isUpdatingStage}
         loadingContent={<LoadingContent />}
       >
         {(item) => (
@@ -715,13 +645,12 @@ function RequestTable() {
             onContextMenu={(e) => {
               e.preventDefault();
               if (item.status === "cancel") return;
-
-              handleCancelRequest(item.id);
+              handleDeleteStages(item.id);
             }}
           >
             {(columnKey) => (
               <TableCell className="py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
-                {renderCell(item, columnKey)}
+                {renderCell(item, columnKey, stagesBookingStatus)}
               </TableCell>
             )}
           </TableRow>

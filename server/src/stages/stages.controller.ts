@@ -7,6 +7,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   UploadedFiles,
@@ -204,7 +205,7 @@ export class StagesController {
   }
 
   // ! Update Stage
-  @Post('update/:stage_id')
+  @Patch('update/:stage_id')
   @ApiHeaders([
     {
       name: 'authorization',

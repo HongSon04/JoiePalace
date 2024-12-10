@@ -1,7 +1,6 @@
 "use client";
 
 import AdminHeader from "@/app/_components/AdminHeader";
-import RequestBreadcrumbs from "./RequestBreadcrumbs";
 import RequestDetail from "./RequestDetail";
 
 function Page({ params: { yeuCauId } }) {
