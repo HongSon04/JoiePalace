@@ -1111,7 +1111,6 @@ const Page = ({ params }) => {
                 <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
                     <TitleSpanInfo title={'Thêm mới dịch vụ - Chỉ thêm khi tiệc đã hoàn thành'} />
                     <div className='grid grid-cols-3 gap-[30px]'>
-
                         {extraServices.map((service, index) => (
                             <DropDownSelect2
                                 key={index}

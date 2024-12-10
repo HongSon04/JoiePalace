@@ -146,7 +146,7 @@ const Page = ({ params }) => {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className='mt-5 flex gap-5'>
                     <AdminInputStage
-                        title="Thông tin sảnh"
+                        title="Thông tin trang trí"
                         control={control}
                         heightTextarea={'h-[120px]'}
                         fields={[

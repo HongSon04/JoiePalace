@@ -230,6 +230,8 @@ export const API_CONFIG = {
     GET_ALL: (params) =>
       constructUrlWithParams(`${DECORS_API}/get-all`, params),
     GET_BY_ID: (id) => `${DECORS_API}/get/${id}`,
+    UPDATE: (id) => `${DECORS_API}/update/${id}`,
+
   },
 
   // NOTIFICATIONS API
