@@ -14,6 +14,7 @@ import {
 import { MdOutlineRestaurantMenu } from "react-icons/md";
 import { BsCardChecklist } from "react-icons/bs";
 import { signOut } from "next-auth/react";
+import Cookies from "js-cookie";
 
 const listMenu = [
   { id: 2, name: "Sự kiện", categories: "su-kien", href: "su-kien" },
