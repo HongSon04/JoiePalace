@@ -209,6 +209,12 @@ function AdminSidebarNav() {
         icon: StageIcon,
         className: "",
       },
+      {
+        title: "Trang Trí",
+        path: `/admin/trang-tri`,
+        icon: StageIcon,
+        className: "",
+      },
     ];
   }, [currentBranch]);  
 

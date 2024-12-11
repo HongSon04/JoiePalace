@@ -12,7 +12,7 @@ export const organizationSchema = z.object({
         .coerce.number()
         .int({ message: "Số lượng bàn chính phải là số nguyên" })
         .min(1, { message: "Số lượng bàn chính phải lớn hơn 0" }),
-spare_table_count: z
+    spare_table_count: z
         .coerce.number()
         .int({ message: "Số bàn dự phòng phải là số nguyên" })
         .min(0, { message: "Số bàn dự phòng không được nhỏ hơn 0" }) 

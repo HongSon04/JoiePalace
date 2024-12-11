@@ -103,8 +103,8 @@ const Page = () => {
   };
 
   return (
-    <div className='flex flex-col gap-[30px] p-4'>
-      <span className='text-2xl font-bold leading-[22px] text-white'>Đổi mật khẩu</span>
+    <div className='flex flex-col gap-[30px] p-4 max-sm:p-0'>
+      <span className='text-2xl font-bold leading-[22px] text-white max-sm:text-center'>Đổi mật khẩu</span>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='flex flex-col gap-[30px] w-full'>
           {/* Current Password Field */}
@@ -140,7 +140,7 @@ const Page = () => {
             trigger={trigger}
           />
 
-          <div className='flex gap-[20px] justify-end w-full'>
+          <div className='flex gap-[20px] justify-end w-full max-sm:justify-between'>
             {/* <button
               type="button"
               className='flex items-center gap-[10px] px-4 py-[10px] bg-gray-200 text-black rounded-full text-sm hover:bg-gray-300 transition-all duration-300'
@@ -162,7 +162,7 @@ const Page = () => {
       </form>
       {isModalOpen && (
         <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-          <div className='bg-white rounded-lg p-6 w-1/3'>
+          <div className='bg-white rounded-lg p-6 w-1/3 max-md:w-[80%];'>
             <h2 className='text-lg font-bold mb-4 text-black'>Xác nhận đổi mật khẩu</h2>
             <p className='text-black'>Bạn có chắc chắn muốn đổi mật khẩu không?</p>
             <div className='flex justify-end mt-4'>

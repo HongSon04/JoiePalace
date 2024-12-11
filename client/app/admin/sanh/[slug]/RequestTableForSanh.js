@@ -38,6 +38,7 @@ import LoadingContent from "@/app/_components/LoadingContent";
 import SearchForm from "@/app/_components/SearchForm";
 import { deleteStageByID, fetchStagesAll, fetchStagesBooking } from "@/app/_lib/features/stages/stagesSlice";
 
+
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",

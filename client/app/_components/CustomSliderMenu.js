@@ -107,10 +107,10 @@ const CustomSliderMenu = () => {
       {dataSlider.map((i, index) => {
         return (
           <div key={index}>
-            <div className="flex flex-col md:flex-row justify-center items-end gap-10 mt-20 max-md:mt-0">
+            <div className="flex flex-row justify-center items-end gap-10 mt-20 max-md:mt-10">
               <div className="flex justify-center">
                 <div className="absolute text-left-to-right">
-                  <h1 className="text-5xl relative right-[210px] top-[100px] uppercase text-gold font-bold -rotate-90 max-lg:text-4xl max-lg:right-[150px] max-lg:top-[75px] max-sm:right-[72px] max-sm:text-xl max-sm:top-[40px]">
+                  <h1 className="text-5xl relative right-[210px] top-[100px] uppercase text-gold font-bold -rotate-90 max-lg:text-4xl max-lg:right-[150px] max-lg:top-[75px] max-sm:right-[72px] max-sm:text-xl max-sm:top-[40px] max-sm:hidden">
                     Thực đơn
                   </h1>
                 </div>
@@ -164,7 +164,7 @@ const CustomSliderMenu = () => {
                   </div>
                 </div>
               </div>
-              <div className="w-[450px] h-[650px] p-5 bg-white max-lg:max-w-[300px] max-sm:p-2 max-sm:w-[135px]">
+              <div className="w-[450px] h-[650px]  p-5 bg-white max-lg:max-w-[300px] max-sm:max-h-[257px] max-sm:p-2 max-sm:w-[135px]">
                 <Image
                   src={`${i.img || '/Alacarte-Menu-Thumbnail.png'}`}
                   alt="menu"

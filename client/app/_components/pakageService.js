@@ -76,6 +76,7 @@ const WeddingPackages = ({ dataPackage }) => {
       // Set the state with the accumulated array of enriched services
       setOrther_service(enrichedServices);
     };
+    console.log('dataPackage', dataPackage);
 
     if (dataPackage) {
       servicePakages(dataPackage);
@@ -132,8 +133,8 @@ const WeddingPackages = ({ dataPackage }) => {
 
   if (!dataPackage) return null;
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center justify-around">
-      <div className="flex my-8 gap-4 items-center justify-center">
+    <div className="min-h-screen p-8 flex flex-col items-center justify-around max-xl:justify-end max-xl:py-2">
+      <div className="flex my-8 gap-4 items-center justify-center max-xl:hidden">
         {/* <h1 className="text-4xl font-bold text-center mb-2 text-gold uppercase">DỊCH VỤ TRỌN GÓI</h1> */}
         {/* <div className="flex space-x-4 m-auto p-1 mt-2 bg-whiteAlpha-200 rounded-full w-fit">
           <button className="bg-gold px-6 py-2 rounded-full font-semibold">
@@ -153,7 +154,7 @@ const WeddingPackages = ({ dataPackage }) => {
           <div
             key={pkg.id}
             onClick={() => setPackageFocus(index)}
-            className={`overflow-y-hidden min-h-[500px]  p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${packageFocus === index ? "border border-gold" : ""
+            className={`overflow-x-hidden  h-[500px] p-3 rounded-lg flex flex-col items-center space-y-4 cursor-pointer ${packageFocus === index ? "border border-gold" : " border border-gray-600"
               }`}
           >
             <div className="affterLine mr-[290px] z-10"></div>
@@ -164,7 +165,7 @@ const WeddingPackages = ({ dataPackage }) => {
             )}
             <h2 className="text-lg font-bold text-center z-20">{pkg?.name}</h2>
             <p className="text-center text-2xl font-semibold uppercase z-20">
-              {pkg?.price.toLocaleString()} TRIỆU VND
+              {pkg ? Math.round(pkg.price / 1000000).toLocaleString() : 0} TRIỆU VND
             </p>
             <p className="text-center z-20 ">{pkg?.short_description}</p>
 
@@ -213,8 +214,8 @@ const WeddingPackages = ({ dataPackage }) => {
                 </div>
               ))}
               <div className="flex justify-center items-center gap-4 mt-3">
-                <button onClick={() => route.push(`/client/chi-tiet-goi-dich-vu/${pkg.slug}`)} className="flex justify-center items-center gap-2 bg-gold text-white px-4 py-2 rounded-lg font-semibold ">
-                  LIÊN HỆ NGAY{" "}
+                <button onClick={() => route.push(`/client/chi-tiet-goi-dich-vu/${pkg.slug}`)} className="flex justify-center items-center gap-2 bg-gold text-white px-4 py-2 rounded-lg font-semibold max-md:text-[18px]">
+                  LIÊN HỆ NGAY
                   <svg
                     width="20"
                     height="20"
@@ -240,7 +241,7 @@ const WeddingPackages = ({ dataPackage }) => {
                     />
                   </svg>
                 </button>
-                <button className="flex justify-center items-center gap-2 bg-whiteAlpha-200 text-white px-4 py-2 rounded-lg font-semibold ">
+                {/* <button className="flex justify-center items-center gap-2 bg-whiteAlpha-200 text-white px-4 py-2 rounded-lg font-semibold ">
                   <svg
                     width="20"
                     height="20"
@@ -253,7 +254,7 @@ const WeddingPackages = ({ dataPackage }) => {
                       fill="white"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
