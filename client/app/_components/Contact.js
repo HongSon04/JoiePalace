@@ -12,7 +12,6 @@ import { formatDate } from "../_utils/format";
 import useCustomToast from "../_hooks/useCustomToast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPackageById } from "../_services/packageServices";
-import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import IconButton from "./IconButton";
 
 const formSchema = z.object({
