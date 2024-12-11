@@ -174,12 +174,12 @@ const PaymentMethod = ({
                 <AccordionItem
                     key="1"
                     aria-label="Thông tin thanh toán"
+                    setIsModalOpen={true}
                     title={<span className="text-white">Thông tin thanh toán</span>}
                     className='bg-whiteAlpha-200 rounded-lg px-[16px] font-gilroy'
-                    isOpen={true}
                 >
                     <div className="flex flex-col md:flex-row justify-between p-3">
-                        <div className="mb-8 md:mb-0 w-[40%]">
+                        <div className="mb-8 md:mb-0 w-[40%] max-md:w-full">
                             <h2 className="font-bold text-lg mb-4">Đặt cọc</h2>
                             <ul className="text-white space-y-2 ">
                                 <li>• Tiền cọc: 30% tổng chi phí tiệc (đã tính thuế).</li>

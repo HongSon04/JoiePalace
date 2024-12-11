@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+  
 @font-face {
   font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Heavy.otf") format("opentype");
@@ -745,10 +745,14 @@ select {
 .affterLine::after {
   content: "";
   position: absolute;
-  width: 300px;
+  width: 20%;
   height: 264px;
   background-image: url(/line-group.svg);
   background-size: cover;
+  /* margin-left: 10px; */
+  display:flex;
+  justify-content: center;
+  opacity:0.5;
 }
 .bg-cloche {
   background-image: url(/cloche.png);

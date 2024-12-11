@@ -125,7 +125,7 @@ const Footer = () => {
             ))}
             <div className="flex items-center justify-between">
               {images.map((image, index) => (
-                <div key={index} className="h-[24px] w-[24px]">
+                <div key={index} className="h-[24px] w-[24px]  border-white border rounded">
                   <Image src={`/${image}`} alt="" />
                 </div>
               ))}
