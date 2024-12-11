@@ -1,10 +1,11 @@
 'use client';
-import Image from 'next/image';
+import { Image } from "@chakra-ui/react";
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import arrow_forward from '@/public/arrow_forward.svg';
+import ButtonDiscover from './ButtonDiscover';
 
 // Define your validation schema using Zod
 const schema = z.object({
@@ -54,58 +55,34 @@ const ToolCreactCombo = () => {
     );
 
     return (
-        <div className="min-h-fit flex flex-col lg:flex-row gap-10 lg:gap-40 w-11/12 lg:w-8/12 mx-auto items-center justify-between py-8">
-            <div className="w-full lg:w-1/2 text-center lg:text-left">
-                <div className="font-bold text-2xl lg:text-4xl leading-[32px] lg:leading-[64px] font-inter text-gold uppercase mb-4 lg:mb-8">
-                    CÔNG CỤ <br />
-                    TẠO COMBO <br />
-                    VÀ DỰ CHI
-                </div>
-                <div className="font-normal text-sm lg:text-base leading-[20px] lg:leading-[24px] font-inter">
-                    Nắm bắt được tâm lý khách hàng, với tiêu chí “Tiện lợi - Nhanh gọn - Rõ ràng”, Joie Palace giới thiệu bộ công cụ tạo tiệc và dự chi hoàn toàn mới. Với mục tiêu mang đến cái nhìn tổng quát về những chi tiết, những thành phần cần thiết để tạo nên một bữa tiệc đáng nhớ và thành công, chúng tôi ở đây để giúp bạn lựa chọn được những dịch vụ phù hợp với nhu cầu, cũng như đưa ra được con số hoàn hảo nhất, vừa vặn với tầm dự chi của bạn.
-                </div>
+        <div className="select-none flex h-screen max-lg:h-fit max-lg:py-10 justify-between items-center px-[200px] max-xl:px-[100px] max-lg:px-[30px]">
+            {/* Left Section */}
+            <div className="text-left max-w-[380px]  max-lg:max-w-[55%] max-sm:max-w-[100%]">
+                <h2 className="text-[48px] max-lg:text-[24px]  font-bold text-gold mb-4 uppercase font-gilroy">TẠO GÓI TIỆC</h2>
+                <p className="text-white mb-6  max-lg:text-[13px]">
+                    Nắm bắt được tâm lý khách hàng, với tiêu chí “Tiện lợi- Nhanh gọn - Rõ ràng”, Joie Palace giới thiệu bộ công cụ tạo tiệc và dự chi hoàn toàn mới. Với mục tiêu mang đến cái nhìn tổng quát về những chi tiết, những thành phần cần thiết để tạo nên một bữa tiệc đang nhớ và thành công, chúng tôi ở đây để giúp bạn lựa chọn được những dịch vụ phù hợp với nhu cầu, cũng như đưa ra được con số hoàn hảo nhất, vừa vặn với tầm dự chi của bạn.
+                </p>
+                <ButtonDiscover name={'Tạo ngay'} link={'/client/tao-combo'}></ButtonDiscover>
             </div>
-            <div className="w-full lg:w-1/2">
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex flex-col gap-6 lg:gap-[30px]">
-                        <InputSelect
-                            label="Với số lượng khách khoảng..."
-                            options={[
-                                { value: 'option1', label: 'Option 1' },
-                                { value: 'option2', label: 'Option 2' },
-                                { value: 'option3', label: 'Option 3' }
-                            ]}
-                            error={errors.numberPeoples}
-                            name="numberPeoples"
-                        />
-                        <InputField
-                            label="Quý khách dự định tổ chức tiệc..."
-                            type="text"
-                            placeholder="Quý khách dự định tổ chức tiệc..."
-                            error={errors.eventType}
-                            name="eventType"
-                        />
-                        <InputSelect
-                            label="Số tiền quý khách dự kiến chi khoảng..."
-                            options={[
-                                { value: 'option1', label: 'Option 1' },
-                                { value: 'option2', label: 'Option 2' },
-                                { value: 'option3', label: 'Option 3' }
-                            ]}
-                            error={errors.budget}
-                            name="budget"
-                        />
-                        <div className="flex gap-4 lg:gap-[20px] justify-center lg:justify-end w-full">
-                            <button
-                                type="submit"
-                                className="flex items-center justify-center gap-2 lg:gap-[10px] px-4 py-2 lg:py-[10px] bg-gold text-white rounded-full text-xs lg:text-sm hover:bg-gold/80 transition-all duration-300 w-full"
-                            >
-                                <Image src={arrow_forward} alt="iconArrow" />
-                                Tạo ngay
-                            </button>
-                        </div>
-                    </div>
-                </form>
+            <div className="relative bottom-10 right-24  max-lg:right-4 max-sm:hidden">
+                <div className="max-xl:w-48 max-lg:w-40 w-64 h-auto shadow-lg right-10">
+                    <Image
+                        src="/combo.png"
+                        alt=""
+                    />
+                </div>
+                <div className="max-xl:w-48 max-lg:w-40 absolute top-10 -right-44 max-md:left-[32px] w-64 h-auto shadow-lg  ">
+                    <Image
+                        src="/combo.png"
+                        alt=""
+                    />
+                </div>
+                <div className="max-xl:w-48 max-lg:w-40 absolute top-10 max-lg:top-20  max-md:right-[68px]  right-44 w-64 h-auto shadow-lg ">
+                    <Image
+                        src="/combo.png"
+                        alt=""
+                    />
+                </div>
             </div>
         </div>
 

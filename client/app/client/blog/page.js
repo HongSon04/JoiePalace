@@ -76,8 +76,8 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                                 WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
@@ -91,8 +91,8 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                                 WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
@@ -108,8 +108,8 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                                 WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
@@ -123,8 +123,8 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                                 WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
@@ -140,8 +140,8 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                                 WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
@@ -155,8 +155,8 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                                 WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>

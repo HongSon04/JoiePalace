@@ -12,7 +12,7 @@ import {
 
 import Link from "next/link";
 import { Result } from "postcss";
-import { Image } from '@nextui-org/react';
+import { Image } from "@chakra-ui/react";
 
 const page = () => {
   const [user, setUser] = useState();
@@ -233,7 +233,7 @@ const page = () => {
         totalMoney={`${totalAmount.toLocaleString("vi-VN")} VND`}
       ></TitleHistoryPartyUser>
       <div className="w-full h-[1px] bg-whiteAlpha-300"></div>
-      <div className="flex gap-[30px]">
+      <div className="flex gap-[30px] max-sm:flex-col max-sm:items-end">
         <div className="flex gap-3 items-center">
           <span className="text-sm font-normal leading-5">Lọc theo ngày</span>
           <select
@@ -302,15 +302,12 @@ const page = () => {
           </div>
         ))
       ) : (
-        <div className='absolute'>
-          <div className='relative left-[400px] top-[263px]  w-[100px] h-[100px]'>
-            <div>  <Image
-              src='/notebook.png'
-              alt="user-img"
-              fill
-              className="w-[200px] opacity-50"
-            /></div>
-          </div>
+        <div className='flex justify-center'>
+          <Image
+            src='/notebook.png'
+            alt="user-img"
+            className="w-[100px] opacity-50"
+          />
         </div>
       )}
     </div>

@@ -136,3 +136,6 @@ background-color: #022C25;
 body {
     overflow-x: hidden;
 }
+#picker {
+    color: red !important;
+}

@@ -1,11 +1,10 @@
 // HOST URL
-// const HOST = `https://joieplace.live/api`;
 const HOST = `http://joieplace.live/api`;
-const MEMBERSHIPS = `https://joieplace.live/memberships`;
+const MEMBERSHIPS = `http://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
-const AUTH_API = `${HOST}/auth`;
+const AUTH_API = `${HOST}/auth`;  
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
