@@ -1,10 +1,10 @@
 "use client";
+import { getLocalTimeZone, isWeekend, today, parseDate } from "@internationalized/date";
 import { Calendar } from "@nextui-org/react";
-import { useState, useEffect } from "react";
-import { API_CONFIG, makeAuthorizedRequest } from "../_utils/api.config";
-import { DateTime } from 'luxon';
-import { parseISO, isValid, isWeekend } from "date-fns";
 import { useLocale } from "antd/es/locale";
+import { useEffect, useState } from "react";
+import { API_CONFIG, makeAuthorizedRequest } from "../_utils/api.config";
+import { format } from "date-fns";
 
 // Hàm lấy ngày bắt đầu và kết thúc của tháng và tuần hiện tại
 function getCurrentMonthAndWeekDates() {
@@ -37,6 +37,42 @@ export default function CustomCalendar() {
   const [branchData, setBranchData] = useState(null);
   const [dataBooking, setDataBooking] = useState(null);
 
+  const bookings = dataBooking?.data || [];
+  const expiredDates = bookings
+    .map((booking) => {
+      const organization_date = booking.organization_date;
+      if (organization_date) {
+        try {
+          const dateTime = parseDate(format(organization_date, "yyyy-MM-dd"));
+          console.log("dateTime -> ", dateTime);
+          return dateTime;
+        } catch (error) {
+          return null;
+        }
+      }
+      return null; 
+    })
+    .filter(Boolean);
+
+    console.log("expiredDates -> ", expiredDates)
+
+  let now = today(getLocalTimeZone());
+  console.log("now -> ", now);
+  console.log("typof now -> ", typeof now);
+  console.log("now + 5 -> " + now.add({days: 5}))
+
+  let disabledRanges = [
+    [...expiredDates]
+  ];
+
+  let {locale} = useLocale();
+
+  let isDateUnavailable = (date) =>
+    isWeekend(date, locale || 'en-US') ||
+    disabledRanges.some(
+      (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
+    );
+  
   // useEffect để lấy dữ liệu khi component được mount
   useEffect(() => {
     const fetchAminData = async () => {
@@ -77,70 +113,11 @@ export default function CustomCalendar() {
     };
 
     fetchAminData();
-  }, []);  // Fetch once on mount
+  }, []);
 
-  // Kiểm tra nếu dataBooking có dữ liệu hợp lệ trước khi sử dụng
-  const bookings = dataBooking?.data || [];
-  // Chuyển đổi expired_at thành đối tượng DateTime
-  const expiredDates = bookings
-    .map((booking) => {
-      const expiredAt = booking.expired_at;
-      if (expiredAt) {
-        try {
-          // Chuyển đổi expiredAt thành DateTime và bỏ giờ, phút, giây
-          const dateTime = DateTime.fromISO(expiredAt).startOf('day');
-          if (!dateTime.isValid) {
-            // console.error("Invalid DateTime from expired_at:", expiredAt);
-            return null; // Trả về null nếu không hợp lệ
-          }
-          return dateTime; // Trả về đối tượng DateTime hợp lệ
-        } catch (error) {
-          // console.error("Error parsing expired_at:", expiredAt, error);
-          return null;
-        }
-      }
-      return null; // Trả về null nếu expired_at không tồn tại
-    })
-    .filter(Boolean); // Lọc bỏ các giá trị null (invalid dates)
+  
 
-  // Tạo disabledRanges từ expiredDates
-  let disabledRanges = expiredDates.map((expiredDate) => {
-    if (!expiredDate || !expiredDate.isValid) return null; // Nếu expiredDate không hợp lệ, trả về null
-    // Chuyển DateTime thành chuỗi ISO để đảm bảo tính tương thích với Calendar
-    const startDate = expiredDate.toISODate(); // Chuyển thành chuỗi ISO chuẩn (YYYY-MM-DD)
-    const endDate = expiredDate.plus({ days: 5 }).toISODate(); // Tạo phạm vi từ expiredDate đến expiredDate + 5 ngày
-    return [startDate, endDate]; // Trả về phạm vi ngày dưới dạng chuỗi ISO
-  }).filter(Boolean); // Lọc bỏ các phạm vi không hợp lệ
-
-  // console.log("Disabled Ranges:", disabledRanges); // Kiểm tra disabledRanges
-
-
-  // Hàm kiểm tra ngày không khả dụng
-  let isDateUnavailable = (date) => {
-    // Kiểm tra nếu date không hợp lệ (trong trường hợp sử dụng DateTime từ Luxon)
-    if (!date || !(date instanceof Date || date.isValid)) {
-      // console.error("Invalid date:", date);
-      return true; // Trả về true nếu ngày không hợp lệ (vô hiệu hóa)
-    }
-
-    // Chuyển đối tượng `date` thành DateTime (nếu là đối tượng Date)
-    const dateTime = DateTime.fromJSDate(date);
-
-    // Kiểm tra phạm vi disabledRanges
-    return disabledRanges.some(([start, end]) => {
-      const startDate = DateTime.fromISO(start);
-      const endDate = DateTime.fromISO(end);
-
-      // So sánh date với start và end (sử dụng Luxon DateTime để so sánh)
-      return dateTime >= startDate && dateTime <= endDate;
-    });
-  };
 
   // Calendar component sử dụng Next UI
-  return (
-    <Calendar
-      aria-label="Date (Unavailable)"
-      isDateUnavailable={isDateUnavailable} // Truyền hàm kiểm tra ngày không khả dụng
-    />
-  );
+    return <Calendar aria-label="Date (Unavailable)" isDateUnavailable={isDateUnavailable} />;
 }

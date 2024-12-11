@@ -83,8 +83,6 @@ const TableStageStatus = () => {
       const bookingByBranchData = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.GET_ALL({
           branch_id: branchId,
-          // status:  ["pending", "processing"] , 
-          status: "pending",
           startDate : startOfWeek,
           endDate : endOfWeek,
           itemsPerPage: 100
