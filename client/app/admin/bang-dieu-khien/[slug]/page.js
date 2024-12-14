@@ -3,28 +3,24 @@
 //   title: "Bảng điều khiển",
 // };
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PiArrowSquareOutLight } from "react-icons/pi";
 
-import { BsThreeDots } from "react-icons/bs";
-import "../../../_styles/globals.css";
-import Chart from "@/app/_components/Chart";
 import AdminHeader from "@/app/_components/AdminHeader";
+import Chart from "@/app/_components/Chart";
+import useApiServices from "@/app/_hooks/useApiServices";
 import {
-  fetchInfoByMonth,
-  fetchRevenueBranchByQuarter,
   fetchAllByBranch,
+  fetchInfoByMonth,
   fetchRevenueBranchByMonth,
+  fetchRevenueBranchByQuarter,
   fetchRevenueBranchByWeek,
   fetchRevenueBranchByYear,
-  fetchUserByBranchId,
 } from "@/app/_services/apiServices";
-import Link from "next/link";
-import {
-  fetchBranchBySlug
-} from "@/app/_services/branchesServices";
-import useApiServices from "@/app/_hooks/useApiServices";
 import { API_CONFIG } from "@/app/_utils/api.config";
+import Link from "next/link";
+import "../../../_styles/globals.css";
+
 const Page = ({ params }) => {
   const { slug } = params;
   const [dataUser, setDataUser] = useState(null);
@@ -42,16 +38,21 @@ const Page = ({ params }) => {
   const [dataBookingByMonth, setDataBookingByMonth] = useState([]);
   function getCurrentMonthStartAndEnd() {
     const currentDate = new Date();
-    const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-    
+    const startDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+    const endDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+
     return {
-        startDate: formatDate(startDate),
-        endDate: formatDate(endDate)
-        
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate),
     };
-    
-    
   }
   useEffect(() => {
     const fetchAminData = async () => {
@@ -60,17 +61,16 @@ const Page = ({ params }) => {
         const branchId = currentBranch.id;
         // console.log(idBranch);
         // console.log(branchId);
-        
+
         const { startDate, endDate } = getCurrentMonthStartAndEnd();
         const dataBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            idBranch : branchId,
+            idBranch: branchId,
             is_confirm: false,
             is_deposit: false,
             start_date: startDate,
             end_date: endDate,
-            status : "pending"
-            
+            status: "pending",
           }),
           "GET",
           null
@@ -79,7 +79,7 @@ const Page = ({ params }) => {
           API_CONFIG.BOOKINGS.GET_ALL({
             start_date: startDate,
             end_date: endDate,
-            branch_id: branchId
+            branch_id: branchId,
           }),
           "GET",
           null
@@ -94,23 +94,21 @@ const Page = ({ params }) => {
         );
         // console.log(startDate);
         // console.log(dataUser);
-        
-        
+
         const [
-            dataInfo,
-            dataTotalAdminByMonth,
-            dataTotalAdminByWeek,
-            dataTotalAdminByYear,
-            dataTotalAdminByQuarter,
-            dataTotalBranch,
+          dataInfo,
+          dataTotalAdminByMonth,
+          dataTotalAdminByWeek,
+          dataTotalAdminByYear,
+          dataTotalAdminByQuarter,
+          dataTotalBranch,
         ] = await Promise.all([
-            fetchInfoByMonth(branchId),
-            fetchRevenueBranchByMonth(0),
-            fetchRevenueBranchByWeek(0),
-            fetchRevenueBranchByYear(0),
-            fetchRevenueBranchByQuarter(0),
-            fetchAllByBranch(2),
-            
+          fetchInfoByMonth(branchId),
+          fetchRevenueBranchByMonth(0),
+          fetchRevenueBranchByWeek(0),
+          fetchRevenueBranchByYear(0),
+          fetchRevenueBranchByQuarter(0),
+          fetchAllByBranch(2),
         ]);
         // console.log(dataUser);
         setIdBranch(idBranch);
@@ -125,16 +123,14 @@ const Page = ({ params }) => {
         setBranchId(branchId);
         setDataInfo(dataInfo);
         setAllBooking(dataBooking);
-    } catch (error) {
+      } catch (error) {
         console.error("Error fetching data:", error);
-    }
-    
+      }
     };
 
     fetchAminData();
   }, []);
-  // console.log(dataUser);
-  
+
   const createChartData = (data, label) => {
     let chartData = {
       labels: [],
@@ -145,19 +141,22 @@ const Page = ({ params }) => {
         },
       ],
     };
-  
+
     if (data) {
-      const totalRevune = data["Hồ Chí Minh"] || {}; 
-      const branches = totalRevune.branches || {}; 
-  
+      const totalRevune = data["Hồ Chí Minh"] || {};
+      const branches = totalRevune.branches || {};
+
       chartData.labels = ["Hồ Chí Minh", ...Object.keys(branches)];
-  
-      chartData.datasets[0].data = [totalRevune.value, ...Object.values(branches)];
+
+      chartData.datasets[0].data = [
+        totalRevune.value,
+        ...Object.values(branches),
+      ];
     }
-  
+
     return chartData;
   };
-  
+
   let dataByWeek = createChartData(dataTotalAdminByWeek, "Doanh thu theo tuần");
   let dataByMonth = createChartData(
     dataTotalAdminByMonth,
@@ -167,13 +166,27 @@ const Page = ({ params }) => {
   // console.log(dataTotalAdminByYear);
   const dataBranchChart = dataTotalBranch || [];
   // Kiểm tra nếu các đối tượng không phải là null hoặc undefined, nếu không thì sử dụng mảng rỗng
-  const quarterlyRevenues = Object.values(dataBranchChart.total_revune_by_quarter || {}).flat();
-  const monthlyRevenues = Object.values(dataBranchChart.total_revune_by_month || []);
-  const weeklyRevenues = Object.values(dataBranchChart.total_revune_by_week || []);
-  const yearlyRevenues = Object.values(dataBranchChart.total_revune_by_year || []);
+  const quarterlyRevenues = Object.values(
+    dataBranchChart.total_revune_by_quarter || {}
+  ).flat();
+  const monthlyRevenues = Object.values(
+    dataBranchChart.total_revune_by_month || []
+  );
+  const weeklyRevenues = Object.values(
+    dataBranchChart.total_revune_by_week || []
+  );
+  const yearlyRevenues = Object.values(
+    dataBranchChart.total_revune_by_year || []
+  );
   // Tính tổng doanh thu của các quý, tháng, tuần
-  const totalQuarterRevenue = quarterlyRevenues.reduce((acc, curr) => acc + curr, 0);
-  const totalMonthRevenue = monthlyRevenues.reduce((acc, curr) => acc + curr, 0);
+  const totalQuarterRevenue = quarterlyRevenues.reduce(
+    (acc, curr) => acc + curr,
+    0
+  );
+  const totalMonthRevenue = monthlyRevenues.reduce(
+    (acc, curr) => acc + curr,
+    0
+  );
   const totalWeekRevenue = weeklyRevenues.reduce((acc, curr) => acc + curr, 0);
 
   // Tổng doanh thu
@@ -181,29 +194,27 @@ const Page = ({ params }) => {
 
   // console.log(yearlyRevenues);  // In ra tổng doanh thu
 
-
-
   const dataBranch = {
-    labels: ['Tuần', 'Tháng', 'Năm'],  
-    datasets: [{
-      label: 'Doanh thu',
-      data: [
-        ...weeklyRevenues,  
-        ...monthlyRevenues, 
-        ...yearlyRevenues  
-      ]
-    }]
+    labels: ["Tuần", "Tháng", "Năm"],
+    datasets: [
+      {
+        label: "Doanh thu",
+        data: [...weeklyRevenues, ...monthlyRevenues, ...yearlyRevenues],
+      },
+    ],
   };
 
   const dataEachMonth = dataBranchChart.total_revune_each_month;
   const eachMonthChartData = dataEachMonth?.data || [];
   const dataEachMonthChart = {
-    labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-    datasets: [{
-      data: eachMonthChartData
-    }]
+    labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+    datasets: [
+      {
+        data: eachMonthChartData,
+      },
+    ],
   };
- 
+
   const dataBooking = allBooking?.data || [];
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -211,11 +222,14 @@ const Page = ({ params }) => {
   }
   function formatDateTime(dateString) {
     const date = new Date(dateString);
-    const formattedTime = date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+    const formattedTime = date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     return `${formattedTime}`;
   }
   // console.log(dataBookingByMonth);
-  
+
   return (
     <main className="grid gap-6  text-white ">
       <AdminHeader
@@ -246,8 +260,9 @@ const Page = ({ params }) => {
                 <p className="text-2xl font-bold">{dataInfo.totalUser}</p>
               </div>
               <div className="flex justify-between items-center">
-                <p className="text-white text-base font-normal">Khách hàng trong tháng</p>
-
+                <p className="text-white text-base font-normal">
+                  Khách hàng trong tháng
+                </p>
               </div>
             </div>
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-8 w-[251px]">
@@ -256,7 +271,7 @@ const Page = ({ params }) => {
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-base font-normal">Tiệc trong tháng</p>
-               
+
                 <Link href={`/admin/quan-ly-tiec/${slug}`}>
                   <PiArrowSquareOutLight className="text-2xl" />
                 </Link>
@@ -267,7 +282,6 @@ const Page = ({ params }) => {
                 <p className="text-2xl font-bold">
                   {dataInfo.totalFutureBooking}
                 </p>
-               
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-red-400 text-base font-normal">
@@ -283,7 +297,6 @@ const Page = ({ params }) => {
                 <p className="text-2xl font-bold">
                   {dataInfo.totalPendingBooking}
                 </p>
-                
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-base font-normal">Tiệc đang diễn ra</p>
@@ -297,17 +310,20 @@ const Page = ({ params }) => {
           <p>Đang tải dữ liệu...</p>
         )}
       </div>
-      
+
       <div className="container  flex gap-4 w-full h-full  p-4">
         <div className="p-4 w-1/3 h-auto  bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
             <p className="text-base font-semibold ">Khách hàng mới nhất</p>
-            
           </div>
           <div className="flex flex-col gap-3 h-[580px] px-[10px] overflow-y-auto hide-scrollbar">
             {dataUser && dataUser.data.length > 0 ? (
               dataUser.data.map((item) => (
-                <Link key={item.id} href={``} className="flex gap-5 items-center w-full">
+                <Link
+                  key={item.id}
+                  href={``}
+                  className="flex gap-5 items-center w-full"
+                >
                   <div className="flex gap-5 items-center rounded-xl p-3 bg-whiteAlpha-50 bg-cover  w-full bg-center">
                     {item.avatar ? (
                       <Image
@@ -335,7 +351,10 @@ const Page = ({ params }) => {
                         <div className="flex gap-3 items-center text-xs">
                           {item.membership_id ? (
                             <>
-                              <Image src="/image/Group.svg" alt="Membership Icon" />
+                              <Image
+                                src="/image/Group.svg"
+                                alt="Membership Icon"
+                              />
                               <p>{item.memberships}</p>
                             </>
                           ) : null}
@@ -350,7 +369,6 @@ const Page = ({ params }) => {
                 <p className="text-center">Đang tải dữ liệu.</p>
               </div>
             )}
-
           </div>
         </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
@@ -409,36 +427,39 @@ const Page = ({ params }) => {
                   dataBooking.map((item, index) => (
                     <tr key={index}>
                       <td>{item.users ? item.users.username : "N/A"}</td>
-                      <td>{item.branches ? item.branches.name : "N/A"}</td> 
-                      <td>{item.phone || "N/A"}</td> 
+                      <td>{item.branches ? item.branches.name : "N/A"}</td>
+                      <td>{item.phone || "N/A"}</td>
                       <td>
                         <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
-                          <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
+                          <p className="text-teal-400 font-bold text-xs">
+                            Xem thêm
+                          </p>
                         </Link>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="text-center  h-[357px]">Không có dữ liệu.</td>
+                    <td colSpan={4} className="text-center  h-[357px]">
+                      Không có dữ liệu.
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
-        {slug === "ho-chi-minh" &&
+        {slug === "ho-chi-minh" && (
           <div className=" w-1/2">
             <div className="flex items-center justify-between mb-[10px]">
               <p className="text-base  font-semibold">Doanh thu tổng / năm</p>
-             
             </div>
 
             <div className="p-4 bg-blackAlpha-100 rounded-xl ">
               <Chart data={dataBranch} chartType="bar" />
             </div>
           </div>
-        }
+        )}
       </div>
       <div className="w-full p-4">
         <div className="flex items-center justify-between mb-[10px]">
@@ -473,39 +494,66 @@ const Page = ({ params }) => {
                     <td>{item.name || "N/A"}</td>
                     <td>{item.branches ? item.branches.name : "N/A"}</td>
                     <td>{item.stages ? item.stages.name : "N/A"}</td>
-                    <td>{item.created_at ? formatDate(item.created_at) : "N/A"}</td>
-                    <td>{item.expired_at ? formatDate(item.expired_at) : "N/A"}</td>
-                    <td>{item.expired_at ? formatDateTime(item.expired_at) : "N/A"}</td>
                     <td>
-                      <li className={`status ${
-                            item.is_deposit 
-                                ? item.status === 'pending' ? 'chua-thanh-toan' :
-                                  item.status === 'processing' ? 'da-hoan-tien' :
-                                  item.status === 'success' ? 'da-thanh-toan ' :
-                                  item.status === 'cancel' ? 'da-huy' :
-                                  ''
-                                : 'da-dat-coc' 
-                        }`}>
-                            {item.is_deposit 
-                                ? item.status === 'pending' ? 'Đang chờ' :
-                                  item.status === 'processing' ? 'Đang xử lý' :
-                                  item.status === 'success' ? 'Thành công' :
-                                  item.status === 'cancel' ? 'Đã hủy' :
-                                  ''
-                                : 'Chưa đặt cọc'
-                            }
+                      {item.created_at ? formatDate(item.created_at) : "N/A"}
+                    </td>
+                    <td>
+                      {item.expired_at ? formatDate(item.expired_at) : "N/A"}
+                    </td>
+                    <td>
+                      {item.expired_at
+                        ? formatDateTime(item.expired_at)
+                        : "N/A"}
+                    </td>
+                    <td>
+                      <li
+                        className={`status ${
+                          item.is_deposit
+                            ? item.status === "pending"
+                              ? "chua-thanh-toan"
+                              : item.status === "processing"
+                              ? "da-hoan-tien"
+                              : item.status === "success"
+                              ? "da-thanh-toan "
+                              : item.status === "cancel"
+                              ? "da-huy"
+                              : ""
+                            : "da-dat-coc"
+                        }`}
+                      >
+                        {item.is_deposit
+                          ? item.status === "pending"
+                            ? "Đang chờ"
+                            : item.status === "processing"
+                            ? "Đang xử lý"
+                            : item.status === "success"
+                            ? "Thành công"
+                            : item.status === "cancel"
+                            ? "Đã hủy"
+                            : ""
+                          : "Chưa đặt cọc"}
                       </li>
                     </td>
 
                     <td>
-                      {item.booking_details && item.booking_details.length > 0 ? 
-                        `${item.booking_details[0].table_count != null ? item.booking_details[0].table_count : 'N/A'} + ${item.booking_details[0].spare_table_count != null ? item.booking_details[0].spare_table_count : 'N/A'}` 
-                        : 'N/A'}
+                      {item.booking_details && item.booking_details.length > 0
+                        ? `${
+                            item.booking_details[0].table_count != null
+                              ? item.booking_details[0].table_count
+                              : "N/A"
+                          } + ${
+                            item.booking_details[0].spare_table_count != null
+                              ? item.booking_details[0].spare_table_count
+                              : "N/A"
+                          }`
+                        : "N/A"}
                     </td>
 
-
                     <td>
-                      <Link href={`/admin/quan-ly-tiec/${slug}/${item.id}`} className="text-teal-400 text-xs font-bold">
+                      <Link
+                        href={`/admin/quan-ly-tiec/${slug}/${item.id}`}
+                        className="text-teal-400 text-xs font-bold"
+                      >
                         Xem thêm
                       </Link>
                     </td>
@@ -513,7 +561,9 @@ const Page = ({ params }) => {
                 ))
               ) : (
                 <tr className="h-72">
-                  <td colSpan="11" className="text-center">Không có dữ liệu.</td>
+                  <td colSpan="11" className="text-center">
+                    Không có dữ liệu.
+                  </td>
                 </tr>
               )}
             </tbody>

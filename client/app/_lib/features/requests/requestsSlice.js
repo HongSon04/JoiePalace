@@ -140,11 +140,11 @@ export const fetchRequests = createAsyncThunk(
       null,
       { signal }
     );
-
+    
     // console.log("response from fetchRequests thunk -> ", response);
     if (response.success) {
-      dispatch(fetchingRequestsSuccess(response));
-      return response; // Return the response for further use
+      dispatch(fetchingRequestsSuccess(response));// Return the response for further use
+      return response;
     } else {
       dispatch(fetchingRequestsFailure(response.error.message));
       return rejectWithValue(response.error.message);
@@ -182,13 +182,46 @@ export const updateRequestStatus = createAsyncThunk(
 );
 
 export const fetchRequestsByBranch = createAsyncThunk(
-  "requests/fetchRequestsByBranch",
+  "requests/fetchRequestsByBranch", 
   async ({ params, branchId, signal }, { dispatch, rejectWithValue }) => {
     dispatch(fetchingRequests());
 
     try {
       const response = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.GET_ALL(params),
+        "GET",
+        null,
+        { signal }
+      );
+
+      if (response.success) {
+        const filteredBookings = branchId
+          ? response.data.filter((booking) => booking.branch_id === branchId)
+          : response.data;
+
+        dispatch(
+          fetchingRequestsSuccess({ ...response, data: filteredBookings })
+        );
+        return filteredBookings;
+      } else {
+        dispatch(fetchingRequestsFailure(response));
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching requests:", error); // Log any errors
+      dispatch(fetchingRequestsFailure(error));
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const fetchRequestsBookingStage = createAsyncThunk(
+  "requests/fetchRequestsByBranch", 
+  async ({ params, branchId, signal }, { dispatch, rejectWithValue }) => {
+    dispatch(fetchingRequests());
+
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.BOOKINGS.GET_BOOKING_LIST(params),
         "GET",
         null,
         { signal }

@@ -119,8 +119,6 @@ function Page() {
 
   const handleSaveMenu = React.useCallback(
     async (data) => {
-      console.log(JSON.stringify(dishesId));
-
       if (files.length <= 0) {
         setIsImagesEmpty(true);
         return;

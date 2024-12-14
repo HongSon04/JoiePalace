@@ -156,6 +156,7 @@ export class MenusController {
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
   @ApiQuery({ name: 'user_id', required: false, description: '1' })
+  @ApiQuery({ name: 'is_show', required: false, description: 'true | false' })
   findAll(@Query() query: FilterMenuDto) {
     return this.menusService.findAll(query);
   }
@@ -207,7 +208,9 @@ export class MenusController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAllDeleted(@Query() query: FilterPriceDto) {
+  @ApiQuery({ name: 'user_id', required: false, description: '1' })
+  @ApiQuery({ name: 'is_show', required: false, description: 'true | false' })
+  findAllDeleted(@Query() query: FilterMenuDto) {
     return this.menusService.findAllDeleted(query);
   }
 

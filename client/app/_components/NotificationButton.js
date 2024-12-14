@@ -1,11 +1,8 @@
 "use client";
 
 import Image from "next/image";
-
 import Notification from "./Notification";
-
 import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
-
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Button } from "@nextui-org/react";
 import React from "react";
@@ -60,7 +57,7 @@ function NotificationButton() {
     [notifications]
   );
 
-  console.log("notifications -> ", notifications);
+  // console.log("notifications -> ", notifications);
 
   const mutation = useMutation({
     mutationFn: markIsRead,

@@ -43,4 +43,11 @@ export class FilterMenuDto {
     description: 'Ngày kết thúc tạo menu',
   })
   endDate: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Trạng thái hiển thị của menu',
+    enum: ['true', 'false'],
+  })
+  is_show: string;
 }

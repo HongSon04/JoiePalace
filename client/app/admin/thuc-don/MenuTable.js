@@ -1,12 +1,17 @@
-import {
-  ExclamationCircleIcon,
-  EllipsisVerticalIcon as VerticalDotsIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
+import CustomPagination from "@/app/_components/CustomPagination";
+import LoadingContent from "@/app/_components/LoadingContent";
+import SearchForm from "@/app/_components/SearchForm";
+import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import { CONFIG } from "@/app/_utils/config";
+import { formatPrice, toStandardDate } from "@/app/_utils/formaters";
+import { capitalize } from "@/app/_utils/helpers";
+import { EllipsisVerticalIcon as VerticalDotsIcon } from "@heroicons/react/24/outline";
 import { parseDate } from "@internationalized/date";
 import {
   Button,
-  Chip,
   DateRangePicker,
   Dropdown,
   DropdownItem,
@@ -18,32 +23,14 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  User,
 } from "@nextui-org/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Image } from "antd";
 import { format } from "date-fns";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React from "react";
-import { BsMoon, BsSun } from "react-icons/bs";
-import { useDispatch, useSelector } from "react-redux";
-import useApiServices from "@/app/_hooks/useApiServices";
-import useCustomToast from "@/app/_hooks/useCustomToast";
-import {
-  deleteMenu,
-  destroyMenu,
-  fetchRequests,
-  getDeletedMenuList,
-  getMenuList,
-  updateRequestStatus,
-} from "@/app/_lib/features/menu/menuSlice";
-import { CONFIG } from "@/app/_utils/config";
-import { capitalize } from "@/app/_utils/helpers";
-import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
-import CustomPagination from "@/app/_components/CustomPagination";
-import LoadingContent from "@/app/_components/LoadingContent";
-import SearchForm from "@/app/_components/SearchForm";
-import { Image } from "antd";
-import { formatPrice } from "@/app/_utils/formaters";
+import { useDispatch } from "react-redux";
 
 const INITIAL_VISIBLE_COLUMNS = ["id", "images", "name", "price", "actions"];
 
@@ -57,16 +44,6 @@ const columns = [
 
 function MenuTable() {
   const pathname = usePathname();
-  const router = useRouter();
-  const {
-    menuList,
-    isFetchingMenuList,
-    isFetchingMenuListError,
-    isDeletingMenu,
-    pagination,
-    error,
-  } = useSelector((store) => store.menu);
-  const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
   const [date, setDate] = React.useState({
@@ -80,11 +57,41 @@ function MenuTable() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [menuStatus, setMenuStatus] = React.useState(CONFIG.MENU_STATUS[0].key);
   const toast = useCustomToast();
+  const { makeAuthorizedRequest } = useApiServices();
+  const queryClient = useQueryClient();
 
-  // Function to convert the custom date object to a standard Date object
-  const toStandardDate = (customDate) => {
-    return new Date(customDate.year, customDate.month - 1, customDate.day);
-  };
+  const {
+    data: menu,
+    isLoading: isFetchingMenu,
+    isError: isFetchingMenuError,
+  } = useQuery({
+    queryKey: ["menu", searchQuery, menuStatus, currentPage, itemsPerPage],
+    queryFn: async () => {
+      const api =
+        menuStatus === "deleted"
+          ? API_CONFIG.MENU.GET_ALL_DELETED({
+              search: searchQuery,
+              page: currentPage,
+              itemsPerPage,
+              startDate: formattedStartDate,
+              endDate: formattedEndDate,
+              is_show: true,
+            })
+          : API_CONFIG.MENU.GET_ALL({
+              search: searchQuery,
+              page: currentPage,
+              itemsPerPage,
+              startDate: formattedStartDate,
+              endDate: formattedEndDate,
+              is_show: true,
+            });
+
+      const response = await makeAuthorizedRequest(api);
+
+      if (response.success) return response;
+      else throw new Error("Failed to fetch menu");
+    },
+  });
 
   // Format the dates to "dd-MM-yyyy"
   const formattedStartDate = format(toStandardDate(date.start), "dd-MM-yyyy");
@@ -104,108 +111,174 @@ function MenuTable() {
     setSearchQuery(query);
   }, []);
 
-  const handleDeleteMenu = async (id) => {
-    const result = await dispatch(deleteMenu(id)).unwrap();
-
-    console.log(result);
-
-    if (result.success) {
+  const {
+    mutate: deleteMenu,
+    isPending: isDeletingMenu,
+    isError: isDeletingMenuError,
+  } = useMutation({
+    mutationKey: ["deleteMenu"],
+    mutationFn: async (id) => {
       toast({
-        title: "Xóa thực đơn thành công",
-        description: 'Bạn vẫn có thể xem trong mục "Đã xóa"',
-        type: "success",
+        title: "Đang xóa thực đơn...",
+        description: "Vui lòng chờ!",
+        type: "info",
       });
-    } else {
-      if (result.error.statusCode == 401) {
-        toast({
-          title: "Xóa thực đơn thất bại",
-          description: "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại",
-          type: "error",
-        });
-      } else {
-        toast({
-          title: "Xóa thực đơn thất bại",
-          description: "Vui lòng thử lại sau",
-          type: "error",
-        });
+
+      try {
+        const response = await makeAuthorizedRequest(
+          API_CONFIG.MENU.DELETE(id),
+          "DELETE",
+          { menu_id: id }
+        );
+
+        if (response.success) {
+          toast({
+            title: "Xóa thành công",
+            description: "Thực đơn đã được xóa",
+            type: "success",
+          });
+        } else {
+          if (response.error.statusCode === 401) {
+            toast({
+              title: "Lỗi khi xóa thực đơn",
+              description: "Phiên đăng nhập đã hết hạn",
+              type: "error",
+              isClosable: true,
+            });
+          } else {
+            toast({
+              title: "Lỗi khi xóa thực đơn",
+              description:
+                response.error.message || "Có lỗi xảy ra khi xóa thực đơn",
+              type: "error",
+              isClosable: true,
+            });
+          }
+        }
+      } catch (error) {
+        return error;
       }
-    }
-  };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["menu"] });
+    },
+  });
 
-  const handleDestroyMenu = async (id) => {
-    try {
-      const result = await dispatch(destroyMenu(id)).unwrap();
+  const {
+    mutate: destroyMenu,
+    isPending: isDestroyingMenu,
+    isError: isDestroyingMenuError,
+  } = useMutation({
+    mutationKey: ["destroyMenu"],
+    mutationFn: async (id) => {
+      if (typeof window === undefined) return;
 
-      if (result.success) {
-        toast({
-          title: "Xóa thành công",
-          description: "Thực đơn đã bị xóa vĩnh viễn",
-          type: "success",
-        });
-      } else {
-        toast({
-          title: "Xóa thất bại",
-          description: "Vui lòng thử lại sau",
-          type: "error",
-        });
+      const confirm = window.confirm(
+        "Bạn có chắc muốn xóa vĩnh viễn thực đơn này"
+      );
+
+      if (!confirm) return;
+
+      toast({
+        title: "Đang xóa vĩnh viễn thực đơn...",
+        description: "Vui lòng chờ!",
+        type: "info",
+      });
+
+      try {
+        const response = await makeAuthorizedRequest(
+          API_CONFIG.MENU.DESTROY(id),
+          "DELETE",
+          { menu_id: id }
+        );
+
+        if (response.success) {
+          toast({
+            title: "Xóa vĩnh viễn thành công",
+            description: "Thực đơn đã được xóa vĩnh viễn",
+            type: "success",
+          });
+        } else {
+          if (response.error.statusCode === 401) {
+            toast({
+              title: "Lỗi khi xóa vĩnh viễn thực đơn",
+              description: "Phiên đăng nhập đã hết hạn",
+              type: "error",
+              isClosable: true,
+            });
+          } else {
+            toast({
+              title: "Lỗi khi xóa vĩnh viễn thực đơn",
+              description:
+                response.error.message ||
+                "Có lỗi xảy ra khi xóa vĩnh viễn thực đơn",
+              type: "error",
+              isClosable: true,
+            });
+          }
+        }
+      } catch (error) {
+        return error;
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["menu"] });
+    },
+  });
 
-  React.useEffect(() => {
-    const params = {
-      status: menuStatus,
-      page: currentPage,
-      itemsPerPage,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-      is_show: true,
-    };
+  const {
+    mutate: restoreMenu,
+    isPending: isRestoringMenu,
+    isError: isRestoringMenuError,
+  } = useMutation({
+    mutationKey: ["restoreMenu"],
+    mutationFn: async (id) => {
+      toast({
+        title: "Đang khôi phục thực đơn...",
+        description: "Vui lòng chờ!",
+        type: "info",
+      });
 
-    if (menuStatus === "active") {
-      dispatch(getMenuList({ params }));
-    } else {
-      dispatch(getDeletedMenuList({ params }));
-    }
+      try {
+        const response = await makeAuthorizedRequest(
+          API_CONFIG.MENU.RESTORE(id),
+          "PUT",
+          { menu_id: id }
+        );
 
-    return () => {};
-  }, [
-    currentPage,
-    itemsPerPage,
-    menuStatus,
-    formattedEndDate,
-    formattedStartDate,
-    router,
-  ]);
-
-  React.useEffect(() => {
-    const controller = new AbortController();
-
-    const params = {
-      page: currentPage,
-      itemsPerPage,
-      search: searchQuery,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-      is_show: true,
-    };
-
-    dispatch(getMenuList({ signal: controller.signal, params }));
-
-    return () => {
-      controller.abort();
-    };
-  }, [
-    currentPage,
-    itemsPerPage,
-    searchQuery,
-    menuStatus,
-    formattedEndDate,
-    formattedStartDate,
-    router,
-  ]);
+        if (response.success) {
+          toast({
+            title: "Khôi phục thành công",
+            description: "Thực đơn đã được khôi phục",
+            type: "success",
+          });
+        } else {
+          if (response.error.statusCode === 401) {
+            toast({
+              title: "Lỗi khi khôi phục thực đơn",
+              description: "Phiên đăng nhập đã hết hạn",
+              type: "error",
+              isClosable: true,
+            });
+          } else {
+            toast({
+              title: "Lỗi khi khôi phục thực đơn",
+              description:
+                response.error.message ||
+                "Có lỗi xảy ra khi khôi phục thực đơn",
+              type: "error",
+              isClosable: true,
+            });
+          }
+        }
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["menu"] });
+    },
+  });
 
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -223,14 +296,16 @@ function MenuTable() {
     );
   }, [visibleColumns]);
   const sortedItems = React.useMemo(() => {
-    return [...menuList].sort((a, b) => {
+    if (!menu?.data) return [];
+
+    return [...menu?.data].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, menuList]);
+  }, [sortDescriptor, menu?.data]);
 
   const renderCell = React.useCallback(
     (item, columnKey) => {
@@ -264,31 +339,39 @@ function MenuTable() {
                     <VerticalDotsIcon className="text-default-300" />
                   </Button>
                 </DropdownTrigger>
-                <DropdownMenu>
-                  <DropdownItem>
-                    <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
-                  </DropdownItem>
 
-                  {menuStatus == "deleted" ? (
+                {menuStatus == "deleted" ? (
+                  <DropdownMenu>
+                    <DropdownItem>
+                      <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                    </DropdownItem>
+                    <DropdownItem onClick={() => restoreMenu(item.id)}>
+                      {`Khôi phục thực đơn`}
+                    </DropdownItem>
                     <DropdownItem
-                      onClick={() => handleDestroyMenu(item.id)}
+                      onClick={() => destroyMenu(item.id)}
                       className={`text-red-400 ${
                         item.status === "cancel" ? "hidden" : ""
                       }`}
                     >
                       {`Xóa vĩnh viễn`}
                     </DropdownItem>
-                  ) : (
+                  </DropdownMenu>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownItem>
+                      <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                    </DropdownItem>
                     <DropdownItem
-                      onClick={() => handleDeleteMenu(item.id)}
+                      onClick={() => deleteMenu(item.id)}
                       className={`text-red-400 ${
                         item.status === "cancel" ? "hidden" : ""
                       }`}
                     >
                       {`Xóa thực đơn này`}
                     </DropdownItem>
-                  )}
-                </DropdownMenu>
+                  </DropdownMenu>
+                )}
               </Dropdown>
             </div>
           );
@@ -396,14 +479,14 @@ function MenuTable() {
     return (
       <CustomPagination
         page={currentPage}
-        total={pagination.lastPage}
+        total={menu?.pagination?.lastPage}
         onChange={onPageChange}
         classNames={{
           base: "flex justify-center",
         }}
       />
     );
-  }, [currentPage, pagination.lastPage]);
+  }, [currentPage, menu?.pagination?.lastPage]);
 
   // console.log(menu);
 
@@ -450,11 +533,9 @@ function MenuTable() {
         )}
       </TableHeader>
       <TableBody
-        emptyContent={
-          isFetchingMenuListError ? error : "Không tìm thấy thực đơn"
-        }
+        emptyContent={"Không tìm thấy thực đơn"}
         items={sortedItems}
-        isLoading={isFetchingMenuList || isDeletingMenu}
+        isLoading={isFetchingMenu}
         loadingContent={<LoadingContent />}
       >
         {(item) => (

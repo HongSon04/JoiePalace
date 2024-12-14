@@ -6,6 +6,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import MenuTable from "./MenuTable";
+import { Button } from "@nextui-org/react";
 
 function Page() {
   const { isLoading } = useRoleGuard();
@@ -22,12 +23,16 @@ function Page() {
           showSearchForm={false}
           className="flex-1"
         />
-        <Link
-          href="/admin/thuc-don/tao-thuc-don"
-          className="px-3 py-2 h-full bg-whiteAlpha-100 flex flex-center gap-3 rounded-full text-white shrink-0 hover:whiteAlpha-200"
-        >
-          <PlusIcon className="h-6 w-6 cursor-pointer text-white" />
-          Tạo thực đơn
+        <Link href="/admin/thuc-don/tao-thuc-don">
+          <Button
+            endContent={
+              <PlusIcon className="h-5 w-5 cursor-pointer text-white" />
+            }
+            className="bg-whiteAlpha-100 text-white"
+            radius="full"
+          >
+            Tạo thực đơn
+          </Button>
         </Link>
       </div>
       {/* BREADCRUMBS */}

@@ -3,24 +3,24 @@
 import AdminHeader from "@/app/_components/AdminHeader";
 import Dish from "@/app/_components/Dish";
 import FormInput from "@/app/_components/FormInput";
-import SaveIcon from "@/app/_components/SaveIcon";
 import Uploader from "@/app/_components/Uploader";
-import { dishCategories } from "@/app/_utils/config";
+import useApiServices from "@/app/_hooks/useApiServices";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import useRoleGuard from "@/app/_hooks/useRoleGuard";
+import { API_CONFIG } from "@/app/_utils/api.config";
 import { formatPrice } from "@/app/_utils/formaters";
-import { capitalize } from "@/app/_utils/helpers";
-import { _require } from "@/app/_utils/validations";
 import docScan from "@/public/document_scanner.svg";
-import pizza from "@/public/local_pizza.svg";
-import restaurant from "@/public/restaurant.svg";
-import setMeal from "@/public/set_meal.svg";
 import textSnippet from "@/public/text_snippet.svg";
 import {
   ExclamationCircleIcon,
   PlusIcon,
-  SquaresPlusIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Button, Chip, useDisclosure } from "@nextui-org/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Divider, Spinner } from "@nextui-org/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Col, Row } from "antd";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import {
   useParams,
@@ -30,24 +30,22 @@ import {
 } from "next/navigation";
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { IoSaveOutline } from "react-icons/io5";
+import { useDispatch } from "react-redux";
 import { z } from "zod";
-import DishesModal from "../[id]/DishesModal";
 import Breadcrumbs from "./Breadcrumbs";
-import { AnimatePresence, motion } from "framer-motion";
-import useRoleGuard from "@/app/_hooks/useRoleGuard";
+import DishesModal from "./DishesModal";
+import Loading from "../../loading";
 
 const schema = z.object({
-  name: z.string({ required_error: "Tên thực đơn không được để trống" }),
-  maxDishes: z
-    .number({
-      required_error: "Số lượng món tối đa không được để trống",
+  name: z
+    .string({ required_error: "Vui lòng nhập tên thực đơn" })
+    .min(1, { message: "Vui lòng nhập tên thực đơn" }),
+  description: z
+    .string({
+      required_error: "Vui lòng nhập mô tả thực đơn",
     })
-    .min(1, { message: "Số lượng món tối thiểu là 1" })
-    .max(8, { message: "Số lượng món tối đa là 8" }),
-  maxAppetizer: z.number({
-    required_error: "Số lượng món khai vị không được để trống",
-  }),
+    .min(1, { message: "Vui lòng nhập mô tả thực đơn" }),
 });
 
 const MAX_FILE_SIZE = 5000000;
@@ -62,23 +60,13 @@ function checkFileType(file) {
 
 function Page() {
   const { isLoading } = useRoleGuard();
-
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [dishCategory, setDishCategory] = React.useState([]);
   const [selectedMenuDishes, setSelectedMenuDishes] = React.useState([]);
   const [imageSrc, setImageSrc] = React.useState("");
-  const [appetizer, setAppetizer] = React.useState([]);
-  const [mainCourse, setMainCourse] = React.useState([]);
-  const [dessert, setDessert] = React.useState([]);
+  const [menuDishes, setMenuDishes] = React.useState({});
   const [isImagesEmpty, setIsImagesEmpty] = React.useState(false);
   const [isImageOverSize, setIsImageOverSize] = React.useState(false);
   const [isFormatAccepted, setIsFormatAccepted] = React.useState(false);
   const [isDishesEmpty, setIsDishesEmpty] = React.useState(true);
-  const [menuDishes, setMenuDishes] = React.useState({
-    appetizer,
-    mainCourse,
-    dessert,
-  });
   const [files, setFiles] = React.useState([]);
   const pathname = usePathname();
   const router = useRouter();
@@ -92,21 +80,41 @@ function Page() {
     watch,
     reset,
     getValues,
-  } = useForm();
-  const { status } = useSelector((store) => store.menu);
-  const dispatch = useDispatch();
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const { makeAuthorizedRequest } = useApiServices();
+  const [open, setOpen] = React.useState(false);
+
+  const {
+    data: foodCategories,
+    isLoading: isFetchingFoodCategories,
+    isError: isFetchingFoodCategoriesError,
+  } = useQuery({
+    queryKey: ["foodCategories"],
+    queryFn: async () => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.CATEGORIES.GET_BY_SLUG(API_CONFIG.FOOD_CATEGORY_SLUG)
+      );
+
+      if (response.success) {
+        return response.data;
+      } else {
+        throw new Error(response.message);
+      }
+    },
+  });
+
+  const total = React.useMemo(() => {
+    return Object.values(menuDishes).reduce((acc, dishes) => {
+      return acc + dishes.reduce((acc, dish) => acc + dish.price, 0);
+    }, 0);
+  }, [menuDishes]);
+  const toast = useCustomToast();
 
   const handleFileChange = (files) => {
     setFiles(files);
-  };
-
-  const handleAddingDishes = (dishes, category) => {
-    setMenuDishes((prevMenuDishes) => {
-      return {
-        ...prevMenuDishes,
-        [category]: [...dishes],
-      };
-    });
   };
 
   const createQueryString = useCallback(
@@ -125,23 +133,132 @@ function Page() {
     setValue(name, value);
   };
 
+  const handleRemoveDish = React.useCallback(
+    (dish) => {
+      const dishCategory = dish.categories;
+
+      setMenuDishes((prev) => {
+        // Check if the category exists in the current state
+        if (prev[dishCategory?.id]) {
+          // Filter out the dish to be removed based on its ID
+          const updatedDishes = prev[dishCategory?.id].filter(
+            (item) => item.id !== dish.id // Compare by dish.id
+          );
+
+          // Return the updated state
+          return {
+            ...prev,
+            [dishCategory?.id]: updatedDishes,
+          };
+        }
+        return prev; // Return the previous state if the category doesn't exist
+      });
+    },
+    [setMenuDishes]
+  );
+
+  const handleRemoveAllDishes = React.useCallback((category) => {
+    setMenuDishes((prev) => {
+      return {
+        ...prev,
+        [category.id]: [],
+      };
+    });
+  }, []);
+
+  const {
+    mutate: createMenu,
+    isPending: isCreatingMenu,
+    isError: isCreatingMenuError,
+  } = useMutation({
+    mutationKey: ["createMenu"],
+    mutationFn: async (formData) => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.MENU.CREATE,
+        "POST",
+        formData
+      );
+
+      if (response.success) {
+        toast({
+          title: "Thành công",
+          description: "Thực đơn của bạn đã được tạo",
+          type: "success",
+        });
+      } else {
+        if (response.error.statusCode === 401) {
+          toast({
+            title: "Lỗi khi tạo thực đơn",
+            description: "Phiên đăng nhập đã hết hạn",
+            type: "error",
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Lỗi khi tạo thực đơn",
+            description:
+              response.error.message || "Có lỗi xảy ra khi tạo thực đơn",
+            type: "error",
+            isClosable: true,
+          });
+        }
+      }
+    },
+  });
+
   // Function to handle form submission
   const onSubmit = (data) => {
-    console.log(data);
+    setIsSubmitting(true);
+    const { name, description } = data;
+
+    const dishesIds = Object.values(menuDishes).reduce(
+      (acc, dishes) => [...acc, ...dishes.map((dish) => dish.id)],
+      []
+    );
+
+    Object.values(menuDishes).forEach((dishes) => {
+      if (dishes.length < 1) {
+        toast({
+          title: "Lỗi khi tạo thực đơn",
+          description: "Vui lòng chọn ít nhất một món ăn cho mỗi danh mục",
+          type: "error",
+        });
+        return;
+      }
+    });
+
+    if (files.length === 0) {
+      setIsImagesEmpty(true);
+      return;
+    }
+
+    if (files[0].size > MAX_FILE_SIZE) {
+      setIsImageOverSize(true);
+      return;
+    }
+
+    if (!checkFileType(files[0])) {
+      setIsFormatAccepted(true);
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", total);
+    formData.append("is_show", true);
+    formData.append("products", JSON.stringify(dishesIds));
+    files.forEach((image) => {
+      formData.append("images", image);
+    });
+
+    createMenu(formData);
   };
 
-  React.useEffect(() => {
-    const dishCategory = searchParams.get("dishesCategory");
-    setDishCategory(dishCategory);
-  }, [searchParams]);
-
-  React.useEffect(() => {
-    setMenuDishes({
-      appetizer,
-      mainCourse,
-      dessert,
-    });
-  }, [appetizer, mainCourse, dessert]);
+  if (isLoading || isFetchingFoodCategories) {
+    return <Loading />;
+  }
 
   return (
     <div>
@@ -157,275 +274,246 @@ function Page() {
 
       {/* BREADCRUMBS */}
       <Breadcrumbs></Breadcrumbs>
-      <>
-        <div className="flex gap-5 mt-8 w-fit">
-          {/* IMAGE & UPLOADER */}
-          <div className="flex flex-col">
-            <Uploader
-              id={"menu-images"}
-              name={"menu-images"}
-              register={register}
-              files={files}
-              setFiles={setFiles}
-              onFileChange={handleFileChange}
-            />
-            <AnimatePresence>
-              {isImagesEmpty && (
-                <motion.div
-                  key={"isImagesEmpty"}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-red-400 text-sm font-normal mt-2 mb-2"
-                >
-                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
-                  {"Hãy chọn ít nhất một ảnh cho thực đơn của bạn nhé!"}
-                </motion.div>
-              )}
-              {isImageOverSize && (
-                <motion.div
-                  key={"isImageOverSize"}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-red-400 text-sm font-normal mt-2 mb-2"
-                >
-                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
-                  {"Hãy chọn ảnh có dung lượng nhỏ hơn 5MB nhé!"}
-                </motion.div>
-              )}
-              {!isFormatAccepted && (
-                <motion.div
-                  key={"isFormatAccepted"}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-red-400 text-sm font-normal mt-2 mb-2"
-                >
-                  <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
-                  {"Vui lòng chọn ảnh có định dạng jpg, jpeg hoặc png!"}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          {/* FORM */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-            className="form h-fit [&>div]:mb-5 [&>div>h4]:font-semibold [&>div>h4]:mb-3 [&>div>h4]:text-white p-5 rounded-md bg-whiteAlpha-100 min-w-[400px]"
-          >
-            {/* MENU NAME */}
-            <div className="flex flex-col">
-              <h4 className="flex gap-3">
-                <Image src={docScan} width={20} height={20} alt="icon" />
-                Tên thực đơn
-              </h4>
-              <FormInput
-                register={register}
-                errors={errors}
-                theme="dark"
-                brna
-                name="name"
-                value={watch("name")}
-                label=""
-                type="text"
-                ariaLabel={"Tên thực đơn"}
-                onChange={handleInputChange}
-                placeholder="Ex: Thực đơn tiệc cưới"
-                wrapperClassName="!mt-0"
-              ></FormInput>
-            </div>
-            {/* MAX OF DISHES */}
-            <div className="flex flex-col">
-              <h4 className="flex gap-3">
-                <SquaresPlusIcon width={20} height={20} color="white" />
-                Số lượng món tối đa
-              </h4>
-              <FormInput
-                register={register}
-                errors={errors}
-                theme="dark"
-                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
-                name="maxDishes"
-                value={watch("maxDishes")}
-                label=""
-                type="number"
-                onChange={handleInputChange}
-                wrapperClassName="!mt-0"
-              ></FormInput>
-            </div>
-            {/* MAX OF APPETIZER */}
-            <div className="flex flex-col">
-              <h4 className="flex gap-3">
-                <Image src={pizza} width={20} height={20} alt="icon" />
-                Số lượng món khai vị
-              </h4>
-              <FormInput
-                register={register}
-                errors={errors}
-                theme="dark"
-                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
-                name="maxAppetizer"
-                value={watch("maxAppetizer")}
-                label=""
-                type="number"
-                ariaLabel={"Số lượng món khai vị"}
-                onChange={handleInputChange}
-                wrapperClassName="!mt-0"
-              ></FormInput>
-            </div>
-            {/* MAX OF MAIN COURSE */}
-            <div className="flex flex-col">
-              <h4 className="flex gap-3">
-                <Image src={restaurant} width={20} height={20} alt="icon" />
-                Số lượng món chính
-              </h4>
-              <FormInput
-                register={register}
-                errors={errors}
-                theme="dark"
-                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
-                value={watch("maxMainCourse")}
-                label=""
-                type="number"
-                ariaLabel={"Số lượng món chính"}
-                onChange={handleInputChange}
-                wrapperClassName="!mt-0"
-              ></FormInput>
-            </div>
-            {/* MAX OF DESSERT */}
-            <div className="flex flex-col">
-              <h4 className="flex gap-3">
-                <Image src={setMeal} width={20} height={20} alt="icon" />
-                Số lượng món tráng miệng
-              </h4>
-              <FormInput
-                register={register}
-                errors={errors}
-                theme="dark"
-                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
-                name="maxDessert"
-                value={watch("maxDessert")}
-                label=""
-                ariaLabel={"Số lượng món tráng miệng"}
-                onChange={handleInputChange}
-                wrapperClassName="!mt-0"
-              ></FormInput>
-            </div>
-            {/* MENU DESCRIPTION */}
-            <div className="flex flex-col">
-              <h4 className="flex gap-3">
-                <Image src={textSnippet} width={20} height={20} alt="icon" />
-                Mô tả thực đơn
-              </h4>
-              <FormInput
-                register={register}
-                errors={errors}
-                theme="dark"
-                className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
-                name="description"
-                value={watch("description")}
-                label=""
-                type="textarea"
-                ariaLabel={"Số lượng món khai vị"}
-                onChange={handleInputChange}
-                placeholder="Ex: Thực đơn giành cho chú rể Nguyễn Văn A và cô dâu Trần Thị B"
-                wrapperClassName="!mt-0"
-              ></FormInput>
-            </div>
-            <footer className="flex justify-end">
-              <Button
-                className="bg-teal-400 text-white font-semibold rounded-full"
-                size="medium"
-                color="primary"
-                startContent={<SaveIcon width={20} height={20} />}
-                type="submit"
-                onClick={handleSubmit}
+      <Row gutter={[20]}>
+        <Col span={14} className="!overflow-hidden !rounded-lg">
+          <Row gutter={[20]} className="!rounded-lg bg-whiteAlpha-100 p-5">
+            {/* IMAGE & UPLOADER */}
+            <Col span={12}>
+              <div className="flex flex-col rounded-lg">
+                <Uploader
+                  id={"menu-images"}
+                  name={"menu-images"}
+                  register={register}
+                  files={files}
+                  setFiles={setFiles}
+                  onFileChange={handleFileChange}
+                />
+                <AnimatePresence>
+                  {isImagesEmpty && (
+                    <motion.div
+                      key={"isImagesEmpty"}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="text-red-400 text-sm font-normal mt-2 mb-2"
+                    >
+                      <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                      {"Hãy chọn ít nhất một ảnh cho thực đơn của bạn nhé!"}
+                    </motion.div>
+                  )}
+                  {isImageOverSize && (
+                    <motion.div
+                      key={"isImageOverSize"}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="text-red-400 text-sm font-normal mt-2 mb-2"
+                    >
+                      <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                      {"Hãy chọn ảnh có dung lượng nhỏ hơn 5MB nhé!"}
+                    </motion.div>
+                  )}
+                  {isFormatAccepted && (
+                    <motion.div
+                      key={"isFormatAccepted"}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="text-red-400 text-sm font-normal mt-2 mb-2"
+                    >
+                      <ExclamationCircleIcon className="w-4 h-4 mr-1 inline" />{" "}
+                      {"Vui lòng chọn ảnh có định dạng jpg, jpeg hoặc png!"}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </Col>
+            {/* FORM */}
+            <Col span={12}>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="form h-fit [&>div]:mb-5 [&>div>h4]:font-semibold [&>div>h4]:mb-3 [&>div>h4]:text-white"
               >
-                Lưu
-              </Button>
-            </footer>
-          </form>
-          {/* DISHES LIST */}
-          <Row gutter={[20, 20]}>
-            {dishCategories.map((category, index) => (
-              <Col span={24} key={index}>
+                {/* MENU NAME */}
+                <div className="flex flex-col">
+                  <h4 className="flex gap-3">
+                    <Image src={docScan} width={20} height={20} alt="icon" />
+                    Tên thực đơn
+                  </h4>
+                  <FormInput
+                    register={register}
+                    errors={errors}
+                    theme="dark"
+                    name="name"
+                    value={watch("name")}
+                    label=""
+                    type="text"
+                    ariaLabel={"Tên thực đơn"}
+                    onChange={handleInputChange}
+                    placeholder="Ex: Thực đơn tiệc cưới"
+                    wrapperClassName="!mt-0"
+                    className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                  ></FormInput>
+                </div>
+                {/* MENU DESCRIPTION */}
+                <div className="flex flex-col">
+                  <h4 className="flex gap-3">
+                    <Image
+                      src={textSnippet}
+                      width={20}
+                      height={20}
+                      alt="icon"
+                    />
+                    Mô tả thực đơn
+                  </h4>
+                  <FormInput
+                    register={register}
+                    errors={errors}
+                    theme="dark"
+                    className="!bg-whiteAlpha-50 hover:!bg-whiteAlpha-100"
+                    name="description"
+                    value={watch("description")}
+                    label=""
+                    type="textarea"
+                    ariaLabel={"Số lượng món khai vị"}
+                    onChange={handleInputChange}
+                    placeholder="Ex: Thực đơn giành cho chú rể Nguyễn Văn A và cô dâu Trần Thị B"
+                    wrapperClassName="!mt-0"
+                  ></FormInput>
+                </div>
+                <footer className="flex justify-end">
+                  <Button
+                    className="bg-teal-400 text-white font-normal rounded-full"
+                    size="medium"
+                    color="primary"
+                    startContent={
+                      !isCreatingMenu ? (
+                        <IoSaveOutline className="w-4 h-4" />
+                      ) : (
+                        <Spinner size="sm" color="white" />
+                      )
+                    }
+                    type="submit"
+                    onClick={handleSubmit(onSubmit)}
+                  >
+                    {isCreatingMenu ? "Đang tạo thực đơn..." : "Tạo thực đơn"}
+                  </Button>
+                </footer>
+              </form>
+              <Divider className="my-5 bg-whiteAlpha-100" />
+              <div className="text-white">
+                <h4 className="flex gap-3 text-base font-medium">
+                  Chi phí thực đơn
+                </h4>
+
+                {foodCategories?.at(0)?.childrens?.map((category, index) => (
+                  <div
+                    className="flex justify-between mt-3"
+                    key={category.name + index}
+                  >
+                    <p className="text-white">
+                      {category.name}: {menuDishes[category?.id]?.length || 0}{" "}
+                      món
+                    </p>
+                    <p className="text-white">
+                      {formatPrice(
+                        menuDishes[category?.id]?.reduce(
+                          (acc, cur) => (acc += cur?.price),
+                          0
+                        )
+                      ) || 0}
+                    </p>
+                  </div>
+                ))}
+
+                <div className="flex justify-between mt-3 text-white">
+                  <p>
+                    Tổng: {Object.values(menuDishes).flat().length || 0} món
+                  </p>
+                  <p>{formatPrice(total)}</p>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Col>
+        {/* DISHES LIST */}
+        <Col span={10}>
+          <div className="w-full">
+            {foodCategories?.at(0)?.childrens?.map((category, index) => (
+              <div key={category?.name + category?.id} className="mb-5">
                 {/* HEADER */}
                 <div className="flex justify-between items-center w-full p-3 rounded-xl bg-whiteAlpha-100">
                   <div className="flex flex-col gap-1">
                     <h4 className="text-lg leading-7 font-semibold text-white">
-                      {category.label} -{" "}
-                      {getValues(`max${capitalize(category.key)}`)} món
+                      {index + 1} {"."} {category?.name}
                     </h4>
                     <p className="text-md leading-6 font-normal text-white">
-                      Tổng:{" "}
-                      {formatPrice(
-                        menuDishes[category.key]
-                          .filter((dish) => dish.category === category.key)
-                          .map((dish) => dish.price)
-                          .reduce((a, b) => a + b, 0)
-                      )}
+                      Tổng: {menuDishes[category?.id]?.length || 0} món
                     </p>
                   </div>
-                  <Chip className="bg-whiteAlpha-100 text-white">
-                    {(() => {
-                      const maxDishes = Number(
-                        getValues(`max${capitalize(category.key)}`)
-                      );
-                      const currentDishes = Number(
-                        menuDishes[category.key].length
-                      );
-                      const remainingDishes = maxDishes - currentDishes;
-                      return remainingDishes > 0
-                        ? `Còn ${remainingDishes}`
-                        : "Đã đủ";
-                    })()}
-                  </Chip>
                 </div>
                 {/* DISHES LIST */}
-                {menuDishes[category.key].map((dish) => {
-                  if (dish.category === category.key) {
-                    return (
-                      <Dish
-                        key={dish.id}
-                        dish={dish}
-                        className={"mt-3 !h-fit !hover:brightness-95"}
-                      />
-                    );
-                  }
-                })}
-                <>
-                  <Button
-                    isIconOnly
-                    onClick={() => {
-                      router.push(
-                        pathname +
-                          "?" +
-                          createQueryString("dishesCategory", category.key)
+                {Array.isArray(menuDishes[category?.id]) &&
+                menuDishes[category?.id]?.length > 0 ? (
+                  menuDishes[category?.id]?.map((dish) => {
+                    if (dish.categories?.id === category?.id) {
+                      return (
+                        <div
+                          className="relative group"
+                          key={dish?.id + dish.name}
+                        >
+                          <Button
+                            onClick={() => handleRemoveDish(dish)}
+                            className="absolute h-full inset-0 bg-blackAlpha-200 opacity-0 group-hover:opacity-100 flex-center z-50"
+                          >
+                            <XMarkIcon className="w-6 h-6 text-white" />
+                          </Button>
+                          <Dish
+                            dish={dish}
+                            className={"mt-3 !h-fit !hover:brightness-95"}
+                          />
+                        </div>
                       );
-                      onOpen();
-                    }}
-                    className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
-                    radius="full"
-                  >
-                    <PlusIcon className="w-5 h-5 text-white font-semibold" />
-                  </Button>
-                  <DishesModal
-                    category={dishCategory}
-                    isOpen={isOpen}
-                    onOpenChange={onOpenChange}
-                    onAddingDishes={handleAddingDishes}
-                    menuDishes={menuDishes}
-                    // menuInfo={formState}
-                    selectedMenuDishes={selectedMenuDishes}
-                    setSelectedMenuDishes={setSelectedMenuDishes}
-                  />
-                </>
-              </Col>
+                    }
+                    return null; // Return null if the dish doesn't match the category
+                  })
+                ) : (
+                  <div className="p-3 text-white mt-3 flex-center text-center rounded-lg bg-whiteAlpha-100">
+                    <p>Chưa có món ăn nào trong danh mục này</p>
+                  </div>
+                )}
+                <Button
+                  isIconOnly
+                  onClick={() => {
+                    router.push(
+                      pathname +
+                        "?" +
+                        createQueryString("dishesCategory", category.slug)
+                    );
+                    setOpen(true);
+                  }}
+                  className="bg-whiteAlpha-100 p-3 group rounded-lg shadow-md flex items-center hover:whiteAlpha-200 cursor-pointer flex-center h-fit w-full mt-3"
+                  radius="full"
+                >
+                  <PlusIcon className="w-5 h-5 text-white font-semibold" />
+                </Button>
+                <Divider className="mt-5 bg-whiteAlpha-100" />
+                <DishesModal
+                  isOpen={open}
+                  onOpenChange={setOpen}
+                  category={category}
+                  categories={foodCategories}
+                  selectedMenuDishes={selectedMenuDishes}
+                  setSelectedMenuDishes={setSelectedMenuDishes}
+                  setMenuDishes={setMenuDishes}
+                  menuDishes={menuDishes}
+                  onRemoveAllDishes={handleRemoveAllDishes}
+                />
+              </div>
             ))}
-          </Row>
-        </div>
-      </>
+          </div>
+        </Col>
+      </Row>
     </div>
   );
 }

@@ -39,6 +39,28 @@ export const CONFIG = {
       label: "Đã xóa",
     },
   ],
+  STAGE_STATUS: [
+    {
+      key: "Không hoạt động",
+      label: "Không hoạt động",
+    },
+    {
+      key: "Đang tổ chức",
+      label: "Đang tổ chức",
+    },
+    {
+      key: "Sắp diễn ra",
+      label: "Sắp diễn ra",
+    },
+    {
+      key: "Không có tiệc",
+      label: "Không có tiệc",
+    },
+    {
+      key: "Đã hoàn thành",
+      label: "Đã hoàn thành",
+    },
+  ],
 };
 
 export const roles = [
