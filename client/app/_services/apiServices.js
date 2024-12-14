@@ -18,6 +18,18 @@ export const fetchAllDashBoard = async () => {
       throw error; 
     }
 };
+export const fetchBookingStatusBranch = async (branchId) => {
+  try {
+    const response = await axios.get(API_CONFIG.DASHBOARD.GET_BOOKING_STATUS_BRANCH(branchId));
+    if (response.status !== 200) {
+      throw new Error("Có lỗi khi lấy dữ liệu !");
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi:", error);
+    throw error; 
+  }
+};
 export const fetchTotalAdminWeek = async (branchId) => {
   try {
     const response = await axios.get(API_CONFIG.DASHBOARD.GET_TOTAL_ADMIN_WEEK(branchId));
