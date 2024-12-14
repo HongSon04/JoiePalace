@@ -68,10 +68,10 @@ export default function CustomCalendar() {
   let {locale} = useLocale();
 
   let isDateUnavailable = (date) =>
-    isWeekend(date, locale || 'en-US') ||
-    disabledRanges.some(
-      (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
-    );
+    // isWeekend(date, locale || 'en-US') ||
+    // disabledRanges.some(
+    //   (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
+    // );
   
   // useEffect để lấy dữ liệu khi component được mount
   useEffect(() => {
