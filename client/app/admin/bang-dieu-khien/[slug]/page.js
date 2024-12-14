@@ -397,7 +397,7 @@ const Page = ({ params }) => {
             <p className="text-base font-semibold ">Lịch tổ chức tháng 11</p>
           </div>
           <div className="flex justify-center">
-            <CustomCalendar />
+            {/* <CustomCalendar /> */}
           </div>
         </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
