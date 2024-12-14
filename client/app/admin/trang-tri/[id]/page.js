@@ -17,6 +17,7 @@ import IconButtonSave from '@/app/_components/IconButtonSave';
 import { updatingDecorsSuccess } from '@/app/_lib/decors/decorsSlice';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const defaultValues = {
     name: "",
@@ -213,6 +214,9 @@ const Page = ({ params }) => {
                     Thông tin trang trí / {decorsDetail.name || "Loading..."}
                 </h1>
             </Stack>
+            <div className='flex w-full'>
+                <Link href={'/admin/trang-tri/add'} className='ml-auto rounded-lg py-3 px-4 bg-teal-500 text-white '>Tạo trang trí</Link>
+            </div>
             <form onSubmit={handleSubmit(onSubmit)}>
 
             <div className='flex mt-5 gap-5'>

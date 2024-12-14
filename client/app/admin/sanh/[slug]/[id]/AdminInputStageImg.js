@@ -1,30 +1,37 @@
-'use client'
+'use client';
 import { Box, Button, Image, Text } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 const AdminInputStageImg = ({ title, inputId, initialImages = [] }) => {
     const [imageFiles, setImageFiles] = useState([]);
-    const [imagePreviews, setImagePreviews] = useState(initialImages);
+    const [imagePreviews, setImagePreviews] = useState(initialImages || []);
 
     useEffect(() => {
-        setImagePreviews(initialImages); 
+        imagePreviews.forEach((src) => URL.revokeObjectURL(src));
+        setImagePreviews(initialImages);
     }, [initialImages]);
 
     const handleImageUpload = (event) => {
         const files = Array.from(event.target.files);
         const newImagePreviews = files.map((file) => URL.createObjectURL(file));
-
+        
+       
         setImagePreviews((prevImages) => [...prevImages, ...newImagePreviews]);
         setImageFiles((prevFiles) => [...prevFiles, ...files]);
+        onImageChange(files);
     };
 
     const handleDeleteImage = (index) => {
-        setImagePreviews((prevPreviews) => {
-            const updatedPreviews = prevPreviews.filter((_, i) => i !== index);
-            return updatedPreviews;
-        });
+        // Revoke object URL to avoid memory leak
+        URL.revokeObjectURL(imagePreviews[index]);
+        
+        setImagePreviews((prevPreviews) => 
+            prevPreviews.filter((_, i) => i !== index)
+        );
 
-        setImageFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+        setImageFiles((prevFiles) => 
+            prevFiles.filter((_, i) => i !== index)
+        );
     };
 
     return (
