@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import HeaderSelect from '../HeaderSelect';
 import RequestBreadcrumbsForQuanLyTiec from './RequestBreadcrumbsForQuanLyTiec';
 import InputDetailCustomer from './InputDetailCustomer';
@@ -159,16 +159,6 @@ const Page = ({ params }) => {
             spare_table_count: 0,
         },
     });
-
-    const fetchLimitStages = async (stageId) => {
-        try {
-            const response = await makeAuthorizedRequest(API_CONFIG.STAGES.GET_ALL_BY_STAGE_ID(stageId), 'GET');
-            const limitStagesData = response.data[0];
-            setLimitStages(limitStagesData.capacity_max || 0);
-        } catch (error) {
-            console.error(error);
-        }
-    };
     const fetchAllStages = async (branchId) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.STAGES.GET_ALL_BY_BRANCH(branchId), 'GET');
@@ -493,7 +483,7 @@ const Page = ({ params }) => {
                 setSelectStatusBookings(partyData.status || '');
                 setBranch_id(partyData.branch_id);
                 setPartyPrice(partyData.party_types?.price || partyPrice);
-                setStagePrice(partyData.stages?.price || 0);
+                setStagePrice(partyData.stages?.price || stagePrice);
                 
                 const isDepositSuccessful = bookingDetails.deposit_status === 'success';
                 setSelectStatusDeposit(isDepositSuccessful);
@@ -577,6 +567,7 @@ const Page = ({ params }) => {
             shift: shiftValue,
             menu: selectedMenuId,
             decor: selectedMenuId,
+            stage_id: partyData.stage_id || '',
             total_amount: bookingDetails.total_amount,
             depositAmount: bookingDetails.deposits?.amount,
             amount_booking: bookingDetails.amount_booking,
@@ -687,6 +678,17 @@ const Page = ({ params }) => {
         getMenu()
     }, [menus]);
 
+    useEffect(() => {
+        const selectedStage = stages[0]?.options.find(option => String(option.value) === String(selectStages));
+        if (selectedStage) {
+            setStagePrice(selectedStage.price || 0);
+            setLimitStages(selectedStage.capacity_max || 0);
+        } else {
+            setStagePrice(0);
+            setLimitStages(0);
+        }
+    }, [selectStages, stages]);
+
     const handleMenuChange = async (event) => {
         const selectedMenuId = event.target.value; 
         console.log('Selected Menu ID:', selectedMenuId); 
@@ -739,20 +741,21 @@ const Page = ({ params }) => {
         handleServiceChange(event, otherServices, selectOtherDishes, setSelectOtherDishes, setSelectOtherServices);
     };
 
-    const handleStageChange = (event) => {
+    const handleStageChange = useCallback((event) => {
         const selectedStageId = event.target.value;
         setSelectStages(selectedStageId);
-        fetchLimitStages(selectedStageId);
 
         const selectedStage = stages[0]?.options.find(option => String(option.value) === String(selectedStageId));
-    
+        
         if (selectedStage) {
-            setLimitStages(selectedStage.capacity_max || 0);
             setStagePrice(selectedStage.price || 0);
+            setLimitStages(selectedStage.capacity_max || 0);
         } else {
             setStagePrice(0);
+            setLimitStages(0);
         }
-    };
+    }, [stages]);
+
     const handleDecorChange = (event) => {
         const selectedDecorId = Number(event.target.value);
         setSelectedDecors(selectedDecorId);

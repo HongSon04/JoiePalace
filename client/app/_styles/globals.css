@@ -758,3 +758,9 @@ select {
   background-image: url(/cloche.png);
   background-size: cover;
 }
+/* Đánh dấu các ngày có sự kiện */
+.react-calendar__tile.highlight {
+  background-color: #0070f3; 
+  color: white;
+  border-radius: 50%; 
+}
