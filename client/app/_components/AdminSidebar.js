@@ -198,8 +198,8 @@ function AdminSidebarNav() {
         className: "",
       },
       {
-        title: "Bài viết",
-        path: `/admin/bai-viet/`,
+        title: "Danh mục bài viết",
+        path: `/admin/danh-muc-bai-viet/`,
         icon: blogIcon,
         className: "",
       },

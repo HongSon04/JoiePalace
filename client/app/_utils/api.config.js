@@ -228,10 +228,12 @@ export const API_CONFIG = {
   },
 
   DECORS: {
+    CREATE: `${DECORS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${DECORS_API}/get-all`, params),
     GET_BY_ID: (id) => `${DECORS_API}/get/${id}`,
     UPDATE: (id) => `${DECORS_API}/update/${id}`,
+    DELETE: (id) => `${DECORS_API}/delete/${id}`,
 
   },
 

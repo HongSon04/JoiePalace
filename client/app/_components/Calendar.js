@@ -125,7 +125,7 @@ export default function CustomCalendar() {
         base: "bg-whiteAlpha-100",
         title: "text-white",
         nextButton: "text-white",
-        prevButton: "text-white",
+        prevButton: "text-wphite",
         headerWrapper: "bg-transparent text-white",
         gridHeader: "bg-transparent border-b border-whiteAlpha-200",
       }}

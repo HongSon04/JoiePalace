@@ -42,7 +42,7 @@ const services = [
   {
     id: 1,
     name: "sự kiện",
-    link: 'su-kien',
+    link: "su-kien",
     title: "hơn cả sự mong đợi",
     description:
       "Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất lượng dịch vụ, White Palace là không gian hoàn hảo để triển khai bất kì kế hoạch sự kiện nào mà bạn đang ấp ủ, từ các buổi yến tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật giải trí sáng tạo, các sự kiện trọng thể của doanh nghiệp như sự kiện ra mắt sản phẩm, tiệc tri ân khách hàng, tiệc tất niên, triển lãm thương mại.",
@@ -50,7 +50,7 @@ const services = [
   {
     id: 2,
     name: "tiệc cưới",
-    link: 'tiec-cuoi',
+    link: "tiec-cuoi",
     title: "Chạm đến trái tim",
     description:
       "Tiệc cưới – bức tranh tình yêu vượt mọi ngôn từ cảm xúc, bước khởi đầu hoàn hảo cho cuộc hôn nhân viên mãn. Vì vậy, hãy để chúng tôi giúp bạn san sẻ niềm hạnh phúc đến những người yêu thương bằng một chuyến du hành mỹ vị khó quên, với đa dạng lựa chọn, từ những set menu đã được nghiên cứu kỹ lưỡng hay bạn có thể tự chọn thực đơn theo đặc điểm khách mời.",
@@ -58,13 +58,12 @@ const services = [
   {
     id: 3,
     name: "hội nghị",
-    link: 'hoi-nghi',
+    link: "hoi-nghi",
     title: "dấu ấn thành công",
     description:
       "White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.",
   },
 ];
-
 const events = [
   [
     {
@@ -147,16 +146,16 @@ function Home() {
           id: index + 1,
           content: i.title,
           urlImage: i.images[0],
-          link:i.slug,
+          link: i.slug,
         })),
         blog.slice(3, 6).map((i, index) => ({
-          id: index + 4, 
+          id: index + 4,
           content: i.title,
           urlImage: i.images[0],
-          link:i.slug,
+          link: i.slug,
         })),
       ];
-      
+
       setShow6blognew(mapdataBlog);
 
       setDataPackage(res.data.slice(0, 3));
@@ -170,8 +169,8 @@ function Home() {
 
   if (!dataPackage) return <Loading></Loading>;
   const navigation = (link) => {
-    router.push(`/client/tin-tuc/${link}`)
-  }
+    router.push(`/client/tin-tuc/${link}`);
+  };
 
   return (
     <>
@@ -264,8 +263,9 @@ function Home() {
                   className={`location-image-bg absolute top-0 left-0 w-full h-full scale-150 pointer-events-none overflow-hidden`}
                 >
                   <Image
-                    src={`/images-client/locations/venues-placeholder-${index + 1
-                      }-scaled.jpg`}
+                    src={`/images-client/locations/venues-placeholder-${
+                      index + 1
+                    }-scaled.jpg`}
                     w={"100%"}
                     h={"100%"}
                     className="object-cover"
@@ -389,7 +389,10 @@ function Home() {
                         {service.description}
                       </span>
                     </div>
-                    <ButtonDiscover className={"w-fit px-3"} link={`/client/${service.link}`} />
+                    <ButtonDiscover
+                      className={"w-fit px-3"}
+                      link={`/client/${service.link}`}
+                    />
                   </TextFade>
                 </div>
               </div>
@@ -485,8 +488,9 @@ function Home() {
               {show6blognew.map((event, indexEvent) => (
                 <div
                   key={indexEvent}
-                  className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${indexEvent === 0 ? "flex-col-reverse" : "flex-col"
-                    } gap-6 overflow-y-scroll cursor-pointer`}
+                  className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${
+                    indexEvent === 0 ? "flex-col-reverse" : "flex-col"
+                  } gap-6 overflow-y-scroll cursor-pointer`}
                 >
                   {event.map((item, indexItem) => (
                     <div
@@ -504,11 +508,17 @@ function Home() {
                         <div className="absolute inset-0 bg-blackAlpha-600"></div>
                       </div>
                       <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-between py-10 px-5">
-                        <span className="font-semibold text-xs leading-[22px] 500px:text-sm sm:text-lg sm:leading-7 
-                line-clamp-4 block overflow-hidden text-ellipsis">
+                        <span
+                          className="font-semibold text-xs leading-[22px] 500px:text-sm sm:text-lg sm:leading-7 
+                line-clamp-4 block overflow-hidden text-ellipsis"
+                        >
                           {item.content}
                         </span>
-                        <IconButton background="none" type={"button"} onClick={() => navigation(item.link)}>
+                        <IconButton
+                          background="none"
+                          type={"button"}
+                          onClick={() => navigation(item.link)}
+                        >
                           <Image
                             src="/arrow_circle_right.svg"
                             w={"100%"}
@@ -538,7 +548,10 @@ function Home() {
               replayEffect={false}
               styles="block lg:hidden pl-8"
             >
-              <ButtonDiscover className={"w-fit px-3"} link={'/client/tin-tuc'} />
+              <ButtonDiscover
+                className={"w-fit px-3"}
+                link={"/client/tin-tuc"}
+              />
             </TextFade>
           </div>
         </section>
@@ -610,7 +623,7 @@ function Home() {
                       </div>
                     </TextFade>
                   </div>
-                  <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-fit translate-y-[25%] backdrop-blur-lg bg-white/10 py-16 px-8 overflow-hidden">
+                  <div className="w-full translate-y-0 lg:w-[50%] 2xl:w-[30%] h-fit lg:h-fit md:translate-y-[25%] backdrop-blur-lg bg-white/10 py-16 px-8 overflow-hidden">
                     <TextFade
                       settings={{
                         hidden: { opacity: 0, x: 50 },

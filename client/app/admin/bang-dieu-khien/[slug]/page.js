@@ -295,6 +295,7 @@ const Page = ({ params }) => {
   const handlePeriodChange = (event) => {
     setSelectedPeriod(event.target.value);
   };
+
   return (
     <main className="grid gap-6  text-white ">
       <AdminHeader
@@ -315,7 +316,7 @@ const Page = ({ params }) => {
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="text-4xl font-bold">
-                    {allInfo.count_booking_status.pending}
+                    {allInfo?.count_booking_status?.pending}
                   </p>
                 </div>
               </div>

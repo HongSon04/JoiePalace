@@ -32,14 +32,12 @@ export const loginAccountUser = async (dataToSend) => {
 };
 export const loginGoogle = async (dataToSend) => {
   const response = await axios.post(
-    "https://joieplace.live/api/auth/login-social",
+    "http://joieplace.live/api/auth/login-social",
     dataToSend
   );
   if (response.status !== 200 && response.status !== 201) {
     throw new Error("Có lỗi");
   }
-
-  console.log("responseapi", response);
   return response;
 };
 
