@@ -217,7 +217,7 @@ const Blog = () => {
                   </p>
                   <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
-                      "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                      "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
                 </div>
               </Link>
@@ -247,7 +247,7 @@ const Blog = () => {
                   </p>
                   <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
-                      "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                      "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
                 </div>
               </Link>
@@ -276,7 +276,7 @@ const Blog = () => {
                   </p>
                   <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
-                      "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                      "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
                 </div>
               </Link>
