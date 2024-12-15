@@ -555,7 +555,7 @@ export class BlogsController {
   })
   @ApiOperation({ summary: 'Cập nhật bài viết theo id' })
   update(
-    @Param('id') id: string,
+    @Param('blog_id') id: string,
     @Body() updateBlogDto: UpdateBlogDto,
     @UploadedFiles() files: { images?: Express.Multer.File[] },
   ) {
