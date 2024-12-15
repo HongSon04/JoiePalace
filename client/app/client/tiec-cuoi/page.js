@@ -43,7 +43,7 @@ function Event() {
               </h1>
               <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[13px]">
                 Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất
-                lượng dịch vụ, White Palace là không gian hoàn hảo để triển khai
+                lượng dịch vụ, JOIE PALACE là không gian hoàn hảo để triển khai
                 bất kì kế hoạch tiệc cưới nào mà bạn đang ấp ủ, từ các buổi yến
                 tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới
                 đến các chương trình nghệ thuật giải trí sáng tạo, các tiệc cưới
@@ -111,7 +111,7 @@ function Event() {
                     <Image src="/Wedding-6-e1719420516884.jpg" alt="" />
                   </div>
                   <p className="max-w-[641px] text-base relative left-[70px] top-[25px] text-fade-in max-lg:left-0 max-lg:top-0 max-sm:text-[10px] max-sm:leading-4">
-                    Mọi không gian tại White Palace được thiết kế để có thể tùy
+                    Mọi không gian tại JOIE PALACE được thiết kế để có thể tùy
                     biến một cách linh hoạt, phù hợp với mọi quy mô và hình thức
                     tổ chức tiệc cưới. Từ những tiệc cưới trưng bày, triển lãm,
                     đến những chương trình biểu diễn nghệ thuật hay hội nghị, ra

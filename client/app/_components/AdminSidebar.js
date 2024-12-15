@@ -16,28 +16,24 @@ import { Divider } from "@chakra-ui/react";
 
 // import images
 import blogIcon from "@/public/admin-sidebar/bai-viet.svg";
-import tableAndChair from "@/public/admin-sidebar/ban-ghe.svg";
 import dashboardIcon from "@/public/admin-sidebar/bang-dieu-khien.svg";
 import settingIcon from "@/public/admin-sidebar/cai-dat.svg";
 import branchIcon from "@/public/admin-sidebar/chi-nhanh.svg";
-import drinkIcon from "@/public/admin-sidebar/do-uong.svg";
+import categoryIcon from "@/public/admin-sidebar/danh-muc.svg";
 import customerIcon from "@/public/admin-sidebar/khach-hang.svg";
 import contactIcon from "@/public/admin-sidebar/lien-he-ho-tro.svg";
 import menuIcon from "@/public/admin-sidebar/menu.svg";
-import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import feedbackIcon from "@/public/admin-sidebar/phan-hoi-danh-gia.svg";
+import StageIcon from "@/public/admin-sidebar/sanh.svg";
 import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
 import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
+import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
-import categoryIcon from "@/public/admin-sidebar/danh-muc.svg";
-import StageIcon from "@/public/admin-sidebar/sanh.svg";
 import logo from "@/public/logo-dark.png";
-import { useDispatch, useSelector } from "react-redux";
-import { API_CONFIG } from "../_utils/api.config";
-import AdminUser from "./AdminUser";
-import { getCurrentBranch } from "../_lib/features/branch/branchSlice";
 import { Tooltip } from "@nextui-org/react";
+import { useSelector } from "react-redux";
+import AdminUser from "./AdminUser";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);

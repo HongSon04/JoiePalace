@@ -29,7 +29,7 @@ const Footer = () => {
       </div>
       <div className="flex justify-center gap-20 max-lg:w-5/6 max-lg:gap-10 max-sm:gap-1 max-md:hidden">
         <div className="flex flex-col gap-8 text-sm font-normal leading-5 max-sm:gap-4 max-sm:text-xs">
-          <span>Copyright: 2023 White Palace All rights reserved</span>
+          <span>Copyright: 2023 JOIE PALACE All rights reserved</span>
           <span>
             Managed by <span className="font-bold">@NangTamFixBug Co. Ltd</span>
           </span>
@@ -81,7 +81,7 @@ const Footer = () => {
       <div className="hidden justify-between gap-20 max-lg:w-5/6 max-lg:gap-10 max-sm:gap-1 max-md:flex">
         <div>
           <div className="flex flex-col gap-8 text-sm font-normal leading-5 max-sm:gap-4 max-sm:text-xs">
-            <span>Copyright: 2023 White Palace All rights reserved</span>
+            <span>Copyright: 2023 JOIE PALACE All rights reserved</span>
             <span>
               Managed by <span className="font-bold">@NangTamFixBug Co. Ltd</span>
             </span>
