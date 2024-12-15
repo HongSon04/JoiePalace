@@ -8,6 +8,7 @@ function CustomPagination({
   page,
   className,
   classNames = {},
+  cursorClassName = "bg-gold",
 }) {
   return (
     <Pagination
@@ -23,7 +24,7 @@ function CustomPagination({
         item: "!bg-whiteAlpha-200 text-gray-400",
         prev: "!bg-whiteAlpha-200 text-gray-400",
         next: "!bg-whiteAlpha-200 text-gray-400",
-        cursor: "bg-gold",
+        cursor: cursorClassName,
         ...classNames,
       }}
     />

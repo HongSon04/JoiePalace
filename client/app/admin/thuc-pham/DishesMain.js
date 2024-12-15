@@ -1,18 +1,8 @@
 "use client";
 
 import Error from "@/app/_components/Error";
-import useApiServices from "@/app/_hooks/useApiServices";
 import useRoleGuard from "@/app/_hooks/useRoleGuard";
-import {
-  fetchCategoriesBySlug,
-  fetchingCategories,
-  fetchingCategoriesFailure,
-  fetchingCategoriesSuccess,
-} from "@/app/_lib/features/categories/categoriesSlice";
-import {
-  fetchingCategoryDishes,
-  fetchingCategoryDishesSuccess,
-} from "@/app/_lib/features/dishes/dishesSlice";
+import { fetchCategoriesBySlug } from "@/app/_lib/features/categories/categoriesSlice";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import {
   Tab,
@@ -26,7 +16,6 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../loading";
 import DishesSection from "./DishesSection";
-import DishesTable from "./DishesTable";
 
 function DishesMain() {
   const { isLoading } = useRoleGuard();

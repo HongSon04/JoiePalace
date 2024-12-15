@@ -1,16 +1,24 @@
 "use client";
-import { getLocalTimeZone, isWeekend, today, parseDate } from "@internationalized/date";
+import "@/app/_styles/calendar.css";
+import { CalendarDate, isWeekend, parseDate } from "@internationalized/date";
 import { Calendar } from "@nextui-org/react";
-import { useLocale } from "antd/es/locale";
+import { useLocale } from "@react-aria/i18n";
 import { useEffect, useState } from "react";
 import { API_CONFIG, makeAuthorizedRequest } from "../_utils/api.config";
-import { format } from "date-fns";
 
 // Hàm lấy ngày bắt đầu và kết thúc của tháng và tuần hiện tại
 function getCurrentMonthAndWeekDates() {
   const currentDate = new Date();
-  const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const startDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+  const endDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0
+  );
 
   const dayOfWeek = currentDate.getDay();
   const startOfWeek = new Date(currentDate);
@@ -38,41 +46,32 @@ export default function CustomCalendar() {
   const [dataBooking, setDataBooking] = useState(null);
 
   const bookings = dataBooking?.data || [];
-  const expiredDates = bookings
-    .map((booking) => {
-      const organization_date = booking.organization_date;
-      if (organization_date) {
-        try {
-          const dateTime = parseDate(format(organization_date, "yyyy-MM-dd"));
-          console.log("dateTime -> ", dateTime);
-          return dateTime;
-        } catch (error) {
-          return null;
-        }
-      }
-      return null; 
-    })
-    .filter(Boolean);
 
-    console.log("expiredDates -> ", expiredDates)
+  const partyDates = bookings
+    .map(
+      (booking) =>
+        new Date(booking.organization_date).toISOString().split("T")[0]
+    )
+    .map((dateString) => {
+      const date = parseDate(dateString);
+      return [date, date];
+    });
 
-  let now = today(getLocalTimeZone());
-  console.log("now -> ", now);
-  console.log("typof now -> ", typeof now);
-  console.log("now + 5 -> " + now.add({days: 5}))
+  console.log("partyDates -> ", partyDates);
 
-  let disabledRanges = [
-    [...expiredDates]
-  ];
+  let { locale } = useLocale();
 
-  let {locale} = useLocale();
-
-  let isDateUnavailable = (date) =>
-    isWeekend(date, locale || 'en-US') ||
-    disabledRanges.some(
-      (interval) => date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
+  let isDateUnavailable = (date) => {
+    // Check if the date is in partyDates
+    const isPartyDate = partyDates.some(
+      (interval) =>
+        date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0
     );
-  
+
+    // Return true only if it's a party date
+    return isPartyDate;
+  };
+
   // useEffect để lấy dữ liệu khi component được mount
   useEffect(() => {
     const fetchAminData = async () => {
@@ -86,8 +85,8 @@ export default function CustomCalendar() {
         const { startDate, endDate } = getCurrentMonthAndWeekDates();
 
         // Chuyển đổi "DD-MM-YYYY" thành đối tượng Date
-        const start = new Date(startDate.split('-').reverse().join('-'));
-        const end = new Date(endDate.split('-').reverse().join('-'));
+        const start = new Date(startDate.split("-").reverse().join("-"));
+        const end = new Date(endDate.split("-").reverse().join("-"));
 
         // Tính số ngày giữa 2 ngày
         const diffDays = (end - start) / (1000 * 3600 * 24);
@@ -99,7 +98,7 @@ export default function CustomCalendar() {
             startDate: startDate,
             endDate: endDate,
             itemsPerPage: diffDays + 1,
-            status: "pending"
+            status: "pending",
           }),
           "GET",
           null
@@ -115,9 +114,21 @@ export default function CustomCalendar() {
     fetchAminData();
   }, []);
 
-  
-
-
   // Calendar component sử dụng Next UI
-    return <Calendar aria-label="Date (Unavailable)" isDateUnavailable={isDateUnavailable} />;
+  return (
+    <Calendar
+      aria-label="Party Dates"
+      isDisabled={true}
+      isDateUnavailable={isDateUnavailable}
+      classNames={{
+        cellDisabled: "custom-calendar-cell-disabled",
+        base: "bg-whiteAlpha-100",
+        title: "text-white",
+        nextButton: "text-white",
+        prevButton: "text-wphite",
+        headerWrapper: "bg-transparent text-white",
+        gridHeader: "bg-transparent border-b border-whiteAlpha-200",
+      }}
+    />
+  );
 }

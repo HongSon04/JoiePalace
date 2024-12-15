@@ -11,6 +11,7 @@ const AdminThemChiNhanhImg = ({ title, inputId, onImagesChange, name, initialIma
   // Update the images reference and notify parent component when image previews change
   useEffect(() => {
     if (imagesRef.current !== imagePreviews) {
+      
       onImagesChange(name, imageFiles);
       imagesRef.current = imagePreviews;
     }

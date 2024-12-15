@@ -267,6 +267,7 @@ export class CategoriesService {
       const childCategories = await this.prismaService.categories.findMany({
         where: {
           deleted: false,
+          category_id: Number(id),
         },
         include: {
           tags: true,
@@ -320,6 +321,7 @@ export class CategoriesService {
       const childCategories = await this.prismaService.categories.findMany({
         where: {
           deleted: false,
+          category_id: Number(rootCategory.id),
         },
         include: {
           tags: true,
