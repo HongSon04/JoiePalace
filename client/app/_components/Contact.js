@@ -165,7 +165,8 @@ const Contact = () => {
         position: "top",
         type: "error",
         title: "Thất bại!",
-        description: error.response?.data.message || "Vui lòng kiểm tra lại thông tin!",
+        description:
+          error.response?.data.message || "Vui lòng kiểm tra lại thông tin!",
         closable: true,
       });
 
@@ -245,7 +246,7 @@ const Contact = () => {
             Ca sáng (9h - 15h)
           </option>
           <option className="bg-darkGreen-800" value="Tối">
-            Ca tối            (17h - 21h)
+            Ca tối (17h - 21h)
           </option>
         </select>
       </div>
@@ -270,32 +271,43 @@ const Contact = () => {
           ))}
         </select>
       </div>
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex justify-between h-auto">
         <span>
           Mức chi<span className="text-red-700">*</span>
         </span>
-        <select
-          name="budget"
-          value={formData.budget}
-          onChange={handleSelectChange}
-          className="w-[40%] border bg-transparent border-darkGreen-400 p-3 py-2 rounded-sm text-white"
-        >
-          <option className="bg-darkGreen-800" value="50 - 100 triệu">
-            50 - 100 triệu
-          </option>
-          <option className="bg-darkGreen-800" value="100 - 300 triệu">
-            100 - 300 triệu
-          </option>
-          <option className="bg-darkGreen-800" value="300 - 500 triệu">
-            300 - 500 triệu
-          </option>
-          <option className="bg-darkGreen-800" value="500 - 1 tỉ">
-            500 - 1 tỉ
-          </option>
-          <option className="bg-darkGreen-800" value="Trên 1 tỉ">
-            Trên 1 tỉ
-          </option>
-        </select>
+        <div className="dropdow flex flex-col w-[40%] px-3 gap-2">
+          <InputIndex
+            value={formData.budget}
+            messageError={errors.budget}
+            onChange={handleChange}
+            name="budget"
+            type="number"
+            min="0"
+            placeholder="Nhập mức chi"
+          />
+          <select
+            name="budget"
+            value={formData.budget}
+            onChange={handleSelectChange}
+            className="w-[100%] border bg-whiteAlpha-100 rounded-lg border-darkGreen-400 py-2 overflow-hidden text-white !px-0"
+          >
+            <option className="bg-darkGreen-800" value="50 - 100 triệu">
+              50 - 100 triệu
+            </option>
+            <option className="bg-darkGreen-800" value="100 - 300 triệu">
+              100 - 300 triệu
+            </option>
+            <option className="bg-darkGreen-800" value="300 - 500 triệu">
+              300 - 500 triệu
+            </option>
+            <option className="bg-darkGreen-800" value="500 - 1 tỉ">
+              500 - 1 tỉ
+            </option>
+            <option className="bg-darkGreen-800" value="Trên 1 tỉ">
+              Trên 1 tỉ
+            </option>
+          </select>
+        </div>
       </div>
       <div className="w-full flex items-center justify-between">
         <span>
@@ -328,8 +340,9 @@ const Contact = () => {
       />
       <div className="w-full flex justify-end">
         <IconButton
-          className={`w-auto px-6 text-white flex items-center gap-2 rounded-full !bg-gold py-${isLoading ? "3" : "0"
-            } h-auto ${isLoading ? "select-none" : ""}`}
+          className={`w-auto px-6 text-white flex items-center gap-2 rounded-full !bg-gold py-${
+            isLoading ? "3" : "0"
+          } h-auto ${isLoading ? "select-none" : ""}`}
           onClick={handleSubmit}
         >
           {!isLoading ? (
@@ -361,5 +374,3 @@ const Contact = () => {
 };
 
 export default Contact;
-
-

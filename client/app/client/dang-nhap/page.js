@@ -189,9 +189,8 @@ const Page = () => {
     callToApiLoginSocial();
   }
   return (
-    <div className="w-screen h-screen flex relative gap-28 items-center justify-center">
+    <div className="w-screen h-screen flex relative gap-28 items-center justify-center p-8 lg:p-0">
       {isLoading ? <LoadingLoginRegis /> : null}
-
       <div className="w-1/2 h-full overflow-hidden">
         <Image
           src="/img_login.png"

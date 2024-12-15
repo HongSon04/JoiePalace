@@ -36,7 +36,7 @@ import { capitalize } from "@/app/_utils/helpers";
 import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
 import CustomPagination from "@/app/_components/CustomPagination";
 import LoadingContent from "@/app/_components/LoadingContent";
-import { fetchDecors } from "@/app/_lib/decors/decorsSlice";
+import { deleteDecor, fetchDecors } from "@/app/_lib/decors/decorsSlice";
   
   const INITIAL_VISIBLE_COLUMNS = [
     "id",
@@ -155,131 +155,55 @@ import { fetchDecors } from "@/app/_lib/decors/decorsSlice";
       router,
     ]);
   
-    const handleUpdateStatus = React.useCallback(
+    const handleDeleteDecor = React.useCallback(
       async (id) => {
-        const confirm = window.confirm(
-          `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Đang xử lý"?`
-        );
-  
-        if (!confirm) return;
-  
-        if (confirm) {
-          const data = await dispatch(
-            updateRequestStatus({
-              requestId: id,
-              requestData: {
-                is_deposit: false,
-                is_confirm: false,
-                status: "processing",
-              },
-            })
-          ).unwrap();
-  
-          if (data.success) {
-            toast({
-              title: "Cập nhật thành công",
-              description: `Yêu cầu đã được cập nhật trạng thái "Đang xử lý"`,
-              type: "success",
-            });
-  
-            const params = {
-              page: currentPage,
-              itemsPerPage,
-              search: searchQuery,
-              startDate: formattedStartDate,
-              endDate: formattedEndDate,
-            };
-            // Fetch the requests again to update the state
-            dispatch(fetchDecors({ params }));
-          } else {
-            const { statusCode, message } = data?.error;
-  
-            if (statusCode == 401) {
-              toast({
-                title: "Phiên đăng nhập đã hết hạn",
-                description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
-                type: "error",
-              });
-            } else {
-              toast({
-                title: "Cập nhật thất bại",
-                description: message || "Yêu cầu chưa được cập nhật trạng thái",
-                type: "error",
-              });
-            }
-          }
+        const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
+
+        if (!currentBranch) {
+          toast({
+            title: "Lỗi",
+            description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
+            type: "error",
+          });
+          router.push("/auth/chon-chi-nhanh");
+          return;
         }
-      },
-      [
-        date,
-        formattedEndDate,
-        formattedStartDate,
-        requestStatus,
-        searchQuery,
-        itemsPerPage,
-        currentPage,
-      ]
-    );
-  
-    const handleCancelRequest = React.useCallback(
-      async (id) => {
+
         const confirm = window.confirm(
-          `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Hủy"?`
+          `Bạn có chắc chắn xóa trang trí này #${id}?`
         );
   
         if (!confirm) return;
   
         if (confirm) {
-          const data = await dispatch(
-            updateRequestStatus({
-              requestId: id,
-              requestData: {
-                is_deposit: false,
-                is_confirm: false,
-                status: "cancel",
-              },
-            })
-          ).unwrap();
+          const data = await dispatch(deleteDecor({id})).unwrap();
+          console.log("Delete response:", data);
   
           if (data.success) {
             toast({
-              title: "Cập nhật thành công",
-              description: `Yêu cầu đã được cập nhật trạng thái "Hủy"`,
+              title: "Xóa trang trí thành công",
+              description: `Yêu cầu xóa trang trí thành công`,
               type: "success",
             });
   
             const params = {
-              is_confirm: false,
-              is_deposit: false,
-              status: requestStatus,
               page: currentPage,
               itemsPerPage,
-              search: searchQuery,
               startDate: formattedStartDate,
               endDate: formattedEndDate,
             };
-            // Fetch the requests again to update the state
             dispatch(
-              fetchRequests({
+              fetchDecors({
                 params,
               })
             );
           } else {
             const { statusCode, message } = data?.error;
-  
-            if (statusCode == 401) {
-              toast({
-                title: "Phiên đăng nhập đã hết hạn",
-                description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
-                type: "error",
-              });
-            } else {
-              toast({
-                title: "Cập nhật thất bại",
-                description: message || "Yêu cầu chưa được cập nhật trạng thái",
-                type: "error",
-              });
-            }
+            toast({
+              title: "Xóa thất bại",
+              description: message || "Yêu cầu cần xem xét lại",
+              type: "error",
+            });
           }
         }
       },
@@ -291,9 +215,8 @@ import { fetchDecors } from "@/app/_lib/decors/decorsSlice";
         searchQuery,
         itemsPerPage,
         currentPage,
-      ]
-    );
-  
+    ])
+      
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(
       new Set(INITIAL_VISIBLE_COLUMNS)
@@ -387,6 +310,12 @@ import { fetchDecors } from "@/app/_lib/decors/decorsSlice";
                     <DropdownItem>
                       <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
                     </DropdownItem>
+                     <DropdownItem
+                      onClick={() => handleDeleteDecor(item.id)}
+                      className="text-red-400"
+                    >
+                      {`Xóa trang trí`}
+                  </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               </div>

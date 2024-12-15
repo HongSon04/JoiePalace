@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import React, { useState } from "react";
 import { createAccountUser } from "@/app/_services/accountServices";
+import axios from "axios";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -49,9 +50,10 @@ const Page = () => {
         password: formData.password,
         phone: "null",
       });
-      // const emailRes = await axios.post(
-      //   "https://joieplace.live/api/auth/send-email-verify"
-      // );
+      const emailRes = await axios.post(
+        "https://joieplace.live/api/auth/send-email-verify",
+        { email: formData.email }
+      );
       toast({
         position: "top",
         type: "success",
@@ -79,8 +81,8 @@ const Page = () => {
     }
   };
   return (
-    <div className="w-screen h-screen flex relative gap-28 items-center justify-center">
-      <div className="w-1/2 h-full overflow-hidden">
+    <div className="w-screen h-screen flex relative lg:gap-28 items-center justify-center p-8 lg:p-0">
+      <div className="w-1/2 h-full overflow-hidden hidden md:block">
         <Image
           src="/img_login.png"
           w={"100%"}
@@ -90,7 +92,7 @@ const Page = () => {
         />
       </div>
       <Image className="absolute" src="/decor_cover" alt="" />
-      <div className="w-1/2 h-full pr-28 flex items-center">
+      <div className="w-full md:w-1/2 h-full p-0 lg:pr-28 flex items-center flex-shrink-0">
         <div className="p-6 flex flex-col w-full max-w-[490px] bg-blackAlpha-500 gap-4">
           <h1 className="text-4xl font-black text-gold">Đăng ký</h1>
           <span className="text-base">
@@ -156,11 +158,6 @@ const Page = () => {
                 <div className="w-10 h-10 border-4 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
               )}
             </IconButton>
-            {/* <span className="flex w-full justify-center font-light">Hoặc</span>
-            <button className="w-fit rounded-full bg-white text-black flex items-center gap-2 py-3 px-5 m-auto">
-              <Image w={"auto"} h={"auto"} src="/googeIcon.svg" alt="" />
-              <span className="font-medium !text-black">Đăng ký bằng Google</span>
-            </button> */}
           </form>
         </div>
       </div>
