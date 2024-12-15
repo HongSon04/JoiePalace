@@ -10,6 +10,7 @@ const initialState = {
     lastPage: 1,
     nextPage: null,
     prevPage: null,
+    count: 0,
   },
 
   error: null,
@@ -25,6 +26,8 @@ const initialState = {
 
   isDeletingDecors: false,
   isDeletingDecorsError: false,
+
+  notificationCount: 0, 
 };
 
 const decorsSlice = createSlice({
@@ -91,6 +94,10 @@ const decorsSlice = createSlice({
       state.isDeletingDecorsError = true;
       state.error = action.payload;
     },
+    setNotificationCount(state, action) {
+      state.notificationCount = action.payload;
+    },
+    
   },
   extraReducers: (builder) => {
     builder
@@ -214,6 +221,8 @@ export const {
   deletingDecors,
   deletingDecorsSuccess,
   deletingDecorsFailure,
+
+  setNotificationCount 
 } = decorsSlice.actions;
 
 export default decorsSlice;

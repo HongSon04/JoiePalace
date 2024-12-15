@@ -20,7 +20,7 @@ export function formatPrice(price) {
     currency: "VND",
   })
     .format(price)
-    .replace("₫", "VND");
+    .replace("₫", "đ");
 }
 
 export const formatFullDateTime = (input) => {

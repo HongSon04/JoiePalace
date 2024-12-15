@@ -162,7 +162,7 @@ const Page = () => {
 
     return (
         <div className='flex flex-col gap-[30px]'>
-            <div className='flex justify-between'>
+            <div className='flex justify-between max-sm:flex-col max-sm:items-center max-sm:gap-4'>
                 <span className='text-2xl font-bold leading-[22px] text-white'>Tài khoản</span>
                 <div className='flex items-center gap-[30px]'>
                     <span className='text-base font-semibold'>Hạng thành viên:</span>
@@ -221,7 +221,7 @@ const Page = () => {
                         trigger={trigger}
                     />
 
-                    <div className='flex gap-[20px] justify-end w-full'>
+                    <div className='flex gap-[20px] justify-end w-full max-sm:justify-between'>
                         <button
                             type="button"
                             className='flex items-center gap-[10px] px-4 py-[10px] bg-white text-black rounded-full text-sm'

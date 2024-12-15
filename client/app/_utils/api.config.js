@@ -1,10 +1,10 @@
 // HOST URL
 const HOST = `http://joieplace.live/api`;
-const MEMBERSHIPS = `https://joieplace.live/memberships`;
+const MEMBERSHIPS = `http://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
-const AUTH_API = `${HOST}/auth`;
+const AUTH_API = `${HOST}/auth`;  
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
@@ -116,6 +116,8 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
+    GET_ALL_INFO: 
+      `${DASHBOARD_API}/get-all-info`,
     GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
@@ -130,6 +132,7 @@ export const API_CONFIG = {
       `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
     GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_BOOKING_STATUS_BRANCH : (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`
   },
 
   // PRODUCTS API
@@ -228,6 +231,8 @@ export const API_CONFIG = {
     GET_ALL: (params) =>
       constructUrlWithParams(`${DECORS_API}/get-all`, params),
     GET_BY_ID: (id) => `${DECORS_API}/get/${id}`,
+    UPDATE: (id) => `${DECORS_API}/update/${id}`,
+
   },
 
   // NOTIFICATIONS API

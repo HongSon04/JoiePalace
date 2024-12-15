@@ -28,7 +28,7 @@ function Conference() {
       <ScrollFullPage>
         <div className="section ">
           <section className="select-none flex max-h-screen justify-between items-start max-lg:pt-20 lg:px-[25px] xl:max-w-screen-xl m-auto">
-            <div className="flex flex-col justify-center max-sm:w-full lg:h-screen z-10 max-lg:w-[65%]">
+            <div className="flex flex-col justify-center max-sm:w-full lg:h-screen z-10 max-lg:w-[65%] max-sm:hidden">
               <Image
                 className="w-full h-full object-cover"
                 src="/Meeting-1-1.jpg"
@@ -39,7 +39,7 @@ function Conference() {
               <h1 className="text-gold mb-10 font-bold text-fade-in font-gilroy text-7xl max-lg:text-5xl max-sm:text-xl max-sm:mb-2 ">
                 Hội nghị
               </h1>
-              <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[10px] max-sm:leading-3">
+              <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[13px] ">
                 Trung tâm Sự kiện White Palace là địa điểm hoàn hảo để bạn có
                 thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo
                 chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra
@@ -49,7 +49,7 @@ function Conference() {
                 hợp.
               </p>
             </div>
-            <div className="bgYellow md:before:h-screen w-[350px] mb:w-[250px] relative flex flex-col md:justify-center lg:h-full max-lg:bottom-[100px] max-lg:pb-[80px] max-sm:pb-[50px]">
+            <div className="bgYellow md:before:h-screen w-[350px] mb:w-[250px] relative flex flex-col md:justify-center lg:h-full max-lg:bottom-[100px] max-lg:pb-[80px] max-sm:pb-[100px]">
               <div className="max-lg:mt-[150px] max-sm:pb-[50px]">
                 <div className="bg-gray-500 max-w-[60%] relative top-[20px] left-[20px] z-10">
                   <Image

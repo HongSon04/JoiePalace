@@ -37,6 +37,7 @@ import { capitalize } from "@/app/_utils/helpers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
+
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
