@@ -92,6 +92,8 @@ const Uploader = ({
         ></Image>
         <p className="text-base text-gray-400">
           Kéo và thả ảnh của bạn tại đây, <br /> hoặc bấm vào nút chọn ảnh
+          <br />
+          (Vui lòng chọn ảnh có dung lượng nhỏ hơn 5MB)
         </p>
         <input
           type="file"
@@ -103,7 +105,7 @@ const Uploader = ({
           id={id || name}
           name={name}
           aria-label="Chọn ảnh"
-          required
+          // required
           // {...register(name)}
           // tabIndex={0}
         />
@@ -140,7 +142,7 @@ const Uploader = ({
                 className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex gap-2 items-center"
               >
                 <button
-                  className="rounded-full text-gray-600 hover:text-gray-800"
+                  className="rounded-full !text-gray-600 hover:text-gray-800"
                   onClick={() => handleRemoveFile(index)}
                 >
                   <XMarkIcon className="w-5 h-5" />

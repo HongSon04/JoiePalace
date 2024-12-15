@@ -127,8 +127,6 @@ function RequestTable() {
       router.push("/auth/chon-chi-nhanh");
     }
     const params = {
-      is_confirm: false,
-      is_deposit: false,
       status: requestStatus,
       page: currentPage,
       branch_id: currentBranch.id,
@@ -139,7 +137,7 @@ function RequestTable() {
 
     dispatch(fetchRequests({ params }));
 
-    return () => {};
+    return () => { };
   }, [
     currentPage,
     itemsPerPage,
@@ -164,8 +162,6 @@ function RequestTable() {
     const controller = new AbortController();
 
     const params = {
-      is_confirm: false,
-      is_deposit: false,
       status: requestStatus,
       page: currentPage,
       branch_id: currentBranch.id,
@@ -200,13 +196,13 @@ function RequestTable() {
           description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
           type: "error",
         });
-  
+
         router.push("/auth/chon-chi-nhanh");
       }
       const confirm = window.confirm(
         `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Đang xử lý"?`
       );
-      
+
 
       if (!confirm) return;
 
@@ -282,7 +278,7 @@ function RequestTable() {
           description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
           type: "error",
         });
-  
+
         router.push("/auth/chon-chi-nhanh");
       }
       const confirm = window.confirm(
@@ -410,7 +406,7 @@ function RequestTable() {
             currency: 'VND',
           }).format(item.booking_details.total_amount || 0);
 
-          // return item.booking_details.total_amount
+        // return item.booking_details.total_amount
         case "amount_booking":
           const amount_booking = item.booking_details?.map((detail) => detail.deposits?.amount ? `${detail.deposits.amount}` : "Chưa có tiền cọc")
           return new Intl.NumberFormat('vi-VN', {
@@ -444,78 +440,76 @@ function RequestTable() {
             </User>
           );
         case "status":
-            // <select
-            //   name="status"
-            //   value={cellValue}
-            //   className="select relative z-50"
-            //   onClick={(e) => e.stopPropagation()}
-            //   onMouseDown={(e) => e.stopPropagation()}
-            // >
-            //   {CONFIG.BOOKING_STATUS.map((status) => (
-            //     <option value={status.key} key={status.key} className="option">
-            //       {status.label}
-            //     </option>
-            //   ))}
-            // </select>  
-            switch (cellValue) {
-              case "pending":
-                return (
-                  <Chip variant="flat" color="warning">
-                    Chưa xử lý
-                  </Chip>
-                );
-  
-              case "processing":
-                return (
-                  <Chip variant="flat" color="primary">
-                    Đang xử lý
-                  </Chip>
-                );
-              case "success":
-                return (
-                  <Chip variant="flat" color="primary">
-                    Sử lý thành công
-                  </Chip>
-                );
-              case "cancel":
-                return (
-                  <Chip variant="flat" color="danger">
-                    Đã hủy
-                  </Chip>
-                );
-            }
+          // <select
+          //   name="status"
+          //   value={cellValue}
+          //   className="select relative z-50"
+          //   onClick={(e) => e.stopPropagation()}
+          //   onMouseDown={(e) => e.stopPropagation()}
+          // >
+          //   {CONFIG.BOOKING_STATUS.map((status) => (
+          //     <option value={status.key} key={status.key} className="option">
+          //       {status.label}
+          //     </option>
+          //   ))}
+          // </select>  
+          switch (cellValue) {
+            case "pending":
+              return (
+                <Chip variant="flat" color="warning">
+                  Chưa xử lý
+                </Chip>
+              );
+
+            case "processing":
+              return (
+                <Chip variant="flat" color="primary">
+                  Đang xử lý
+                </Chip>
+              );
+            case "success":
+              return (
+                <Chip variant="flat" color="success">
+                  Sử lý thành công
+                </Chip>
+              );
+            case "cancel":
+              return (
+                <Chip variant="flat" color="danger">
+                  Đã hủy
+                </Chip>
+              );
+          }
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>
-                  <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => handleUpdateStatus(item.id)}
-                  className={`${
-                    item.status === "processing" ? "hidden" : ""
-                  }`}
-                >
-                  {`Cập nhật trạng thái "Đang xử lý"`}
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => handleCancelRequest(item.id)}
-                  className={`text-red-400 ${
-                    item.status === "cancel" ? "hidden" : ""
-                  }`}
-                >
-                  {`Cập nhật trạng thái "Hủy"`}
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    <VerticalDotsIcon className="text-default-300" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem>
+                    <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleUpdateStatus(item.id)}
+                    className={`${item.status === "processing" ? "hidden" : ""
+                      }`}
+                  >
+                    {`Cập nhật trạng thái "Đang xử lý"`}
+                  </DropdownItem>
+                  <DropdownItem
+                    onClick={() => handleCancelRequest(item.id)}
+                    className={`text-red-400 ${item.status === "cancel" ? "hidden" : ""
+                      }`}
+                  >
+                    {`Cập nhật trạng thái "Hủy"`}
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
           );
         default:
           return cellValue;
@@ -587,7 +581,7 @@ function RequestTable() {
               value={requestStatus}
             >
               {CONFIG.BOOKING_STATUS.map((item) => {
-                if (item.key === "success") return;
+                {/* if (item.key === "success") return; */ }
 
                 return (
                   <option key={item.key} value={item.key} className="option">

@@ -5,7 +5,6 @@ export function formatDateTime(dateTime) {
   return date.toLocaleString();
 }
 
-
 export function ISOStringToDateTimeString(isoString) {
   const date = new Date(isoString);
   return date.toLocaleString();
@@ -21,7 +20,7 @@ export function formatPrice(price) {
     currency: "VND",
   })
     .format(price)
-    .replace("₫", "VND");
+    .replace("₫", "đ");
 }
 
 export const formatFullDateTime = (input) => {
@@ -60,20 +59,7 @@ export const formatFullDateTime = (input) => {
   };
 };
 
-// Example usage
-// try {
-//   const formattedDateTime = formatDateTime("2024-10-25T09:07:54.323Z");
-//   // console.log(formattedDateTime.iso); // Outputs: 2024-10-25T09:07:54.323Z
-//   // console.log(formattedDateTime.time); // Outputs: 09:07 AM
-//   // console.log(formattedDateTime.date); // Outputs: 25/10/2024
-// } catch (error) {
-//   console.error(error.message);
-// }
-
-// Example usage
-// const date = new Date("2024-10-25T09:07:54.323Z");
-// const formattedDateTime = formatDateTime(date);
-
-// console.log(formattedDateTime.iso); // Outputs: 2024-10-25T09:07:54.323Z
-// console.log(formattedDateTime.time); // Outputs: 09:07 AM
-// console.log(formattedDateTime.date); // Outputs: 25/10/2024
+// Function to convert the custom date object to a standard Date object
+export const toStandardDate = (customDate) => {
+  return new Date(customDate.year, customDate.month - 1, customDate.day);
+};

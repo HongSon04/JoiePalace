@@ -198,14 +198,20 @@ function AdminSidebarNav() {
         className: "",
       },
       {
-        title: "Bài viết",
-        path: `/admin/bai-viet/`,
+        title: "Danh mục bài viết",
+        path: `/admin/danh-muc-bai-viet/`,
         icon: blogIcon,
         className: "",
       },
       {
         title: "Sảnh",
         path: `/admin/sanh/${currentBranch?.slug}`,
+        icon: StageIcon,
+        className: "",
+      },
+      {
+        title: "Trang Trí",
+        path: `/admin/trang-tri`,
         icon: StageIcon,
         className: "",
       },

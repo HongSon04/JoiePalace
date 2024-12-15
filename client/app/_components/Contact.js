@@ -12,7 +12,6 @@ import { formatDate } from "../_utils/format";
 import useCustomToast from "../_hooks/useCustomToast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPackageById } from "../_services/packageServices";
-import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import IconButton from "./IconButton";
 
 const formSchema = z.object({
@@ -35,14 +34,20 @@ const Contact = () => {
   const [listBranches, setListBranches] = useState([]);
   const [listPartyTypes, setListPartyTypes] = useState([]);
   const [dataPackage, setDataPackage] = useState(null);
+  const [user, setUser] = useState();
   const toast = useCustomToast();
   const router = useRouter();
-  const [userInfo, setUserInfo] = useState({});
   const searchParams = useSearchParams();
   const package_id = searchParams.get("package_id");
-  const [bookingDetails, setBookingDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Fetch user data from local storage
+  useEffect(() => {
+    const getUser = JSON.parse(localStorage.getItem("user"));
+    setUser(getUser);
+  }, []);
+
+  // Initialize form data with default values
   const [formData, setFormData] = useState({
     user_id: "",
     name: "",
@@ -57,43 +62,48 @@ const Contact = () => {
     note: "",
   });
 
+  // Update formData when user data is available
+  useEffect(() => {
+    if (user) {
+      setFormData((prevData) => ({
+        ...prevData,
+        user_id: user.id || "",
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+  }, [user]);
+
   useEffect(() => {
     const fetchData = async () => {
       const branches = await fetchBranchesFromApi();
       const partyTypes = await fecthAllPartyTypes();
       let dataPackageRes = null;
-      if (package_id !== null) {
+
+      if (package_id) {
         dataPackageRes = await getPackageById(package_id);
         setDataPackage(dataPackageRes.data[0]);
-        setBookingDetails({
-          decor_id: dataPackageRes.data[0].decor_id,
-          menu_id: dataPackageRes.data[0].menu_id,
-          party_types: dataPackageRes.data[0].party_types,
-          decor: dataPackageRes.data[0].decors,
-          menu: dataPackageRes.data[0].menus,
-        });
       }
+
       setListBranches(branches);
       setListPartyTypes(partyTypes);
 
-      // Thiết lập giá trị mặc định cho formData
-      if (branches.length > 0 && partyTypes.length > 0) {
-        if (dataPackageRes) {
-          const partyTypeData = dataPackageRes.data[0].party_types;
-          setFormData((prevData) => ({
-            ...prevData,
-            branch: branches[0]?.id || "",
-            partyType: partyTypeData.id,
-          }));
-        } else {
-          setFormData((prevData) => ({
-            ...prevData,
-            branch: branches[0]?.id || "",
-            partyType: partyTypes[0]?.id || "",
-          }));
-        }
+      // Set default values for formData based on fetched data
+      if (branches.length > 0) {
+        setFormData((prevData) => ({
+          ...prevData,
+          branch: branches[0]?.id || "",
+        }));
+      }
+      if (partyTypes.length > 0) {
+        setFormData((prevData) => ({
+          ...prevData,
+          partyType: partyTypes[0]?.id || "",
+        }));
       }
     };
+
     fetchData();
   }, [package_id]);
 
@@ -117,27 +127,27 @@ const Contact = () => {
     e.preventDefault();
     setIsLoading(true);
     const validationErrors = {};
+
     try {
-      setIsLoading(true);
+      // Validate form data
       formSchema.parse(formData);
-      setErrors({});
+      setErrors({}); // Clear previous errors
+
       const dataToSend = {
-        user_id: JSON.parse(localStorage?.getItem("user")).id,
+        user_id: formData.user_id,
         branch_id: formData.branch,
         party_type_id: formData.partyType,
-        stage_id: 0,
-        package_id: package_id,
         name: formData.name,
         phone: formData.phone.toString(),
         email: formData.email,
-        company_name: "",
         note: formData.note,
         number_of_guests: Number(formData.guestCount),
         budget: formData.budget.toString(),
         shift: formData.shift.toString(),
         organization_date: formatDate(formData.date),
-        // bookingDetails,
       };
+
+      // Send booking request
       const response = await createNewBooking(dataToSend);
       if (response.status === 200 || response.status === 201) {
         toast({
@@ -147,29 +157,32 @@ const Contact = () => {
           description: "Nhà hàng sẽ liên hệ lại với thời gian sớm nhất 😘😘!",
           closable: true,
         });
+        router.push("/client/cam-on"); // Redirect to thank you page
       }
-      router.push("/client/cam-on");
     } catch (error) {
-      {
-        toast({
-          position: "top",
-          type: "error",
-          title: "Thất bại!",
-          description:
-            error.response?.data.message || "Vui lòng kiểm tra lại thông tin!",
-          closable: true,
-        });
-      }
-      error?.errors?.forEach((err) => {
-        validationErrors[err.path[0]] = err.message;
+      // Handle validation and submission errors
+      toast({
+        position: "top",
+        type: "error",
+        title: "Thất bại!",
+        description:
+          error.response?.data.message || "Vui lòng kiểm tra lại thông tin!",
+        closable: true,
       });
-      setErrors(validationErrors);
+
+      // Collect validation errors
+      if (error.errors) {
+        error.errors.forEach((err) => {
+          validationErrors[err.path[0]] = err.message;
+        });
+        setErrors(validationErrors);
+      }
     } finally {
       setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
+  // If branches or party types are not loaded, return null to avoid rendering the form
   if (!listBranches.length || !listPartyTypes.length) return null;
 
   return (
@@ -258,32 +271,43 @@ const Contact = () => {
           ))}
         </select>
       </div>
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex justify-between h-auto">
         <span>
           Mức chi<span className="text-red-700">*</span>
         </span>
-        <select
-          name="budget"
-          value={formData.budget}
-          onChange={handleSelectChange}
-          className="w-[40%] border bg-transparent border-darkGreen-400 p-3 py-2 rounded-sm text-white"
-        >
-          <option className="bg-darkGreen-800" value="50 - 100 triệu">
-            50 - 100 triệu
-          </option>
-          <option className="bg-darkGreen-800" value="100 - 300 triệu">
-            100 - 300 triệu
-          </option>
-          <option className="bg-darkGreen-800" value="300 - 500 triệu">
-            300 - 500 triệu
-          </option>
-          <option className="bg-darkGreen-800" value="500 - 1 tỉ">
-            500 - 1 tỉ
-          </option>
-          <option className="bg-darkGreen-800" value="Trên 1 tỉ">
-            Trên 1 tỉ
-          </option>
-        </select>
+        <div className="dropdow flex flex-col w-[40%] px-3 gap-2">
+          <InputIndex
+            value={formData.budget}
+            messageError={errors.budget}
+            onChange={handleChange}
+            name="budget"
+            type="number"
+            min="0"
+            placeholder="Nhập mức chi"
+          />
+          <select
+            name="budget"
+            value={formData.budget}
+            onChange={handleSelectChange}
+            className="w-[100%] border bg-whiteAlpha-100 rounded-lg border-darkGreen-400 py-2 overflow-hidden text-white !px-0"
+          >
+            <option className="bg-darkGreen-800" value="50 - 100 triệu">
+              50 - 100 triệu
+            </option>
+            <option className="bg-darkGreen-800" value="100 - 300 triệu">
+              100 - 300 triệu
+            </option>
+            <option className="bg-darkGreen-800" value="300 - 500 triệu">
+              300 - 500 triệu
+            </option>
+            <option className="bg-darkGreen-800" value="500 - 1 tỉ">
+              500 - 1 tỉ
+            </option>
+            <option className="bg-darkGreen-800" value="Trên 1 tỉ">
+              Trên 1 tỉ
+            </option>
+          </select>
+        </div>
       </div>
       <div className="w-full flex items-center justify-between">
         <span>
@@ -315,7 +339,6 @@ const Contact = () => {
         styles="overflow-hidden"
       />
       <div className="w-full flex justify-end">
-        {/* <ButtonDiscover type="submit" name="Gửi" className="w-auto px-6" /> */}
         <IconButton
           className={`w-auto px-6 text-white flex items-center gap-2 rounded-full !bg-gold py-${
             isLoading ? "3" : "0"

@@ -3,6 +3,7 @@
 import authBg from "@/public/auth-bg.png";
 import {
   ChatBubbleLeftRightIcon,
+  MagnifyingGlassIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Button, Tooltip } from "@nextui-org/react";
@@ -24,72 +25,50 @@ import { Col, Row } from "antd";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-// const initialBranches = [
-//   {
-//     id: 1,
-//     name: "Hoàng Văn Thụ",
-//     image: banner,
-//     address: "123 Hoàng Văn Thụ, Phường 4, Quận Tân Bình, TP.HCM",
-//     phone: "0123456789",
-//     email: "joiepalace.hoangvanthu@gmail.com",
-//     status: "active",
-//     slug: "hoang-van-thu",
-//   },
-//   {
-//     id: 2,
-//     image: banner2,
-//     name: "Lê Văn Sỹ",
-//     address: "123 Lê Vă Sỹ, Phường 4, Quận Tân Bình, TP.HCM",
-//     phone: "0123456789",
-//     email: "joiepalace.levansy@gmail.com",
-//     status: "active",
-//     slug: "le-van-sy",
-//   },
-//   {
-//     id: 3,
-//     image: banner2,
-//     name: "Phạm Văn Đồng",
-//     address: "123 Phạm Văn Đồng, Phường 4, Quận Tân Bình, TP.HCM",
-//     phone: "0123456789",
-//     email: "joiepalace.phamvandong@gmail.com",
-//     status: "active",
-//     slug: "pham-van-dong",
-//   },
-//   {
-//     id: 4,
-//     image: logo,
-//     name: "Tổng",
-//     address: "123 Phạm Văn Đồng, Phường 4, Quận Tân Bình, TP.HCM",
-//     phone: "0123456789",
-//     email: "joiepalace.tong@gmail.com",
-//     status: "active",
-//     slug: "tong",
-//   },
-// ];
-
 function Page() {
   const { fetchData } = useApiServices();
-
   const dispatch = useDispatch();
-
   const { branches, isLoading, isError, errorMessage } = useSelector(
     (store) => store.branch
   );
+  const abortControllerRef = React.useRef(new AbortController());
 
-  const getBranches = React.useCallback(() => {
-    fetchData(dispatch, fetchBranchesFromApi, {
-      loadingAction: loading,
-      successAction: fetchBranchesSuccess,
-      errorAction: error,
-    });
-  }, [dispatch]);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [isSearching, setIsSearching] = React.useState(false);
+  const isMounted = React.useRef(false);
+
+  const getBranches = React.useCallback((params) => {
+    fetchData(
+      dispatch,
+      () => fetchBranchesFromApi(params, abortControllerRef.current.signal),
+      {
+        loadingAction: loading,
+        successAction: fetchBranchesSuccess,
+        errorAction: error,
+      }
+    );
+  }, []);
 
   React.useEffect(() => {
-    getBranches();
-  }, [getBranches]);
+    isMounted.current = true;
+
+    const params = {
+      search: searchQuery,
+    };
+
+    abortControllerRef.current.abort();
+    abortControllerRef.current = new AbortController();
+
+    getBranches(params);
+
+    return () => {
+      isMounted.current = false;
+      abortControllerRef.current.abort();
+    };
+  }, [getBranches, searchQuery]);
 
   return (
-    <div className="relative w-full h-screen p-8">
+    <div className="w-full h-screen p-8">
       <Image
         priority
         src={authBg}
@@ -124,32 +103,60 @@ function Page() {
 
       {/* BRANCHES */}
       <div className="abs-center">
-        <div className="flex flex-col p-5 rounded-md bg-blackAlpha-500 backdrop-blur-sm w-[1000px] h-[600px] overflow-y-auto">
-          <h2 className="text-3xl leading-9 font-medium text-center text-white">
+        <div className="flex flex-col p-5 rounded-md bg-blackAlpha-500 backdrop-blur-sm w-[1000px] h-[600px] ">
+          <h2 className="text-3xl leading-9 font-medium text-center text-white pb-5">
             Chọn chi nhánh
           </h2>
-          {isLoading && <Loading />}
-          {isError && <Error withOverlay={true} error={errorMessage} />}
-          {!isLoading && !isError && (
-            <Row className="mt-8" gutter={[20, 20]}>
-              {branches && branches.length > 0 ? (
-                branches.map((branch) => (
-                  <Col key={branch.id} span={8}>
-                    <Branch
-                      branch={branch}
-                      to={`/auth/dang-nhap/${branch.slug}`}
-                    />
+          {/* Search form */}
+          <div className="flex justify-between pb-5 text-white relative">
+            <div className="flex gap-3 items-center">
+              <MagnifyingGlassIcon className="w-5 h-5 text-white" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm chi nhánh"
+                className="input w-[70%] outline-none"
+                value={searchQuery}
+                onChange={(e) => {
+                  setIsSearching(true);
+                  setSearchQuery(e.target.value);
+                }}
+              />
+            </div>
+            <Button
+              onClick={getBranches}
+              className="bg-white text-black"
+              radius="full"
+            >
+              Làm mới
+            </Button>
+          </div>
+          <div className="overflow-y-auto relative flex-1 rounded-lg">
+            {isLoading && <Loading type="absolute" />}
+            {isError && !isSearching && (
+              <Error withOverlay={true} error={errorMessage} />
+            )}
+            {!isLoading && !isError && (
+              <Row className="" gutter={[20, 20]}>
+                {branches && branches.length > 0 ? (
+                  branches.map((branch) => (
+                    <Col key={branch.id} span={8}>
+                      <Branch
+                        branch={branch}
+                        to={`/auth/dang-nhap/${branch.slug}`}
+                        buttonText="Chọn"
+                      />
+                    </Col>
+                  ))
+                ) : (
+                  <Col span={24} className="flex flex-center">
+                    <p className="text-center text-white">
+                      No branches available
+                    </p>
                   </Col>
-                ))
-              ) : (
-                <Col span={24} className="flex flex-center">
-                  <p className="text-center text-white">
-                    No branches available
-                  </p>
-                </Col>
-              )}
-            </Row>
-          )}
+                )}
+              </Row>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { API_CONFIG } from "../_utils/api.config";
 
 export const getAllPackages = async () => {
   const response = await axios.get(
-    "https://joieplace.live/api/packages/get-all"
+    "http://joieplace.live/api/packages/get-all"
   );
   if (response.status !== 201 && response.status !== 200) {
     throw new Error("Có lỗi xảy ra khi lấy dữ liệu");

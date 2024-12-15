@@ -22,7 +22,7 @@ function SearchForm({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={`outline-none placeholder-gray-200 ${classNames.input}`}
+        className={`outline-none placeholder-gray-200 ${classNames.input} color-white`}
       />
       <button
         type="submit"

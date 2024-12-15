@@ -31,9 +31,7 @@ function Dish(props) {
     dispatch(setSelectedDish(dish));
   };
 
-  const href = navigate
-    ? props.link || `/admin/thuc-pham?id=${dish.id}`
-    : "#";
+  const href = navigate ? props.link || `/admin/thuc-pham?id=${dish.id}` : "#";
 
   return (
     <>
@@ -58,7 +56,7 @@ function Dish(props) {
             />
           </div>
           <div className="flex flex-col flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-5 flex-1">
+            <div className="flex items-center justify-between flex-1 min-w-0">
               <h3
                 className={`${
                   mode === "dark" ? "text-gray-600" : "text-white"
@@ -67,7 +65,7 @@ function Dish(props) {
                 {dish.name}
               </h3>
               <p
-                className={`${
+                className={`truncate ${
                   mode === "dark" ? "text-gray-600" : "text-white"
                 }`}
               >

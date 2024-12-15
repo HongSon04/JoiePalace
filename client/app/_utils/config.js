@@ -2,8 +2,10 @@ import dishImagePlaceholder from "@/public/Alacarte-Menu-Thumbnail.png";
 import imageUploaderPlaceholder from "@/public/imageUploaderPlaceholder.svg";
 import clientPattern from "@/public/line-group.svg";
 import clientDishImagePlaceholder from "@/public/clientDishPlaceholder.png";
+import imagePlaceholder from "@/public/image_placeholder.png";
 
 export const CONFIG = {
+  IMAGE_PLACEHOLDER: imagePlaceholder,
   DISH_IMAGE_PLACEHOLDER: dishImagePlaceholder,
   IMAGE_UPLOADER_PLACEHOLDER: imageUploaderPlaceholder,
   CLIENT_PATTERN: clientPattern,
@@ -25,6 +27,38 @@ export const CONFIG = {
     {
       key: "cancel",
       label: "Đã hủy",
+    },
+  ],
+  MENU_STATUS: [
+    {
+      key: "active",
+      label: "Hoạt động",
+    },
+    {
+      key: "deleted",
+      label: "Đã xóa",
+    },
+  ],
+  STAGE_STATUS: [
+    {
+      key: "Không hoạt động",
+      label: "Không hoạt động",
+    },
+    {
+      key: "Đang tổ chức",
+      label: "Đang tổ chức",
+    },
+    {
+      key: "Sắp diễn ra",
+      label: "Sắp diễn ra",
+    },
+    {
+      key: "Không có tiệc",
+      label: "Không có tiệc",
+    },
+    {
+      key: "Đã hoàn thành",
+      label: "Đã hoàn thành",
     },
   ],
 };

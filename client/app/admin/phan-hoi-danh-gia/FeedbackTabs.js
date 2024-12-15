@@ -482,16 +482,6 @@ function FeedbackTabs() {
                   className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
                 >
                   {c.name}
-                  {/* <Chip
-                    color="default"
-                    classNames={{
-                      base: "shrink-0 max-w-3 min-w-5 h-3 min-h-5 text-xs rounded-md",
-                      content: "font-bold",
-                    }}
-                    size="small"
-                  >
-                    
-                  </Chip> */}
                 </Tab>
               ))}
 
@@ -500,17 +490,7 @@ function FeedbackTabs() {
                 color={"white"}
                 className="aria-[selected=true]:opacity-100 opacity-45 aria-[selected=true]:font-semibold transition text-lg flex items-center gap-2"
               >
-                Ẩn
-                {/* <Chip
-                  color="default"
-                  classNames={{
-                    base: "shrink-0 max-w-3 min-w-5 h-3 min-h-5 text-xs rounded-md",
-                    content: "font-bold",
-                  }}
-                  size="small"
-                >
-                  1
-                </Chip> */}
+                Ẩ
               </Tab>
               <div className="flex-1 justify-end flex">
                 <DateRangePicker

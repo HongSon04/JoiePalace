@@ -45,6 +45,7 @@ const getDishCategoryName = (slug) => {
 
 function ServiceItem({ service, compairState, onChange, name, type }) {
   const carouselRef = React.useRef(null);
+  const inputRef = React.useRef(null);
 
   const onCarouselChange = (currentSlide) => {
     console.log(currentSlide);
@@ -66,8 +67,6 @@ function ServiceItem({ service, compairState, onChange, name, type }) {
     console.log("");
   }
   const isSelected = parsedState && parsedState.id == service.id;
-
-  const inputRef = React.useRef(null);
 
   const handleSelectAndClose = () => {
     inputRef.current.click();
@@ -123,18 +122,24 @@ function ServiceItem({ service, compairState, onChange, name, type }) {
         </span>
       </label>
       <Modal
-        title={
-          <h3 className="text-2xl font-bold text-center mb-5">
-            {service.name}
-          </h3>
-        }
+        // title={
+        //   <h3 className="text-2xl font-bold text-center mb-5 text-gray-600">
+        //     {service.name}
+        //   </h3>
+        // }
         centered
         open={onOpen}
         footer={[
-          <Button variant="light" radius="full" onPress={handleClose}>
+          <Button
+            key={"closeButton"}
+            variant="light"
+            radius="full"
+            onPress={handleClose}
+          >
             Đóng
           </Button>,
           <Button
+            key={"selectButton"}
             radius="full"
             className="bg-gold text-white"
             onPress={handleSelectAndClose}
@@ -156,6 +161,9 @@ function ServiceItem({ service, compairState, onChange, name, type }) {
             ></Image>
           </Col>
           <Col span={12}>
+            <h3 className="text-2xl font-bold mb-5 text-gray-800">
+              {service.name}
+            </h3>
             <p className="text-base text-gray-600">
               {service.short_description}
             </p>
@@ -176,17 +184,17 @@ function ServiceItem({ service, compairState, onChange, name, type }) {
                 ))}
               </>
             )}
-            <Divider className="mt-5" />
+            <Divider className="mt-5 bg-gray-100" />
             <div className="flex flex-col mt-3 text-gray-800">
               <p className="text-base font-semibold text-inherit">
                 Tổng giá trị: {service.price.toLocaleString()} VNĐ
               </p>
-              <Link
+              {/* <Link
                 className="text-gold text-base underline shrink-0 hover:text-gold hover:underline hover:brightness-90 mt-3"
                 href={`/client/chi-tiet-thuc-don/${service.slug}`}
               >
                 Xem chi tiết
-              </Link>
+              </Link> */}
             </div>
           </Col>
         </Row>

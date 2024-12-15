@@ -7,6 +7,7 @@ import silverCrown from '@/public/silverCrown.svg';
 import goldCrown from '@/public/goldCrown.svg';
 import platinum from '@/public/platinum.svg';
 import { fetchAllBookingByUserId, fetchBookingById } from '@/app/_services/bookingServices';
+import { useRouter } from 'next/navigation';
 
 const membershipTiers = [
     {
@@ -42,6 +43,7 @@ const membershipTiers = [
 const Page = () => {
     const [total_amountUser, setTotalAmountUser] = useState(0);
     const [activeTier, setActiveTier] = useState(membershipTiers[0]);
+    const router = useRouter();
 
     useEffect(() => {
         const getData = async () => {
@@ -88,7 +90,7 @@ const Page = () => {
 
     return (
         <div className='flex flex-col gap-[30px] text-white '>
-            <h2 className='text-2xl font-bold'>Thành viên</h2>
+            <h2 className='text-2xl font-bold max-sm:text-center'>Thành viên</h2>
             {/* Tiers Display Section */}
             <div className='relative flex justify-between items-center'>
                 {membershipTiers.map((tier, index) => (

@@ -47,11 +47,13 @@ const Page = () => {
     setLoading(true);
     // main
     try {
+      localStorage.setItem("reset_email", JSON.stringify(data.email));
+
       const result = await tryCatchWrapper(() => forgotPassword(data), {
         message: "Vui lòng kiểm tra lại thông tin!",
       });
 
-      if (result.success) {
+      if (result?.status === 200) {
         toast({
           title: "Gửi mail thành công!",
           description: "Quý khách vui lòng kiểm tra email",
@@ -61,7 +63,7 @@ const Page = () => {
       } else {
         toast({
           title: "Gửi mail thất bại!",
-          description: result?.error || "Vui lòng thử lại sau",
+          description: result?.message || "Vui lòng thử lại sau",
           status: "error",
           position: "top-right",
         });

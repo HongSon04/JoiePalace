@@ -1,11 +1,10 @@
 // HOST URL
-// const HOST = `https://joieplace.live/api`;
 const HOST = `http://joieplace.live/api`;
-const MEMBERSHIPS = `https://joieplace.live/memberships`;
+const MEMBERSHIPS = `http://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
-const AUTH_API = `${HOST}/auth`;
+const AUTH_API = `${HOST}/auth`;  
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
@@ -63,7 +62,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${USER_API}/get/${id}`,
     GET_BY_BRANCH_ID: (id) => `${USER_API}/get-all-by-branch-id/${id}`,
     CHANGE_PASSWORD: `${USER_API}/change-password`,
-    RESET_PASSWORD: `${USER_API}/forgot-passwod`,
+    RESET_PASSWORD: `${USER_API}/forgot-password`,
     FORGOT_PASSWORD: `${USER_API}/forgot-password`,
     CHANGE_PROFILE: `${USER_API}/change-profile`,
     DELETE: (id) => `${USER_API}/delete/${id}`,
@@ -117,7 +116,8 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
-    
+    GET_ALL_INFO: 
+      `${DASHBOARD_API}/get-all-info`,
     GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
@@ -132,6 +132,7 @@ export const API_CONFIG = {
       `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
     GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_BOOKING_STATUS_BRANCH : (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`
   },
 
   // PRODUCTS API
@@ -227,14 +228,19 @@ export const API_CONFIG = {
   },
 
   DECORS: {
+    CREATE: `${DECORS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${DECORS_API}/get-all`, params),
     GET_BY_ID: (id) => `${DECORS_API}/get/${id}`,
+    UPDATE: (id) => `${DECORS_API}/update/${id}`,
+    DELETE: (id) => `${DECORS_API}/delete/${id}`,
+
   },
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
-    GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
+    GET_BY_ID: (id, params) =>
+      constructUrlWithParams(`${NOTIFICATIONS_API}/get/${id}`, params),
     IS_READ: `${NOTIFICATIONS_API}/update-is-read`,
   },
 
