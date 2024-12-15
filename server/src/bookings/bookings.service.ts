@@ -203,14 +203,19 @@ export class BookingsService {
       // Build where conditions using Prisma types
       const whereConditions: any = {
         deleted,
-        ...(query.startDate &&
-          query.endDate && {
-            created_at: {
-              gte: FormatDateToStartOfDay(query.startDate),
-              lte: FormatDateToEndOfDay(query.endDate),
-            },
-          }),
       };
+
+      if (query.startOrganizationDate && query.endOrganizationDate) {
+        whereConditions.organization_date = {
+          gte: FormatDateToStartOfDay(query.startOrganizationDate),
+          lte: FormatDateToEndOfDay(query.endOrganizationDate),
+        };
+      } else if (query.startDate && query.endDate) {
+        whereConditions.created_at = {
+          gte: FormatDateToStartOfDay(query.startDate),
+          lte: FormatDateToEndOfDay(query.endDate),
+        };
+      }
 
       // Add search conditions if search exists
       if (query.search) {

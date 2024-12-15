@@ -172,7 +172,7 @@ function News() {
                       <div className="absolute bottom-[20px] w-full">
                         <p className="w-[90%] font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl max-sm:left-0 m-auto">
                           {blog.title ||
-                            "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                            "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                         </p>
                       </div>
                     </div>
@@ -218,7 +218,7 @@ function News() {
                     </p>
                     <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                       {blog.title ||
-                        "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                        "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                     </p>
                   </div>
                 </Link>
@@ -261,7 +261,7 @@ function News() {
                     </p>
                     <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                       {blog.title ||
-                        "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                        "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                     </p>
                   </div>
                 </Link>
@@ -302,7 +302,7 @@ function News() {
                     </p>
                     <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                       {blog.title ||
-                        "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                        "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                     </p>
                   </div>
                 </Link>

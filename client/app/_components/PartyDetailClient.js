@@ -186,20 +186,30 @@ const PartyDetailClient = ({
           {showDetailLink && (
             <>
               {statusParty === 'success' ? (
-                <div className='underline text-gold text-xs font-medium cursor-pointer'
-                  onClick={clickfeedback}>
-                  Gửi đánh giá
-                </div>
-              ) : statusParty === 'pending' ? (
-                <div className='underline text-red-500 text-xs font-medium cursor-pointer'
-                  onClick={oncLickDelete}
-                >
-                  Hủy
-                </div>
-              ) : ''}
-              <Link href={linkTo} className='underline text-gold text-xs font-medium cursor-pointer'>
-                Chi tiết
-              </Link>
+                <>
+                  <div className='underline text-gold text-xs font-medium cursor-pointer'
+                    onClick={clickfeedback}>
+                    Gửi đánh giá
+                  </div>
+                  <Link href={linkTo} className='underline text-gold text-xs font-medium cursor-pointer'>
+                    Chi tiết
+                  </Link>
+                </>
+              )
+                : statusParty === 'pending' ? (
+                  <div className='underline text-red-500 text-xs font-medium cursor-pointer'
+                    onClick={oncLickDelete}
+                  >
+                    Hủy
+                  </div>
+                )
+                  : statusParty === 'processing' ? (
+                    <Link href={linkTo} className='underline text-gold text-xs font-medium cursor-pointer'>
+                      Chi tiết
+                    </Link>
+                  )
+                    : ''}
+
             </>
           )}
           {Collapsed && (

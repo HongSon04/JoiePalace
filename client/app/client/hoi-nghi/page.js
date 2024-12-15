@@ -40,7 +40,7 @@ function Conference() {
                 Hội nghị
               </h1>
               <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[13px] ">
-                Trung tâm Sự kiện White Palace là địa điểm hoàn hảo để bạn có
+                Trung tâm Sự kiện JOIE PALACE là địa điểm hoàn hảo để bạn có
                 thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo
                 chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra
                 cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng
@@ -109,11 +109,11 @@ function Conference() {
                     <Image src="/meeting-6.png" alt="" />
                   </div>
                   <p className="max-w-[641px] text-base relative left-[70px] top-[25px] text-fade-in max-lg:left-0 max-lg:top-0 max-sm:text-[10px] max-sm:leading-4">
-                    Tại White Palace, chúng tôi cung cấp các gói họp hội nghị
+                    Tại JOIE PALACE, chúng tôi cung cấp các gói họp hội nghị
                     tiêu chuẩn nửa ngày và nguyên ngày với mức giá linh hoạt cho
                     doanh nghiệp. Dựa trên quy mô và tính chất của hội nghị, các
                     chuyên gia của chúng tôi sẽ thiết kế và sắp xếp phương án
-                    tối ưu nhất. Đặc biệt, White Palace sẽ luôn đồng hành, hỗ
+                    tối ưu nhất. Đặc biệt, JOIE PALACE sẽ luôn đồng hành, hỗ
                     trợ khách hàng và đối tác trong suốt quá trình tổ chức, đảm
                     bảo sự kiện diễn ra suôn sẻ, chỉn chu trong từng chi tiết.
                     <ul>
