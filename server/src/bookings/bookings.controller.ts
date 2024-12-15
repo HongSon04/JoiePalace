@@ -311,8 +311,10 @@ export class BookingsController {
     return this.bookingsService.findOne(id);
   }
 
+  // ! Get Booking Now For Next 14 Days
+
   // ! Get Booking For Next 14 Days
-  @Get('get-booking-list/:branch_id')
+  @Get('get-booking-list-for-next-14-days/:branch_id')
   @ApiOperation({
     summary:
       'Lấy danh sách đơn tiệc trong 14 ngày tới (dành cho clients sau dữ liệu booking)',
