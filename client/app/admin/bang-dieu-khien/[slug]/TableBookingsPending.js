@@ -80,26 +80,31 @@ const TableBookingsPending = () => {
   const fetchBookingData = async () => {
     try {
       const currentBranch = JSON.parse(localStorage.getItem('currentBranch'));
-      const branchId = currentBranch.id;
+      let branchId = currentBranch.id;
       const slug = currentBranch.slug;
+      if (currentBranch.slug === "ho-chi-minh") {
+        branchId = 0;
+      }
       // Sử dụng ngày đã chọn (start_Date và end_Date) khi gọi API
       const startDate = start_Date || getDefaultDateRange().start_Date;
       const endDate = end_Date || getDefaultDateRange().end_Date;
-      // console.log(startDate);
-      // console.log(endDate);
+      
+      console.log(startDate);
+      console.log(endDate);
       // Gọi API để lấy booking theo chi nhánh (sử dụng start_Date và end_Date đã chọn)
       const bookingByBranchData = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.GET_ALL({
           branch_id: branchId,
+          startDate: startDate,
+          endDate: endDate,
           is_deposit: true,
           is_confirm: true,
-          status: 'pending',
-          startDate: startDate,
-          endDate: endDate
+          status: "pending",
         }),
-        'GET',
+        "GET",
         null
       );
+      console.log(bookingByBranchData);
       setSlug(slug);
       setDataBookingByBranch(bookingByBranchData);
     } catch (error) {

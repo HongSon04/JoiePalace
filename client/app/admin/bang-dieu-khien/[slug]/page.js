@@ -105,10 +105,6 @@ const Page = ({ params }) => {
         // console.log(branchId);
 
         const {
-          startDate,
-          endDate,
-          currentDate,
-          month,
           startOfWeek,
           endOfWeek,
         } = getCurrentMonthAndWeekDates();
@@ -224,9 +220,6 @@ const Page = ({ params }) => {
   // console.log(dataTotalAdminByYear);
   const dataBranchChart = dataTotalBranch || [];
   // Kiểm tra nếu các đối tượng không phải là null hoặc undefined, nếu không thì sử dụng mảng rỗng
-  const quarterlyRevenues = Object.values(
-    dataBranchChart.total_revune_by_quarter || {}
-  ).flat();
   const monthlyRevenues = Object.values(
     dataBranchChart.total_revune_by_month || []
   );
@@ -236,21 +229,7 @@ const Page = ({ params }) => {
   const yearlyRevenues = Object.values(
     dataBranchChart.total_revune_by_year || []
   );
-  // Tính tổng doanh thu của các quý, tháng, tuần
-  const totalQuarterRevenue = quarterlyRevenues.reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const totalMonthRevenue = monthlyRevenues.reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const totalWeekRevenue = weeklyRevenues.reduce((acc, curr) => acc + curr, 0);
-
-  // Tổng doanh thu
-  // const yearlyRevenues = totalQuarterRevenue + totalMonthRevenue + totalWeekRevenue;
-
-  // console.log(yearlyRevenues);  // In ra tổng doanh thu
+ 
 
   const dataBranch = {
     labels: ["Tuần", "Tháng", "Năm"],
@@ -283,7 +262,7 @@ const Page = ({ params }) => {
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
   const totalInfoBranch = dataTotalBranch?.count_booking_status[0]?.data;
-  console.log(bookingsOffWeekBranch);
+  // console.log(bookingsOffWeekBranch);
   useEffect(() => {
     if (allBooking && allBooking.pagination) {
       setCurrentPage(allBooking.pagination.currentPage);
