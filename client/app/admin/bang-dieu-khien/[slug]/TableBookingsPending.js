@@ -89,22 +89,21 @@ const TableBookingsPending = () => {
       const startDate = start_Date || getDefaultDateRange().start_Date;
       const endDate = end_Date || getDefaultDateRange().end_Date;
       
-      console.log(startDate);
-      console.log(endDate);
+      // console.log(startDate);
+      // console.log(endDate);
       // Gọi API để lấy booking theo chi nhánh (sử dụng start_Date và end_Date đã chọn)
       const bookingByBranchData = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.GET_ALL({
           branch_id: branchId,
+          status: "processing",
           startDate: startDate,
           endDate: endDate,
-          is_deposit: true,
-          is_confirm: true,
-          status: "pending",
+          itemsPerPage: 5
         }),
         "GET",
         null
       );
-      console.log(bookingByBranchData);
+      // console.log(bookingByBranchData);
       setSlug(slug);
       setDataBookingByBranch(bookingByBranchData);
     } catch (error) {
@@ -138,6 +137,7 @@ const TableBookingsPending = () => {
         <thead>
           <tr>
             <th>Sảnh</th>
+            <th>Chi nhánh</th>
             <th>Ngày tổ chức</th>
             <th>Ca tổ chức</th>
             <th></th>
@@ -147,9 +147,10 @@ const TableBookingsPending = () => {
           {dataBookingByBranch && Array.isArray(dataBookingByBranch.data) && dataBookingByBranch.data.length > 0 ? (
             dataBookingByBranch.data.map((item, index) => (
               <tr key={index}>
-                <td>{item.booking_details?.[0]?.stage_detail?.name || 'N/A'}</td>
-                <td>{item.expired_at ? formatDate(item.expired_at) : 'N/A'}</td>
-                <td>{item.shift || 'N/A'}</td>
+                <td className="text-center">{item.booking_details?.[0]?.stage_detail?.name || 'N/A'}</td>
+                <td className="text-center">{item.branches ? item.branches.name : 'N/A'}</td>
+                <td className="text-center">{item.expired_at ? formatDate(item.expired_at) : 'N/A'}</td>
+                <td className="text-center">{item.shift || 'N/A'}</td>
                 <td>
                   <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
                     <p className="text-teal-400 font-bold text-xs">Xem thêm</p>

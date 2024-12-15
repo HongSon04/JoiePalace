@@ -175,9 +175,9 @@ const TableStageStatus = () => {
   const currentShift = getCurrentShift();
   return (
     <div className="w-full">
-      <div className="flex items-center  justify-between mb-[10px]">
+      <div className="flex items-center  justify-between mb-[10px] ">
         <p className="text-base  font-semibold">Trạng thái các sảnh</p>
-        <p className="text-base  font-semibold">{currentShift} - {currentDate}</p>
+        <p className="text-base  font-semibold ">{currentShift} - {currentDate}</p>
       </div>
       <div className='overflow-y-auto max-h-[380px]'>
         <table className="table w-full">

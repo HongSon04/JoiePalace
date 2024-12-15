@@ -96,12 +96,10 @@ export default function CustomCalendar() {
         const dataBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: branchId,
+            status: "processing",
             startDate: startDate,
             endDate: endDate,
-            is_deposit: true,
-            is_confirm: true,
-            itemsPerPage: diffDays + 1,
-            status: "pending",
+            itemsPerPage: diffDays + 1
           }),
           "GET",
           null

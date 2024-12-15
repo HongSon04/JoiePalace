@@ -110,15 +110,16 @@ const Page = ({ params }) => {
         } = getCurrentMonthAndWeekDates();
         const totalBookingWeek = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
+            branch_id: 0,
             startDate: startOfWeek,
             endDate: endOfWeek,
-            status: "pending",
+            status: "processing",
           }),
           "GET",
           null
         );
 
-        // console.log(endOfWeek);
+        console.log(totalBookingWeek);
         // console.log(end_Date);
         const allBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
@@ -428,11 +429,9 @@ const Page = ({ params }) => {
           </div>
         </div>
       </div>
-      {slug !== "ho-chi-minh" && (
-        <div className="w-full p-4">
-          <TableStageStatus />
-        </div>
-      )}
+      <div className=" p-4">
+        <TableStageStatus />
+      </div>
       <div className="flex  gap-6 p-4">
         <div className="w-1/2 ">
           <div className="flex items-center justify-between mb-[10px]">
