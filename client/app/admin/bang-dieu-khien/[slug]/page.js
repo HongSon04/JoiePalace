@@ -266,7 +266,7 @@ const Page = ({ params }) => {
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
   const totalInfoBranch = dataTotalBranch?.count_booking_status[0]?.data;
-  // console.log(allBooking);
+  console.log(bookingsOffWeekBranch);
   useEffect(() => {
     if (allBooking && allBooking.pagination) {
       setCurrentPage(allBooking.pagination.currentPage);
@@ -274,7 +274,7 @@ const Page = ({ params }) => {
     }
   }, [allBooking]);
   const requestData = dataBookingByBranch.data;
-  // console.log(requestData);
+  // console.log(totalInfoBranch);
   const handlePeriodChange = (event) => {
     setSelectedPeriod(event.target.value);
   };
@@ -394,7 +394,7 @@ const Page = ({ params }) => {
       <div className="w-full  flex gap-4   p-4">
         <div className="p-4   bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
-            <p className="text-base font-semibold ">Lịch tổ chức tháng 11</p>
+            <p className="text-base font-semibold ">Lịch tổ chức tháng {month}</p>
           </div>
           <div className="flex justify-center">
             {/* <CustomCalendar /> */}
