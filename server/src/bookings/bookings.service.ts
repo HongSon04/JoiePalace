@@ -210,7 +210,7 @@ export class BookingsService {
           gte: FormatDateToStartOfDay(query.startOrganizationDate),
           lte: FormatDateToEndOfDay(query.endOrganizationDate),
         };
-      } else {
+      } else if (query.startDate && query.endDate) {
         whereConditions.created_at = {
           gte: FormatDateToStartOfDay(query.startDate),
           lte: FormatDateToEndOfDay(query.endDate),
