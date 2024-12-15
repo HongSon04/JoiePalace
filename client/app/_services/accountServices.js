@@ -42,31 +42,15 @@ export const loginGoogle = async (dataToSend) => {
 };
 
 export const forgotPassword = async (email) => {
-  const response = await makeAuthorizedRequest(
-    API_CONFIG.MAIL.FORGOT_PASSWORD,
-    "POST",
-    email
-  );
-
-  // console.log(response);
-
-  if (!response.success) {
-    throw new Error(response?.error?.message || "Đã có lỗi xảy ra");
-  }
+  const response = await axios.post(API_CONFIG.MAIL.FORGOT_PASSWORD, email);
 
   return response;
 };
 
 export const resetPassword = async (data) => {
-  const response = await makeAuthorizedRequest(
-    API_CONFIG.USER.RESET_PASSWORD,
-    "POST",
-    data
-  );
+  const response = await axios.post(API_CONFIG.USER.FORGOT_PASSWORD, data);
 
-  if (!response.success) {
-    throw new Error(response?.error?.message || "Đã có lỗi xảy ra");
-  }
+  console.log("response -> resetPassword", response);
 
   return response;
 };

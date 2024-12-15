@@ -5,11 +5,11 @@ const AdminInputStage = ({ fields = [], title, heightTextarea, control }) => {
   return (
     <div className="p-4 w-[363px] bg-whiteAlpha-200 rounded-lg h-fit">
       <div className="flex gap-3 flex-col">
-        <span className="mb-5 font-bold leading-6 text-base text-white">
+        <span className="mb-2 font-bold leading-6 text-base text-white">
           {title}
         </span>
         {Array.isArray(fields) && fields.length > 0 ? (
-          fields.map((field, index) => (
+          fields?.map((field, index) => (
             <Controller
               key={index}
               name={field.name}
@@ -27,20 +27,20 @@ const AdminInputStage = ({ fields = [], title, heightTextarea, control }) => {
                       {...inputProps}
                       className="px-[10px] py-3 bg-whiteAlpha-200 text-white rounded-md placeholder:text-gray-500 w-full"
                       onChange={(e) => {
-                        inputProps.onChange(e.target.value); // Cập nhật giá trị khi chọn chi nhánh mới
+                        inputProps.onChange(e.target.value);
                       }}
                       value={inputProps.value || ""} // Giá trị hiện tại hoặc giá trị mặc định
                     >
                       <option value="" className="text-black" disabled>
-                        {field.placeholder}
+                        {field?.placeholder}
                       </option>
-                      {field.options.map((option) => (
+                      {field?.options?.map((option) => (
                         <option
-                          key={option.value}
+                          key={option?.value}
                           className="text-black"
-                          value={option.value}
+                          value={option?.value}
                         >
-                          {option.label}
+                          {option?.label}
                         </option>
                       ))}
                     </select>

@@ -62,7 +62,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${USER_API}/get/${id}`,
     GET_BY_BRANCH_ID: (id) => `${USER_API}/get-all-by-branch-id/${id}`,
     CHANGE_PASSWORD: `${USER_API}/change-password`,
-    RESET_PASSWORD: `${USER_API}/forgot-passwod`,
+    RESET_PASSWORD: `${USER_API}/forgot-password`,
     FORGOT_PASSWORD: `${USER_API}/forgot-password`,
     CHANGE_PROFILE: `${USER_API}/change-profile`,
     DELETE: (id) => `${USER_API}/delete/${id}`,
@@ -239,7 +239,8 @@ export const API_CONFIG = {
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
-    GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
+    GET_BY_ID: (id, params) =>
+      constructUrlWithParams(`${NOTIFICATIONS_API}/get/${id}`, params),
     IS_READ: `${NOTIFICATIONS_API}/update-is-read`,
   },
 

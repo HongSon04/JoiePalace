@@ -12,10 +12,6 @@ const AdminInputStageImg = ({
 }) => {
   const [imagePreviews, setImagePreviews] = useState(initialImages);
 
-  useEffect(() => {
-    setImagePreviews(initialImages);
-  }, [initialImages]);
-
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     const newImagePreviews = files.map((file) => URL.createObjectURL(file));

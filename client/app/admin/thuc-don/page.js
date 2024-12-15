@@ -1,54 +1,15 @@
 "use client";
 
 import AdminHeader from "@/app/_components/AdminHeader";
-import useApiServices from "@/app/_hooks/useApiServices";
-import useCustomToast from "@/app/_hooks/useCustomToast";
-import {
-  fetchMenuListError,
-  fetchMenuListRequest,
-  fetchMenuListSuccess,
-} from "@/app/_lib/features/menu/menuSlice";
-import { API_CONFIG } from "@/app/_utils/api.config";
+import useRoleGuard from "@/app/_hooks/useRoleGuard";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import MenuList from "./MenuList";
+import MenuTable from "./MenuTable";
+import { Button } from "@nextui-org/react";
 
 function Page() {
-  const [page, setPage] = React.useState(1);
-  const dispatch = useDispatch();
-  const { menuList, status } = useSelector((store) => store.menu);
-  const toast = useCustomToast();
-  const { makeAuthorizedRequest } = useApiServices();
-
-  const fetchMenuList = async () => {
-    dispatch(fetchMenuListRequest());
-
-    const data = await makeAuthorizedRequest(API_CONFIG.MENU.GET_ALL(), "GET");
-
-    if (data.success) {
-      dispatch(fetchMenuListSuccess(data));
-    } else {
-      toast({
-        title: "Lỗi",
-        description: "Không thể tải danh sách thực đơn",
-        type: "error",
-      });
-      dispatch(fetchMenuListError());
-    }
-  };
-
-  React.useEffect(() => {
-    async function fetchData() {
-      await fetchMenuList();
-    }
-
-    fetchData();
-
-    return () => {};
-  }, []);
+  const { isLoading } = useRoleGuard();
 
   return (
     <div>
@@ -62,12 +23,16 @@ function Page() {
           showSearchForm={false}
           className="flex-1"
         />
-        <Link
-          href="/admin/thuc-don/tao-thuc-don"
-          className="px-3 py-2 h-full bg-whiteAlpha-100 flex flex-center gap-3 rounded-full text-white shrink-0 hover:whiteAlpha-200"
-        >
-          <PlusIcon className="h-6 w-6 cursor-pointer text-white" />
-          Tạo thực đơn
+        <Link href="/admin/thuc-don/tao-thuc-don">
+          <Button
+            endContent={
+              <PlusIcon className="h-5 w-5 cursor-pointer text-white" />
+            }
+            className="bg-whiteAlpha-100 text-white"
+            radius="full"
+          >
+            Tạo thực đơn
+          </Button>
         </Link>
       </div>
       {/* BREADCRUMBS */}
@@ -83,9 +48,7 @@ function Page() {
       </Breadcrumb>
 
       {/* MENU LIST */}
-      {status === "loading" && <div>Loading...</div>}
-      {status === "failed" && <div>Error: {error}</div>}
-      {status === "succeeded" && <MenuList menuList={menuList} />}
+      <MenuTable />
     </div>
   );
 }

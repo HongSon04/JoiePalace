@@ -37,6 +37,7 @@ import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
 import CustomPagination from "@/app/_components/CustomPagination";
 import LoadingContent from "@/app/_components/LoadingContent";
 import { deleteDecor, fetchDecors } from "@/app/_lib/decors/decorsSlice";
+import { API_CONFIG } from "@/app/_utils/api.config";
   
   const INITIAL_VISIBLE_COLUMNS = [
     "id",
@@ -176,7 +177,7 @@ import { deleteDecor, fetchDecors } from "@/app/_lib/decors/decorsSlice";
         if (!confirm) return;
   
         if (confirm) {
-          const data = await dispatch(deleteDecor({id})).unwrap();
+          const data = await makeAuthorizedRequest(API_CONFIG.DECORS.DELETE(id),"DELETE");
           console.log("Delete response:", data);
   
           if (data.success) {
@@ -198,7 +199,7 @@ import { deleteDecor, fetchDecors } from "@/app/_lib/decors/decorsSlice";
               })
             );
           } else {
-            const { statusCode, message } = data?.error;
+            const { message } = data?.error;
             toast({
               title: "Xóa thất bại",
               description: message || "Yêu cầu cần xem xét lại",

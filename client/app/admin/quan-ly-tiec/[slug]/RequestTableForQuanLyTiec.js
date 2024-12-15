@@ -463,7 +463,7 @@ function RequestTable() {
 
             case "processing":
               return (
-                <Chip variant="flat" color="primary">
+                <Chip color="primary" variant="flat">
                   Đang xử lý
                 </Chip>
               );

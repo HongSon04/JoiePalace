@@ -1,160 +1,202 @@
+import CustomPagination from "@/app/_components/CustomPagination";
 import Dish from "@/app/_components/Dish";
-import { getDishes } from "@/app/_lib/features/dishes/dishesSlice";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
 import { capitalize } from "@/app/_utils/helpers";
 import {
   Button,
   Checkbox,
   CheckboxGroup,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
+  Skeleton,
+  extendVariants,
 } from "@nextui-org/react";
-import { Col, Row } from "antd";
+import { useQuery } from "@tanstack/react-query";
+import { Col, Modal, Row } from "antd";
+import { useSearchParams } from "next/navigation";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useToast } from "@chakra-ui/react";
+
+const CustomCheckbox = extendVariants(Checkbox, {
+  variants: {
+    color: {
+      teal: {
+        wrapper: "data-[selected=true]:after:!bg-teal-400",
+      },
+    },
+  },
+});
 
 function DishesModal({
   isOpen,
-  category,
-  onAddingDishes,
-  menuDishes,
-  menuInfo,
+  categories,
   onOpenChange,
   selectedMenuDishes,
   setSelectedMenuDishes,
+  setMenuDishes,
+  menuDishes,
+  onRemoveAllDishes,
 }) {
-  const toast = useToast();
-  const { dishes } = useSelector((state) => state.dishes);
-  const categoryDishes = dishes.filter((dish) => dish.category === category);
-  const [isUnCheckAll, setIsUnCheckAll] = React.useState(false);
-  const dispatch = useDispatch();
-
-  const handleAddSelectedMenuDishes = (selectedMenuDish) => {
-    setSelectedMenuDishes((prev) => [...prev, selectedMenuDish]);
-  };
-
-  const handleRemoveSelectedMenuDishes = (selectedMenuDish) => {
-    setSelectedMenuDishes((prev) =>
-      prev.filter((dish) => dish.id !== selectedMenuDish.id)
-    );
-  };
-
-  const handleValueChange = (dish) => {
-    if (selectedMenuDishes.map((dish) => dish.id).includes(dish.id)) {
-      handleRemoveSelectedMenuDishes(dish);
-    } else {
-      handleAddSelectedMenuDishes(dish);
-    }
-  };
+  const toast = useCustomToast();
+  const searchParams = useSearchParams();
+  const [page, setPage] = React.useState(1);
+  const [search, setSearch] = React.useState("");
+  const [category, setCategory] = React.useState("");
 
   React.useEffect(() => {
-    dispatch(getDishes());
-  }, [dispatch]);
+    const dishesCategorySlug = searchParams.get("dishesCategory");
+    const category = categories
+      ?.at(0)
+      ?.childrens?.find((item) => item.slug === dishesCategorySlug);
+    setCategory(category);
+  }, [searchParams, categories]);
+
+  const {
+    data: categoryDishes,
+    isLoading: isFetchingCategoryDishes,
+    isError: isFetchingCategoryDishesError,
+  } = useQuery({
+    queryKey: ["categoryDishes", category?.id, page, search],
+    queryFn: async () => {
+      const abortController = new AbortController();
+      const signal = abortController.signal;
+
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.GET_BY_CATEGORY(
+          category?.id,
+          {
+            page,
+            search,
+          },
+          signal
+        )
+      );
+
+      if (response.success) {
+        return response;
+      } else {
+        throw new Error(response.message);
+      }
+    },
+    enabled: !!category,
+  });
+
+  const handleAddDish = (dishes, category) => {
+    setMenuDishes((prev) => {
+      const existingDishes = prev[category.id] || [];
+      const newDishes = dishes.filter(
+        (dish) => !existingDishes.some((item) => item.id === dish.id)
+      );
+
+      return {
+        ...prev,
+        [category.id]: [...existingDishes, ...newDishes],
+      };
+    });
+  };
 
   React.useEffect(() => {
     if (isOpen) {
-      setSelectedMenuDishes(menuDishes[category]);
+      setSelectedMenuDishes(menuDishes[category?.id] || []);
+    } else {
+      setSelectedMenuDishes([]);
     }
-  }, [isOpen, menuDishes, menuInfo, category, setSelectedMenuDishes]);
-
-  React.useEffect(() => {
-    if (selectedMenuDishes.length === 0) setIsUnCheckAll(false);
-    else setIsUnCheckAll(true);
-  }, [selectedMenuDishes]);
+  }, [isOpen, menuDishes, category]);
 
   return (
-    <Modal scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader
-              className={`flex ${isUnCheckAll ? "gap-3 items-center" : ""}`}
-            >
-              <h2 className="text-base font-semibold p-3 rounded-md bg-zinc-100 text-gray-600 w-fit">
-                {capitalize(category)}
-              </h2>
-              {isUnCheckAll && (
-                <Button
-                  variant="flat"
-                  color="danger"
-                  onClick={() => {
-                    setIsUnCheckAll(true);
-                    onAddingDishes([], category);
-                  }}
-                >
-                  Bỏ chọn
-                </Button>
-              )}
-            </ModalHeader>
-            <ModalBody>
-              <CheckboxGroup
-                value={selectedMenuDishes.map((dish) => dish.id)}
-                lazy
-                // isDisabled={isDisabled}
-              >
-                <Row gutter={[12, 12]}>
-                  {categoryDishes.map((dish, index) => (
-                    <Col span={24} key={index} className="w-full">
-                      <Checkbox
-                        className="w-full max-w-none"
-                        value={dish.id}
-                        name="dish"
-                        classNames={{
-                          label: "w-full",
-                        }}
-                        onChange={(e) => handleValueChange(dish)}
-                      >
-                        <Dish
-                          key={dish.id}
-                          dish={dish}
-                          mode="dark"
-                          className={"w-full z-0 relative"}
-                          navigate={false}
-                        />
-                      </Checkbox>
-                    </Col>
-                  ))}
-                </Row>
-              </CheckboxGroup>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
-                Đóng
-              </Button>
-              <Button
-                color="primary"
-                onPress={() => {
-                  // validate number of dishes before adding
-                  if (
-                    selectedMenuDishes.length >
-                    menuInfo[`max${capitalize(category)}`]
-                  ) {
-                    toast({
-                      title: "Chưa chọn đúng số lượng món ăn",
-                      description:
-                        "Vui lòng chọn lại, hoặc điều chỉnh số lượng món ăn",
-                      status: "warning",
-                      duration: 2000,
-                      isClosable: true,
-                    });
-                    return;
-                  }
-                  onAddingDishes(selectedMenuDishes, category);
-                  setSelectedMenuDishes([]);
-                  onClose();
-                }}
-              >
-                Chọn
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
+    <Modal
+      title={
+        <h2 className="text-base font-semibold p-3 rounded-md bg-zinc-100 text-gray-600 w-fit">
+          {capitalize(category?.name)}
+        </h2>
+      }
+      footer={[
+        <Button
+          variant="flat"
+          key={"cancel"}
+          className="rounded-full mr-3"
+          onClick={() => onOpenChange(false)}
+        >
+          Đóng
+        </Button>,
+        <Button
+          key={"choose"}
+          className="bg-darkGreen-primary text-white rounded-full"
+          onClick={() => {
+            handleAddDish(selectedMenuDishes, category);
+            setSelectedMenuDishes([]);
+            onOpenChange(false);
+          }}
+        >
+          Chọn
+        </Button>,
+      ]}
+      centered
+      open={isOpen}
+      onOk={() => onOpenChange(false)}
+      onCancel={() => onOpenChange(false)}
+      width={1000}
+    >
+      {isFetchingCategoryDishes ? (
+        <DishesSkeleton />
+      ) : (
+        <CheckboxGroup
+          value={selectedMenuDishes.map((dish) => dish.id)} // Use dish.id for value
+          onValueChange={(selectedIds) => {
+            const selectedDishes = categoryDishes?.data?.filter((dish) =>
+              selectedIds.includes(dish.id)
+            );
+            setSelectedMenuDishes(selectedDishes || []);
+          }}
+          lazy
+        >
+          <Row gutter={[12, 12]} className="w-full">
+            {categoryDishes?.data?.map((dish, index) => (
+              <Col span={12} key={index}>
+                <div className="max-w-full">
+                  <CustomCheckbox
+                    color="teal"
+                    className="w-full max-w-none"
+                    value={dish.id}
+                    name="dish"
+                    classNames={{
+                      label: "w-full",
+                    }}
+                  >
+                    <Dish
+                      key={dish.id}
+                      dish={dish}
+                      mode="dark"
+                      className={"!w-full z-0 relative !bg-gray-100"}
+                      navigate={false}
+                    />
+                  </CustomCheckbox>
+                </div>
+              </Col>
+            ))}
+          </Row>
+          <CustomPagination
+            page={page || 1}
+            total={categoryDishes?.pagination?.lastPage || 1}
+            onChange={(page) => setPage(page)}
+            classNames={{
+              cursor: "cursor-pointer !bg-darkgreen-primary",
+            }}
+          />
+        </CheckboxGroup>
+      )}
     </Modal>
   );
 }
 
 export default DishesModal;
+
+function DishesSkeleton() {
+  return (
+    <div className="columns-2">
+      {[...Array(6)].map((_, index) => (
+        <div key={index}>
+          <Skeleton width="100%" height="200px" className="rounded-lg" />
+        </div>
+      ))}
+    </div>
+  );
+}

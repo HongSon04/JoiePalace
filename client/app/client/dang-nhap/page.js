@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { useSession, signIn } from "next-auth/react";
 import { GetPlatform, getSessionData } from "@/app/_utils/nextAuth";
 import LoadingLoginRegis from "@/app/_components/LoadingLoginRegis";
+import Link from "next/link";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -224,9 +225,12 @@ const Page = () => {
               type="password"
               placeholder="Mật khẩu*"
             />
-            <span className="text-gold text-base font-normal cursor-pointer">
+            <Link
+              href={"/client/quen-mat-khau"}
+              className="text-gold text-base font-normal cursor-pointer"
+            >
               Quên mật khẩu
-            </span>
+            </Link>
             <IconButton
               className={`w-full text-white flex items-center gap-2 rounded-full !bg-gold py-${
                 loading ? "1" : "0"
