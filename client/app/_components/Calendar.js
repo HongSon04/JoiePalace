@@ -97,8 +97,8 @@ export default function CustomCalendar() {
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: branchId,
             status: "processing",
-            startDate: startDate,
-            endDate: endDate,
+            startOrganizationDate: startDate,
+            endOrganizationDate: endDate,
             itemsPerPage: diffDays + 1
           }),
           "GET",

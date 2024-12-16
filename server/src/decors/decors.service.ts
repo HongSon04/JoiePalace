@@ -520,7 +520,6 @@ export class DecorsService {
         products: {
           set: productsTagSet,
         },
-        images: decor.images,
       };
 
       let uploadImages;
@@ -534,13 +533,14 @@ export class DecorsService {
         if (!uploadImages) {
           throw new BadRequestException('Upload ảnh thất bại');
         }
-
-        dataToUpdate.images = uploadImages;
       }
 
       const updatedDecor = await this.prismaService.decors.update({
         where: { id: Number(id) },
-        data: dataToUpdate,
+        data: {
+          images: [...(uploadImages || []), ...(decor.images || [])],
+          ...dataToUpdate,
+        },
         include: {
           products: {
             include: {

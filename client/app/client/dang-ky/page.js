@@ -51,7 +51,12 @@ const Page = () => {
         password: formData.password,
         phone: "null",
       });
+<<<<<<< HEAD
       const emailRes = await axios.post(API_CONFIG.AUTH.VERIFY,
+=======
+      const emailRes = await axios.post(
+        "http://joieplace.live/api/auth/send-email-verify",
+>>>>>>> d2d602344a46ee1441f1215412ef40e092399788
         { email: formData.email }
       );
       toast({

@@ -782,8 +782,16 @@ export class ProductsService {
 
       // Check product existence by name and not the same id
       const findProductByName = await this.prismaService.products.findFirst({
-        where: { AND: [{ name }, { id: { not: Number(id) } }] },
+        where: {
+          name: name,
+          AND: {
+            id: {
+              not: Number(id),
+            },
+          },
+        },
       });
+
       if (findProductByName) {
         throw new BadRequestException('Tên Sản phẩm đã tồn tại');
       }
@@ -841,7 +849,10 @@ export class ProductsService {
         await this.cloudinaryService.deleteMultipleImagesByUrl(
           findProduct.images,
         );
-        updateData.images = uploadImages;
+        updateData.images = [
+          ...(uploadImages || []),
+          ...(updateData.images || []),
+        ];
       }
 
       // Update product

@@ -349,12 +349,15 @@ const Page = ({ params }) => {
             console.error('Lỗi khi lấy dịch vụ khác:', error);
         }
     };
-
+    const getServiceNameById = (id, services) => {
+        const service = services.find(service => service.id === id);
+        return service ? service.name : 'Không xác định';
+    };
+    
     const fetchPackageByID = async (packageId) => {
         try {
             const response = await makeAuthorizedRequest(API_CONFIG.PACKAGES.GET_BY_ID(packageId), 'GET');
             const packageData = response.data[0];
-    
             setSelectedMenu(packageData.menu_id);
             await fetchFoodsByMenuId(packageData.menu_id);
             setSelectPartyTypes(packageData.party_type_id);
@@ -381,10 +384,11 @@ const Page = ({ params }) => {
                 const otherServicesFromAPI = JSON.parse(packageData.other_service);
                 const updatedOtherDishes = otherServicesFromAPI.map((service) => ({
                     id: service.id,
-                    name: service.name || 'Không xác định',
+                    name: getServiceNameById(service.id, otherServices),
                     price: service.price || 0,
                     quantity: service.quantity,
                 }));
+
                 setSelectOtherDishes(updatedOtherDishes);
             } else {
                 setSelectOtherDishes([]);
@@ -395,10 +399,11 @@ const Page = ({ params }) => {
                 const extraServicesFromAPI = JSON.parse(packageData.extra_service);
                 const updatedExtraDishes = extraServicesFromAPI.map((service) => ({
                     id: service.id,
-                    name: service.name || 'Không xác định',
+                    name: getServiceNameById(service.id, extraServices),
                     price: service.price || 0,
                     quantity: service.quantity,
                 }));
+
                 setSelectExtraDishes(updatedExtraDishes);
             } else {
                 setSelectExtraDishes([]);
@@ -434,6 +439,7 @@ const Page = ({ params }) => {
                 const options = stages[0]?.options || [];
                 // Kiểm tra package_id
                 if (partyData.package_id) {
+                    console.log('Calling fetchPackageByID with packageId:', partyData.package_id);
                     await fetchPackageByID(partyData.package_id);
                 } 
                     if(partyData.stage_id){
@@ -579,14 +585,22 @@ const Page = ({ params }) => {
             foods: bookingDetails.menus?.products || [],
             menus_price: bookingDetails.menus?.price || 0,
             other_service: partyData.other_service || null,
+            extra_service: partyData.extra_service || null,
         });
     };
+    const memoizedCheckServices = useCallback((details) => {
+        checkServices(details);
+    }, [otherServices, extraServices])
 
     useEffect(() => {
+        console.log('extraServices:', extraServices);
+        console.log('selectExtraServices:', selectExtraServices);
+        console.log('selectExtraDishes:', selectExtraDishes);
+        console.log('bookingDetails:', bookingDetails);
         if (otherServices[0]?.options.length > 1 && extraServices[0]?.options.length > 1 && bookingDetails) {
-            checkServices(bookingDetails);
+            memoizedCheckServices(bookingDetails);
         }
-    }, [otherServices, extraServices, bookingDetails]);
+    }, [otherServices, extraServices, bookingDetails, memoizedCheckServices]);
 
     const checkSelectedDecor = (decorOptions, partyData) => {
         if (!Array.isArray(decorOptions) || decorOptions.length === 0) {
@@ -709,7 +723,6 @@ const Page = ({ params }) => {
         }
     };
 
-
     const handleChangeQuantity = (id, selectedDishesState, setSelectedDishesState, change) => {
         setSelectedDishesState(selectedDishesState.map(dish =>
             dish.id === id ? { ...dish, quantity: dish.quantity + change } : dish
@@ -733,6 +746,8 @@ const Page = ({ params }) => {
 
     // Handle extra service change
     const handleExtraService = (event) => {
+         const selectedValue = event.target.value; // Hoặc cách bạn lấy giá trị từ event
+         console.log('Selected Extra Service Value:', selectedValue);
         handleServiceChange(event, extraServices, selectExtraDishes, setSelectExtraDishes, setSelectExtraServices);
     };
 
