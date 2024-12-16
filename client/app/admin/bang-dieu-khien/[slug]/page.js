@@ -105,24 +105,21 @@ const Page = ({ params }) => {
         // console.log(branchId);
 
         const {
-          startDate,
-          endDate,
-          currentDate,
-          month,
           startOfWeek,
           endOfWeek,
         } = getCurrentMonthAndWeekDates();
         const totalBookingWeek = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
+            branch_id: 0,
             startDate: startOfWeek,
             endDate: endOfWeek,
-            status: "pending",
+            status: "processing",
           }),
           "GET",
           null
         );
 
-        // console.log(endOfWeek);
+        console.log(totalBookingWeek);
         // console.log(end_Date);
         const allBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
@@ -224,9 +221,6 @@ const Page = ({ params }) => {
   // console.log(dataTotalAdminByYear);
   const dataBranchChart = dataTotalBranch || [];
   // Kiểm tra nếu các đối tượng không phải là null hoặc undefined, nếu không thì sử dụng mảng rỗng
-  const quarterlyRevenues = Object.values(
-    dataBranchChart.total_revune_by_quarter || {}
-  ).flat();
   const monthlyRevenues = Object.values(
     dataBranchChart.total_revune_by_month || []
   );
@@ -236,21 +230,7 @@ const Page = ({ params }) => {
   const yearlyRevenues = Object.values(
     dataBranchChart.total_revune_by_year || []
   );
-  // Tính tổng doanh thu của các quý, tháng, tuần
-  const totalQuarterRevenue = quarterlyRevenues.reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const totalMonthRevenue = monthlyRevenues.reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const totalWeekRevenue = weeklyRevenues.reduce((acc, curr) => acc + curr, 0);
-
-  // Tổng doanh thu
-  // const yearlyRevenues = totalQuarterRevenue + totalMonthRevenue + totalWeekRevenue;
-
-  // console.log(yearlyRevenues);  // In ra tổng doanh thu
+ 
 
   const dataBranch = {
     labels: ["Tuần", "Tháng", "Năm"],
@@ -283,7 +263,7 @@ const Page = ({ params }) => {
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
   const totalInfoBranch = dataTotalBranch?.count_booking_status[0]?.data;
-  // console.log(allBooking);
+  // console.log(bookingsOffWeekBranch);
   useEffect(() => {
     if (allBooking && allBooking.pagination) {
       setCurrentPage(allBooking.pagination.currentPage);
@@ -291,7 +271,7 @@ const Page = ({ params }) => {
     }
   }, [allBooking]);
   const requestData = dataBookingByBranch.data;
-  // console.log(requestData);
+  // console.log(totalInfoBranch);
   const handlePeriodChange = (event) => {
     setSelectedPeriod(event.target.value);
   };
@@ -437,7 +417,7 @@ const Page = ({ params }) => {
       <div className="w-full  flex gap-4   p-4">
         <div className="p-4   bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[10px]">
-            <p className="text-base font-semibold ">Lịch tổ chức tháng 11</p>
+            <p className="text-base font-semibold ">Lịch tổ chức tháng {month}</p>
           </div>
           <div className="flex justify-center">
             <CustomCalendar />
@@ -449,11 +429,9 @@ const Page = ({ params }) => {
           </div>
         </div>
       </div>
-      {slug !== "ho-chi-minh" && (
-        <div className="w-full p-4">
-          <TableStageStatus />
-        </div>
-      )}
+      <div className=" p-4">
+        <TableStageStatus />
+      </div>
       <div className="flex  gap-6 p-4">
         <div className="w-1/2 ">
           <div className="flex items-center justify-between mb-[10px]">

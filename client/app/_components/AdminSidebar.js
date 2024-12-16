@@ -34,6 +34,7 @@ import logo from "@/public/logo-dark.png";
 import { Tooltip } from "@nextui-org/react";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
+import { TbLogs } from "react-icons/tb";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -43,7 +44,6 @@ function AdminSidebar() {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
-        await animate();
 
         await animate(
           scope.current,
@@ -165,7 +165,7 @@ function AdminSidebarNav() {
         className: "",
       },
       {
-        title: "Danh mục",// path: isGeneralBranch
+        title: "Danh mục", // path: isGeneralBranch
         //   ? "/admin/bang-dieu-khien"
         //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
         path: `/admin/quan-ly-danh-muc/`,
@@ -200,6 +200,12 @@ function AdminSidebarNav() {
         className: "",
       },
       {
+        title: "Bài viết",
+        path: `/admin/bai-viet/`,
+        icon: blogIcon,
+        className: "",
+      },
+      {
         title: "Sảnh",
         path: `/admin/sanh/${currentBranch?.slug}`,
         icon: StageIcon,
@@ -212,7 +218,7 @@ function AdminSidebarNav() {
         className: "",
       },
     ];
-  }, [currentBranch]);  
+  }, [currentBranch]);
 
   const subOptions = React.useMemo(() => {
     return [

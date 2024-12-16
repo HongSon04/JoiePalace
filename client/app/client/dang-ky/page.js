@@ -51,7 +51,7 @@ const Page = () => {
         phone: "null",
       });
       const emailRes = await axios.post(
-        "https://joieplace.live/api/auth/send-email-verify",
+        "http://joieplace.live/api/auth/send-email-verify",
         { email: formData.email }
       );
       toast({

@@ -31,15 +31,17 @@ const WeddingSection = () => {
                 // Fetch all products for each package
                 const enrichedPackages = await Promise.all(
                     packagesByUser.map(async (item) => {
+                        console.log(item.price);
                         const otherService = JSON.parse(item.other_service);
                         const products = await Promise.all(
                             otherService.map(service => getProductById(service.id))
                         );
 
                         return {
+                            id:item.id,
                             title: item.name,
-                            price: `${Math.ceil(item.price / 1000000).toLocaleString()} Triệu VND`,
-                            details: `Thường dành cho tiệc khoảng ${item.number_of_guests || 0} khách.`,
+                            price: `${Math.ceil(item.price / 1000000).toLocaleString()} ${item.price < 1000000000 ? 'Triệu' : 'Tỷ'} VND`,
+                            details: `Thường dành cho tiệc khoảng ${item.number_of_guests || 0} khách.`,    
                             categories: [
                                 {
                                     title: "Trang trí",
@@ -119,29 +121,37 @@ const WeddingSection = () => {
             </div>
         );
     }
-    const detailCombo = () => {
-        router.push('')
+    const detailCombo = (id) => {
+        router.push(`/client/chi-tiet-goi-dich-vu/${id}`)
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {weddingPacks.map((pack, packIndex) => (
-                <div key={packIndex} className="relative group rounded-lg text-white cursor-pointer overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105">
-                    <div className={`bg-gradient-to-r from-gold to-whiteAlpha-400 p-6 transition-transform duration-500 hover:shadow-xl ease-in-out ${openPackIndex === packIndex ? 'translate-y-[-8px]' : ''}`}>
-                        <div className='flex justify-between items-center'>
-                            <h2 className="text-lg font-bold uppercase">{pack.title}</h2>
-                        </div>
-                        <p className="text-3xl font-semibold mt-2">{pack.price}</p>
-                        <button
-                            onClick={() => togglePack(packIndex)}
-                            className="mt-4 bg-white text-sm font-semibold text-black py-2 px-4 rounded-md transition duration-300 hover:bg-gray-200 shadow-lg"
-                        >
-                            {openPackIndex === packIndex ? 'Ẩn Chi Tiết' : 'Xem Chi Tiết →'}
-                        </button>
-                    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {weddingPacks.map((pack, packIndex) => (
+          <div
+            key={packIndex}
+            className="relative group rounded-lg text-white cursor-pointer overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105"
+          >
+            <div
+              className={`bg-gradient-to-r from-gold to-whiteAlpha-400 p-6 transition-transform duration-500 hover:shadow-xl ease-in-out ${
+                openPackIndex === packIndex ? "translate-y-[-8px]" : ""
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-bold uppercase">{pack.title}</h2>
+              </div>
+              <p className="text-3xl font-semibold mt-2">{pack.price}</p>
+              <button
+                onClick={() => detailCombo(pack.id)}
+                className="mt-4 bg-white text-sm font-semibold text-black py-2 px-4 rounded-md transition duration-300 hover:bg-gray-200 shadow-lg"
+              >
+                {/* {openPackIndex === packIndex ? 'Ẩn Chi Tiết' : 'Xem Chi Tiết →'} */}
+                Xem Chi Tiết →
+              </button>
+            </div>
 
-                    {/* Expanded Details */}
-                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openPackIndex === packIndex ? 'max-h-[500px]' : 'max-h-0'}`}>
+            {/* Expanded Details */}
+            {/* <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openPackIndex === packIndex ? 'max-h-[500px]' : 'max-h-0'}`}>
                         <div className="mt-4 bg-whiteAlpha-500 text-black p-4 rounded-lg shadow-lg transition-opacity duration-500 ease-in-out">
                             <p className="mb-2 text-gray-800 text-base leading-5">{pack.details}</p>
 
@@ -163,17 +173,17 @@ const WeddingSection = () => {
                                     <div className={`transition-all duration-500 ease-in-out ${openDropdownIndex === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
                                         <ul className="mt-2 list-disc ml-6 text-white">
                                             {category.items.map((item, itemIndex) => (
-                                                <li key={itemIndex} className='my-3 hover:underline hover:text-yellow-400' onClick={detailCombo}>{item}</li>
+                                                <li key={itemIndex} className='my-3 hover:underline hover:text-yellow-400' onClick={()=>detailCombo(1)}>{item}</li>
                                             ))}
                                         </ul>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    </div>
-                </div>
-            ))}
-        </div>
+                    </div> */}
+          </div>
+        ))}
+      </div>
     );
 };
 

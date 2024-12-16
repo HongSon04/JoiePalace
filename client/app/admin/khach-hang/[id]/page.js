@@ -91,7 +91,7 @@ const Page = ({params}) => {
         <div className="rounded-lg bg-whiteAlpha-50 ">
           <div className="w-full grid p-4">
             <p className="text-lg font-bold">Danh sách tiệc</p>
-            <div className='overflow-x-auto max-w-[1531px]  scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
+            <div className='overflow-x-auto max-w-[1531px]  scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100'>
               <BookingsTable userId = {userID}  />
             </div>
             
