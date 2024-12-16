@@ -475,9 +475,9 @@ const Page = ({ params }) => {
                 {Array.isArray(requestData) && requestData.length > 0 ? (
                   requestData.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.users ? item.users.username : "N/A"}</td>
-                      <td>{item.branches ? item.branches.name : "N/A"}</td>
-                      <td>{item.phone || "N/A"}</td>
+                      <td>{item.users ? item.users.username : "--"}</td>
+                      <td>{item.branches ? item.branches.name : "--"}</td>
+                      <td>{item.phone || "--"}</td>
                       <td>
                         <Link
                           href={`/admin/yeu-cau/${item.branches?.slug}/${item.id}`}
