@@ -44,7 +44,6 @@ function AdminSidebar() {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
-        await animate();
 
         await animate(
           scope.current,
