@@ -3,7 +3,7 @@ import { API_CONFIG } from "@/app/_utils/api.config";
 
 export const getAllMemberShips = async(membershipId) => {
     try {
-        const response = await axios.get("http://joieplace.live/api/memberships/get-all");
+        const response = await axios.get(API_CONFIG.MEMBERSHIPS.GET_ALL);
         if (response.status !== 200) {
             throw new Error("Có lỗi khi lấy dữ liệu !");
         }
