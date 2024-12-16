@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserFromLocalStorage } from "../_lib/features/authentication/accountSlice";
+import { useRouter } from 'next/navigation'; 
 
 function AdminUser() {
   const dispatch = useDispatch();
@@ -26,7 +27,17 @@ function AdminUser() {
   }, [dispatch]);
 
   const { isSidebarOpen } = useSelector((store) => store.sidebar);
-
+  const router = useRouter();
+    const handleLogout = () => {
+        const isConfirmed = window.confirm("Bạn có chắc chắn muốn đăng xuất không?");
+    
+        if (isConfirmed) {
+            localStorage.removeItem('currentBranch');
+            localStorage.removeItem('user');
+            localStorage.removeItem('refreshToken');
+            router.push("/admin/");
+        } 
+    };
   return (
     <Popover placement="right-start">
       <PopoverTrigger>
@@ -66,7 +77,7 @@ function AdminUser() {
           </li>
          
           <li className="w-full">
-            <Button
+            <Button onClick={handleLogout}
               startContent={
                 <ArrowRightStartOnRectangleIcon className="w-6 h-6 text-red-400" />
               }

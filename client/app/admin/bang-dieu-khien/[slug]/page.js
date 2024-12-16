@@ -101,26 +101,24 @@ const Page = ({ params }) => {
         if (currentBranch.slug === "ho-chi-minh") {
           idBranch = 0;
         }
-        // console.log(idBranch);
-        // console.log(branchId);
-
         const {
           startOfWeek,
           endOfWeek,
         } = getCurrentMonthAndWeekDates();
+        // console.log(startOfWeek);
+        // console.log(endOfWeek);
         const totalBookingWeek = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            branch_id: 0,
-            startDate: startOfWeek,
-            endDate: endOfWeek,
+            branch_id: idBranch,
             status: "processing",
+            startOrganizationDate: startOfWeek,
+            endOrganizationDate: endOfWeek
           }),
           "GET",
           null
         );
 
-        console.log(totalBookingWeek);
-        // console.log(end_Date);
+        // console.log(totalBookingWeek);
         const allBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: idBranch,
@@ -263,7 +261,7 @@ const Page = ({ params }) => {
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
   const totalInfoBranch = dataTotalBranch?.count_booking_status[0]?.data;
-  // console.log(bookingsOffWeekBranch);
+  // console.log(totalBookingWeekBranch);
   useEffect(() => {
     if (allBooking && allBooking.pagination) {
       setCurrentPage(allBooking.pagination.currentPage);
@@ -282,6 +280,7 @@ const Page = ({ params }) => {
         title="Chung"
         showBackButton={false}
         showHomeButton={false}
+        showSearchForm = {false}
       ></AdminHeader>
       <div className="px-4 w-full flex gap-[16px] justify-between text-white">
         {slug === "ho-chi-minh" ? (
@@ -415,12 +414,12 @@ const Page = ({ params }) => {
       </div>
 
       <div className="w-full  flex gap-4   p-4">
-        <div className="p-4   bg-whiteAlpha-100  rounded-xl">
-          <div className="flex justify-between gap-[10px] items-center mb-[10px]">
+        <div className="p-4 bg-whiteAlpha-100  rounded-xl">
+          <div className="flex justify-between gap-[10px] items-center mb-[20px]">
             <p className="text-base font-semibold ">Lịch tổ chức tháng {month}</p>
           </div>
-          <div className="flex justify-center">
-            <CustomCalendar />
+          <div className="flex justify-center ">
+            <CustomCalendar/>
           </div>
         </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
@@ -458,7 +457,7 @@ const Page = ({ params }) => {
                       <td>{item.branches ? item.branches.name : "N/A"}</td>
                       <td>{item.phone || "N/A"}</td>
                       <td>
-                        <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
+                        <Link href={`/admin/yeu-cau/${item.branches?.slug}/${item.id}`}>
                           <p className="text-teal-400 font-bold text-xs">
                             Xem thêm
                           </p>
@@ -499,7 +498,7 @@ const Page = ({ params }) => {
             </div>
 
             {selectedPeriod === "week" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-whiteAlpha-100 rounded-xl min-h-[410px]">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tuần</p>
                 </div>
@@ -507,7 +506,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "month" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-whiteAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tháng</p>
                 </div>
@@ -515,7 +514,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "year" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-whiteAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo năm</p>
                 </div>
@@ -529,7 +528,7 @@ const Page = ({ params }) => {
             <div className="flex justify-between gap-[10px] items-center mb-[10px]">
               <p className="text-base font-semibold ">Doanh thu tổng</p>
             </div>
-            <div className="p-2 bg-blackAlpha-100 rounded-xl">
+            <div className="p-2  bg-whiteAlpha-100 rounded-xl min-h-[410px]">
               <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                 <p className=" text-base">Doanh thu theo năm</p>
               </div>
