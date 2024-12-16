@@ -26,6 +26,7 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import TableBookingsPending from "./TableBookingsPending";
 import TableStageStatus from "./TableStageStatus";
+import { Skeleton } from "@nextui-org/react";
 
 const Page = ({ params }) => {
   const { slug } = params;
@@ -283,10 +284,10 @@ const Page = ({ params }) => {
         showHomeButton={false}
         showSearchForm={false}
       ></AdminHeader>
-      <div className="px-4 w-full flex gap-[16px] justify-between text-white">
-        {slug === "ho-chi-minh" ? (
-          allInfo ? (
-            <>
+      {slug === "ho-chi-minh" ? (
+        allInfo ? (
+          <>
+            <div className="px-4 w-full flex gap-[16px] justify-between text-white">
               <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
                 <FiPhone className="text-4xl" />
                 <div className="flex justify-between items-center">
@@ -343,12 +344,23 @@ const Page = ({ params }) => {
                   </p>
                 </div>
               </div>
-            </>
-          ) : (
-            <p>Đang tải dữ liệu...</p>
-          )
-        ) : dataTotalBranch ? (
-          <>
+            </div>
+          </>
+        ) : (
+          <div className="px-4 w-full flex gap-[16px] justify-between text-white">
+            {[0, 1, 2, 3].map((n) => {
+              return (
+                <Skeleton
+                  className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200"
+                  key={n}
+                ></Skeleton>
+              );
+            })}
+          </div>
+        )
+      ) : dataTotalBranch ? (
+        <>
+          <div className="px-4 w-full flex gap-[16px] justify-between text-white">
             <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
               <FiPhone className="text-4xl" />
               <div className="flex justify-between items-center">
@@ -406,11 +418,20 @@ const Page = ({ params }) => {
                 </div>
               </div>
             </div>
-          </>
-        ) : (
-          <p>Đang tải dữ liệu...</p>
-        )}
-      </div>
+          </div>
+        </>
+      ) : (
+        <div className="px-4 w-full flex gap-[16px] justify-between text-white">
+          {[0, 1, 2, 3].map((n) => {
+            return (
+              <Skeleton
+                className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200"
+                key={n}
+              ></Skeleton>
+            );
+          })}
+        </div>
+      )}
 
       <div className="w-full  flex gap-4   p-4">
         <div className="p-4 bg-whiteAlpha-100  rounded-xl">

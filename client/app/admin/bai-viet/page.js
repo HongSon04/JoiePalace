@@ -1,15 +1,17 @@
 "use client";
-import AdminHeader from "@/app/_components/AdminHeader";
-import React from "react";
-import BlogBreadCrumbs from "./BlogBreadCrumbs";
-import BlogsTabs from "./BlogsTabs";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import { useRouter } from "next/navigation";
 
 const Blogs = () => {
+  const router = useRouter();
+
+  router.push(API_CONFIG.PATHS.COMING_SOON);
+
   return (
     <div className="relative">
-      <AdminHeader title="Bài viết" />
+      {/* <AdminHeader title="Bài viết" />
       <BlogBreadCrumbs />
-      <BlogsTabs />
+      <BlogsTabs /> */}
     </div>
   );
 };

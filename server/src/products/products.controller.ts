@@ -23,10 +23,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { isPublic } from 'decorator/auth.decorator';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
+import { FilterProductDto } from './dto/FilterProduct.dto';
 
 @ApiTags('Products - Quản lý sản phẩm')
 @Controller('api/products')
@@ -174,7 +174,8 @@ export class ProductsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
-  findAll(@Query() query: FilterPriceDto) {
+  @ApiQuery({ name: 'category_id', required: false, description: '1' })
+  findAll(@Query() query: FilterProductDto) {
     return this.productsService.findAll(query);
   }
 
@@ -237,20 +238,13 @@ export class ProductsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false })
   @ApiQuery({ name: 'endDate', required: false })
-  findAllDeleted(@Query() query: FilterPriceDto) {
+  @ApiQuery({ name: 'category_id', required: false, description: '1' })
+  findAllDeleted(@Query() query: FilterProductDto) {
     return this.productsService.findAllDeleted(query);
   }
 
   // ! Get Services
   @Get('/get-services')
-  // @ApiHeaders([
-  //   {
-  //     name: 'authorization',
-  //     description: 'Bearer token',
-  //     required: false,
-  //   },
-  // ])
-  // @ApiBearerAuth('authorization')
   @isPublic()
   @ApiResponse({
     status: HttpStatus.OK,
@@ -453,8 +447,9 @@ export class ProductsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false })
   @ApiQuery({ name: 'endDate', required: false })
+  @ApiQuery({ name: 'deleted', required: false })
   findByCategoryId(
-    @Query() query: FilterPriceDto,
+    @Query() query: FilterProductDto,
     @Param('category_id') category_id: string,
   ) {
     return this.productsService.findByCategoryId(query, category_id);
@@ -504,7 +499,10 @@ export class ProductsController {
   @ApiQuery({ name: 'startDate', required: false })
   @ApiQuery({ name: 'endDate', required: false })
   @ApiOperation({ summary: 'Lấy sản phẩm theo id tag' })
-  findByTagId(@Query() query: FilterPriceDto, @Param('tag_id') tag_id: number) {
+  findByTagId(
+    @Query() query: FilterProductDto,
+    @Param('tag_id') tag_id: number,
+  ) {
     return this.productsService.findByTagId(query, tag_id);
   }
 
