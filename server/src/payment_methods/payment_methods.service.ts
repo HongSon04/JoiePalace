@@ -81,7 +81,7 @@ export class PaymentMethodsService {
       var secretKey = this.configService.get<string>('MOMO_SECRET_KEY');
       var orderInfo = 'Thanh toán tiền cọc';
       var partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE');
-      var redirectUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/momo-callback?deposit_id=${findDeposit.id}`;
+      var redirectUrl = `${this.configService.get<string>('BACKEND_URL')}api/payment-methods/momo-callback?deposit_id=${findDeposit.id}`;
       var ipnUrl = 'https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b';
       var requestType = 'payWithMethod';
       var amount = Number(findDeposit.amount);
@@ -282,7 +282,7 @@ export class PaymentMethodsService {
       let tmnCode = this.configService.get<string>('VNP_TMN_CODE');
       let secretKey = this.configService.get<string>('VNP_HASH_SECRET');
       let vnpUrl = this.configService.get<string>('VNP_URL');
-      let returnUrl = `${this.configService.get<string>('BACKEND_URL')}payment-methods/vnpay-callback?deposit_id=${findDeposit.id}`;
+      let returnUrl = `${this.configService.get<string>('BACKEND_URL')}api/payment-methods/vnpay-callback?deposit_id=${findDeposit.id}`;
       let orderId = dayjs(date).format('DDHHmmss');
       let amount = findDeposit.amount;
       let bankCode = '';
@@ -407,8 +407,8 @@ export class PaymentMethodsService {
         amount: findDeposit.amount,
         customerId: findDeposit.transactionID,
         currency: 'VND',
-        returnUrl: `${this.configService.get<string>('BACKEND_URL')}payment-methods/onepay/callback`,
-        againLink: `${this.configService.get<string>('BACKEND_URL')}payment-methods/onepay/${findDeposit.id}`,
+        returnUrl: `${this.configService.get<string>('BACKEND_URL')}api/payment-methods/onepay/callback`,
+        againLink: `${this.configService.get<string>('BACKEND_URL')}api/payment-methods/onepay/${findDeposit.id}`,
         clientIp:
           req.headers['x-forwarded-for'] ||
           req.connection.remoteAddress ||
@@ -525,7 +525,7 @@ export class PaymentMethodsService {
         description: `Thanh toán tiền cọc cho ID: ${findDeposit.transactionID}`,
         bank_code: '',
         mac: '',
-        callback_url: `${this.configService.get<string>('BACKEND_URL')}payment-methods/zalopay-callback?deposit_id=${findDeposit.id}`,
+        callback_url: `${this.configService.get<string>('BACKEND_URL')}api/payment-methods/zalopay-callback?deposit_id=${findDeposit.id}`,
       };
 
       const data =
