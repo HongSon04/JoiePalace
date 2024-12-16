@@ -1014,16 +1014,15 @@ export class BookingsService {
         ...partyTypeFormat
       } = party_types;
 
-      // Upload images
-      let uploadImages;
-
-      if (files?.images?.length > 0) {
+      // ? Upload Image If Exist
+      let uploadImages = [];
+      if (files?.images && files?.images?.length > 0) {
         uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/booking',
         );
 
-        if (!uploadImages) {
+        if (uploadImages.length === 0) {
           throw new BadRequestException('Upload ảnh thất bại');
         }
       }
@@ -1123,10 +1122,7 @@ export class BookingsService {
             fee,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
-            images: [
-              ...(uploadImages || []),
-              ...(findBookingDetail.images || []),
-            ],
+            images: findBookingDetail.images,
           },
         });
 
