@@ -496,7 +496,7 @@ export class CategoriesService {
             : findCategories.category_id
               ? Number(findCategories.category_id)
               : null,
-          images: uploadImages ? uploadImages : findCategories.images,
+          images: [...(uploadImages || []), ...(findCategories.images || [])],
           tags: { set: tagsSet },
         },
         include: {

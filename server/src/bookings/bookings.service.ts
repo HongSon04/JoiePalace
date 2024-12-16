@@ -1014,15 +1014,16 @@ export class BookingsService {
         ...partyTypeFormat
       } = party_types;
 
-      // ? Upload Image If Exist
-      let uploadImages = [];
-      if (files?.images && files?.images?.length > 0) {
+      // Upload images
+      let uploadImages;
+
+      if (files?.images?.length > 0) {
         uploadImages = await this.cloudinaryService.uploadMultipleFilesToFolder(
           files.images,
           'joiepalace/booking',
         );
 
-        if (uploadImages.length === 0) {
+        if (!uploadImages) {
           throw new BadRequestException('Upload ảnh thất bại');
         }
       }
@@ -1096,13 +1097,6 @@ export class BookingsService {
           (totalAmount + totalFee - depositAmount).toFixed(0),
         );
 
-        // Push New Image To Old Image
-        if (uploadImages.length > 0) {
-          uploadImages.map((image) => {
-            findBookingDetail.images.push(image);
-          });
-        }
-
         // ! Update Booking
         await this.prismaService.booking_details.update({
           where: { booking_id: Number(findBooking.id) },
@@ -1129,7 +1123,10 @@ export class BookingsService {
             fee,
             total_amount: Number(totalAmount),
             amount_booking: bookingAmount,
-            images: findBookingDetail.images,
+            images: [
+              ...(uploadImages || []),
+              ...(findBookingDetail.images || []),
+            ],
           },
         });
 

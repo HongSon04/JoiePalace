@@ -841,7 +841,10 @@ export class ProductsService {
         await this.cloudinaryService.deleteMultipleImagesByUrl(
           findProduct.images,
         );
-        updateData.images = uploadImages;
+        updateData.images = [
+          ...(uploadImages || []),
+          ...(updateData.images || []),
+        ];
       }
 
       // Update product

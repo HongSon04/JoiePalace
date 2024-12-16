@@ -319,7 +319,7 @@ export class PackagesService {
           description,
           price: Number(price),
           short_description,
-          images: uploadImages ? uploadImages : findPackageById.images,
+          images: [...(uploadImages || []), ...(findPackageById.images || [])],
           other_service,
           note,
           is_show: String(is_show) === 'true',
