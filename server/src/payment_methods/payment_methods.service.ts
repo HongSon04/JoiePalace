@@ -641,7 +641,7 @@ export class PaymentMethodsService {
         this.successPayment(res);
       }
     } catch (ex) {
-      result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
+      result.return_code = 0;
       result.return_message = ex.message;
     }
     console.log('result', result);
@@ -651,19 +651,15 @@ export class PaymentMethodsService {
   // *********************************************************
   // ! Payment Success
   private async successPayment(res) {
-    console.log(
-      `${this.configService.get<string>('FRONTEND_URL')}xac-nhan-thanh-toan/thanh-toan-thanh-cong`,
-    );
-
     res.redirect(
-      `${this.configService.get<string>('FRONTEND_URL')}xac-nhan-thanh-toan/thanh-toan-thanh-cong`,
+      `${this.configService.get<string>('FRONTEND_URL')}client/xac-nhan-thanh-toan/thanh-toan-thanh-cong`,
     );
   }
 
   // ! Payment Fail
   private async failPayment(res) {
     res.redirect(
-      `${this.configService.get<string>('FRONTEND_URL')}xac-nhan-thanh-toan/thanh-toan-that-bai`,
+      `${this.configService.get<string>('FRONTEND_URL')}client/xac-nhan-thanh-toan/thanh-toan-that-bai`,
     );
   }
 
