@@ -8,9 +8,6 @@ function SelectedProduct({ product }) {
     product?.images?.at(0) || CONFIG.DISH_IMAGE_PLACEHOLDER
   );
 
-  console.log("product", product);
-  
-
   const onError = () => {
     setImage(CONFIG.DISH_IMAGE_PLACEHOLDER);
   };
@@ -19,7 +16,9 @@ function SelectedProduct({ product }) {
     <div className="rounded-lg flex gap-3 items-start">
       <div className="relative rounded-lg overflow-hidden w-14 h-14">
         <Image
+          fill
           src={image}
+          alt={product?.name}
           onError={onError}
           sizes="44px"
           className="rounded-lg object-cover"
