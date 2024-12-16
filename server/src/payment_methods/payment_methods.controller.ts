@@ -23,7 +23,7 @@ import { PaymentMethodsService } from './payment_methods.service';
 export class PaymentMethodsController {
   constructor(private readonly paymentMethodsService: PaymentMethodsService) {}
 
-  // ! Payment Momo
+  // ! Payment Momo 
   @Post('momo/:transactionID')
   @isPublic()
   @ApiOperation({ summary: 'Thanh toán qua Momo' })

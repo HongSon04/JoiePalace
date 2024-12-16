@@ -51,6 +51,7 @@ export const API_CONFIG = {
     REFRESH_TOKEN: `${AUTH_API}/refresh-token`,
     UPLOAD_AVATAR: `${AUTH_API}/upload-avatar`,
     LOGIN_GOOLGE: `${AUTH_API}/login-social`,
+    VERIFY: `${AUTH_API}/send-email-verify`
   },
 
   // USER API
@@ -212,6 +213,7 @@ export const API_CONFIG = {
     CREATE: `${BLOGS_API}/create`,
     GET_ALL: `${BLOGS_API}/get-all`,
     GET_BY_SLUG: (slug) => `${BLOGS_API}/get-by-slug/${slug}`,
+    GET_BY_ID: (id) => `${BLOGS_API}/get-by-slug/${id}`,
   },
 
   //MEMBERSHIPS
