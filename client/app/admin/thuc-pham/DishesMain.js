@@ -2,8 +2,7 @@
 
 import Error from "@/app/_components/Error";
 import useRoleGuard from "@/app/_hooks/useRoleGuard";
-import { fetchCategoriesBySlug } from "@/app/_lib/features/categories/categoriesSlice";
-import { API_CONFIG } from "@/app/_utils/api.config";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
 import {
   Tab,
   TabIndicator,
@@ -12,35 +11,40 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Loading from "../loading";
 import DishesSection from "./DishesSection";
 
 function DishesMain() {
   const { isLoading } = useRoleGuard();
+  const queryClient = useQueryClient();
 
   const {
-    categories,
+    data: categories,
     isLoading: isFetchingCategories,
     isError: isErrorFetchingCategories,
-    error: errorFetchingCategories,
-  } = useSelector((store) => store.categories);
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.CATEGORIES.GET_BY_SLUG(API_CONFIG.FOOD_CATEGORY_SLUG),
+        "GET"
+      );
 
-  const dispatch = useDispatch();
-
-  React.useEffect(() => {
-    dispatch(fetchCategoriesBySlug({ slug: API_CONFIG.FOOD_CATEGORY_SLUG }));
-
-    return () => {};
-  }, []);
+      if (response.success) {
+        return response.data.at(0).childrens;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    },
+  });
 
   if (isFetchingCategories) {
     return <Loading />;
   }
 
   if (isErrorFetchingCategories) {
-    return <Error error={errorFetchingCategories} />;
+    return <Error error={"Lỗi khi lấy dữ liệu danh mục"} />;
   }
 
   return (
@@ -50,13 +54,7 @@ function DishesMain() {
           <p className="text-gray-400">Tải danh mục món ăn thất bại</p>
           <button
             className="text-gray-400 underline"
-            onClick={() =>
-              dispatch(
-                fetchCategoriesBySlug({
-                  slug: API_CONFIG.FOOD_CATEGORY_SLUG,
-                })
-              )
-            }
+            onClick={() => queryClient.invalidateQueries(["categories"])}
           >
             Thử lại
           </button>
@@ -85,11 +83,6 @@ function DishesMain() {
                   key={index}
                   categories={categories}
                 />{" "}
-                {/* <DishesTable
-                key={index}
-                dishCategory={category}
-                categories={categories}
-              /> */}
               </TabPanel>
             ))}
         </TabPanels>

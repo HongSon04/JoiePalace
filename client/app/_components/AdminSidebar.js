@@ -31,10 +31,9 @@ import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import logo from "@/public/logo-dark.png";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip } from "antd";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
-import { TbLogs } from "react-icons/tb";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -281,7 +280,7 @@ function AdminSidebarItem({ item, className }) {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   return (
-    <Tooltip placement="topLeft" title={item?.title}>
+    <Tooltip placement="topLeft" title={item?.title} color="white">
       <li
         item={item}
         className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
