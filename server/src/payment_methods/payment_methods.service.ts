@@ -708,11 +708,4 @@ export class PaymentMethodsService {
       contents.type,
     );
   }
-
-  // ! Random Number ID
-  generateUniqueTransactionId(findDeposit, transID) {
-    const timestamp = dayjs(Date.now()).format('YYMMDD');
-    const randomPart = Math.random().toString(36).substring(2, 10); // Tạo một chuỗi ngẫu nhiên
-    return `${timestamp}-${findDeposit.transactionID}-${transID}-${randomPart}`;
-  }
 }
