@@ -233,9 +233,9 @@ const Page = () => {
   if (!dataPackage && !dataToShow && !categories) return <Loading></Loading>;
   return (
     <>
-      <div className="w-full px-48">
-        <section className="w-full h-screen pt-[150px] pb-[60px] flex justify-between items-center relative z-10">
-          <div className="w-2/5 h-auto flex flex-col gap-8 z-10">
+      <div className="w-full px-12 520px:px-24 lg:px-48">
+        <section className="w-full h-screen pt-[150px] pb-[60px] flex justify-between items-center relative z-10 flex-col-reverse 735px:flex-row  gap-4 735px:gap-0">
+          <div className="w-full 735px:w-2/5 h-auto flex flex-col gap-8 z-10">
             <small className="text-gold text-base font-normal leading-6">
               {dataPackage.short_description}
             </small>
@@ -256,7 +256,7 @@ const Page = () => {
               {/* <IconButton className="w-fit px-4 z-10">TẠO NGAY</IconButton> */}
             </div>
           </div>
-          <div className="w-2/5 h-full overflow-hidden">
+          <div className="w-full 735px:w-2/5 h-full overflow-hidden">
             <Image
               src="https://wallpapers.com/images/hd/wedding-aesthetic-reception-iie309969jsfu8zp.jpg"
               className="w-full h-full object-cover"
@@ -272,7 +272,7 @@ const Page = () => {
           </div>
         </section>
         <section className="w-full py-[60px] min-h-screen flex flex-col items-center gap-8">
-          <div className="flex w-fit justify-center gap-4 py-2 px-4 items-center rounded-full bg-whiteAlpha-50">
+          <div className="flex w-fit justify-center gap-4 py-2 px-4 items-center rounded-full bg-whiteAlpha-50 ">
             <span
               onClick={() => {
                 setOptionIndex(0);
@@ -342,8 +342,8 @@ const Page = () => {
               </svg>
             </button>
           </div>
-          <div className="w-full flex gap-5">
-            <div className="flex flex-col gap-6 p-5 rounded-2xl w-1/3 h-auto">
+          <div className="w-full flex gap-5 flex-col-reverse 735px:flex-row">
+            <div className="flex flex-col gap-6 p-5 rounded-2xl w-full 735px:w-1/3 h-auto">
               <div
                 className={`flex flex-col gap-4 bg-whiteAlpha-50 p-5 rounded-2xl h-[${
                   optionIndex === 2 ? "5" : "7"
@@ -370,7 +370,11 @@ const Page = () => {
                         </span>
                         <br />
                         <span className="mb-4 leading-5">
-                          Tiền thực đơn gói này là: {(dataPackage?.menus.price * Math.ceil(numberOfGuests / 10)).toLocaleString()}{" "}
+                          Tiền thực đơn gói này là:{" "}
+                          {(
+                            dataPackage?.menus.price *
+                            Math.ceil(numberOfGuests / 10)
+                          ).toLocaleString()}{" "}
                           VNĐ. Với số lượng bàn của gói này là:{" "}
                           {Math.ceil(numberOfGuests / 10)} bàn, và{" "}
                           {numberOfGuests || 0} khách.
@@ -381,7 +385,7 @@ const Page = () => {
                 </div>
               ) : null}
             </div>
-            <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+            <div className="w-full 735px:w-2/3 h-full  flex flex-col gap-3 relative">
               <div className="flex gap-3 items-center">
                 <span className="text-3xl font-bold">{dataToShow?.name}</span>
               </div>
@@ -390,7 +394,7 @@ const Page = () => {
               </span>
               <div className="w-full flex flex-wrap gap-4">
                 {optionIndex === 0 ? (
-                  <div className="w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
+                  <div className="w-[calc(33.33%-16px)] 615px:w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
                     <div className="overflow-hidden h-[150px] max-h-[150px] rounded-lg">
                       <Image
                         src={dataToShow?.images[0]}
@@ -416,7 +420,7 @@ const Page = () => {
                             item?.data?.map((key, index) => (
                               <div
                                 key={index}
-                                className="w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer"
+                                className="w-[calc(33.33%-16px)] 615px:w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer"
                               >
                                 <div className="overflow-hidden h-[100%] max-h-[150px] rounded-lg">
                                   <Image
@@ -431,7 +435,7 @@ const Page = () => {
                               </div>
                             ))
                           ) : (
-                            <div className="w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
+                            <div className="w-[calc(33.33%-16px)] 615px:w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer">
                               <div className="overflow-hidden h-[100%] max-h-[150px] rounded-lg">
                                 <Image
                                   src={item?.data?.images[0]}
@@ -459,7 +463,7 @@ const Page = () => {
                               {dataToShow?.data[menu.slug]?.map((item) => (
                                 <div
                                   key={item?.id}
-                                  className={`w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer`}
+                                  className={`w-[calc(33.33%-16px)] 615px:w-[calc(25%-16px)] aspect-w-1 aspect-h-1 p-2 gap-3 flex flex-col rounded-lg cursor-pointer`}
                                 >
                                   <div className="overflow-hidden h-[150px] max-h-[150px] rounded-lg">
                                     <Image
@@ -484,7 +488,7 @@ const Page = () => {
                     {dataToShow?.map((item, index) => (
                       <div
                         key={item[0]?.id}
-                        className={`w-[calc(25%-16px)] p-2 gap-3 flex flex-col rounded-lg cursor-pointer`}
+                        className={`w-[calc(33.33%-16px)] 615px:w-[calc(25%-16px)] p-2 gap-3 flex flex-col rounded-lg cursor-pointer`}
                       >
                         <div className="overflow-hidden h-[100%] max-h-[150px] rounded-lg">
                           <Image
@@ -581,7 +585,11 @@ const Page = () => {
                           >
                             <span className="text-base">{c?.name}</span>
                             <span className="text-base">
-                              {(dataPackage?.menus?.price * Math.ceil(numberOfGuests / 10)).toLocaleString("vn-VN")} VNĐ
+                              {(
+                                dataPackage?.menus?.price *
+                                Math.ceil(numberOfGuests / 10)
+                              ).toLocaleString("vn-VN")}{" "}
+                              VNĐ
                             </span>
                           </div>
                         );
@@ -617,7 +625,10 @@ const Page = () => {
                         cur.products.reduce((acc, cur) => acc + cur.price, 0),
                       0
                     )} */}
-                    {Math.ceil(dataPackage.price / 1000000)} {`${dataPackage.price < 1000000000 ? "Triệu" : "Tỉ"}`} VNĐ
+                    {(
+                      Math.ceil(dataPackage.price / 1000000) * 1000000
+                    ).toLocaleString()}{" "}
+                    VNĐ
                   </span>
                 </div>
                 <ChevronDownIcon

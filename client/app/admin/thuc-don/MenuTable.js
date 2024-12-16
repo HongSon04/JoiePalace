@@ -91,6 +91,7 @@ function MenuTable() {
       if (response.success) return response;
       else throw new Error("Failed to fetch menu");
     },
+    refetchOnWindowFocus: false,
   });
 
   // Format the dates to "dd-MM-yyyy"
@@ -343,7 +344,9 @@ function MenuTable() {
                 {menuStatus == "deleted" ? (
                   <DropdownMenu>
                     <DropdownItem>
-                      <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
+                      <Link href={`${pathname}/${item.id}?isDeleted=true`}>
+                        Xem chi tiết
+                      </Link>
                     </DropdownItem>
                     <DropdownItem onClick={() => restoreMenu(item.id)}>
                       {`Khôi phục thực đơn`}
@@ -519,7 +522,7 @@ function MenuTable() {
     >
       <TableHeader
         columns={headerColumns}
-        className="!bg-whiteAlpha-100 has-[role=columnheader]:bg-whiteAlpha-200 here"
+        className="!bg-whiteAlpha-100 has-[role=columnheader]:bg-whiteAlpha-200"
       >
         {(column) => (
           <TableColumn
@@ -541,7 +544,7 @@ function MenuTable() {
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => (
-              <TableCell className="py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
+              <TableCell className="group-aria-[selected=false]/tr:group-data-[hover=true]/tr:before:!bg-whiteAlpha-100 py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
                 {renderCell(item, columnKey)}
               </TableCell>
             )}

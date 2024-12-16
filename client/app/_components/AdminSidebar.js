@@ -30,11 +30,12 @@ import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
+import decorsIcon from "@/public/admin-sidebar/trang-tri.svg";
+import packageIcon from "@/public/admin-sidebar/goi-combo.svg";
 import logo from "@/public/logo-dark.png";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip } from "antd";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
-import { TbLogs } from "react-icons/tb";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -44,7 +45,6 @@ function AdminSidebar() {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
-
         await animate(
           scope.current,
           {
@@ -214,7 +214,13 @@ function AdminSidebarNav() {
       {
         title: "Trang Trí",
         path: `/admin/trang-tri`,
-        icon: StageIcon,
+        icon: decorsIcon,
+        className: "",
+      },
+      {
+        title: "Gói Combo",
+        path: `/admin/goi-combo`,
+        icon: packageIcon,
         className: "",
       },
       {
@@ -288,7 +294,7 @@ function AdminSidebarItem({ item, className }) {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   return (
-    <Tooltip content={item.title} placement="right-end">
+    <Tooltip placement="topLeft" title={item?.title} color="white">
       <li
         item={item}
         className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${

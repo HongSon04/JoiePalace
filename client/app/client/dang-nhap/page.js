@@ -192,7 +192,7 @@ const Page = () => {
   return (
     <div className="w-screen h-screen flex relative gap-28 items-center justify-center p-8 lg:p-0">
       {isLoading ? <LoadingLoginRegis /> : null}
-      <div className="w-1/2 h-full overflow-hidden">
+      <div className="w-1/2 h-full overflow-hidden hidden md:block">
         <Image
           src="/img_login.png"
           w={"100%"}
@@ -202,7 +202,7 @@ const Page = () => {
         />
       </div>
       <Image className="absolute" src="/decor_cover" alt="" />
-      <div className="w-1/2 h-full pr-28 flex items-center">
+      <div className="w-full justify-center md:w-1/2 h-full p-0 lg:pr-28 flex items-center flex-shrink-0">
         <div className="p-6 flex flex-col w-full max-w-[490px] bg-blackAlpha-500 gap-4">
           <h1 className="text-4xl font-black text-gold">Đăng nhập</h1>
           <span className="text-base">

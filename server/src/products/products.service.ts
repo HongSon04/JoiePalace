@@ -1,4 +1,3 @@
-import { tags } from './../../node_modules/.prisma/client/index.d';
 import {
   BadRequestException,
   HttpException,
@@ -7,7 +6,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
@@ -18,6 +16,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FilterProductDto } from './dto/FilterProduct.dto';
 
 @Injectable()
 export class ProductsService {
@@ -125,7 +124,7 @@ export class ProductsService {
   }
 
   // ! Get all products
-  async findAll(query: FilterPriceDto) {
+  async findAll(query: FilterProductDto) {
     try {
       // Parse và gán giá trị mặc định cho các tham số
       const page = Number(query.page) || 1;
@@ -133,6 +132,7 @@ export class ProductsService {
       const search = query.search || '';
       const skip = (page - 1) * itemsPerPage;
       const priceSort = query?.priceSort?.toLowerCase();
+      const category_id = query.category_id || null;
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
@@ -169,6 +169,10 @@ export class ProductsService {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
         ];
+      }
+
+      if (category_id && category_id !== 'null') {
+        whereConditions.category_id = Number(category_id);
       }
 
       // Điều kiện giá
@@ -239,7 +243,7 @@ export class ProductsService {
   }
 
   // ! Get all deleted products
-  async findAllDeleted(query: FilterPriceDto) {
+  async findAllDeleted(query: FilterProductDto) {
     try {
       // Parse và gán giá trị mặc định cho các tham số
       const page = Number(query.page) || 1;
@@ -247,6 +251,7 @@ export class ProductsService {
       const search = query.search || '';
       const skip = (page - 1) * itemsPerPage;
       const priceSort = query?.priceSort?.toLowerCase();
+      const category_id = query.category_id || null;
 
       const startDate = query.startDate
         ? FormatDateToStartOfDay(query.startDate)
@@ -283,6 +288,10 @@ export class ProductsService {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
         ];
+      }
+
+      if (category_id && category_id !== 'null') {
+        whereConditions.category_id = Number(category_id);
       }
 
       // Điều kiện giá
@@ -535,7 +544,7 @@ export class ProductsService {
   }
 
   // ! Get all products by category id
-  async findByCategoryId(query: FilterPriceDto, category_id: string) {
+  async findByCategoryId(query: FilterProductDto, category_id: string) {
     try {
       // Parse và gán giá trị mặc định cho các tham số
       const page = Number(query.page) || 1;
@@ -647,7 +656,7 @@ export class ProductsService {
   }
 
   // ! Get all products by tag id
-  async findByTagId(query: FilterPriceDto, tag_id: number) {
+  async findByTagId(query: FilterProductDto, tag_id: number) {
     try {
       // Parse và gán giá trị mặc định cho các tham số
       const page = Number(query.page) || 1;

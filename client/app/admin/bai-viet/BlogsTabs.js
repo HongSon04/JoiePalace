@@ -1,46 +1,35 @@
 "use cient";
-import Loading from "@/app/loading";
+import FormInput from "@/app/_components/FormInput";
+import Uploader from "@/app/_components/Uploader";
+import useCustomToast from "@/app/_hooks/useCustomToast";
+import { deleteCategory } from "@/app/_lib/features/categories/categoriesSlice";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import { Image } from "@chakra-ui/react";
 import {
-  EllipsisVerticalIcon as VerticalDotsIcon,
+  ExclamationCircleIcon,
   PlusIcon,
   XMarkIcon,
-  ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod/dist/zod";
 import {
   Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
+import { useQuery } from "@tanstack/react-query";
 import { Col, Row } from "antd";
-import FormInput from "@/app/_components/FormInput";
-import Uploader from "@/app/_components/Uploader";
-import { motion, AnimatePresence } from "framer-motion";
-import useCustomToast from "@/app/_hooks/useCustomToast";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod/dist/zod";
-import { useDispatch, useSelector } from "react-redux";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import {
-  addCategory,
-  deleteCategory,
-  fetchRequests,
-  updateRequestStatus,
-} from "@/app/_lib/features/categories/categoriesSlice";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { FaPen } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { Image } from "@chakra-ui/react";
-import { API_CONFIG } from "@/app/_utils/api.config";
+import { useDispatch, useSelector } from "react-redux";
+import { z } from "zod";
+import Loading from "../loading";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -95,7 +84,6 @@ const checkFileSize = (file) => {
 
 const BlogsTabs = () => {
   const dispatch = useDispatch();
-  const [categories, setCategories] = useState(null);
   const [blogs, setBlogs] = useState(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const inputRef = React.useRef();
@@ -120,25 +108,26 @@ const BlogsTabs = () => {
   } = useForm({
     resolver: zodResolver(schema),
   });
-  useEffect(() => {
-    const fecthData = async () => {
-      const blogCategories = await axios.get(API_CONFIG.PACKAGES.GET_BY_ID(10)
-      );
-      const blogs = await axios.get(API_CONFIG.BLOGS.GET_ALL);
-      const listCategoriesBlog = blogCategories?.data?.data[0]?.childrens;
-      const listBlogs = blogs?.data?.data;
 
-      setCategory_id(listCategoriesBlog[0].id);
-      setBlogs(listBlogs);
-      setCategories(listCategoriesBlog);
-      setDataToShow(
-        listBlogs.filter(
-          (item) => item.category_id === listCategoriesBlog[0].id
-        )
+  const {
+    data: categories,
+    isLoading: isFetchingCategories,
+    isError: isFetchingCategoriesError,
+  } = useQuery({
+    queryKey: ["get/categories"],
+    queryFn: async () => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.CATEGORIES.GET_BY_SLUG(API_CONFIG.BLOG_CATEGORY_SLUG),
+        "GET"
       );
-    };
-    fecthData();
-  }, []);
+      if (response.success) {
+        return response?.data;
+      } else {
+        return response;
+      }
+    },
+  });
+
   React.useEffect(() => {
     if (files.some((file) => !checkFileSize(file))) {
       setIsImageOverSize(true);
@@ -152,6 +141,7 @@ const BlogsTabs = () => {
       setIsFormatAccepted(true);
     }
   }, [files]);
+
   const getNumberBlog = (category) => {
     let totalBlogCount = 0;
     blogs.filter((blog) => {
@@ -267,13 +257,12 @@ const BlogsTabs = () => {
     router.refresh();
   };
 
-  if (!categories || !blogs || !dataToShow) return <Loading />;
-  console.log("categories", categories);
+  if (!categories) return <Loading />;
   return (
     <>
       <div className="w-full min-h-[100vh] mt-12 flex flex-col gap-[30px]">
         <div className="w-full flex gap">
-          {categories.map((category) => (
+          {categories?.at(0)?.childrens?.map((category) => (
             <span
               onClick={() => {
                 setDataToShow(
@@ -299,14 +288,14 @@ const BlogsTabs = () => {
             Thêm bài viết
           </Button>
         </div>
-        {dataToShow.length > 0 ? (
+        {dataToShow?.length > 0 ? (
           <div className="w-full min-h-[500px] flex gap-16">
             <div className="w-[65%] min-h-[200px] flex flex-col gap-5">
-              {dataToShow.map((item) => (
-                <div key={item.id} className="w-full flex gap-4">
+              {dataToShow?.map((item) => (
+                <div key={item?.id} className="w-full flex gap-4">
                   <div className="w-[170px] h-[160px] overflow-hidden">
                     <Image
-                      src={item.images[0]}
+                      src={item?.images[0]}
                       className="w-full h-full object-cover"
                       alt=""
                     />
@@ -320,7 +309,7 @@ const BlogsTabs = () => {
                     </span>
                     <span className="uppercase text-xs text-[#9BA2AE]">
                       {(() => {
-                        const date = new Date(item.created_at);
+                        const date = new Date(item?.created_at);
                         const day = date.getUTCDate();
                         const month = date.getUTCMonth() + 1; // Tháng bắt đầu từ 0
                         const year = date.getUTCFullYear();

@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-  
+
 @font-face {
   font-family: "Gilroy";
   src: url("../../fonts/gilroy/SVN-Gilroy Heavy.otf") format("opentype");
@@ -750,9 +750,9 @@ select {
   background-image: url(/line-group.svg);
   background-size: cover;
   /* margin-left: 10px; */
-  display:flex;
+  display: flex;
   justify-content: center;
-  opacity:0.5;
+  opacity: 0.5;
 }
 .bg-cloche {
   background-image: url(/cloche.png);
@@ -760,7 +760,9 @@ select {
 }
 /* Đánh dấu các ngày có sự kiện */
 .react-calendar__tile.highlight {
-  background-color: #0070f3; 
+  background-color: #0070f3;
   color: white;
-  border-radius: 50%; 
+  border-radius: 50%;
 }
+
+/* tr[data-] */

@@ -4,13 +4,13 @@ const MEMBERSHIPS = `https://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
-const AUTH_API = `${HOST}/auth`;  
+const AUTH_API = `${HOST}/auth`;
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
 const DASHBOARD_API = `${HOST}/dashboard`;
 const PRODUCTS_API = `${HOST}/products`;
-const FEEDBACKS_API = `${HOST}/feedbacks`;
+const FEEDBACKS_API = `${HOST}/feedbacks`;  
 const PARTYTYPES_API = `${HOST}/party-types`;
 const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
@@ -25,7 +25,6 @@ const DECORS_API = `${HOST}/decors`;
 const STAGES_API = `${HOST}/stages`;
 const MAIL_API = `${HOST}/mail`;
 
-
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
   const url = new URL(baseUrl);
@@ -36,12 +35,17 @@ const constructUrlWithParams = (baseUrl, params) => {
 
 // API Endpoints
 export const API_CONFIG = {
+  PATHS: {
+    COMING_SOON: "/admin/comming-soon",
+  },
+
   GENERAL_BRANCH: "ho-chi-minh",
   FOOD_CATEGORY_SLUG: "menu-products",
   STAGE_CATEGORY_SLUG: "san-khau",
   WEDDING_CAKE_SLUG: "banh-cuoi",
   EXTRA_SERVICES_SLUG: "dich-vu-them",
   BEAVERAGE_CATEGORY_SLUG: "nuoc-uong",
+  BLOG_CATEGORY_SLUG: "bai-viet",
 
   // AUTH API
   AUTH: {
@@ -51,7 +55,7 @@ export const API_CONFIG = {
     REFRESH_TOKEN: `${AUTH_API}/refresh-token`,
     UPLOAD_AVATAR: `${AUTH_API}/upload-avatar`,
     LOGIN_GOOLGE: `${AUTH_API}/login-social`,
-    VERIFY: `${AUTH_API}/send-email-verify`
+    VERIFY: `${AUTH_API}/send-email-verify`,
   },
 
   // USER API
@@ -118,8 +122,7 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
-    GET_ALL_INFO: 
-      `${DASHBOARD_API}/get-all-info`,
+    GET_ALL_INFO: `${DASHBOARD_API}/get-all-info`,
     GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
@@ -134,7 +137,8 @@ export const API_CONFIG = {
       `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
     GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
-    GET_BOOKING_STATUS_BRANCH : (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`
+    GET_BOOKING_STATUS_BRANCH: (id) =>
+      `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`,
   },
 
   // PRODUCTS API
@@ -237,7 +241,6 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${DECORS_API}/get/${id}`,
     UPDATE: (id) => `${DECORS_API}/update/${id}`,
     DELETE: (id) => `${DECORS_API}/delete/${id}`,
-
   },
 
   // NOTIFICATIONS API
@@ -255,8 +258,8 @@ export const API_CONFIG = {
       constructUrlWithParams(`${PACKAGES_API}/get-all`, params),
     GET_BY_SLUG: (slug) => `${PACKAGES_API}/get-by-slug/${slug}`,
     GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
-    GET_ALL_BY_PARAMS: (params) =>
-      constructUrlWithParams(`${PACKAGES_API}/get-all`, params),
+    DELETE: (id) => `${PACKAGES_API}/delete/${id}`,
+
   },
 
   // MENU API

@@ -27,44 +27,35 @@ import React from "react";
 import { BsMoon, BsSun } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 
+import SearchForm from "@/app/_components//SearchForm";
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
-import {
-  fetchRequests,
-  updateRequestStatus,
-} from "@/app/_lib/features/requests/requestsSlice";
+import { fetchRequests, updateRequestStatus } from "@/app/_lib/features/requests/requestsSlice";
 import { CONFIG } from "@/app/_utils/config";
 import { capitalize } from "@/app/_utils/helpers";
 import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
 import CustomPagination from "@/app/_components/CustomPagination";
 import LoadingContent from "@/app/_components/LoadingContent";
-import SearchForm from "@/app/_components/SearchForm";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import { fetchPackages } from "@/app/_lib/features/packages/packagesSlice";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
-  "total_amount",
-  "created_at",
-  "status",
-  "amount_booking",
-  "organization_date",
-  "amount_to_be_paid",
+  "user_id",
+  "menus",
+  "short_description",
+  "price",
   "actions",
 ];
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "Chủ tiệc / Loại tiệc", uid: "name", sortable: true },
-  { name: "Ngày đặt", uid: "created_at", sortable: true },
-  { name: "Tổng giá trị", uid: "total_amount", sortable: true },
-  { name: "Tiền cọc", uid: "amount_booking", sortable: true },
-  { name: "Ngày dự kiến", uid: "organization_date", sortable: true },
-  {
-    name: "Số tiền cần phải thanh toán",
-    uid: "amount_to_be_paid",
-    sortable: true,
-  },
-  { name: "Trạng thái", uid: "status", sortable: true },
+  { name: "Tên người dùng", uid: "user_id", sortable: true },
+  { name: "Tên gói", uid: "name", sortable: true },
+  { name: "Giá tiền", uid: "price", sortable: true },
+  { name: "Mô tả ngắn", uid: "short_description" },
+  { name: "Thực đơn", uid: "menus" },
   { name: "Hành động", uid: "actions" },
 ];
 
@@ -73,14 +64,14 @@ function RequestTable() {
   const pathname = usePathname();
   const router = useRouter();
   const {
-    requests,
+    packages,
     pagination,
-    isFetchingRequests,
-    isFetchingRequestsError,
+    isFetchingDecors,
+    isFetchingDecorsError,
     isUpdatingRequest,
     isUpdatingRequestError,
     error,
-  } = useSelector((store) => store.requests);
+  } = useSelector((store) => store.packages);
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -94,7 +85,7 @@ function RequestTable() {
     ),
   });
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [requestStatus, setRequestStatus] = React.useState("processing");
+  const [requestStatus, setRequestStatus] = React.useState("pending");
   const toast = useCustomToast();
   const [isShowTips, setIsShowTips] = React.useState(true);
 
@@ -122,29 +113,14 @@ function RequestTable() {
   }, []);
 
   React.useEffect(() => {
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-    if (!currentBranch) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
-        type: "error",
-      });
-
-      router.push("/auth/chon-chi-nhanh");
-    }
     const params = {
-      status: requestStatus,
-      page: currentPage,
-      branch_id: currentBranch.id,
-      itemsPerPage,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
+
+      created_at: formattedStartDate,
     };
 
-    dispatch(fetchRequests({ params }));
+    dispatch(fetchPackages({ params }));
 
-    return () => {};
+    return () => { };
   }, [
     currentPage,
     itemsPerPage,
@@ -155,30 +131,15 @@ function RequestTable() {
   ]);
 
   React.useEffect(() => {
-    const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-    if (!currentBranch) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
-        type: "error",
-      });
-
-      router.push("/auth/chon-chi-nhanh");
-    }
     const controller = new AbortController();
 
     const params = {
-      status: requestStatus,
-      page: currentPage,
-      branch_id: currentBranch.id,
-      itemsPerPage,
+
       search: searchQuery,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
+      created_at: formattedStartDate,
     };
 
-    dispatch(fetchRequests({ signal: controller.signal, params }));
+    dispatch(fetchPackages({ signal: controller.signal, params }));
 
     return () => {
       controller.abort();
@@ -193,7 +154,7 @@ function RequestTable() {
     router,
   ]);
 
-  const handleUpdateStatus = React.useCallback(
+  const handleDeleteDecor = React.useCallback(
     async (id) => {
       const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
 
@@ -203,148 +164,45 @@ function RequestTable() {
           description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
           type: "error",
         });
-
         router.push("/auth/chon-chi-nhanh");
+        return;
       }
+
       const confirm = window.confirm(
-        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Đang xử lý"?`
+        `Bạn có chắc chắn xóa trang trí này #${id}?`
       );
 
       if (!confirm) return;
 
       if (confirm) {
-        const data = await dispatch(
-          updateRequestStatus({
-            requestId: id,
-            requestData: {
-              is_deposit: false,
-              is_confirm: false,
-              status: "processing",
-            },
-          })
-        ).unwrap();
+        const data = await makeAuthorizedRequest(API_CONFIG.PACKAGES.DELETE(id), "DELETE");
+        console.log("Delete response:", data);
 
         if (data.success) {
           toast({
-            title: "Cập nhật thành công",
-            description: `Yêu cầu đã được cập nhật trạng thái "Đang xử lý"`,
+            title: "Xóa trang trí thành công",
+            description: `Yêu cầu xóa trang trí thành công`,
             type: "success",
           });
 
           const params = {
-            is_confirm: false,
-            is_deposit: false,
-            status: requestStatus,
             page: currentPage,
-            branch_id: currentBranch.id,
             itemsPerPage,
-            search: searchQuery,
             startDate: formattedStartDate,
             endDate: formattedEndDate,
           };
-          // Fetch the requests again to update the state
-          dispatch(fetchRequests({ params }));
-        } else {
-          const { statusCode, message } = data?.error;
-
-          if (statusCode == 401) {
-            toast({
-              title: "Phiên đăng nhập đã hết hạn",
-              description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
-              type: "error",
-            });
-          } else {
-            toast({
-              title: "Cập nhật thất bại",
-              description: message || "Yêu cầu chưa được cập nhật trạng thái",
-              type: "error",
-            });
-          }
-        }
-      }
-    },
-    [
-      date,
-      formattedEndDate,
-      formattedStartDate,
-      requestStatus,
-      searchQuery,
-      itemsPerPage,
-      currentPage,
-    ]
-  );
-
-  const handleCancelRequest = React.useCallback(
-    async (id) => {
-      const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-
-      if (!currentBranch) {
-        toast({
-          title: "Lỗi",
-          description: "Vui lòng chọn chi nhánh trước khi xem yêu cầu",
-          type: "error",
-        });
-
-        router.push("/auth/chon-chi-nhanh");
-      }
-      const confirm = window.confirm(
-        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Hủy"?`
-      );
-
-      if (!confirm) return;
-
-      if (confirm) {
-        const data = await dispatch(
-          updateRequestStatus({
-            requestId: id,
-            requestData: {
-              is_deposit: false,
-              is_confirm: false,
-              status: "cancel",
-            },
-          })
-        ).unwrap();
-
-        if (data.success) {
-          toast({
-            title: "Cập nhật thành công",
-            description: `Yêu cầu đã được cập nhật trạng thái "Hủy"`,
-            type: "success",
-          });
-
-          const params = {
-            is_confirm: false,
-            is_deposit: false,
-            status: requestStatus,
-            page: currentPage,
-            branch_id: currentBranch.id,
-            itemsPerPage,
-            search: searchQuery,
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          };
-          // Fetch the requests again to update the state
           dispatch(
-            fetchRequests({
+            fetchPackages({
               params,
             })
           );
         } else {
-          const { statusCode, message } = data?.error;
-
-          if (statusCode == 401) {
-            toast({
-              title: "Phiên đăng nhập đã hết hạn",
-              description: "Vui lòng đăng nhập lại để thực hiện tác vụ",
-              type: "error",
-            });
-          } else {
-            toast({
-              title: "Cập nhật thất bại",
-              description: message || "Yêu cầu chưa được cập nhật trạng thái",
-              type: "error",
-            });
-          }
+          const { message } = data?.error;
+          toast({
+            title: "Xóa thất bại",
+            description: message || "Yêu cầu cần xem xét lại",
+            type: "error",
+          });
         }
       }
     },
@@ -356,8 +214,7 @@ function RequestTable() {
       searchQuery,
       itemsPerPage,
       currentPage,
-    ]
-  );
+    ])
 
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -375,122 +232,80 @@ function RequestTable() {
     );
   }, [visibleColumns]);
   const sortedItems = React.useMemo(() => {
-    return [...requests].sort((a, b) => {
+    return [...packages].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, requests]);
+  }, [sortDescriptor, packages]);
+
+  // const fetchUserNameByID = async (id) => {
+  //   try {
+  //     const response = await makeAuthorizedRequest(API_CONFIG.USER.GET_BY_ID(id), "GET");
+  //     console.log('====================================');
+  //     console.log(response.data.username);
+  //     console.log('====================================');
+  //     return response.data.username;
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   const renderCell = React.useCallback(
-    (item, columnKey) => {
+    async(item, columnKey) => {
       const cellValue = item[columnKey];
-
       switch (columnKey) {
-        case "shift":
-          return cellValue === "Sáng" ? (
-            <Chip
-              className="text-gray-800 bg-white"
-              startContent={<BsSun size={12} className="text-gray-800" />}
-            >
-              {cellValue}
-            </Chip>
-          ) : (
-            <Chip
-              className="text-white bg-blackAlpha-500"
-              startContent={<BsMoon size={12} className="text-white" />}
-            >
-              {cellValue}
-            </Chip>
-          );
-        case "total_amount":
-          // const totalAmount = item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0)
-          return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(item.booking_details.total_amount || 0);
-
-        // return item.booking_details.total_amount
-        case "amount_booking":
-          const amount_booking = item.booking_details?.map((detail) =>
-            detail.deposits?.amount
-              ? `${detail.deposits.amount}`
-              : "Chưa có tiền cọc"
-          );
-          return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(amount_booking);
-
-        case "amount_to_be_paid":
-          const bookingDetails = item.booking_details?.[0];
-          const totalAmount_paid = bookingDetails?.total_amount || 0;
-          const depositAmount = bookingDetails?.deposits?.amount || 0;
-          const amountPaid = totalAmount_paid - depositAmount;
-
-          return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(amountPaid);
-
-        case "deposit_amount":
-        case "created_at":
-          return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
-        case "organization_date":
-          return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "name":
-          return (
-            <User
-              avatarProps={{ radius: "lg", src: item.avatar }}
-              description={item.email}
-              name={cellValue}
-            >
-              {item.email}
-            </User>
-          );
-        case "status":
-          // <select
-          //   name="status"
-          //   value={cellValue}
-          //   className="select relative z-50"
-          //   onClick={(e) => e.stopPropagation()}
-          //   onMouseDown={(e) => e.stopPropagation()}
-          // >
-          //   {CONFIG.BOOKING_STATUS.map((status) => (
-          //     <option value={status.key} key={status.key} className="option">
-          //       {status.label}
-          //     </option>
-          //   ))}
-          // </select>
-          switch (cellValue) {
-            case "pending":
-              return (
-                <Chip variant="flat" color="warning">
-                  Chưa xử lý
-                </Chip>
-              );
+          return item.name;
 
-            case "processing":
-              return (
-                <Chip color="primary" variant="flat">
-                  Đang xử lý
-                </Chip>
-              );
-            case "success":
-              return (
-                <Chip variant="flat" color="success">
-                  Sử lý thành công
-                </Chip>
-              );
-            case "cancel":
-              return (
-                <Chip variant="flat" color="danger">
-                  Đã hủy
-                </Chip>
-              );
-          }
+        case "user_id":
+         return item.users.username
+        case "menus":
+          return item.menus.name;
+        // case "status":
+        //   // <select
+        //   //   name="status"
+        //   //   value={cellValue}
+        //   //   className="select relative z-50"
+        //   //   onClick={(e) => e.stopPropagation()}
+        //   //   onMouseDown={(e) => e.stopPropagation()}
+        //   // >
+        //   //   {CONFIG.BOOKING_STATUS.map((status) => (
+        //   //     <option value={status.key} key={status.key} className="option">
+        //   //       {status.label}
+        //   //     </option>
+        //   //   ))}
+        //   // </select>
+        //   switch (cellValue) {
+        //     case "pending":
+        //       return (
+        //         <Chip variant="flat" color="warning">
+        //           Chưa xử lý
+        //         </Chip>
+        //       );
+
+        //     case "processing":
+        //       return (
+        //         <Chip variant="flat" color="primary">
+        //           Đang xử lý
+        //         </Chip>
+        //       );
+        //     case "cancel":
+        //       return (
+        //         <Chip variant="flat" color="danger">
+        //           Đã hủy
+        //         </Chip>
+        //       );
+        //   }
+        case "short_description":
+          return item.short_description
+        case "price":
+          return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(item.price || 0);
         case "actions":
           return (
             <div className="relative flex justify-center items-center gap-2">
@@ -505,20 +320,10 @@ function RequestTable() {
                     <Link href={`${pathname}/${item.id}`}>Xem chi tiết</Link>
                   </DropdownItem>
                   <DropdownItem
-                    onClick={() => handleUpdateStatus(item.id)}
-                    className={`${
-                      item.status === "processing" ? "hidden" : ""
-                    }`}
+                    onClick={() => handleDeleteDecor(item.id)}
+                    className="text-red-400"
                   >
-                    {`Cập nhật trạng thái "Đang xử lý"`}
-                  </DropdownItem>
-                  <DropdownItem
-                    onClick={() => handleCancelRequest(item.id)}
-                    className={`text-red-400 ${
-                      item.status === "cancel" ? "hidden" : ""
-                    }`}
-                  >
-                    {`Cập nhật trạng thái "Hủy"`}
+                    {`Xóa trang trí`}
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -528,7 +333,7 @@ function RequestTable() {
           return cellValue;
       }
     },
-    [handleUpdateStatus, pathname]
+    [pathname]
   );
 
   const onItemsPerPageChange = React.useCallback((e) => {
@@ -594,9 +399,7 @@ function RequestTable() {
               value={requestStatus}
             >
               {CONFIG.BOOKING_STATUS.map((item) => {
-                {
-                  /* if (item.key === "success") return; */
-                }
+                if (item.key === "success") return;
 
                 return (
                   <option key={item.key} value={item.key} className="option">
@@ -653,25 +456,26 @@ function RequestTable() {
     requestStatus,
   ]);
 
-  const bottomContent = React.useMemo(() => {
-    return (
-      <CustomPagination
-        page={currentPage}
-        total={pagination.lastPage}
-        onChange={onPageChange}
-        classNames={{
-          base: "flex justify-center",
-        }}
-      />
-    );
-  }, [currentPage, pagination.lastPage]);
+  // const bottomContent = React.useMemo(() => {
+  //   return (
+  //     <CustomPagination
+  //       page={currentPage}
+  //       total={pagination.lastPage}
+  //       onChange={onPageChange}
+  //       classNames={{
+  //         base: "flex justify-center",
+  //       }}
+  //     />
+  //   );
+  // }, [currentPage, pagination.lastPage]);
 
-  console.log(pathname);
+  // console.log(requests);
+
   return (
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
-      bottomContent={bottomContent}
+      // bottomContent={bottomContent}
       bottomContentPlacement="inside"
       classNames={{
         thead:
@@ -693,7 +497,7 @@ function RequestTable() {
       onSelectionChange={setSelectedKeys}
       onSortChange={setSortDescriptor}
       selectionBehavior="replace"
-      onRowAction={(key) => handleUpdateStatus(key)}
+    // onRowAction={(key) => handleUpdateStatus(key)}
     >
       <TableHeader
         columns={headerColumns}
@@ -712,10 +516,10 @@ function RequestTable() {
       </TableHeader>
       <TableBody
         emptyContent={
-          isFetchingRequestsError ? error : "Không tìm thấy yêu cầu"
+          isFetchingDecorsError ? error : "Không tìm thấy yêu cầu"
         }
         items={sortedItems}
-        isLoading={isFetchingRequests || isUpdatingRequest}
+        isLoading={isFetchingDecors || isUpdatingRequest}
         loadingContent={<LoadingContent />}
       >
         {(item) => (
@@ -723,13 +527,13 @@ function RequestTable() {
             key={item.id}
             onContextMenu={(e) => {
               e.preventDefault();
-              if (item.status === "cancel") return;
+              // if (item.status === "cancel") return;
 
-              handleCancelRequest(item.id);
+              // handleCancelRequest(item.id);
             }}
           >
             {(columnKey) => (
-              <TableCell className="group-aria-[selected=false]/tr:group-data-[hover=true]/tr:before:!bg-whiteAlpha-100 py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
+              <TableCell className="py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
                 {renderCell(item, columnKey)}
               </TableCell>
             )}

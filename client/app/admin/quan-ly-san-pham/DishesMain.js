@@ -49,7 +49,9 @@ function DishesMain() {
           <button
             className="text-gray-400 underline"
             onClick={() => dispatch(fetchCategories())}
-          ></button>
+          >
+            Tải lại
+          </button>
         </div>
       )}
 

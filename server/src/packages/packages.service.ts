@@ -20,7 +20,7 @@ export class PackagesService {
   constructor(
     private prismaService: PrismaService,
     private cloudinaryService: CloudinaryService,
-  ) { }
+  ) {}
 
   // ! Create package
   async create(
@@ -235,17 +235,12 @@ export class PackagesService {
         include: {
           menus: {
             include: {
-<<<<<<< HEAD
-              products: true,
-            }
-=======
               products: {
                 include: {
                   tags: true,
                 },
               },
             },
->>>>>>> d2d602344a46ee1441f1215412ef40e092399788
           },
           decors: true,
           party_types: true,
@@ -568,7 +563,7 @@ export class PackagesService {
         throw new NotFoundException('ID Menu không tồn tại');
       }
       const tableCount = Math.ceil(Number(number_of_guests) / 10);
-      console.log('tableCount: ' + tableCount)
+      console.log('tableCount: ' + tableCount);
       console.log('total-menu: ' + Number(menu.price * tableCount));
       totalPrice += Number(menu.price) * tableCount;
     }
@@ -600,7 +595,9 @@ export class PackagesService {
           if (!product) {
             throw new NotFoundException('Không tìm thấy dịch vụ khác');
           }
-          console.log('product: ' + Number(product.price) * Number(other.quantity));
+          console.log(
+            'product: ' + Number(product.price) * Number(other.quantity),
+          );
           totalPrice += Number(product.price) * Number(other.quantity);
 
           // Enrich other service data

@@ -30,6 +30,7 @@ const Uploader = ({
   name,
   register,
   errors,
+  required = true,
 }) => {
   const fileInputRef = useRef();
 
@@ -105,9 +106,7 @@ const Uploader = ({
           id={id || name}
           name={name}
           aria-label="Chọn ảnh"
-          // required
-          // {...register(name)}
-          // tabIndex={0}
+          required={required}
         />
         <button
           type="button"

@@ -118,7 +118,7 @@ function DishesModal({
         </Button>,
         <Button
           key={"choose"}
-          className="bg-teal-400 text-white rounded-full"
+          className="bg-darkGreen-primary text-white rounded-full"
           onClick={() => {
             handleAddDish(selectedMenuDishes, category);
             setSelectedMenuDishes([]);
