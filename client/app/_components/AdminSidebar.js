@@ -31,9 +31,10 @@ import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import logo from "@/public/logo-dark.png";
-import { Tooltip } from "antd";
+import { Tooltip } from "@nextui-org/react";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
+import { TbLogs } from "react-icons/tb";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -43,8 +44,6 @@ function AdminSidebar() {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
-        await animate();
-
         await animate(
           scope.current,
           {
@@ -196,6 +195,12 @@ function AdminSidebarNav() {
       {
         title: "Danh mục bài viết",
         path: `/admin/danh-muc-bai-viet/`,
+        icon: blogIcon,
+        className: "",
+      },
+      {
+        title: "Bài viết",
+        path: `/admin/bai-viet/`,
         icon: blogIcon,
         className: "",
       },

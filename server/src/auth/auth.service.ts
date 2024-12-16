@@ -72,11 +72,13 @@ export class AuthService {
           expired_at: new Date(Date.now() + 1000 * 60 * 15),
         },
       });
+      console.log('Chuẩn bị gửi Mail');
       await this.mailService.confirmRegister(
         user.username,
         user.email,
         randomToken,
       );
+      console.log('Đã bị gửi Mail thành công');
       // ? Return token
       throw new HttpException(
         {

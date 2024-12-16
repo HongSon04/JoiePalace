@@ -25,7 +25,7 @@ const Page = () => {
             localStorage.removeItem('currentBranch');
             localStorage.removeItem('user');
             localStorage.removeItem('refreshToken');
-            router.push("/auth/chon-chi-nhanh");
+            router.push("/admin/");
         } 
     };
     

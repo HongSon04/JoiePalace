@@ -44,10 +44,18 @@ const Page = ({ params }) => {
   const { makeAuthorizedRequest } = useApiServices();
   const [dataBookingByBranch, setDataBookingByBranch] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
   const [start_Date, setStartDate] = useState(null);
   const [end_Date, setEndDate] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
+  const [totalBookingMonth, setTotalBookingMonth] = useState("month");
+  const [itemPerPage, setItemsPerPage] = useState(null);
+  const formatDate = (dateInput) => {
+    const date = new Date(dateInput);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
   function getCurrentMonthAndWeekDates() {
     const currentDate = new Date();
     const startDate = new Date(
@@ -93,29 +101,31 @@ const Page = ({ params }) => {
         if (currentBranch.slug === "ho-chi-minh") {
           idBranch = 0;
         }
-        // console.log(idBranch);
-        // console.log(branchId);
-
-        const {
-          startDate,
-          endDate,
-          currentDate,
-          month,
-          startOfWeek,
-          endOfWeek,
-        } = getCurrentMonthAndWeekDates();
+        const { startDate, endDate, startOfWeek, endOfWeek } =
+          getCurrentMonthAndWeekDates();
+        // console.log(startDate);
+        // console.log(endDate);
         const totalBookingWeek = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            startDate: startOfWeek,
-            endDate: endOfWeek,
-            status: "pending",
+            branch_id: idBranch,
+            status: "processing",
+            startOrganizationDate: startOfWeek,
+            endOrganizationDate: endOfWeek,
           }),
           "GET",
           null
         );
-
-        // console.log(endOfWeek);
-        // console.log(end_Date);
+        const totalBookingMonth = await makeAuthorizedRequest(
+          API_CONFIG.BOOKINGS.GET_ALL({
+            branch_id: idBranch,
+            status: "success",
+            startOrganizationDate: startDate,
+            endOrganizationDate: endDate,
+          }),
+          "GET",
+          null
+        );
+        // console.log(totalBookingMonth);
         const allBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: idBranch,
@@ -139,9 +149,6 @@ const Page = ({ params }) => {
           null
         );
 
-        // console.log(currentDate);
-        // console.log(dataUser);
-
         const [
           allInfo,
           dataInfo,
@@ -160,6 +167,7 @@ const Page = ({ params }) => {
           fetchAllByBranch(branchId),
         ]);
         // console.log(dataUser);
+        setTotalBookingMonth(totalBookingMonth);
         setIdBranch(idBranch);
         setDataBookingByBranch(dataBookingByBranch);
         setallInfo(allInfo);
@@ -216,9 +224,6 @@ const Page = ({ params }) => {
   // console.log(dataTotalAdminByYear);
   const dataBranchChart = dataTotalBranch || [];
   // Kiểm tra nếu các đối tượng không phải là null hoặc undefined, nếu không thì sử dụng mảng rỗng
-  const quarterlyRevenues = Object.values(
-    dataBranchChart.total_revune_by_quarter || {}
-  ).flat();
   const monthlyRevenues = Object.values(
     dataBranchChart.total_revune_by_month || []
   );
@@ -228,21 +233,6 @@ const Page = ({ params }) => {
   const yearlyRevenues = Object.values(
     dataBranchChart.total_revune_by_year || []
   );
-  // Tính tổng doanh thu của các quý, tháng, tuần
-  const totalQuarterRevenue = quarterlyRevenues.reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const totalMonthRevenue = monthlyRevenues.reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const totalWeekRevenue = weeklyRevenues.reduce((acc, curr) => acc + curr, 0);
-
-  // Tổng doanh thu
-  // const yearlyRevenues = totalQuarterRevenue + totalMonthRevenue + totalWeekRevenue;
-
-  // console.log(yearlyRevenues);  // In ra tổng doanh thu
 
   const dataBranch = {
     labels: ["Tuần", "Tháng", "Năm"],
@@ -266,16 +256,13 @@ const Page = ({ params }) => {
   };
 
   const dataBooking = allBooking?.data || [];
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN");
-  }
 
   const { month } = getCurrentMonthAndWeekDates();
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
+  const bookingsOffMonth = totalBookingMonth?.pagination?.total || 0;
   const totalInfoBranch = dataTotalBranch?.count_booking_status[0]?.data;
-  // console.log(allBooking);
+  // console.log(bookingsOffMonth);
   useEffect(() => {
     if (allBooking && allBooking.pagination) {
       setCurrentPage(allBooking.pagination.currentPage);
@@ -283,7 +270,7 @@ const Page = ({ params }) => {
     }
   }, [allBooking]);
   const requestData = dataBookingByBranch.data;
-  // console.log(requestData);
+  // console.log(totalInfoBranch);
   const handlePeriodChange = (event) => {
     setSelectedPeriod(event.target.value);
   };
@@ -294,6 +281,7 @@ const Page = ({ params }) => {
         title="Chung"
         showBackButton={false}
         showHomeButton={false}
+        showSearchForm={false}
       ></AdminHeader>
       <div className="px-4 w-full flex gap-[16px] justify-between text-white">
         {slug === "ho-chi-minh" ? (
@@ -413,9 +401,7 @@ const Page = ({ params }) => {
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex items-end gap-1">
-                  <p className="text-4xl font-bold">
-                    {totalInfoBranch.success}
-                  </p>
+                  <p className="text-4xl font-bold">{bookingsOffMonth}</p>
                   <p>tiệc</p>
                 </div>
               </div>
@@ -427,11 +413,13 @@ const Page = ({ params }) => {
       </div>
 
       <div className="w-full  flex gap-4   p-4">
-        <div className="p-4   bg-whiteAlpha-100  rounded-xl">
-          <div className="flex justify-between gap-[10px] items-center mb-[10px]">
-            <p className="text-base font-semibold ">Lịch tổ chức tháng 11</p>
+        <div className="p-4 bg-whiteAlpha-100  rounded-xl">
+          <div className="flex justify-between gap-[10px] items-center mb-[20px]">
+            <p className="text-base font-semibold ">
+              Lịch tổ chức tháng {month}
+            </p>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center ">
             <CustomCalendar />
           </div>
         </div>
@@ -441,11 +429,9 @@ const Page = ({ params }) => {
           </div>
         </div>
       </div>
-      {slug !== "ho-chi-minh" && (
-        <div className="w-full p-4">
-          <TableStageStatus />
-        </div>
-      )}
+      <div className=" p-4">
+        <TableStageStatus />
+      </div>
       <div className="flex  gap-6 p-4">
         <div className="w-1/2 ">
           <div className="flex items-center justify-between mb-[10px]">
@@ -472,7 +458,9 @@ const Page = ({ params }) => {
                       <td>{item.branches ? item.branches.name : "N/A"}</td>
                       <td>{item.phone || "N/A"}</td>
                       <td>
-                        <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
+                        <Link
+                          href={`/admin/yeu-cau/${item.branches?.slug}/${item.id}`}
+                        >
                           <p className="text-teal-400 font-bold text-xs">
                             Xem thêm
                           </p>
@@ -513,7 +501,7 @@ const Page = ({ params }) => {
             </div>
 
             {selectedPeriod === "week" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl min-h-[410px]">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tuần</p>
                 </div>
@@ -521,7 +509,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "month" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tháng</p>
                 </div>
@@ -529,7 +517,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "year" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo năm</p>
                 </div>
@@ -543,7 +531,7 @@ const Page = ({ params }) => {
             <div className="flex justify-between gap-[10px] items-center mb-[10px]">
               <p className="text-base font-semibold ">Doanh thu tổng</p>
             </div>
-            <div className="p-2 bg-blackAlpha-100 rounded-xl">
+            <div className="p-2  bg-blackAlpha-100 rounded-xl min-h-[410px]">
               <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                 <p className=" text-base">Doanh thu theo năm</p>
               </div>

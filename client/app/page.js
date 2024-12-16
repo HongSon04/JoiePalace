@@ -45,7 +45,7 @@ const services = [
     link: "su-kien",
     title: "hơn cả sự mong đợi",
     description:
-      "Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất lượng dịch vụ, White Palace là không gian hoàn hảo để triển khai bất kì kế hoạch sự kiện nào mà bạn đang ấp ủ, từ các buổi yến tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật giải trí sáng tạo, các sự kiện trọng thể của doanh nghiệp như sự kiện ra mắt sản phẩm, tiệc tri ân khách hàng, tiệc tất niên, triển lãm thương mại.",
+      "Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất lượng dịch vụ, JOIE PALACE là không gian hoàn hảo để triển khai bất kì kế hoạch sự kiện nào mà bạn đang ấp ủ, từ các buổi yến tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật giải trí sáng tạo, các sự kiện trọng thể của doanh nghiệp như sự kiện ra mắt sản phẩm, tiệc tri ân khách hàng, tiệc tất niên, triển lãm thương mại.",
   },
   {
     id: 2,
@@ -61,7 +61,7 @@ const services = [
     link: "hoi-nghi",
     title: "dấu ấn thành công",
     description:
-      "White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.",
+      "JOIE PALACE là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.",
   },
 ];
 const events = [
@@ -99,7 +99,7 @@ const offers = [
     id: 1,
     title: "tặng sân khấu màn hình led cho doanh nghiệp",
     content:
-      "White Palace áp dụng chương trình ưu đãi tặng sân khấu màn hình LED cho sự kiện doanh nghiệp có thời gian tổ chức từ nay đến hết 30/9/2024.",
+      "JOIE PALACE áp dụng chương trình ưu đãi tặng sân khấu màn hình LED cho sự kiện doanh nghiệp có thời gian tổ chức từ nay đến hết 30/9/2024.",
     image: "/images-client/offers/offer1.png",
   },
   {
@@ -107,14 +107,14 @@ const offers = [
     title:
       "tặng kì nghỉ trăng mật 2 ngày 1 đêm trên du thuyển 5 sao elite of the seas tại vịnh hạ long khi đặt tiệc cưới",
     content:
-      "White Palace trân trọng dành tặng kì trăng mật lãng mạn trên du thuyền 5 sao tại Vịnh Hạ Long (kèm vé máy bay khứ hồi) cho khách hàng tổ chức sự kiện cưới tại chi nhánh bất kỳ",
+      "JOIE PALACE trân trọng dành tặng kì trăng mật lãng mạn trên du thuyền 5 sao tại Vịnh Hạ Long (kèm vé máy bay khứ hồi) cho khách hàng tổ chức sự kiện cưới tại chi nhánh bất kỳ",
     image: "/images-client/offers/offer2.png",
   },
   {
     id: 3,
     title: "tặng trang sức ngọc trai cho khách hàng tiệc cưới",
     content:
-      "White Palace tặng bạn trang sức ngọc trai Long Beach Pearl trị giá 20.000.000 VND khi đặt tiệc cưới tại chi nhánh bất kỳ.",
+      "JOIE PALACE tặng bạn trang sức ngọc trai Long Beach Pearl trị giá 20.000.000 VND khi đặt tiệc cưới tại chi nhánh bất kỳ.",
     image: "/images-client/offers/offer3.png",
   },
 ];
@@ -224,7 +224,7 @@ function Home() {
               Được xây dựng và phát triển bởi IN Hospitality vào năm 2007, White
               Palace là thương hiệu đầu tiên tại Việt Nam mở ra mô hình trung
               tâm hội nghị và sự kiện. Với sự đầu tư bài bản và chuyên biệt cho
-              các hội nghị và sự kiện cao cấp, White Palace luôn được chọn là
+              các hội nghị và sự kiện cao cấp, JOIE PALACE luôn được chọn là
               địa điểm tổ chức của những hội nghị kinh tế lớn, những sự kiện văn
               hóa giải trí có tầm ảnh hưởng và yến tiệc đẳng cấp.
             </span>
@@ -460,7 +460,7 @@ function Home() {
                   <span className="leading-[150%] font-normal text-[18px] w-[85%]">
                     Cảm ơn quý khách đã ghé thăm chuyên mục tin tức của chúng
                     tôi.Tại đây, quý khách có thể cập nhật những tin tức mới
-                    nhất,điểm lại những sự kiện nổi bật nhất tại White Palace
+                    nhất,điểm lại những sự kiện nổi bật nhất tại JOIE PALACE
                     vàkhám phá những ưu đãi đặc biệt dành cho sự kiện của bạn.
                   </span>
                 </TextFade>

@@ -105,9 +105,18 @@ export class PackagesService {
         },
         include: {
           stages: true,
-          menus: true,
+          menus: {
+            include: {
+              products: {
+                include: {
+                  tags: true,
+                },
+              },
+            },
+          },
           decors: true,
           party_types: true,
+          users: true,
         },
       });
 
@@ -140,9 +149,18 @@ export class PackagesService {
       const packages = await this.prismaService.packages.findMany({
         where: whereConditions,
         include: {
-          menus: true,
+          menus: {
+            include: {
+              products: {
+                include: {
+                  tags: true,
+                },
+              },
+            },
+          },
           decors: true,
           party_types: true,
+          users: true,
         },
       });
 
@@ -171,9 +189,18 @@ export class PackagesService {
       const findPackage = await this.prismaService.packages.findUnique({
         where: { id: Number(id) },
         include: {
-          menus: true,
+          menus: {
+            include: {
+              products: {
+                include: {
+                  tags: true,
+                },
+              },
+            },
+          },
           decors: true,
           party_types: true,
+          users: true,
         },
       });
 
@@ -206,9 +233,18 @@ export class PackagesService {
       const findPackage = await this.prismaService.packages.findUnique({
         where: { slug },
         include: {
-          menus: true,
+          menus: {
+            include: {
+              products: {
+                include: {
+                  tags: true,
+                },
+              },
+            },
+          },
           decors: true,
           party_types: true,
+          users: true,
         },
       });
 
@@ -319,7 +355,7 @@ export class PackagesService {
           description,
           price: Number(price),
           short_description,
-          images: uploadImages ? uploadImages : findPackageById.images,
+          images: [...(uploadImages || []), ...(findPackageById.images || [])],
           other_service,
           note,
           is_show: String(is_show) === 'true',
@@ -328,9 +364,18 @@ export class PackagesService {
         },
         include: {
           stages: true,
-          menus: true,
+          menus: {
+            include: {
+              products: {
+                include: {
+                  tags: true,
+                },
+              },
+            },
+          },
           decors: true,
           party_types: true,
+          users: true,
         },
       });
 

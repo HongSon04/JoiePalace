@@ -16,7 +16,7 @@ const offers = [
     id: 1,
     title: "tặng sân khấu màn hình led cho doanh nghiệp",
     content:
-      "White Palace áp dụng chương trình ưu đãi tặng sân khấu màn hình LED cho sự kiện doanh nghiệp có thời gian tổ chức từ nay đến hết 30/9/2024.",
+      "JOIE PALACE áp dụng chương trình ưu đãi tặng sân khấu màn hình LED cho sự kiện doanh nghiệp có thời gian tổ chức từ nay đến hết 30/9/2024.",
     image: "/images-client/offers/offer1.png",
   },
   {
@@ -24,14 +24,14 @@ const offers = [
     title:
       "tặng kì nghỉ trăng mật 2 ngày 1 đêm trên du thuyển 5 sao elite of the seas tại vịnh hạ long khi đặt tiệc cưới",
     content:
-      "White Palace trân trọng dành tặng kì trăng mật lãng mạn trên du thuyền 5 sao tại Vịnh Hạ Long (kèm vé máy bay khứ hồi) cho khách hàng tổ chức sự kiện cưới tại chi nhánh bất kỳ",
+      "JOIE PALACE trân trọng dành tặng kì trăng mật lãng mạn trên du thuyền 5 sao tại Vịnh Hạ Long (kèm vé máy bay khứ hồi) cho khách hàng tổ chức sự kiện cưới tại chi nhánh bất kỳ",
     image: "/images-client/offers/offer2.png",
   },
   {
     id: 3,
     title: "tặng trang sức ngọc trai cho khách hàng tiệc cưới",
     content:
-      "White Palace tặng bạn trang sức ngọc trai Long Beach Pearl trị giá 20.000.000 VND khi đặt tiệc cưới tại chi nhánh bất kỳ.",
+      "JOIE PALACE tặng bạn trang sức ngọc trai Long Beach Pearl trị giá 20.000.000 VND khi đặt tiệc cưới tại chi nhánh bất kỳ.",
     image: "/images-client/offers/offer3.png",
   },
 ];

@@ -20,9 +20,11 @@ const Page = ({ params }) => {
     const fetchData = async () => {
       try {
         const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-        const branchId = currentBranch.id;
         const nameBranch = currentBranch.name;
-
+        let branchId = currentBranch.id;
+        // if (currentBranch.slug === "ho-chi-minh") {
+        //   branchId = 0;
+        // }
         const [dataTotalBranch, allBranch] = await Promise.all([
           fetchAllByBranch(branchId),
           fetchAllBranch()
@@ -85,7 +87,8 @@ const Page = ({ params }) => {
       data: eachMonthChartData
     }]
   };
-
+  // console.log(selectedBranchId);
+  
   return (
     <main className="font-gilroy grid gap-6 p-4 text-white">
       <AdminHeader title="Thống kê doanh thu" showSearchForm={false} />
@@ -105,7 +108,7 @@ const Page = ({ params }) => {
             </select>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="p-4 bg-blackAlpha-100 rounded-xl">
             <Chart data={dataChart} chartType="bar" />
           </div>
@@ -118,8 +121,7 @@ const Page = ({ params }) => {
             <p className="text-base font-semibold">Danh sách tiệc</p>
           </div>
           <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-            {/* Truyền selectedBranchId vào BookingsTable */}
-            <BookingsTable branchId={selectedBranchId} />
+            <BookingsTable  branchId={selectedBranchId == 2 ? 0 : selectedBranchId} />
           </div>
         </div>
       </div>

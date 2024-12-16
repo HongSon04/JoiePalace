@@ -6,18 +6,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateMenuDto } from './dto/create-menu.dto';
-import { UpdateMenuDto } from './dto/update-menu.dto';
-import { PrismaService } from 'src/prisma.service';
-import { MakeSlugger } from 'helper/slug';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { MakeSlugger } from 'helper/slug';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { CreateMenuDto } from './dto/create-menu.dto';
 import { FilterMenuDto } from './dto/FilterMenu.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 
 @Injectable()
 export class MenusService {
@@ -629,7 +628,7 @@ export class MenusService {
           products: {
             set: productsTagSet,
           },
-          images: uploadImages ? uploadImages : findMenuById.images,
+          images: [...(uploadImages || []), ...(findMenuById.images || [])],
         },
         include: {
           products: {

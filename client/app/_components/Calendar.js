@@ -57,7 +57,7 @@ export default function CustomCalendar() {
       return [date, date];
     });
 
-  console.log("partyDates -> ", partyDates);
+  // console.log("partyDates -> ", partyDates);
 
   let { locale } = useLocale();
 
@@ -90,20 +90,21 @@ export default function CustomCalendar() {
 
         // Tính số ngày giữa 2 ngày
         const diffDays = (end - start) / (1000 * 3600 * 24);
-
+        // console.log(startDate);
+        // console.log(endDate);
         // Gửi yêu cầu API với startDate và endDate
         const dataBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: branchId,
-            startDate: startDate,
-            endDate: endDate,
-            itemsPerPage: diffDays + 1,
-            status: "pending",
+            status: "processing",
+            startOrganizationDate: startDate,
+            endOrganizationDate: endDate,
+            itemsPerPage: diffDays + 1
           }),
           "GET",
           null
         );
-
+        // console.log(dataBooking);
         setDataBooking(dataBooking);
         setBranchData({ branchId });
       } catch (error) {

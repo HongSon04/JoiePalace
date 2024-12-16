@@ -80,26 +80,33 @@ const TableBookingsPending = () => {
   const fetchBookingData = async () => {
     try {
       const currentBranch = JSON.parse(localStorage.getItem('currentBranch'));
-      const branchId = currentBranch.id;
+      
+      let branchId = currentBranch.id;
       const slug = currentBranch.slug;
+      if (currentBranch.slug === "ho-chi-minh") {
+        branchId = 0;
+      }
       // Sử dụng ngày đã chọn (start_Date và end_Date) khi gọi API
       const startDate = start_Date || getDefaultDateRange().start_Date;
       const endDate = end_Date || getDefaultDateRange().end_Date;
+      
       // console.log(startDate);
       // console.log(endDate);
+      // console.log(branchId);
       // Gọi API để lấy booking theo chi nhánh (sử dụng start_Date và end_Date đã chọn)
       const bookingByBranchData = await makeAuthorizedRequest(
         API_CONFIG.BOOKINGS.GET_ALL({
           branch_id: branchId,
-          is_deposit: true,
-          is_confirm: true,
-          status: 'pending',
-          startDate: startDate,
-          endDate: endDate
+          status: "processing",
+          startOrganizationDate: startDate,
+          endOrganizationDate: endDate,
+          page: currentPage,
+          itemsPerPage: 4
         }),
-        'GET',
+        "GET",
         null
       );
+      // console.log(bookingByBranchData);
       setSlug(slug);
       setDataBookingByBranch(bookingByBranchData);
     } catch (error) {
@@ -133,6 +140,7 @@ const TableBookingsPending = () => {
         <thead>
           <tr>
             <th>Sảnh</th>
+            <th>Chi nhánh</th>
             <th>Ngày tổ chức</th>
             <th>Ca tổ chức</th>
             <th></th>
@@ -142,11 +150,12 @@ const TableBookingsPending = () => {
           {dataBookingByBranch && Array.isArray(dataBookingByBranch.data) && dataBookingByBranch.data.length > 0 ? (
             dataBookingByBranch.data.map((item, index) => (
               <tr key={index}>
-                <td>{item.booking_details?.[0]?.stage_detail?.name || 'N/A'}</td>
-                <td>{item.expired_at ? formatDate(item.expired_at) : 'N/A'}</td>
-                <td>{item.shift || 'N/A'}</td>
+                <td className="text-center">{item.booking_details?.[0]?.stage_detail?.name || 'N/A'}</td>
+                <td className="text-center">{item.branches ? item.branches.name : 'N/A'}</td>
+                <td className="text-center">{item.organization_date ? formatDate(item.organization_date) : 'N/A'}</td>
+                <td className="text-center">{item.shift || 'N/A'}</td>
                 <td>
-                  <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
+                  <Link href={`/admin/yeu-cau/${item.branches?.slug}/${item.id}`}>
                     <p className="text-teal-400 font-bold text-xs">Xem thêm</p>
                   </Link>
                 </td>
@@ -154,7 +163,7 @@ const TableBookingsPending = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={4} className="text-center h-[204px]">Không có dữ liệu.</td>
+              <td colSpan={5} className="text-center h-[204px]">Không có dữ liệu.</td>
             </tr>
           )}
         </tbody>
@@ -162,7 +171,7 @@ const TableBookingsPending = () => {
 
       {/* Phân trang (ẩn nếu không có dữ liệu hoặc không có trang nào) */}
       {dataBookingByBranch && dataBookingByBranch.pagination && dataBookingByBranch.pagination.lastPage > 0 && dataBookingByBranch.data.length > 0 && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-3">
           <CustomPagination
             page={currentPage}
             total={dataBookingByBranch.pagination.lastPage}
