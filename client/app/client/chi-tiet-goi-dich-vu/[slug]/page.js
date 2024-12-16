@@ -63,260 +63,6 @@ const listSpaces = [
     url: "https://i.pinimg.com/736x/42/d8/ea/42d8eaa1d9228f748c61c7d0db2c5c62.jpg",
   },
 ];
-// const categories = [
-//   {
-//     id: 1,
-//     name: "Sảnh tiệc",
-//     products: [
-//       {
-//         id: "st1",
-//         name: "Sảnh tiệc 1",
-//         price: 1000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "st2",
-//         name: "Sảnh tiệc 2",
-//         price: 2000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "st3",
-//         name: "Sảnh tiệc 3",
-//         price: 3000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "st4",
-//         name: "Sảnh tiệc 4",
-//         price: 4000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "st5",
-//         name: "Sảnh tiệc 5",
-//         price: 5000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "st6",
-//         name: "Sảnh tiệc 6",
-//         price: 6000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//     ],
-//   },
-//   {
-//     id: 2,
-//     name: "Trang trí",
-//     products: [
-//       {
-//         id: "tt1",
-//         name: "Trang trí 1",
-//         price: 1000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "tt2",
-//         name: "Trang trí 2",
-//         price: 2000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "tt3",
-//         name: "Trang trí 3",
-//         price: 3000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "tt4",
-//         name: "Trang trí 4",
-//         price: 4000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "tt5",
-//         name: "Trang trí 5",
-//         price: 5000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "tt6",
-//         name: "Trang trí 6",
-//         price: 6000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//     ],
-//   },
-//   {
-//     id: 3,
-//     name: "Sân khấu",
-//     products: [
-//       {
-//         id: "sk1",
-//         name: "Sân khấu 1",
-//         price: 1000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "sk2",
-//         name: "Sân khấu 2",
-//         price: 2000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "sk3",
-//         name: "Sân khấu 3",
-//         price: 3000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "sk4",
-//         name: "Sân khấu 4",
-//         price: 4000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "sk5",
-//         name: "Sân khấu 5",
-//         price: 5000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "sk6",
-//         name: "Sân khấu 6",
-//         price: 6000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//     ],
-//   },
-//   {
-//     id: 4,
-//     name: "Bánh cưới",
-//     products: [
-//       {
-//         id: "bc1",
-//         name: "Bánh cưới 1",
-//         price: 1000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "bc2",
-//         name: "Bánh cưới 2",
-//         price: 2000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "bc3",
-//         name: "Bánh cưới 3",
-//         price: 3000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "bc4",
-//         name: "Bánh cưới 4",
-//         price: 4000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "bc5",
-//         name: "Bánh cưới 5",
-//         price: 5000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "bc6",
-//         name: "Bánh cưới 6",
-//         price: 6000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//     ],
-//   },
-//   {
-//     id: 5,
-//     name: "Thực đơn",
-//     products: [
-//       {
-//         id: "td1",
-//         name: "Thực đơn 1",
-//         price: 1000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "td2",
-//         name: "Thực đơn 2",
-//         price: 2000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "td3",
-//         name: "Thực đơn 3",
-//         price: 3000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "td4",
-//         name: "Thực đơn 4",
-//         price: 4000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "td5",
-//         name: "Thực đơn 5",
-//         price: 5000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "td6",
-//         name: "Thực đơn 6",
-//         price: 6000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//     ],
-//   },
-//   {
-//     id: 6,
-//     name: "Dịch vụ khác",
-//     products: [
-//       {
-//         id: "dv1",
-//         name: "Dịch vụ 1",
-//         price: 1000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "dv2",
-//         name: "Dịch vụ 2",
-//         price: 2000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "dv3",
-//         name: "Dịch vụ 3",
-//         price: 3000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "dv4",
-//         name: "Dịch vụ 4",
-//         price: 4000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "dv5",
-//         name: "Dịch vụ 5",
-//         price: 5000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//       {
-//         id: "dv6",
-//         name: "Dịch vụ 6",
-//         price: 6000000,
-//         image: CONFIG.IMAGE_UPLOADER_PLACEHOLDER,
-//       },
-//     ],
-//   },
-// ];
 const arrayMenus = [
   { id: 1, name: "Món chính", slug: "mon-chinh" },
   { id: 2, name: "Món khai vị", slug: "mon-khai-vi" },
@@ -453,19 +199,21 @@ const Page = () => {
       setDataAll(newData);
       setDataToShow(newData?.hall);
       setCategories(dataDrawer);
+
       const priceAllMenu = dataDrawer[4]?.products?.reduce((curr, menu) => {
-        return (curr += menu.price);
+        return (curr += menu?.price);
       }, 0);
       data?.data[0]?.number_of_guests
         ? setTotalMenu(
             priceAllMenu * Math.ceil(data?.data[0]?.number_of_guests / 10)
           )
         : setTotalMenu(priceAllMenu);
+        
       const totalCost = dataDrawer.reduce((acc, category) => {
         const categoryTotal = category.products.reduce((catAcc, product) => {
-          let productPrice = product.price;
+          let productPrice = product?.price;
 
-          if (category.id === 5) {
+          if (category?.id === 5) {
             const tablesNeeded = Math.ceil(
               data?.data[0]?.number_of_guests || 10 / 10
             );
@@ -477,11 +225,11 @@ const Page = () => {
 
         return acc + categoryTotal;
       }, 0);
+      // 
       setTotalResults(totalCost);
     };
     fecthData();
   }, [slug]);
-
   if (!dataPackage && !dataToShow && !categories) return <Loading></Loading>;
   return (
     <>
@@ -622,7 +370,7 @@ const Page = () => {
                         </span>
                         <br />
                         <span className="mb-4 leading-5">
-                          Tiền thực đơn gói này là: {totalMenu.toLocaleString()}{" "}
+                          Tiền thực đơn gói này là: {(dataPackage?.menus.price * Math.ceil(numberOfGuests / 10)).toLocaleString()}{" "}
                           VNĐ. Với số lượng bàn của gói này là:{" "}
                           {Math.ceil(numberOfGuests / 10)} bàn, và{" "}
                           {numberOfGuests || 0} khách.
@@ -789,7 +537,7 @@ const Page = () => {
                 </h2>
                 <div className="flex flex-col gap-3 mt-3">
                   {category.products.map((product) => (
-                    <SelectedProduct product={product} key={product.id} />
+                    <SelectedProduct product={product} key={product?.id} />
                   ))}
                 </div>
               </div>
@@ -822,7 +570,7 @@ const Page = () => {
                   <div className="flex flex-col w-full gap-4 mt-5">
                     {categories?.map((c) => {
                       const total = c.products.reduce(
-                        (acc, cur) => acc + cur.price,
+                        (acc, cur) => acc + cur?.price,
                         0
                       );
                       if (c.id === 5) {
@@ -833,7 +581,7 @@ const Page = () => {
                           >
                             <span className="text-base">{c?.name}</span>
                             <span className="text-base">
-                              {totalMenu.toLocaleString("vn-VN")} VNĐ
+                              {(dataPackage?.menus?.price * Math.ceil(numberOfGuests / 10)).toLocaleString("vn-VN")} VNĐ
                             </span>
                           </div>
                         );
@@ -869,7 +617,7 @@ const Page = () => {
                         cur.products.reduce((acc, cur) => acc + cur.price, 0),
                       0
                     )} */}
-                    {totalResults.toLocaleString()} VNĐ
+                    {Math.ceil(dataPackage.price / 1000000)} {`${dataPackage.price < 1000000000 ? "Triệu" : "Tỉ"}`} VNĐ
                   </span>
                 </div>
                 <ChevronDownIcon

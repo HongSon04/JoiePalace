@@ -8,6 +8,7 @@ import { z } from "zod";
 import React, { useState } from "react";
 import { createAccountUser } from "@/app/_services/accountServices";
 import axios from "axios";
+import { API_CONFIG } from "@/app/_utils/api.config";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const formSchema = z.object({
@@ -50,8 +51,7 @@ const Page = () => {
         password: formData.password,
         phone: "null",
       });
-      const emailRes = await axios.post(
-        "https://joieplace.live/api/auth/send-email-verify",
+      const emailRes = await axios.post(API_CONFIG.AUTH.VERIFY,
         { email: formData.email }
       );
       toast({

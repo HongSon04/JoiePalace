@@ -20,7 +20,7 @@ export class PackagesService {
   constructor(
     private prismaService: PrismaService,
     private cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   // ! Create package
   async create(
@@ -206,7 +206,11 @@ export class PackagesService {
       const findPackage = await this.prismaService.packages.findUnique({
         where: { slug },
         include: {
-          menus: true,
+          menus: {
+            include: {
+              products: true,
+            }
+          },
           decors: true,
           party_types: true,
         },
@@ -493,7 +497,7 @@ export class PackagesService {
       if (!stage) {
         throw new NotFoundException('ID Sảnh không tồn tại');
       }
-
+      console.log('stage-price: ' + stage.price);
       totalPrice += Number(stage.price);
     }
 
@@ -505,6 +509,7 @@ export class PackagesService {
       if (!decor) {
         throw new NotFoundException('ID Trang trí không tồn tại');
       }
+      console.log('decor-price: ' + decor.price);
       totalPrice += Number(decor.price);
     }
 
@@ -517,7 +522,8 @@ export class PackagesService {
         throw new NotFoundException('ID Menu không tồn tại');
       }
       const tableCount = Math.ceil(Number(number_of_guests) / 10);
-      console.log('tableCount', tableCount);
+      console.log('tableCount: ' + tableCount)
+      console.log('total-menu: ' + Number(menu.price * tableCount));
       totalPrice += Number(menu.price) * tableCount;
     }
 
@@ -529,6 +535,8 @@ export class PackagesService {
       if (!partyType) {
         throw new NotFoundException('ID Loại tiệc không tồn tại');
       }
+
+      console.log('party_type-price: ' + partyType.price);
       totalPrice += Number(partyType.price);
     }
 
@@ -546,7 +554,7 @@ export class PackagesService {
           if (!product) {
             throw new NotFoundException('Không tìm thấy dịch vụ khác');
           }
-
+          console.log('product: ' + Number(product.price) * Number(other.quantity));
           totalPrice += Number(product.price) * Number(other.quantity);
 
           // Enrich other service data
