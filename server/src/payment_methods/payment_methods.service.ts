@@ -516,7 +516,7 @@ export class PaymentMethodsService {
       const transID = Math.floor(Math.random() * 99999999999);
       const order = {
         app_id: config.app_id,
-        app_trans_id: `${dayjs(Date.now()).format('YYMMDDHHmmss')}-${findDeposit.transactionID}-${transID}`,
+        app_trans_id: `${dayjs(Date.now()).format('YYMMDD')}-${findDeposit.transactionID}-${transID}`,
         app_user: 'user123',
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items),
@@ -651,15 +651,19 @@ export class PaymentMethodsService {
   // *********************************************************
   // ! Payment Success
   private async successPayment(res) {
+    console.log(
+      `${this.configService.get<string>('FRONTEND_URL')}xac-nhan-thanh-toan/thanh-toan-thanh-cong`,
+    );
+
     res.redirect(
-      `${this.configService.get<string>('FRONTEND_URL')}thanh-toan-thanh-cong`,
+      `${this.configService.get<string>('FRONTEND_URL')}xac-nhan-thanh-toan/thanh-toan-thanh-cong`,
     );
   }
 
   // ! Payment Fail
   private async failPayment(res) {
     res.redirect(
-      `${this.configService.get<string>('FRONTEND_URL')}thanh-toan-that-bai`,
+      `${this.configService.get<string>('FRONTEND_URL')}xac-nhan-thanh-toan/thanh-toan-that-bai`,
     );
   }
 
