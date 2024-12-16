@@ -19,8 +19,11 @@ function News() {
     const fetchData = async () => {
       setLoading(true);
       const DataBlog = await fecthAllBlog();
+      const datablogNew = DataBlog.reverse();
       const newBlog = DataBlog;
-      const new3Blog = DataBlog.slice(0, 3).reverse();
+      const new3Blog = datablogNew.slice(0, 3);
+      // console.log('new3Blog', new3Blog);
+
       setNew3Blog(new3Blog);
       setCountNumberPage(Math.ceil(DataBlog.length / 6));
       setNewBlog(newBlog);
@@ -111,27 +114,28 @@ function News() {
     return `${day} Tháng ${month} ${year}`;
   }
   const LazyLoading = () => {
-    return <div
-      role="status"
-      className="max-w-sm p-4 border  rounded shadow animate-pulse md:p-6 dark:border-gray-700"
-    >
-      <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
-        <svg
-          className="w-10 h-10 text-gray-200 dark:text-gray-600"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          viewBox="0 0 16 20"
-        >
-          <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
-          <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
-        </svg>
-      </div>
-      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4" />
-      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
-      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5" />
-      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700" />
+    return<div
+    role="status"
+    className="max-w-[280px] p-2 border rounded shadow animate-pulse sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl md:p-4 dark:border-gray-700"
+  >
+    <div className="flex items-center justify-center h-20 sm:h-32 md:h-48 lg:h-56 mb-2 bg-gray-300 rounded dark:bg-gray-700">
+      <svg
+        className="w-5 h-5 sm:w-8 sm:h-8 md:w-10 md:h-10 text-gray-200 dark:text-gray-600"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 16 20"
+      >
+        <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
+        <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
+      </svg>
     </div>
+    <div className="h-1.5 bg-gray-200 rounded-full dark:bg-gray-700 w-20 sm:w-32 md:w-48 lg:w-56 mb-2" />
+    <div className="h-1.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-2" />
+    <div className="h-1.5 bg-gray-200 rounded-full dark:bg-gray-700 mb-2" />
+    <div className="h-1.5 bg-gray-200 rounded-full dark:bg-gray-700" />
+  </div>
+  
   }
 
   return (
@@ -168,7 +172,7 @@ function News() {
                       <div className="absolute bottom-[20px] w-full">
                         <p className="w-[90%] font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl max-sm:left-0 m-auto">
                           {blog.title ||
-                            "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                            "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                         </p>
                       </div>
                     </div>
@@ -208,13 +212,13 @@ function News() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <p className="max-md:text-base max-sm:text-[5px] ">
+                    <p className="max-md:text-base max-sm:text-[10px] ">
                       Tin Tức Mới Nhất \{" "}
                       {formatDate(blog.created_at) || "2024-06-20"}
                     </p>
-                    <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                    <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                       {blog.title ||
-                        "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                        "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                     </p>
                   </div>
                 </Link>
@@ -231,7 +235,7 @@ function News() {
             ) : (
               parentDiv2.map((blog, index) => {
                 // console.log(((blog.images)[0])[0]);
-                
+
                 return <Link
                   className="hover:text-white"
                   href={`tin-tuc/${blog.slug}`}
@@ -251,13 +255,13 @@ function News() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <p className="max-md:text-base max-sm:text-[5px] ">
+                    <p className="max-md:text-base max-sm:text-[10px] ">
                       Tin Tức Mới Nhất \{" "}
                       {formatDate(blog.created_at) || "2024-06-20"}
                     </p>
-                    <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                    <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                       {blog.title ||
-                        "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                        "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                     </p>
                   </div>
                 </Link>
@@ -292,13 +296,13 @@ function News() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <p className="max-md:text-base max-sm:text-[5px] ">
+                    <p className="max-md:text-base max-sm:text-[10px] ">
                       Tin Tức Mới Nhất \{" "}
                       {formatDate(blog.created_at) || "2024-06-20"}
                     </p>
-                    <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                    <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                       {blog.title ||
-                        "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                        "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                     </p>
                   </div>
                 </Link>

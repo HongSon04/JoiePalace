@@ -73,7 +73,7 @@ const Page = () => {
     useEffect(() => {
         setUser(data[0]);
     }, []);
-    console.log(user);
+    // console.log(user);
     
     return (
         <div className="flex flex-col gap-8">

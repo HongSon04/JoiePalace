@@ -17,6 +17,9 @@ import ToolCreactCombo from "./_components/ToolCreactCombo";
 import Loading from "./loading";
 import { getAllPackages } from "./_services/packageServices";
 import dynamic from "next/dynamic";
+import { fecthAllBlog } from "./_services/blogServices";
+import { useRouter } from "next/navigation";
+import { fetchBranchesFromApi } from "./_services/branchesServices";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -40,13 +43,15 @@ const services = [
   {
     id: 1,
     name: "sự kiện",
+    link: "su-kien",
     title: "hơn cả sự mong đợi",
     description:
-      "Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất lượng dịch vụ, White Palace là không gian hoàn hảo để triển khai bất kì kế hoạch sự kiện nào mà bạn đang ấp ủ, từ các buổi yến tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật giải trí sáng tạo, các sự kiện trọng thể của doanh nghiệp như sự kiện ra mắt sản phẩm, tiệc tri ân khách hàng, tiệc tất niên, triển lãm thương mại.",
+      "Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất lượng dịch vụ, JOIE PALACE là không gian hoàn hảo để triển khai bất kì kế hoạch sự kiện nào mà bạn đang ấp ủ, từ các buổi yến tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật giải trí sáng tạo, các sự kiện trọng thể của doanh nghiệp như sự kiện ra mắt sản phẩm, tiệc tri ân khách hàng, tiệc tất niên, triển lãm thương mại.",
   },
   {
     id: 2,
     name: "tiệc cưới",
+    link: "tiec-cuoi",
     title: "Chạm đến trái tim",
     description:
       "Tiệc cưới – bức tranh tình yêu vượt mọi ngôn từ cảm xúc, bước khởi đầu hoàn hảo cho cuộc hôn nhân viên mãn. Vì vậy, hãy để chúng tôi giúp bạn san sẻ niềm hạnh phúc đến những người yêu thương bằng một chuyến du hành mỹ vị khó quên, với đa dạng lựa chọn, từ những set menu đã được nghiên cứu kỹ lưỡng hay bạn có thể tự chọn thực đơn theo đặc điểm khách mời.",
@@ -54,9 +59,10 @@ const services = [
   {
     id: 3,
     name: "hội nghị",
+    link: "hoi-nghi",
     title: "dấu ấn thành công",
     description:
-      "White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.",
+      "JOIE PALACE là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp.",
   },
 ];
 const events = [
@@ -65,18 +71,6 @@ const events = [
       id: 1,
       content: "MÀN CHÀO SÂN ĐẦY MẠNH MẼ VÀ ẤN TƯỢNG CỦA SUZUKI XL7 HYBRID",
       urlImage: "/images-client/events/fev.jpg",
-    },
-    {
-      id: 2,
-      content:
-        "KHI SẮC TRẮNG THANH KHIẾT TÔ ĐIỂM CHO KHÔNG GIAN CƯỚI NGHỆ THUẬT CỦA WHITE PALACE PHẠM VĂN ĐỒNG",
-      urlImage: "/images-client/events/46-1.jpg",
-    },
-    {
-      id: 3,
-      content:
-        "ĐẠI HỘI ĐẠI BIỂU LẦN IX CỦA HAWA: WHITE PALACE PHẠM VĂN ĐỒNG ĐÓN TIẾP CỘNG ĐỒNG DOANH NGHIỆP NGÀNH GỖ VÀ MỸ NGHỆ",
-      urlImage: "/images-client/events/HAWA-62.jpg",
     },
   ],
   [
@@ -100,12 +94,13 @@ const events = [
     },
   ],
 ];
+
 const offers = [
   {
     id: 1,
     title: "tặng sân khấu màn hình led cho doanh nghiệp",
     content:
-      "White Palace áp dụng chương trình ưu đãi tặng sân khấu màn hình LED cho sự kiện doanh nghiệp có thời gian tổ chức từ nay đến hết 30/9/2024.",
+      "JOIE PALACE áp dụng chương trình ưu đãi tặng sân khấu màn hình LED cho sự kiện doanh nghiệp có thời gian tổ chức từ nay đến hết 30/9/2024.",
     image: "/images-client/offers/offer1.png",
   },
   {
@@ -113,14 +108,14 @@ const offers = [
     title:
       "tặng kì nghỉ trăng mật 2 ngày 1 đêm trên du thuyển 5 sao elite of the seas tại vịnh hạ long khi đặt tiệc cưới",
     content:
-      "White Palace trân trọng dành tặng kì trăng mật lãng mạn trên du thuyền 5 sao tại Vịnh Hạ Long (kèm vé máy bay khứ hồi) cho khách hàng tổ chức sự kiện cưới tại chi nhánh bất kỳ",
+      "JOIE PALACE trân trọng dành tặng kì trăng mật lãng mạn trên du thuyền 5 sao tại Vịnh Hạ Long (kèm vé máy bay khứ hồi) cho khách hàng tổ chức sự kiện cưới tại chi nhánh bất kỳ",
     image: "/images-client/offers/offer2.png",
   },
   {
     id: 3,
     title: "tặng trang sức ngọc trai cho khách hàng tiệc cưới",
     content:
-      "White Palace tặng bạn trang sức ngọc trai Long Beach Pearl trị giá 20.000.000 VND khi đặt tiệc cưới tại chi nhánh bất kỳ.",
+      "JOIE PALACE tặng bạn trang sức ngọc trai Long Beach Pearl trị giá 20.000.000 VND khi đặt tiệc cưới tại chi nhánh bất kỳ.",
     image: "/images-client/offers/offer3.png",
   },
 ];
@@ -134,8 +129,11 @@ const isBrowser = typeof window !== "undefined";
 function Home() {
   const [timeAutoPlay, setTimeAutoPlay] = useState(false);
   const carouselRef = useRef();
+  const [listBranches, setListBranches] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [dataPackage, setDataPackage] = useState(null);
+  const [show6blognew, setShow6blognew] = useState();
+  const router = useRouter();
   const delay = () => {
     setTimeout(() => {
       setTimeAutoPlay(true);
@@ -144,6 +142,25 @@ function Home() {
   useEffect(() => {
     const callApi = async () => {
       const res = await getAllPackages();
+      const blog = await fecthAllBlog();
+      const branches = await fetchBranchesFromApi();
+      setListBranches(branches.slice(7, 10));
+      const mapdataBlog = [
+        blog.slice(0, 3).map((i, index) => ({
+          id: index + 1,
+          content: i.title,
+          urlImage: i.images[0],
+          link: i.slug,
+        })),
+        blog.slice(3, 6).map((i, index) => ({
+          id: index + 4,
+          content: i.title,
+          urlImage: i.images[0],
+          link: i.slug,
+        })),
+      ];
+
+      setShow6blognew(mapdataBlog);
       setDataPackage(res.data.slice(0, 3));
     };
     delay();
@@ -154,6 +171,9 @@ function Home() {
   };
 
   if (!dataPackage) return <Loading></Loading>;
+  const navigation = (link) => {
+    router.push(`/client/tin-tuc/${link}`);
+  };
 
   return (
     <>
@@ -207,7 +227,7 @@ function Home() {
               Được xây dựng và phát triển bởi IN Hospitality vào năm 2007, White
               Palace là thương hiệu đầu tiên tại Việt Nam mở ra mô hình trung
               tâm hội nghị và sự kiện. Với sự đầu tư bài bản và chuyên biệt cho
-              các hội nghị và sự kiện cao cấp, White Palace luôn được chọn là
+              các hội nghị và sự kiện cao cấp, JOIE PALACE luôn được chọn là
               địa điểm tổ chức của những hội nghị kinh tế lớn, những sự kiện văn
               hóa giải trí có tầm ảnh hưởng và yến tiệc đẳng cấp.
             </span>
@@ -237,8 +257,8 @@ function Home() {
             </span>
           </div>
           <div className="w-[91%] h-screen flex flex-col bg-white gap-[2px] overflow-hidden">
-            {locations.map((location, index) => (
-              <section
+            {listBranches.map((location, index) => (
+                <section
                 key={location.id}
                 className="location-section-item relative w-full h-1/3 bg-pink-100 hover:h-[95%] transition-all duration-500 overflow-hidden"
               >
@@ -285,10 +305,10 @@ function Home() {
                     </div>
                     <div className="w-[50%]">
                       <span className="uppercase text-gold text-6xl font-normal leading-[80px]">
-                        {location.descriptoin}
+                        {locations[index].descriptoin}
                       </span>
                     </div>
-                    <ButtonDiscover className={"w-fit px-3"} />
+                    <ButtonDiscover link={`/client/chi-nhanh/${location.slug}`} className={"w-fit px-3"} />
                   </div>
                 </div>
               </section>
@@ -310,9 +330,9 @@ function Home() {
               },
             }}
             replayEffect={true}
-            styles="absolute z-10 w-screen top-[0%] left-[10%] "
+            styles="absolute z-10 top-[0%] left-[10%] max-lg:-top-[90px]"
           >
-            <span className="uppercase text-gold absolute text-4xl sm:text-6xl font-bold leading-[100%] bg-blackAlpha-200 p-4 rounded-lg backdrop-blur-xl">
+            <span className="uppercase text-gold w-max absolute text-4xl sm:text-6xl font-bold leading-[100%] bg-blackAlpha-200 p-4 max-lg:p-3 rounded-lg backdrop-blur-xl">
               dịch vụ
             </span>
           </TextFade>
@@ -372,7 +392,10 @@ function Home() {
                         {service.description}
                       </span>
                     </div>
-                    <ButtonDiscover className={"w-fit px-3"} />
+                    <ButtonDiscover
+                      className={"w-fit px-3"}
+                      link={`/client/${service.link}`}
+                    />
                   </TextFade>
                 </div>
               </div>
@@ -417,7 +440,7 @@ function Home() {
                   replayEffect={false}
                   styles="w-[79%]"
                 >
-                  <span className="uppercase text-gold font-bold text-[4em] leading-[64px]">
+                  <span className="uppercase text-gold font-bold text-[4em] max-md:text-[24px] max-md:leading-[32px] leading-[64px]">
                     TIN TỨC & SỰ KIỆN MỚI NHẤT
                   </span>
                 </TextFade>
@@ -440,7 +463,7 @@ function Home() {
                   <span className="leading-[150%] font-normal text-[18px] w-[85%]">
                     Cảm ơn quý khách đã ghé thăm chuyên mục tin tức của chúng
                     tôi.Tại đây, quý khách có thể cập nhật những tin tức mới
-                    nhất,điểm lại những sự kiện nổi bật nhất tại White Palace
+                    nhất,điểm lại những sự kiện nổi bật nhất tại JOIE PALACE
                     vàkhám phá những ưu đãi đặc biệt dành cho sự kiện của bạn.
                   </span>
                 </TextFade>
@@ -465,7 +488,7 @@ function Home() {
               </div>
             </div>
             <div className=" w-full px-8 h-[70vh] lg:w-[50%] lg:h-screen lg:pr-20 lg:pt-[100px] lg:pb-[40px] flex gap-6">
-              {events.map((event, indexEvent) => (
+              {show6blognew.map((event, indexEvent) => (
                 <div
                   key={indexEvent}
                   className={`section-event-listCard w-[calc(50%-12px)] h-[100%] flex ${
@@ -488,10 +511,17 @@ function Home() {
                         <div className="absolute inset-0 bg-blackAlpha-600"></div>
                       </div>
                       <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-between py-10 px-5">
-                        <span className="font-semibold text-xs leading-[22px] 500px:text-sm sm:text-lg sm:leading-7">
+                        <span
+                          className="font-semibold text-xs leading-[22px] 500px:text-sm sm:text-lg sm:leading-7 
+                line-clamp-4 block overflow-hidden text-ellipsis"
+                        >
                           {item.content}
                         </span>
-                        <IconButton background="none" type={"button"}>
+                        <IconButton
+                          background="none"
+                          type={"button"}
+                          onClick={() => navigation(item.link)}
+                        >
                           <Image
                             src="/arrow_circle_right.svg"
                             w={"100%"}
@@ -521,7 +551,10 @@ function Home() {
               replayEffect={false}
               styles="block lg:hidden pl-8"
             >
-              <ButtonDiscover className={"w-fit px-3"} />
+              <ButtonDiscover
+                className={"w-fit px-3"}
+                link={"/client/tin-tuc"}
+              />
             </TextFade>
           </div>
         </section>
@@ -593,7 +626,7 @@ function Home() {
                       </div>
                     </TextFade>
                   </div>
-                  <div className="w-full lg:w-[50%] 2xl:w-[30%] h-fit lg:h-fit translate-y-[25%] backdrop-blur-lg bg-white/10 py-16 px-8 overflow-hidden">
+                  <div className="w-full translate-y-0 lg:w-[50%] 2xl:w-[30%] h-fit lg:h-fit md:translate-y-[25%] backdrop-blur-lg bg-white/10 py-16 px-8 overflow-hidden">
                     <TextFade
                       settings={{
                         hidden: { opacity: 0, x: 50 },

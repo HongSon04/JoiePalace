@@ -779,14 +779,6 @@ export class BlogsService {
         short_description,
       } = updateBlogDto;
 
-      // Validate inputs
-      if (!files.images || files.images.length === 0) {
-        throw new HttpException(
-          'Ảnh không được để trống',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
       const slug = MakeSlugger(title);
 
       // Check blog existence
@@ -869,7 +861,7 @@ export class BlogsService {
           tags: {
             connect: tagsSet,
           },
-          images: uploadImages ? uploadImages : existingBlog.images,
+          images: [...(uploadImages || []), ...(existingBlog.images || [])],
         },
         include: {
           tags: true,

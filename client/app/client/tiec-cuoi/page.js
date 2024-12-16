@@ -30,7 +30,7 @@ function Event() {
       <ScrollFullPage>
         <div className="section ">
           <section className="select-none flex max-h-screen justify-between items-start max-lg:pt-20 lg:px-[25px] xl:max-w-screen-xl m-auto">
-            <div className="flex flex-col justify-center lg:h-screen z-10 max-lg:w-[75%]">
+            <div className="flex flex-col justify-center lg:h-screen z-10 max-lg:w-[75%] max-sm:hidden">
               <Image
                 className="w-full h-full object-cover"
                 src="/Wedding-1.jpg"
@@ -41,9 +41,9 @@ function Event() {
               <h1 className="text-gold mb-10 font-bold text-fade-in font-gilroy text-7xl max-lg:text-5xl max-sm:text-xl max-sm:mb-2 ">
                 Tiệc cưới
               </h1>
-              <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[10px] max-sm:leading-3">
+              <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[13px]">
                 Với những giá trị riêng biệt trong thẩm mỹ kiến trúc và chất
-                lượng dịch vụ, White Palace là không gian hoàn hảo để triển khai
+                lượng dịch vụ, JOIE PALACE là không gian hoàn hảo để triển khai
                 bất kì kế hoạch tiệc cưới nào mà bạn đang ấp ủ, từ các buổi yến
                 tiệc mang dấu ấn cá nhân như tiệc thôi nôi, sinh nhật, tiệc cưới
                 đến các chương trình nghệ thuật giải trí sáng tạo, các tiệc cưới
@@ -51,7 +51,7 @@ function Event() {
                 khách hàng, tiệc tất niên, triển lãm thương mại.
               </p>
             </div>
-            <div className="bgYellow lg:before:h-screen w-[350px] mb:w-[250px] relative flex flex-col md:justify-center lg:h-full max-lg:bottom-[100px] max-lg:pb-[80px] max-sm:pb-[50px]">
+            <div className="bgYellow lg:before:h-screen w-[350px] mb:w-[250px] relative flex flex-col md:justify-center lg:h-full max-lg:bottom-[100px] max-lg:pb-[80px] max-sm:pb-[230px]">
               <div className="max-lg:mt-[80px]">
                 <div className="bg-gray-500 max-w-[60%] relative top-[20px] left-[20px] z-10">
                   <Image
@@ -111,7 +111,7 @@ function Event() {
                     <Image src="/Wedding-6-e1719420516884.jpg" alt="" />
                   </div>
                   <p className="max-w-[641px] text-base relative left-[70px] top-[25px] text-fade-in max-lg:left-0 max-lg:top-0 max-sm:text-[10px] max-sm:leading-4">
-                    Mọi không gian tại White Palace được thiết kế để có thể tùy
+                    Mọi không gian tại JOIE PALACE được thiết kế để có thể tùy
                     biến một cách linh hoạt, phù hợp với mọi quy mô và hình thức
                     tổ chức tiệc cưới. Từ những tiệc cưới trưng bày, triển lãm,
                     đến những chương trình biểu diễn nghệ thuật hay hội nghị, ra

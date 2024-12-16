@@ -38,7 +38,7 @@ const MenuItems = ({ data, imgMenu, nameMenu, priceTotal }) => {
                     className="object-contain"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-end text-center text-white p-6">
-                    <h1 className="text-2xl font-bold">WHITE PALACE</h1>
+                    <h1 className="text-2xl font-bold">JOIE PALACE</h1>
                     <p className="text-lg font-semibold mt-4">{nameMenu}</p>
                 </div>
             </div>
@@ -53,7 +53,7 @@ const MenuItems = ({ data, imgMenu, nameMenu, priceTotal }) => {
                     alt="menu"
                     className="absolute inset-0 object-cover blur-md opacity-30"
                 />
-                <div className="relative flex flex-col justify-between   z-10 overflow-y-auto max-h-[450px] gap-5">
+                <div className="relative flex flex-col justify-between z-10 overflow-y-auto max-h-[450px] gap-5 ">
                 <div className="flex flex-col">
                         {/* Tiêu đề menu */}
                         <h2
@@ -62,9 +62,9 @@ const MenuItems = ({ data, imgMenu, nameMenu, priceTotal }) => {
                             Giá Menu: {`${priceTotal.toLocaleString()} đ`}
                         </h2>
                     </div>
-                    <div>
+                    <div className='mb-2'>
                         {data.map((menu, index) => (
-                            <div key={index} className="flex flex-col">
+                            <div key={index} className="flex flex-col flex-wrap">
                                 {/* Tiêu đề menu */}
                                 <h2
                                     className={`text-lg font-semibold flex items-center cursor-pointer hover:bg-whiteAlpha-200 p-2 ${activeMenus.has(index) ? 'bg-whiteAlpha-200' : ''
@@ -89,7 +89,7 @@ const MenuItems = ({ data, imgMenu, nameMenu, priceTotal }) => {
                                 </h2>
                                 {/* Danh sách món ăn */}
                                 <ul
-                                    className={`mt-2 space-y-1 overflow-hidden transition-all duration-300 ${openMenus.includes(index) ? 'max-h-40' : 'max-h-0'
+                                    className={`my-4 space-y-3 overflow-hidden transition-all duration-300 ${openMenus.includes(index) ? 'max-h-40' : 'max-h-0'
                                         }`}
                                 >
                                     {menu.items.map((item, itemIndex) => (
@@ -108,7 +108,6 @@ const MenuItems = ({ data, imgMenu, nameMenu, priceTotal }) => {
                             </div>
                         ))}
                     </div>
-                    
                 </div>
             </div>
         </div>

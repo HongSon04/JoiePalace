@@ -36,10 +36,10 @@ const Page = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-bold leading-6">Thực đơn của bạn</h1>
-      <div className="flex gap-8">
+      <h1 className="text-2xl font-bold leading-6 max-sm:text-center">Thực đơn của bạn</h1>
+      <div className="flex gap-8 flex-wrap">
         {menuDataByIDUser.length > 0 ? (
-          menuDataByIDUser.map((menu) => {
+          menuDataByIDUser.map((menu) => {  
             // Extract items for each category
             const appetizers = menu.products["mon-khai-vi"] || [];
             const mainDishes = menu.products["mon-chinh"] || [];
@@ -82,14 +82,14 @@ const Page = () => {
           })
         ) : (
           <div className="flex flex-col items-center justify-center w-full h-[50vh]">
-            <div className="w-[200px] opacity-50">
+            <div className="w-[200px] max-sm:w-[100px] opacity-50">
               <Image
                 src="/cloche.png"
                 alt="Notebook image"
                 className="object-cover "
               />
             </div>
-            <div className="flex mt-4 text-lg ">
+            <div className="flex mt-4 text-lg max-sm:flex-col max-sm:items-center max-sm:text-[13px]">
               <p>Bạn có muốn tạo menu cho riêng mình?</p>
               <Link
                 href="/client/tao-thuc-don"

@@ -204,7 +204,10 @@ export class StagesService {
           findStage.images,
         );
 
-        updateData.images = stagesImages as any;
+        updateData.images = [
+          ...(stagesImages || []),
+          ...(findStage.images || []),
+        ] as any;
       }
 
       const stagesRes = await this.prismaService.stages.update({

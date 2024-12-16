@@ -8,7 +8,7 @@ import { fetchAllBookingByUserId, fetchBookingById } from '@/app/_services/booki
 
 import Link from 'next/link';
 import { Result } from 'postcss';
-import Image from 'next/image';
+import { Image } from '@chakra-ui/react';
 
 
 const Page = () => {
@@ -176,7 +176,7 @@ const Page = () => {
             </div>
             {
                 loading ? (
-                   ''
+                    ''
                 ) : (
                     resonParty && resonParty.length > 0 ? (
                         resonParty.map(party => (
@@ -191,15 +191,13 @@ const Page = () => {
                             </div>
                         ))
                     ) : (
-                        <div className='absolute'>
-                            <div className='relative left-[400px] top-[450px]  w-[100px] h-[100px]'>
-                                <div>  <Image
-                                    src='/notebook.png'
-                                    alt="user-img"
-                                    fill
-                                    className="w-[200px] opacity-50"
-                                /></div>
-                            </div>
+                        // ''
+                        <div className='flex justify-center'>
+                            <Image
+                                src='/notebook.png'
+                                alt="user-img"
+                                className="w-[100px] opacity-50"
+                            />
                         </div>
                     )
                 )

@@ -1,10 +1,10 @@
 // HOST URL
-const HOST = `https://joieplace.live/api`;
-const MEMBERSHIPS = `https://joieplace.live/memberships`;
+const HOST = `http://joieplace.live/api`;
+const MEMBERSHIPS = `http://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
-const AUTH_API = `${HOST}/auth`;
+const AUTH_API = `${HOST}/auth`;  
 const USER_API = `${HOST}/user`;
 const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
@@ -24,6 +24,7 @@ const PACKAGES_API = `${HOST}/packages`;
 const DECORS_API = `${HOST}/decors`;
 const STAGES_API = `${HOST}/stages`;
 const MAIL_API = `${HOST}/mail`;
+
 
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
@@ -50,6 +51,7 @@ export const API_CONFIG = {
     REFRESH_TOKEN: `${AUTH_API}/refresh-token`,
     UPLOAD_AVATAR: `${AUTH_API}/upload-avatar`,
     LOGIN_GOOLGE: `${AUTH_API}/login-social`,
+    VERIFY: `${AUTH_API}/send-email-verify`
   },
 
   // USER API
@@ -62,7 +64,7 @@ export const API_CONFIG = {
     GET_BY_ID: (id) => `${USER_API}/get/${id}`,
     GET_BY_BRANCH_ID: (id) => `${USER_API}/get-all-by-branch-id/${id}`,
     CHANGE_PASSWORD: `${USER_API}/change-password`,
-    RESET_PASSWORD: `${USER_API}/forgot-passwod`,
+    RESET_PASSWORD: `${USER_API}/forgot-password`,
     FORGOT_PASSWORD: `${USER_API}/forgot-password`,
     CHANGE_PROFILE: `${USER_API}/change-profile`,
     DELETE: (id) => `${USER_API}/delete/${id}`,
@@ -95,6 +97,8 @@ export const API_CONFIG = {
     GET_ALL_BY_BRANCH: (id) => `${STAGES}/get-all?branch_id=${id}`,
     GET_ALL_BY_STAGE_ID: (id) => `${STAGES}/get/${id}`,
     GET_BY_ID: (id) => `${STAGES}/get/${id}`,
+    DESTROY: (id) => `${STAGES}/destroy/${id}`,
+    UPDATE: (id) => `${STAGES}/update/${id}`,
   },
 
   // CATEGORIES API
@@ -114,7 +118,8 @@ export const API_CONFIG = {
 
   // DASHBOARD API
   DASHBOARD: {
-    
+    GET_ALL_INFO: 
+      `${DASHBOARD_API}/get-all-info`,
     GET_TOTAL_REVENUE_BRANCH_WEEK: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-by-week/${id}`,
     GET_TOTAL_REVENUE_BRANCH_MONTH: (id) =>
@@ -129,6 +134,7 @@ export const API_CONFIG = {
       `${DASHBOARD_API}/get-all-info-by-each-time/${id}`,
     GET_TOTAL_REVENUE_EACH_MONTH: (id) =>
       `${DASHBOARD_API}/total-revenue-for-each-branch-each-month/${id}`,
+    GET_BOOKING_STATUS_BRANCH : (id) => `${DASHBOARD_API}/count-booking-status-for-each-branch/${id}`
   },
 
   // PRODUCTS API
@@ -204,9 +210,10 @@ export const API_CONFIG = {
 
   // BLOGS API
   BLOGS: {
-    // CREATE: `${BLOGS_API}/create`,
+    CREATE: `${BLOGS_API}/create`,
     GET_ALL: `${BLOGS_API}/get-all`,
     GET_BY_SLUG: (slug) => `${BLOGS_API}/get-by-slug/${slug}`,
+    GET_BY_ID: (id) => `${BLOGS_API}/get-by-slug/${id}`,
   },
 
   //MEMBERSHIPS
@@ -224,14 +231,19 @@ export const API_CONFIG = {
   },
 
   DECORS: {
+    CREATE: `${DECORS_API}/create`,
     GET_ALL: (params) =>
       constructUrlWithParams(`${DECORS_API}/get-all`, params),
     GET_BY_ID: (id) => `${DECORS_API}/get/${id}`,
+    UPDATE: (id) => `${DECORS_API}/update/${id}`,
+    DELETE: (id) => `${DECORS_API}/delete/${id}`,
+
   },
 
   // NOTIFICATIONS API
   NOTIFICATIONS: {
-    GET_BY_ID: (id) => `${NOTIFICATIONS_API}/get/${id}`,
+    GET_BY_ID: (id, params) =>
+      constructUrlWithParams(`${NOTIFICATIONS_API}/get/${id}`, params),
     IS_READ: `${NOTIFICATIONS_API}/update-is-read`,
   },
 

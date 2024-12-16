@@ -2,11 +2,15 @@
 import axios from "axios";
 import { API_CONFIG } from "@/app/_utils/api.config";
 
-export const fetchBranchesFromApi = async () => {
+export const fetchBranchesFromApi = async (params, signal) => {
   const response = await axios.get(
     API_CONFIG.BRANCHES.GET_ALL({
       itemsPerPage: 99999,
-    })
+      ...params,
+    }),
+    {
+      signal,
+    }
   );
 
   if (response.status !== 200) {
@@ -60,7 +64,3 @@ export const postBranchAPI = async (branch) => {
   }
   return response.data.data;
 };
-
-
-
-

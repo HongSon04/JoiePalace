@@ -44,7 +44,7 @@ function Event() {
                 Thực đơn
               </h1>
               <p className="flex-wrap text-white text-fade-in text-base font-gilroy max-sm:text-[13px] max-sm:leading-6">
-                Với giá trị thẩm mỹ kiến trúc và chất lượng dịch vụ độc đáo, White Palace là không gian lý tưởng cho mọi kế hoạch tiệc cưới của bạn. Từ các buổi tiệc cá nhân như thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật sáng tạo và tiệc trọng thể của doanh nghiệp như ra mắt sản phẩm, tri ân khách hàng, tiệc tất niên và triển lãm thương mại.
+                Với giá trị thẩm mỹ kiến trúc và chất lượng dịch vụ độc đáo, JOIE PALACE là không gian lý tưởng cho mọi kế hoạch tiệc cưới của bạn. Từ các buổi tiệc cá nhân như thôi nôi, sinh nhật, tiệc cưới đến các chương trình nghệ thuật sáng tạo và tiệc trọng thể của doanh nghiệp như ra mắt sản phẩm, tri ân khách hàng, tiệc tất niên và triển lãm thương mại.
               </p>
             </div>
             <div className="bgYellow lg:before:h-screen w-[350px] mb:w-[250px] relative flex flex-col md:justify-center lg:h-full max-lg:pb-[100px]">

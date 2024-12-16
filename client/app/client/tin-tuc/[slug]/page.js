@@ -21,6 +21,8 @@ const Blog = () => {
   useEffect(() => {
     const getBlog = async (slug) => {
       const blogDataSlug = await fetchBlogDataBySlug(slug);
+      // console.log(blogDataSlug);
+      
       setBlog(blogDataSlug);
     };
     getBlog(slug);
@@ -139,7 +141,7 @@ const Blog = () => {
       <section className="h-[80vh] bg-cover relative">
         <div className="absolute w-full">
           <div className="relative top-[250px] min-h-[100px] w-4/6 m-auto max-xl:w-5/6">
-            <div className="w-[550px] max-sm:w-full">
+            <div className="w-[550px] max-sm:w-full bg-blackAlpha-500 p-5 rounded">
               <h1 className="text-4xl uppercase max-sm:text-xl">
                 {contentBanner[0]?.title}
               </h1>
@@ -195,27 +197,27 @@ const Blog = () => {
             {parentDiv1.map((blog, index) => (
               <Link
                 className="hover:text-white"
-                href={`${blog.slug}`}
+                href={`/client/tin-tuc/${blog.slug}`}
                 key={index}
               >
                 <div className="w-[296px] max-lg:w-[200px] max-md:w-[150px] max-sm:w-[100px] leading-10 max-sm:leading-5 mb-20">
                   <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70">
                     <Image
                       src={
-                        blog.images ||
+                        blog.images[0] ||
                         "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                       }
                       alt={blog.title || ""}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="max-md:text-base max-sm:text-[5px] ">
+                  <p className="max-md:text-base max-sm:text-[10px] ">
                     Tin Tức Mới Nhất \{" "}
                     {formatDate(blog.created_at) || "2024-06-20"}
                   </p>
-                  <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                  <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
-                      "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                      "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
                 </div>
               </Link>
@@ -232,20 +234,20 @@ const Blog = () => {
                   <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70">
                     <Image
                       src={
-                        blog.images ||
+                        blog.images[0]  ||
                         "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                       }
                       alt={blog.title || ""}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="max-md:text-base max-sm:text-[5px] ">
+                  <p className="max-md:text-base max-sm:text-[10px] ">
                     Tin Tức Mới Nhất \{" "}
                     {formatDate(blog.created_at) || "2024-06-20"}
                   </p>
-                  <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                  <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
-                      "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                      "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
                 </div>
               </Link>
@@ -261,20 +263,20 @@ const Blog = () => {
                   <div className="div-children-banner cursor-pointer relative before:block before:absolute before:inset-0 before:bg-gradient-to-b before:from-[rgba(102,102,102,0.6)] before:to-[rgba(0,0,0,0.6)] inline-block before:opacity-70">
                     <Image
                       src={
-                        blog.images ||
+                        blog.images[0] ||
                         "https://whitepalace.com.vn/wp-content/uploads/2024/06/JULIA-MORLEY-PHAM-KIM-DUNG-2-300x450.jpg"
                       }
                       alt={blog.title || ""}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="max-md:text-base max-sm:text-[5px] ">
+                  <p className="max-md:text-base max-sm:text-[10px] ">
                     Tin Tức Mới Nhất \{" "}
                     {formatDate(blog.created_at) || "2024-06-20"}
                   </p>
-                  <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
+                  <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
                     {blog.title ||
-                      "WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
+                      "JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU"}
                   </p>
                 </div>
               </Link>
@@ -284,13 +286,13 @@ const Blog = () => {
         <>
           {/* Pagination */}
           <nav
-            className="flex items-center justify-start mt-4"
+            className="flex items-center justify-center mt-4"
             aria-label="Pagination"
           >
             <button
               onClick={handlePreviousPage}
               disabled={numberpage === 1}
-              className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === 1 ? "opacity-50 cursor-not-allowed" : ""
+              className={`bg-white rounded text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === 1 ? "opacity-50 cursor-not-allowed" : ""
                 }`}
             >
               <svg
@@ -317,7 +319,7 @@ const Blog = () => {
                     setNumberPage(item);
                   }
                 }}
-                className={`min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${item === numberpage
+                className={`min-h-[38px] rounded min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${item === numberpage
                     ? "bg-gold text-white"
                     : "bg-white text-black hover:bg-gold hover:text-white"
                   }`}
@@ -330,8 +332,8 @@ const Blog = () => {
             <button
               onClick={handleNextPage}
               disabled={numberpage === countNumberPage}
-              className={`bg-white text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === countNumberPage
-                  ? "opacity-50 cursor-not-allowed"
+              className={`bg-white rounded text-black hover:bg-gold hover:text-white min-h-[38px] min-w-[38px] py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm border mr-1 ${numberpage === countNumberPage
+                  ? "cursor-not-allowed"
                   : ""
                 }`}
             >

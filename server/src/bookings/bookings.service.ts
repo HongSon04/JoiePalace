@@ -203,14 +203,19 @@ export class BookingsService {
       // Build where conditions using Prisma types
       const whereConditions: any = {
         deleted,
-        ...(query.startDate &&
-          query.endDate && {
-            created_at: {
-              gte: FormatDateToStartOfDay(query.startDate),
-              lte: FormatDateToEndOfDay(query.endDate),
-            },
-          }),
       };
+
+      if (query.startOrganizationDate && query.endOrganizationDate) {
+        whereConditions.organization_date = {
+          gte: FormatDateToStartOfDay(query.startOrganizationDate),
+          lte: FormatDateToEndOfDay(query.endOrganizationDate),
+        };
+      } else if (query.startDate && query.endDate) {
+        whereConditions.created_at = {
+          gte: FormatDateToStartOfDay(query.startDate),
+          lte: FormatDateToEndOfDay(query.endDate),
+        };
+      }
 
       // Add search conditions if search exists
       if (query.search) {
@@ -424,6 +429,104 @@ export class BookingsService {
         throw error;
       }
       console.log('Lỗi từ booking.service.ts -> findOne: ', error);
+      throw new InternalServerErrorException({
+        message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
+        error: error.message,
+      });
+    }
+  }
+
+  // ! Get Booking Now For Next 14 Days
+  async getBookingNowForNext14Days(branch_id: number) {
+    try {
+      // Lấy tất cả các sảnh có sẵn
+      const allStages = await this.prismaService.stages.findMany({
+        where: { branch_id: Number(branch_id) },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      const currentDate = new Date();
+      const startDate = new Date(currentDate);
+      const endDate = new Date(currentDate);
+      startDate.setDate(currentDate.getDate() + 0);
+      endDate.setDate(currentDate.getDate() + 14);
+
+      // Lấy tất cả bookings trong khoảng thời gian
+      const bookings = await this.prismaService.bookings.findMany({
+        where: {
+          branch_id: Number(branch_id),
+          organization_date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          organization_date: true,
+          shift: true,
+          stage_id: true,
+        },
+      });
+
+      // Tạo Map để tra cứu booking nhanh hơn
+      const bookingMap = new Map();
+      for (const booking of bookings) {
+        const dateKey = new Date(booking.organization_date).toDateString();
+        bookingMap.set(`${dateKey}-${booking.shift}`, booking);
+      }
+
+      const response = [];
+      const shifts = ['Sáng', 'Tối'];
+
+      for (let i = 0; i <= 14; i++) {
+        const dateToCheck = new Date(currentDate);
+        dateToCheck.setDate(currentDate.getDate() + i);
+        const dateKey = dateToCheck.toDateString();
+
+        for (const shift of shifts) {
+          const existingBooking = bookingMap.get(`${dateKey}-${shift}`);
+          const organi_date = dateToCheck.toISOString().split('T')[0];
+          const [year, month, date] = organi_date.split('-');
+
+          // Tạo danh sách stages với status
+          const stagesWithStatus = allStages.map((stage) => ({
+            id: stage.id,
+            name: stage.name,
+            status: existingBooking
+              ? existingBooking.stage_id === stage.id
+              : false,
+          }));
+
+          response.push({
+            id: existingBooking?.id || null,
+            name: existingBooking?.name || null,
+            organization_date: `${date}-${month}-${year}`,
+            shift: shift,
+            status: !!existingBooking,
+            stages: stagesWithStatus,
+          });
+        }
+      }
+
+      throw new HttpException(
+        {
+          message: 'Lấy dữ liệu đặt chỗ thành công!',
+          data: response,
+        },
+        HttpStatus.OK,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log(
+        'Lỗi từ booking.service.ts -> getBookingNowForNext14Days: ',
+        error,
+      );
       throw new InternalServerErrorException({
         message: 'Đã có lỗi xảy ra, vui lòng thử lại sau!',
         error: error.message,
@@ -992,13 +1095,6 @@ export class BookingsService {
         const bookingAmount = Number(
           (totalAmount + totalFee - depositAmount).toFixed(0),
         );
-
-        // Push New Image To Old Image
-        if (uploadImages.length > 0) {
-          uploadImages.map((image) => {
-            findBookingDetail.images.push(image);
-          });
-        }
 
         // ! Update Booking
         await this.prismaService.booking_details.update({

@@ -8,8 +8,8 @@ const contentBanner = [
         id: 1,
         title: 'MÀN CHÀO SÂN ĐẦY MẠNH MẼ VÀ ẤN TƯỢNG CỦA SUZUKI XL7 HYBRID',
         banner: 'cwe.jpg',
-        descriptions1: 'SUZUKI XL7 HYBRID - Dòng xe đậm chất thể thao đa dụng với hàng loạt cải tiến nổi bật đã chính thức chào sân người yêu xe Việt Nam trong buổi họp báo tổ chức tại White Palace Phạm Văn Đồng vừa qua',
-        descriptions2: "XL7 Hybrid – Mẫu xe Suzuki đậm chất SUV (xe thể thao đa dụng) đã có màn chào sân đầy ấn tượng tại sảnh Hall B - White Palace Phạm Văn Đồng. Vinh dự được đồng hành cùng Suzuki trong buổi họp báo hoành tráng này, White Palace Phạm Văn Đồng đã góp phần tạo nên thành công cho sự kiện với: Sảnh hội nghị Hall B sang trọng, được bố trí theo kiểu lớp học (Classroom), tạo điều kiện cho khách mời có thể vừa chiêm ngưỡng màn ra mắt, vừa ghi chép thông tin quan trọng Hệ thống thang máy tải trọng lớn có khả năng đưa ô tô vào tận sảnh, mang đến màn chào sân ấn tượng của 03 chiếc XL7 Hybrid tại sân khấu chính Khu vực đón khách rộng rãi cùng menu teabreak tinh tế, tiếp thêm năng lượng hứng khởi cho hoạt động networking Hệ thống âm thanh và ánh sáng hiện đại tạo nên trải nghiệm ấn tượng  Dịch vụ hội nghị tận tâm với đội ngũ nhân viên giàu kinh nghiệm",
+        descriptions1: 'SUZUKI XL7 HYBRID - Dòng xe đậm chất thể thao đa dụng với hàng loạt cải tiến nổi bật đã chính thức chào sân người yêu xe Việt Nam trong buổi họp báo tổ chức tại JOIE PALACE Phạm Văn Đồng vừa qua',
+        descriptions2: "XL7 Hybrid – Mẫu xe Suzuki đậm chất SUV (xe thể thao đa dụng) đã có màn chào sân đầy ấn tượng tại sảnh Hall B - JOIE PALACE Phạm Văn Đồng. Vinh dự được đồng hành cùng Suzuki trong buổi họp báo hoành tráng này, JOIE PALACE Phạm Văn Đồng đã góp phần tạo nên thành công cho sự kiện với: Sảnh hội nghị Hall B sang trọng, được bố trí theo kiểu lớp học (Classroom), tạo điều kiện cho khách mời có thể vừa chiêm ngưỡng màn ra mắt, vừa ghi chép thông tin quan trọng Hệ thống thang máy tải trọng lớn có khả năng đưa ô tô vào tận sảnh, mang đến màn chào sân ấn tượng của 03 chiếc XL7 Hybrid tại sân khấu chính Khu vực đón khách rộng rãi cùng menu teabreak tinh tế, tiếp thêm năng lượng hứng khởi cho hoạt động networking Hệ thống âm thanh và ánh sáng hiện đại tạo nên trải nghiệm ấn tượng  Dịch vụ hội nghị tận tâm với đội ngũ nhân viên giàu kinh nghiệm",
         descriptions3: 'Buổi họp báo đã khẳng định vị thế vững chắc của Suzuki tại thị trường Việt Nam hiện nay...',
         arrayImage1: ['wdc.jpg', 'tee.jpg', 'ipk7.jpg'],
         arrayImage2: ['dwcwe.jpg', 'sxw.jpg', 'wqq.jpg'],
@@ -76,9 +76,9 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
-                                WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
+                                JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
                         <div className=" w-[296px] max-lg:w-[200px] max-md:w-[150px] max-sm:w-[100px] leading-10 max-sm:leading-5 mb-20">
@@ -91,9 +91,9 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
-                                WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
+                                JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
                     </div> 
@@ -108,9 +108,9 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
-                                WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
+                                JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
                         <div className=" w-[296px] max-lg:w-[200px] max-md:w-[150px] max-sm:w-[100px] leading-10 max-sm:leading-5 mb-20">
@@ -123,9 +123,9 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
-                                WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
+                                JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
                     </div>
@@ -140,9 +140,9 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
-                                WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
+                                JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
                         <div className=" w-[296px] max-lg:w-[200px] max-md:w-[150px] max-sm:w-[100px] leading-10 max-sm:leading-5 mb-20">
@@ -155,9 +155,9 @@ const Blog = () => {
                                     />
                                 </Link>
                             </div>
-                            <p className="max-md:text-base max-sm:text-[5px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
-                            <p className="font-bold max-lg:text-lg max-sm:text-[10px] max-sm:leading-3 text-xl m-auto">
-                                WHITE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
+                            <p className="max-md:text-base max-sm:text-[10px] ">Tin Tức Mới Nhất \ 26 Tháng Tám 2024</p>
+                            <p className="font-bold max-lg:text-lg max-sm:text-[13px]  text-xl m-auto">
+                                JOIE PALACE VÕ VĂN KIỆT VINH DỰ ĐÓN TIẾP  CHỦ TỊCH MISS WORLD TOÀN CẦU
                             </p>
                         </div>
                     </div>

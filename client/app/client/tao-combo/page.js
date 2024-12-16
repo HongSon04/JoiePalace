@@ -2,19 +2,28 @@
 
 import Footer from "@/app/_components/FooterClient";
 import FormInput from "@/app/_components/FormInput";
+import SelectedProduct from "@/app/_components/SelectedProduct";
+import Uploader from "@/app/_components/Uploader";
 import { fetchDecors } from "@/app/_lib/decors/decorsSlice";
+import {
+  getBeaverageById,
+  getBeaverages,
+} from "@/app/_lib/features/beaverages/beaveragesSlice";
+import { getBranches } from "@/app/_lib/features/branch/branchSlice";
 import { fetchCategoriesBySlug } from "@/app/_lib/features/categories/categoriesSlice";
 import { getMenuList } from "@/app/_lib/features/menu/menuSlice";
-import {
-  fetchingPartyTypesFailure,
-  fetchingPartyTypesSuccess,
-  getPartyTypes,
-} from "@/app/_lib/features/partyTypes/partyTypesSlice";
+import { createPackage } from "@/app/_lib/features/packages/packagesSlice";
+import { getPartyTypes } from "@/app/_lib/features/partyTypes/partyTypesSlice";
 import { fetchProductByCategorySlug } from "@/app/_lib/features/products/productsSlice";
 import { fetchStages } from "@/app/_lib/features/stages/stagesSlice";
 import { fetchHalls } from "@/app/_lib/halls/hallsSlice";
-import { fecthAllPartyTypes } from "@/app/_services/partyTypesServices";
-import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import { CONFIG } from "@/app/_utils/config";
+import { formatPrice } from "@/app/_utils/formaters";
+import {
+  decodeWeddingPackageName,
+  generateUniqueWeddingPackageName,
+} from "@/app/_utils/helpers";
 import pattern from "@/public/line-group.svg";
 import {
   Button,
@@ -45,32 +54,18 @@ import {
 } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox, Divider, Skeleton } from "@nextui-org/react";
-import { Col, Row, Image } from "antd";
+import { Col, Image, Row } from "antd";
 import { AnimatePresence, motion } from "framer-motion";
 import NextImage from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { FaRandom } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import ServiceItem from "./ServiceItem";
-import { CONFIG } from "@/app/_utils/config";
-import SelectedProduct from "@/app/_components/SelectedProduct";
-import { createPackage } from "@/app/_lib/features/packages/packagesSlice";
-import Uploader from "@/app/_components/Uploader";
-import Link from "next/link";
-import { getBranches } from "@/app/_lib/features/branch/branchSlice";
-import {
-  decodeWeddingPackageName,
-  generateUniqueWeddingPackageName,
-} from "@/app/_utils/helpers";
-import { FaRandom } from "react-icons/fa";
-import { formatPrice } from "@/app/_utils/formaters";
-import {
-  getBeaverageById,
-  getBeaverages,
-} from "@/app/_lib/features/beaverages/beaveragesSlice";
 
 const categories = [
   {
@@ -440,49 +435,27 @@ function Page() {
       return;
     }
 
+    if (Object.keys(errors).length > 0) {
+      toast({
+        title: "Vui lòng điền đầy đủ thông tin",
+        status: "error",
+        position: "top-right",
+      });
+    }
+
     if (!isFormatAccepted || isNextImageOverSize) {
       return;
     }
 
-    if (!menuId) {
+    if (
+      typeof menuId !== "string" ||
+      typeof hallId !== "string" ||
+      typeof decorId !== "string" ||
+      typeof stageId !== "string" ||
+      typeof cakeId !== "string"
+    ) {
       toast({
-        title: "Vui lòng chọn thực đơn",
-        status: "error",
-        position: "top-right",
-      });
-      return;
-    }
-
-    if (!hallId) {
-      toast({
-        title: "Vui lòng chọn sảnh",
-        status: "error",
-        position: "top-right",
-      });
-      return;
-    }
-
-    if (!decorId) {
-      toast({
-        title: "Vui lòng chọn gói trang trí",
-        status: "error",
-        position: "top-right",
-      });
-      return;
-    }
-
-    if (!stageId) {
-      toast({
-        title: "Vui lòng chọn gói trang trí sân khấu",
-        status: "error",
-        position: "top-right",
-      });
-      return;
-    }
-
-    if (!cakeId) {
-      toast({
-        title: "Chọn cho mình một chiếc bánh cười phù hợp nhé!",
+        title: "Vui lòng chọn các dịch vụ cần thiết",
         status: "error",
         position: "top-right",
       });
@@ -620,61 +593,7 @@ function Page() {
 
     const storeUser = window.localStorage.getItem("user");
     if (storeUser) setIsLogedIn(true);
-
-    // const params = new URLSearchParams(window.location.search);
-    // const partySize = params.get("partySize") || "";
-    // const budget = params.get("budget") || "";
-    // const partyType = params.get("partyType") || "";
-
-    // setValue("partySize", partySize);
-    // setValue("budget", budget);
-    // setValue("partyType", partyType);
   }, []);
-
-  // React.useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search);
-  //   const partySize = params.get("partySize") || "";
-  //   const budget = params.get("budget") || "";
-  //   const partyTypeId = params.get("partyType") || "";
-  //   const branchId = params.get("branch") || "";
-
-  //   setValue("partySize", partySize);
-  //   setValue("budget", budget);
-
-  //   if (branchId && branches.length > 0) {
-  //     const branch = branches.find((b) => b.id == branchId);
-
-  //     if (branch) {
-  //       setValue("branch", JSON.stringify(branch));
-  //     }
-  //   }
-
-  //   if (partyTypeId && partyTypes.length > 0) {
-  //     const partyType = partyTypes.find((type) => type.id == partyTypeId);
-
-  //     if (partyType) {
-  //       setValue("partyType", JSON.stringify(partyType));
-  //     }
-  //   }
-  // }, [partyTypes]);
-
-  // React.useEffect(() => {
-  //   const subscription = watch((value, { name, type }) => {
-  //     const params = new URLSearchParams(window.location.search);
-  //     if (value.partySize) params.set("partySize", value.partySize);
-  //     if (value.budget) params.set("budget", value.budget);
-  //     if (value.partyType) {
-  //       const parsedPartyType = parsedState(value.partyType);
-  //       params.set("partyType", parsedPartyType.id);
-  //     }
-  //     if (value.branch) {
-  //       const parsedBranch = parsedState(value.branch);
-  //       params.set("branch", parsedBranch.id);
-  //     }
-  //     router.replace(`?${params.toString()}`);
-  //   });
-  //   return () => subscription.unsubscribe();
-  // }, []);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -787,10 +706,15 @@ function Page() {
       // }
     };
 
+    // Fetch data for the first tab when the component mounts
+    if (tabIndex === 0) {
+      fetchData();
+    }
+
     fetchData();
 
     return () => {};
-  }, [tabIndex, branchId]);
+  }, [tabIndex, getValues("branch")]);
 
   React.useEffect(() => {
     if (submitTriggered && Object.keys(errors).length > 0) {
@@ -837,7 +761,7 @@ function Page() {
 
   const renderNoteArea = () => {
     return (
-      <div className="bg-whiteAlpha-50 flex flex-col gap-4 p-5 rounded-2xl w-1/3 h-[70vh]">
+      <div className="bg-whiteAlpha-50 lg:flex flex-col gap-4 p-5 rounded-2xl xl:w-1/3 sxs:w-full h-[70vh]">
         <span className="text-sm font-semibold leading-5 text-left">
           Ghi chú
         </span>
@@ -869,14 +793,14 @@ function Page() {
       ) : (
         <>
           {/* HERO SECTION */}
-          <section className="px-48 pb-16 pt-36 relative !font-gilroy">
+          <section className="xl:px-48 md:px-12 pb-16 pt-36 relative !font-gilroy">
             <NextImage
               src={pattern}
               alt="joie palace pattern"
               className="absolute left-0 top-1/2 -translate-y-1/2"
             />
-            <Row gutter={[20, 20]}>
-              <Col span={12}>
+            <Row gutter={[20, 20]} justify={"start"}>
+              <Col span={12} lg={12} md={12} sm={24} xs={24}>
                 <h1 className="text-5xl text-gold font-gilroy font-semibold uppercase leading-normal">
                   CÔNG CỤ TẠO COMBO <br /> VÀ DỰ CHI
                 </h1>
@@ -890,7 +814,14 @@ function Page() {
                   ra được con số hoàn hảo nhất, vừa vặn với tầm dự chi của bạn.
                 </p>
               </Col>
-              <Col span={12} className="flex justify-end">
+              <Col
+                span={12}
+                lg={12}
+                md={12}
+                sm={24}
+                xs={24}
+                className="flex justify-start md:justify-end"
+              >
                 <form action="#" className="w-[400px]">
                   {partyTypes && (
                     <FormInput
@@ -1054,7 +985,7 @@ function Page() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 id="creator"
-                className="px-48 py-16 relative !font-gilroy"
+                className="xl:px-48 md:px-12 py-16 relative !font-gilroy overflow-hidden"
               >
                 <Tabs
                   variant={"unstyled"}
@@ -1064,12 +995,12 @@ function Page() {
                   onChange={handleTabChange}
                   isLazy
                 >
-                  <TabList className="p-2 rounded-full bg-whiteAlpha-100 w-fit items-center gap-3">
+                  <TabList className="p-2 rounded-full bg-whiteAlpha-100 lg:w-fit md:w-fit sm:w-full items-center gap-3 overflow-x-auto">
                     {categories.map((category, index) => (
                       <Tab
                         key={index}
                         color={"white"}
-                        className="aria-[selected=true]:text-white aria-[selected=true]:opacity-100 aria-[selected=true]:bg-gold bg-transparent opacity-45 transition flex items-center gap-2 uppercase font-semibold flex-center text-center rounded-full py-2 px-6 leading-8"
+                        className="min-w-max aria-[selected=true]:text-white aria-[selected=true]:opacity-100 aria-[selected=true]:bg-gold bg-transparent opacity-45 transition flex items-center gap-2 uppercase font-semibold flex-center text-center rounded-full py-2 px-6 leading-8"
                       >
                         {category.name}
                       </Tab>
@@ -1077,7 +1008,7 @@ function Page() {
                     <Tab
                       key={"generalInformations"}
                       color={"white"}
-                      className="aria-[selected=true]:text-white aria-[selected=true]:opacity-100 aria-[selected=true]:bg-gold bg-transparent opacity-45 transition flex items-center gap-2 uppercase font-semibold flex-center text-center rounded-full py-2 px-6 leading-8"
+                      className="min-w-max aria-[selected=true]:text-white aria-[selected=true]:opacity-100 aria-[selected=true]:bg-gold bg-transparent opacity-45 transition flex items-center gap-2 uppercase font-semibold flex-center text-center rounded-full py-2 px-6 leading-8"
                     >
                       Thông tin chung
                     </Tab>
@@ -1091,6 +1022,7 @@ function Page() {
                     </Button>
                   </TabList>
 
+                  {/* ERROR CATCHING */}
                   {isFetchingCategoriesError ||
                     isFetchingDecorsError ||
                     isFetchingHallsError ||
@@ -1126,13 +1058,13 @@ function Page() {
                           }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 50 }}
-                          className="w-full flex gap-5"
+                          className="w-full flex gap-5 xl:flex-row sxs:flex-col-reverse sxs:gap-3"
                         >
                           {/* NOTE AREA */}
                           {renderNoteArea()}
 
                           {/* PANEL MAIN */}
-                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                          <div className="xl:w-2/3 sxs:w-full h-full flex flex-col gap-3 relative">
                             <div className="flex gap-3 items-center h-full relative">
                               <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
                               <span className="text-xl font-bold ml-4">
@@ -1201,12 +1133,12 @@ function Page() {
                           }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 50 }}
-                          className="w-full flex gap-5"
+                          className="w-full flex gap-5 xl:flex-row sxs:flex-col-reverse sxs:gap-3"
                         >
                           {/* NOTE AREA */}
                           {renderNoteArea()}
 
-                          <div className="w-2/3">
+                          <div className="xl:w-2/3 sxs:w-full">
                             {/* Trang trí */}
                             <div className="flex flex-col gap-3 relative">
                               <div className="flex gap-3 items-center h-full relative">
@@ -1407,13 +1339,13 @@ function Page() {
                           }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 50 }}
-                          className="w-full flex gap-5"
+                          className="w-full flex gap-5 xl:flex-row sxs:flex-col-reverse sxs:gap-3"
                         >
                           {/* NOTE AREA */}
                           {renderNoteArea()}
 
                           {/* PANEL MAIN */}
-                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                          <div className="xl:w-2/3 sxs:w-full h-full  flex flex-col gap-3 relative">
                             <div className="flex gap-3 items-center h-full relative">
                               <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
                               <span className="text-xl font-bold ml-4">
@@ -1483,13 +1415,13 @@ function Page() {
                           }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 50 }}
-                          className="w-full flex gap-5"
+                          className="w-full flex gap-5 xl:flex-row sxs:flex-col-reverse sxs:gap-3"
                         >
                           {/* NOTE AREA */}
                           {renderNoteArea()}
 
                           {/* PANEL MAIN */}
-                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                          <div className="xl:w-2/3 sxs:w-full h-full  flex flex-col gap-3 relative">
                             <div className="flex gap-3 items-center h-full relative">
                               <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
                               <span className="text-xl font-bold ml-4">
@@ -1601,13 +1533,13 @@ function Page() {
                           }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 50 }}
-                          className="w-full flex gap-5"
+                          className="w-full flex gap-5 xl:flex-row sxs:flex-col-reverse sxs:gap-3"
                         >
                           {/* NOTE AREA */}
                           {renderNoteArea()}
 
                           {/* PANEL MAIN */}
-                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                          <div className="xl:w-2/3 sxs:w-full h-full  flex flex-col gap-3 relative">
                             {extraServices &&
                               extraServices.map((category, index) => (
                                 <div key={index} className="text-left">
@@ -1693,7 +1625,7 @@ function Page() {
                           }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 50 }}
-                          className="w-full flex gap-5"
+                          className="w-full flex gap-5 xl:flex-row sxs:flex-col-reverse sxs:gap-3"
                         >
                           {/* UPLOADER */}
                           <div className="w-1/3 text-left">
@@ -1765,7 +1697,7 @@ function Page() {
                           </div>
 
                           {/* PANEL MAIN */}
-                          <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+                          <div className="xl:w-2/3 sxs:w-full h-full  flex flex-col gap-3 relative">
                             <div className="flex gap-3 items-center h-full relative">
                               <div className="shrink-0 w-1 h-full bg-gold absolute left-0 top-0 bottom-0"></div>
                               <span className="text-xl font-bold ml-4">
@@ -1923,7 +1855,7 @@ function Page() {
                                       return acc + cur.price;
                                     }, 0) *
                                     Math.ceil(Number(watch("partySize")) / 10)
-                                  ).toLocaleString("vn-VN") + "VNĐ"}
+                                  ).toLocaleString("vn-VN") + " VNĐ"}
                                   <div className="text-md text-end text-gray-400 mt-1">
                                     {`Đây là số tiền dựa trên số bàn ước tính: ${Math.ceil(
                                       watch("partySize") / 10
@@ -1936,14 +1868,14 @@ function Page() {
                                     if (!cur) return acc;
                                     return acc + cur.price * cur.quantity;
                                   }, 0)
-                                  .toLocaleString("vn-VN")
+                                  .toLocaleString("vn-VN") + " VNĐ"
                               ) : (
                                 drawerData[key]
                                   .reduce((acc, cur) => {
                                     if (!cur) return acc;
                                     return acc + cur.price;
                                   }, 0)
-                                  .toLocaleString("vn-VN") + "VNĐ"
+                                  .toLocaleString("vn-VN") + " VNĐ"
                               )}
                             </div>
                           )}
@@ -2127,7 +2059,7 @@ export function PanelSkeleton() {
       </Skeleton>
 
       {/* PANEL MAIN */}
-      <div className="w-2/3 h-full  flex flex-col gap-3 relative">
+      <div className="xl:w-2/3 sxs:w-full h-full  flex flex-col gap-3 relative">
         <div>
           <div className="flex flex-col justify-start">
             <Skeleton className="flex gap-3 items-center h-full relative bg-whiteAlpha-50 rounded-lg">

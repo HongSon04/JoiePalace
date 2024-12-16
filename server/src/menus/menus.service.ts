@@ -6,18 +6,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateMenuDto } from './dto/create-menu.dto';
-import { UpdateMenuDto } from './dto/update-menu.dto';
-import { PrismaService } from 'src/prisma.service';
-import { MakeSlugger } from 'helper/slug';
-import { FilterPriceDto } from 'helper/dto/FilterPrice.dto';
 import {
   FormatDateToEndOfDay,
   FormatDateToStartOfDay,
 } from 'helper/formatDate';
 import { FormatReturnData } from 'helper/FormatReturnData';
+import { MakeSlugger } from 'helper/slug';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma.service';
+import { CreateMenuDto } from './dto/create-menu.dto';
 import { FilterMenuDto } from './dto/FilterMenu.dto';
+import { UpdateMenuDto } from './dto/update-menu.dto';
 
 @Injectable()
 export class MenusService {
@@ -221,6 +220,10 @@ export class MenusService {
       whereConditions.user_id = Number(query.user_id);
     }
 
+    if (query.is_show) {
+      whereConditions.is_show = String(query.is_show) === 'true' ? true : false;
+    }
+
     // Sắp xếp theo giá
     let orderByConditions: any = {};
     if (priceSort === 'asc' || priceSort === 'desc') {
@@ -293,7 +296,7 @@ export class MenusService {
   }
 
   // ! Get All Menu Deleted
-  async findAllDeleted(query: FilterPriceDto) {
+  async findAllDeleted(query: FilterMenuDto) {
     const page = Number(query.page) || 1;
     const itemsPerPage = Number(query.itemsPerPage) || 10;
     const search = query.search || '';
@@ -372,6 +375,22 @@ export class MenusService {
           },
         },
       ];
+    }
+
+    if (query.user_id) {
+      const findUser = await this.prismaService.users.findUnique({
+        where: { id: Number(query.user_id) },
+      });
+
+      if (!findUser) {
+        throw new NotFoundException('Người dùng không tồn tại');
+      }
+
+      whereConditions.user_id = Number(query.user_id);
+    }
+
+    if (query.is_show) {
+      whereConditions.is_show = String(query.is_show) === 'true' ? true : false;
     }
 
     // Sắp xếp theo giá
@@ -609,7 +628,7 @@ export class MenusService {
           products: {
             set: productsTagSet,
           },
-          images: uploadImages ? uploadImages : findMenuById.images,
+          images: [...(uploadImages || []), ...(findMenuById.images || [])],
         },
         include: {
           products: {
@@ -720,9 +739,21 @@ export class MenusService {
         throw new NotFoundException('Menu không tồn tại');
       }
 
-      if (!findMenu.deleted) {
+      if (findMenu.deleted === false) {
         throw new BadRequestException(
           'Menu chưa bị xóa tạm thời, không thể xóa vĩnh viễn',
+        );
+      }
+
+      const relatedBookings = await this.prismaService.booking_details.findMany(
+        {
+          where: { menu_id: Number(id) },
+        },
+      );
+
+      if (relatedBookings.length > 0) {
+        throw new BadRequestException(
+          'Không thể xóa menu vì có booking liên quan.',
         );
       }
 

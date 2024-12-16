@@ -205,6 +205,16 @@ export class BookingsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  @ApiQuery({
+    name: 'startOrganizationDate',
+    required: false,
+    description: '28-10-2004',
+  })
+  @ApiQuery({
+    name: 'endOrganizationDate',
+    required: false,
+    description: '28-10-2024',
+  })
   @ApiQuery({ name: 'branch_id', required: false, description: '1' })
   @ApiQuery({ name: 'stage_id', required: false, description: '1' })
   @ApiQuery({ name: 'party_type_id', required: false, description: '1' })
@@ -311,11 +321,123 @@ export class BookingsController {
     return this.bookingsService.findOne(id);
   }
 
-  // ! Get Booking For Next 14 Days
-  @Get('get-booking-list/:branch_id')
+  // ! Get Booking Now For Next 14 Days
+  @Get('get-booking-list-from-now-to-14-days/:branch_id')
   @ApiOperation({
     summary:
-      'Lấy danh sách đơn tiệc trong 14 ngày tới (dành cho clients sau dữ liệu booking)',
+      'Lấy danh sách đơn tiệc từ ngày hiện tại đến 14 ngày sau (dành cho clients trước dữ liệu booking)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    example: {
+      message: 'Lấy danh sách đơn tiệc thành công',
+      data: {
+        success: true,
+        data: [
+          {
+            id: null,
+            name: null,
+            organization_date: '16-11-2024',
+            shift: 'Sáng',
+            status: false,
+            stages: [
+              {
+                id: 10,
+                name: 'Stage 2',
+                status: false,
+              },
+            ],
+          },
+          {
+            id: null,
+            name: null,
+            organization_date: '16-11-2024',
+            shift: 'Tối',
+            status: false,
+            stages: [
+              {
+                id: 10,
+                name: 'Stage 2',
+                status: false,
+              },
+            ],
+          },
+          {
+            id: null,
+            name: null,
+            organization_date: '17-11-2024',
+            shift: 'Sáng',
+            status: false,
+            stages: [
+              {
+                id: 10,
+                name: 'Stage 2',
+                status: false,
+              },
+            ],
+          },
+          {
+            id: null,
+            name: null,
+            organization_date: '17-11-2024',
+            shift: 'Tối',
+            status: false,
+            stages: [
+              {
+                id: 10,
+                name: 'Stage 2',
+                status: false,
+              },
+            ],
+          },
+          {
+            id: null,
+            name: null,
+            organization_date: '18-11-2024',
+            shift: 'Sáng',
+            status: false,
+            stages: [
+              {
+                id: 10,
+                name: 'Stage 2',
+                status: false,
+              },
+            ],
+          },
+          {
+            id: null,
+            name: null,
+            organization_date: '18-11-2024',
+            shift: 'Tối',
+            status: false,
+            stages: [
+              {
+                id: 10,
+                name: 'Stage 2',
+                status: false,
+              },
+            ],
+          },
+        ],
+        message: 'Lấy dữ liệu đặt chỗ thành công!',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    example: {
+      message: 'Không tìm thấy dữ liệu',
+    },
+  })
+  getBookingNowForNext14Days(@Param('branch_id') branch_id: string) {
+    return this.bookingsService.getBookingNowForNext14Days(+branch_id);
+  }
+
+  // ! Get Booking For Next 14 Days
+  @Get('get-booking-list-for-next-14-days/:branch_id')
+  @ApiOperation({
+    summary:
+      'Lấy danh sách đơn tiệc từ 2 tuần su tới 5 tuần tới (dành cho clients sau dữ liệu booking)',
   })
   @ApiResponse({
     status: HttpStatus.OK,

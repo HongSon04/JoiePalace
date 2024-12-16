@@ -120,7 +120,7 @@ const PartyDetailClient = ({
   const PopupCancel = ({ content, button1, button2, clickButton1, clickButton2 }) => {
     return (
       <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 '>
-        <div className='bg-white rounded-lg p-6 w-1/3 animate__animated animate__bounce'>
+        <div className='bg-white rounded-lg p-6 w-1/3 max-md:w-[80%]; animate__animated animate__bounce'>
           <h2 className='text-lg font-bold mb-4 text-warning-500'>!!! Quý khách có chắc với quyết định hủy tiệc của mình?</h2>
           <p className='text-black'>{content}</p>
           <div className='flex justify-end mt-4'>
@@ -186,20 +186,30 @@ const PartyDetailClient = ({
           {showDetailLink && (
             <>
               {statusParty === 'success' ? (
-                <div className='underline text-gold text-xs font-medium cursor-pointer'
-                  onClick={clickfeedback}>
-                  Gửi đánh giá
-                </div>
-              ) : statusParty === 'pending' ? (
-                <div className='underline text-red-500 text-xs font-medium cursor-pointer'
-                  onClick={oncLickDelete}
-                >
-                  Hủy
-                </div>
-              ) : ''}
-              <Link href={linkTo} className='underline text-gold text-xs font-medium cursor-pointer'>
-                Chi tiết
-              </Link>
+                <>
+                  <div className='underline text-gold text-xs font-medium cursor-pointer'
+                    onClick={clickfeedback}>
+                    Gửi đánh giá
+                  </div>
+                  <Link href={linkTo} className='underline text-gold text-xs font-medium cursor-pointer'>
+                    Chi tiết
+                  </Link>
+                </>
+              )
+                : statusParty === 'pending' ? (
+                  <div className='underline text-red-500 text-xs font-medium cursor-pointer'
+                    onClick={oncLickDelete}
+                  >
+                    Hủy
+                  </div>
+                )
+                  : statusParty === 'processing' ? (
+                    <Link href={linkTo} className='underline text-gold text-xs font-medium cursor-pointer'>
+                      Chi tiết
+                    </Link>
+                  )
+                    : ''}
+
             </>
           )}
           {Collapsed && (
@@ -372,7 +382,7 @@ const CustomerInfo = ({ title, hostName, email, phoneUser }) => (
       <div className='h-6 w-2 bg-gold'></div>
       <span className='text-base font-medium leading-normal'>{title}</span>
     </div>
-    <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400">
+    <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400 max-md:gap-[10px]">
       <TitleInfo title={'Tên chủ tiệc'} info={hostName} />
       <TitleInfo title={'Email'} info={email} />
       <TitleInfo title={'Số điện thoại'} info={phoneUser} />
@@ -386,7 +396,7 @@ const CustomerOrganizationalInformation = ({ title, space, decorate, typeTable, 
       <div className='h-6 w-2 bg-gold'></div>
       <span className='text-base font-medium leading-normal'>{title}</span>
     </div>
-    <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400">
+    <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400 max-md:gap-[10px]">
       <TitleInfo title={'Không gian'} info={space} />
       <TitleInfo title={'Trang trí'} info={decorate} />
       <TitleInfo title={'Loại bàn'} info={typeTable} />
@@ -404,7 +414,7 @@ const CustomerInfoPayment = ({ title, payerName, paymentMethod, amountPayable, d
       <div className='h-6 w-2 bg-gold'></div>
       <span className='text-base font-medium leading-normal'>{title}</span>
     </div>
-    <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400">
+    <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400 max-md:gap-[10px]">
       <TitleInfo title={'Tên người thanh toán'} info={payerName} />
       <TitleInfo title={'Hình thức thanh toán'} info={paymentMethod} />
       <TitleInfo title={'Tổng số tiền'} info={amountPayable} />
@@ -424,7 +434,7 @@ const CustomerInfoDetailPayment = ({ title, costTable, decorationCost, soundStag
       <span className='text-base font-medium leading-normal'>{title}</span>
     </div>
     <div className='flex flex-col gap-[60px]'>
-      <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400">
+      <div className="grid grid-cols-3 gap-[60px] text-base font-normal text-gray-400 max-md:gap-[10px]">
         <div className='flex gap-[10px] items-center'>
           <TitleInfo title={'Chi phí / bàn'} info={costTable} />
           <Image src={AlertIcon} alt='AlertIcon' objectFit='cover'></Image>
