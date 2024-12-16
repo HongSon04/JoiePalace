@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { API_CONFIG } from "@/app/_utils/api.config";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   user: {},
@@ -55,6 +56,28 @@ const accountSlice = createSlice({
     },
   },
 });
+
+
+export const fetchUserByID = createAsyncThunk(
+  "account/fetchUserByID",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.USER.GET_BY_ID(id),
+        "GET",
+        null
+      );
+      console.log(response)
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.error);
+      }
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
 
 export const {
   login,

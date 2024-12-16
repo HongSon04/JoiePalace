@@ -9,6 +9,8 @@ const initialState = {
   error: null,
   isCreatingPakage: false,
   isCreatingPakageError: null,
+  isFetchingPackage: false,
+  isFetchingPackageError: false,
 };
 
 const packagesSlice = createSlice({
@@ -28,6 +30,21 @@ const packagesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+       builder
+         .addCase(fetchPackages.pending, (state, action) => {
+           state.isFetchingPackage = true;
+           state.isFetchingPackageError = false;
+           state.error = null;
+         })
+         .addCase(fetchPackages.fulfilled, (state, action) => {
+           state.isFetchingPackage = false;
+           state.packages = action.payload.data;
+         })
+         .addCase(fetchPackages.rejected, (state, action) => {
+           state.isFetchingPackage = false;
+           state.isFetchingPackageError = true;
+           state.error = action.payload;
+         });
     builder
       .addCase(createPackage.pending, (state) => {
         state.isCreatingPakage = true;
@@ -45,6 +62,27 @@ const packagesSlice = createSlice({
       });
   },
 });
+export const fetchPackages = createAsyncThunk(
+  "packages/fetchPackages",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PACKAGES.GET_ALL_BY_PARAMS(),
+        "GET",
+        null
+      );
+      console.log(response)
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.error);
+      }
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 
 export const createPackage = createAsyncThunk(
   "packages/createPackage",

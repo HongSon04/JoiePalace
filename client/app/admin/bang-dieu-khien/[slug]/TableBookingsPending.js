@@ -128,7 +128,7 @@ const TableBookingsPending = () => {
     <div className="w-full">
       <div className="flex justify-between items-start mb-[10px]">
         <p className="text-base  font-semibold">Tiệc sắp diễn ra</p>
-        <select className="w-[300px] select" onChange={(e) => handleDateFilterChange(e.target.value)}>
+        <select className="w-[150px] select" onChange={(e) => handleDateFilterChange(e.target.value)}>
           <option className="option" value="7 ngày tới">7 ngày tới</option>
           <option className="option" value="14 ngày tới">14 ngày tới</option>
           <option className="option" value="1 tháng tới">1 tháng tới</option>
