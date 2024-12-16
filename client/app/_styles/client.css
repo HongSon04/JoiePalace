@@ -1,108 +1,108 @@
 #section-location .fp-overflow {
-    display: flex;
+  display: flex;
 }
 .location-section-item .location-image-bg {
-    background-position: center;
+  background-position: center;
 }
 .location-name {
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+  transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
 .location-detail {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
 .location-section-item:hover .location-detail {
-    opacity: 1 !important;
-    visibility: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 .location-section-item:hover .location-name {
-    opacity: 0 !important;
-    visibility: hidden !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 .banner .react-multi-carousel-item {
-    width: 100vw !important;
+  width: 100vw !important;
 }
 #section-event .fp-overflow {
-    display: flex !important;
-    gap: 60px;
+  display: flex !important;
+  gap: 60px;
 }
 .section-event-listCard {
-    overflow-y: scroll;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
-    --scroll-speed: 1000ms;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  --scroll-speed: 1000ms;
 }
 .section-event-listCard::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 #section-offers2 .react-multiple-carousel__arrow,
 #section-offers .react-multiple-carousel__arrow {
-    display: none;
+  display: none;
 }
 #section-information .fp-overflow {
-    display: flex;
-    gap: 40px;
+  display: flex;
+  gap: 40px;
 }
 #section-offers2 .react-multi-carousel-track {
-    gap: 14px;
-    margin-inline: -0px;
+  gap: 14px;
+  margin-inline: -0px;
 }
 
 #location__section-6 .react-multi-carousel-track {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
 }
 #location__section-6 .react-multi-carousel-item {
-    width: calc(100%/3) !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: none !important;
+  width: calc(100% / 3) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: none !important;
 }
 #location__section-6 #bg_fill {
-    background-color: rgb(88 79 79 / 46%);
+  background-color: rgb(88 79 79 / 46%);
 }
 #location__section-5 .fp-overflow {
-    display: flex;
-    flex-direction: column;
-    gap: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
 }
 #location__section-5 .react-multi-carousel-track {
-    display: flex;
-    overflow: hidden;
+  display: flex;
+  overflow: hidden;
 }
 #location__section-5 .react-multi-carousel-item {
-    width: 40% !important;
-    height: 100%;
-    flex: none !important;
-    cursor: pointer;
+  width: 40% !important;
+  height: 100%;
+  flex: none !important;
+  cursor: pointer;
 }
 #location__section-4 .fp-overflow {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 #location__section-3 .fp-overflow {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 #location__section-3 .react-multi-carousel-track {
-    width: 100%;
-    height: 100%;
-    display: flex;
+  width: 100%;
+  height: 100%;
+  display: flex;
 }
 #location__section-3 .react-multi-carousel-list {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 #location__section-3 .react-multi-carousel-item {
-    width: 100%;
-    height: 100%;
-    flex: none !important;
+  width: 100%;
+  height: 100%;
+  flex: none !important;
 }
 /* .carosel-right .react-multi-carousel-item {
     width: 85% !important;
@@ -112,30 +112,37 @@
     background-color: aqua;
 } */
 .space-active {
-    opacity: 1;
+  opacity: 1;
 }
 
 @media screen and (max-width: 1024px) {
-    .page-offers .react-multi-carousel-track {
-        display: flex; flex-direction: column;
-        width: 100%;
-    }
-    .page-offers .react-multi-carousel-item {
-        width: 100% !important;
-    }
-    #location__section-5 .react-multi-carousel-item {
-        width:  calc(100%/3) !important;
-    }
+  .page-offers .react-multi-carousel-track {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .page-offers .react-multi-carousel-item {
+    width: 100% !important;
+  }
+  #location__section-5 .react-multi-carousel-item {
+    width: calc(100% / 3) !important;
+  }
 }
 .section {
-background-color: #022C25;
+  background-color: #022c25;
 }
 * {
-    color: white;
+  color: white;
 }
 body {
-    overflow-x: hidden;
+  overflow-x: hidden;
 }
 #picker {
-    color: red !important;
+  color: red !important;
+}
+
+input[type="date" i]::-webkit-calendar-picker-indicator {
+  background-color: white !important;
+  border-radius: 6px !important;
+  cursor: pointer;
 }

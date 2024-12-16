@@ -30,6 +30,8 @@ import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
+import decorsIcon from "@/public/admin-sidebar/trang-tri.svg";
+import packageIcon from "@/public/admin-sidebar/goi-combo.svg";
 import logo from "@/public/logo-dark.png";
 import { Tooltip } from "antd";
 import { useSelector } from "react-redux";
@@ -212,7 +214,13 @@ function AdminSidebarNav() {
       {
         title: "Trang Trí",
         path: `/admin/trang-tri`,
-        icon: StageIcon,
+        icon: decorsIcon,
+        className: "",
+      },
+      {
+        title: "Gói Combo",
+        path: `/admin/goi-combo`,
+        icon: packageIcon,
         className: "",
       },
       {

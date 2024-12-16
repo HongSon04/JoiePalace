@@ -1,6 +1,6 @@
 // HOST URL
 const HOST = `https://joieplace.live/api`;
-const MEMBERSHIPS = `http://joieplace.live/memberships`;
+const MEMBERSHIPS = `https://joieplace.live/memberships`;
 // const HOST = `http://localhost:5000`;
 
 // Base API URLs
@@ -10,7 +10,7 @@ const BRANCHES_API = `${HOST}/branches`;
 const CATEGORIES_API = `${HOST}/categories`;
 const DASHBOARD_API = `${HOST}/dashboard`;
 const PRODUCTS_API = `${HOST}/products`;
-const FEEDBACKS_API = `${HOST}/feedbacks`;
+const FEEDBACKS_API = `${HOST}/feedbacks`;  
 const PARTYTYPES_API = `${HOST}/party-types`;
 const BOOKING_API = `${HOST}/bookings`;
 const BLOGS_API = `${HOST}/blogs`;
@@ -258,8 +258,8 @@ export const API_CONFIG = {
       constructUrlWithParams(`${PACKAGES_API}/get-all`, params),
     GET_BY_SLUG: (slug) => `${PACKAGES_API}/get-by-slug/${slug}`,
     GET_BY_ID: (id) => `${PACKAGES_API}/get/${id}`,
-    GET_ALL_BY_PARAMS: (params) =>
-      constructUrlWithParams(`${PACKAGES_API}/get-all`, params),
+    DELETE: (id) => `${PACKAGES_API}/delete/${id}`,
+
   },
 
   // MENU API
