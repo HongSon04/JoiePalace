@@ -108,7 +108,7 @@ const Page = ({ params }) => {
             </select>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-6 mb-6">
           <div className="p-4 bg-blackAlpha-100 rounded-xl">
             <Chart data={dataChart} chartType="bar" />
           </div>

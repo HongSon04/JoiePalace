@@ -27,13 +27,6 @@ import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import TableBookingsPending from "./TableBookingsPending";
 import TableStageStatus from "./TableStageStatus";
 
-const formatDate = (dateInput) => {
-  const date = new Date(dateInput);
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-};
 
 const Page = ({ params }) => {
   const { slug } = params;
@@ -52,10 +45,18 @@ const Page = ({ params }) => {
   const { makeAuthorizedRequest } = useApiServices();
   const [dataBookingByBranch, setDataBookingByBranch] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
   const [start_Date, setStartDate] = useState(null);
   const [end_Date, setEndDate] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
+  const [totalBookingMonth, setTotalBookingMonth] = useState("month");
+  const [itemPerPage, setItemsPerPage ] = useState(null);
+  const formatDate = (dateInput) => {
+    const date = new Date(dateInput);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
   function getCurrentMonthAndWeekDates() {
     const currentDate = new Date();
     const startDate = new Date(
@@ -102,11 +103,13 @@ const Page = ({ params }) => {
           idBranch = 0;
         }
         const {
+          startDate,
+          endDate,
           startOfWeek,
           endOfWeek,
         } = getCurrentMonthAndWeekDates();
-        // console.log(startOfWeek);
-        // console.log(endOfWeek);
+        // console.log(startDate);
+        // console.log(endDate);
         const totalBookingWeek = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: idBranch,
@@ -117,8 +120,17 @@ const Page = ({ params }) => {
           "GET",
           null
         );
-
-        // console.log(totalBookingWeek);
+        const totalBookingMonth = await makeAuthorizedRequest(
+          API_CONFIG.BOOKINGS.GET_ALL({
+            branch_id: idBranch,
+            status: "success",
+            startOrganizationDate: startDate,
+            endOrganizationDate: endDate
+          }),
+          "GET",
+          null
+        );
+        // console.log(totalBookingMonth);
         const allBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: idBranch,
@@ -142,9 +154,6 @@ const Page = ({ params }) => {
           null
         );
 
-        // console.log(currentDate);
-        // console.log(dataUser);
-
         const [
           allInfo,
           dataInfo,
@@ -163,6 +172,7 @@ const Page = ({ params }) => {
           fetchAllByBranch(branchId),
         ]);
         // console.log(dataUser);
+        setTotalBookingMonth(totalBookingMonth);
         setIdBranch(idBranch);
         setDataBookingByBranch(dataBookingByBranch);
         setallInfo(allInfo);
@@ -252,16 +262,13 @@ const Page = ({ params }) => {
   };
 
   const dataBooking = allBooking?.data || [];
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN");
-  }
 
   const { month } = getCurrentMonthAndWeekDates();
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
+  const bookingsOffMonth = totalBookingMonth?.pagination?.total || 0;
   const totalInfoBranch = dataTotalBranch?.count_booking_status[0]?.data;
-  // console.log(totalBookingWeekBranch);
+  // console.log(bookingsOffMonth);
   useEffect(() => {
     if (allBooking && allBooking.pagination) {
       setCurrentPage(allBooking.pagination.currentPage);
@@ -401,7 +408,7 @@ const Page = ({ params }) => {
               <div className="flex justify-between items-center">
                 <div className="flex items-end gap-1">
                   <p className="text-4xl font-bold">
-                    {totalInfoBranch.success}
+                    {bookingsOffMonth}
                   </p>
                   <p>tiệc</p>
                 </div>
@@ -498,7 +505,7 @@ const Page = ({ params }) => {
             </div>
 
             {selectedPeriod === "week" && (
-              <div className="p-2  bg-whiteAlpha-100 rounded-xl min-h-[410px]">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl min-h-[410px]">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tuần</p>
                 </div>
@@ -506,7 +513,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "month" && (
-              <div className="p-2  bg-whiteAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tháng</p>
                 </div>
@@ -514,7 +521,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "year" && (
-              <div className="p-2  bg-whiteAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo năm</p>
                 </div>
@@ -528,7 +535,7 @@ const Page = ({ params }) => {
             <div className="flex justify-between gap-[10px] items-center mb-[10px]">
               <p className="text-base font-semibold ">Doanh thu tổng</p>
             </div>
-            <div className="p-2  bg-whiteAlpha-100 rounded-xl min-h-[410px]">
+            <div className="p-2  bg-blackAlpha-100 rounded-xl min-h-[410px]">
               <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                 <p className=" text-base">Doanh thu theo năm</p>
               </div>
