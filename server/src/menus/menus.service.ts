@@ -628,10 +628,7 @@ export class MenusService {
           products: {
             set: productsTagSet,
           },
-          images: [
-            ...(uploadImages || []),
-            ...(findMenuById.images || []),
-          ],
+          images: [...(uploadImages || []), ...(findMenuById.images || [])],
         },
         include: {
           products: {
