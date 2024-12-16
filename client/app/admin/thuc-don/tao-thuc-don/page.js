@@ -61,6 +61,7 @@ function checkFileType(file) {
 function Page() {
   const { isLoading } = useRoleGuard();
   const [selectedMenuDishes, setSelectedMenuDishes] = React.useState([]);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [imageSrc, setImageSrc] = React.useState("");
   const [menuDishes, setMenuDishes] = React.useState({});
   const [isImagesEmpty, setIsImagesEmpty] = React.useState(false);

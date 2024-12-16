@@ -27,14 +27,6 @@ import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import TableBookingsPending from "./TableBookingsPending";
 import TableStageStatus from "./TableStageStatus";
 
-const formatDate = (dateInput) => {
-  const date = new Date(dateInput);
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-};
-
 const Page = ({ params }) => {
   const { slug } = params;
   const [allInfo, setallInfo] = useState(null);
@@ -187,7 +179,7 @@ const Page = ({ params }) => {
     };
 
     fetchAminData();
-  }, [start_Date, end_Date, currentPage]);
+  }, [start_Date, end_Date, currentPage, dataSlug]);
 
   const createChartData = (data, label) => {
     let chartData = {
