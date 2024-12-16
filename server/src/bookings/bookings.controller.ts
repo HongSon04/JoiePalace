@@ -205,6 +205,16 @@ export class BookingsController {
   @ApiQuery({ name: 'priceSort', required: false, description: 'ASC | DESC' })
   @ApiQuery({ name: 'startDate', required: false, description: '28-10-2004' })
   @ApiQuery({ name: 'endDate', required: false, description: '28-10-2024' })
+  @ApiQuery({
+    name: 'startOrganizationDate',
+    required: false,
+    description: '28-10-2004',
+  })
+  @ApiQuery({
+    name: 'endOrganizationDate',
+    required: false,
+    description: '28-10-2024',
+  })
   @ApiQuery({ name: 'branch_id', required: false, description: '1' })
   @ApiQuery({ name: 'stage_id', required: false, description: '1' })
   @ApiQuery({ name: 'party_type_id', required: false, description: '1' })

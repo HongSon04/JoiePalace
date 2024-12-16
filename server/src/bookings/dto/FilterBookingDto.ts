@@ -86,15 +86,27 @@ export class FilterBookingDto {
 
   @ApiProperty({
     required: false,
-    description: 'Ngày bắt đầu của khoảng thời gian tìm kiếm',
+    description: 'Ngày bắt đầu tạo tiệc của khoảng thời gian tìm kiếm',
   })
   startDate?: string;
 
   @ApiProperty({
     required: false,
-    description: 'Ngày kết thúc của khoảng thời gian tìm kiếm',
+    description: 'Ngày kết thúc tạo tiệc của khoảng thời gian tìm kiếm',
   })
   endDate?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Ngày bắt đầu tổ chức của khoảng thời gian tìm kiếm',
+  })
+  startOrganizationDate?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Ngày kết thúc của khoảng thời gian tìm kiếm',
+  })
+  endOrganizationDate?: string;
 
   @ApiProperty({
     required: false,

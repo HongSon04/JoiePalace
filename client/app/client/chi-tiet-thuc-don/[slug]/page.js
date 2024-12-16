@@ -235,7 +235,7 @@ function Conference() {
                         <h1 className="text-4xl leading-[68px] text-left text-gold uppercase mb-5 max-2md:text-2xl">{menu?.name}</h1>
                         <p className="font-normal text-base leading-6 text-left font-inter text-gold  mb-5 max-2md:text-[13px]">( 8 Món )</p>
                         <p className="font-gilroy text-base leading-6 text-left mb-5 max-2md:text-[13px]">
-                            {menu?.description ? menu?.description : "Trung tâm Sự kiện White Palace là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp. Chúng tôi mang đến sự khác biệt với việc cung cấp đa dạng các thực đơn phù hợp với nhu cầu của  khách hàng."}
+                            {menu?.description ? menu?.description : "Trung tâm Sự kiện JOIE PALACE là địa điểm hoàn hảo để bạn có thể tổ chức cùng lúc hội nghị hàng ngàn khách mời, hội thảo chuyên đề và các buổi họp cấp cao. Tất cả đều có thể diễn ra cùng với dịch vụ hội nghị chuyên nghiệp, được phục vụ bởi hàng trăm nhân sự tại đây. Tùy vào mục đích và loại hình hội nghị mà bạn có thể lựa chọn cho mình hình thức bố trí và dịch vụ phù hợp. Chúng tôi mang đến sự khác biệt với việc cung cấp đa dạng các thực đơn phù hợp với nhu cầu của  khách hàng."}
                         </p>
                         {categoriesMenu.map((i, index) => (
                             <Link key={index} className="flex items-end text-gold mb-5 hover:text-gold " href={`#menu${i.slug}`}>

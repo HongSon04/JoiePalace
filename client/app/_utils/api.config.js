@@ -25,6 +25,7 @@ const DECORS_API = `${HOST}/decors`;
 const STAGES_API = `${HOST}/stages`;
 const MAIL_API = `${HOST}/mail`;
 
+
 // Function to construct URL with search params
 const constructUrlWithParams = (baseUrl, params) => {
   const url = new URL(baseUrl);
@@ -208,7 +209,7 @@ export const API_CONFIG = {
 
   // BLOGS API
   BLOGS: {
-    // CREATE: `${BLOGS_API}/create`,
+    CREATE: `${BLOGS_API}/create`,
     GET_ALL: `${BLOGS_API}/get-all`,
     GET_BY_SLUG: (slug) => `${BLOGS_API}/get-by-slug/${slug}`,
   },

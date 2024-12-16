@@ -37,6 +37,9 @@ import {
   fetchRequests,
   updateRequestStatus,
 } from "@/app/_lib/features/categories/categoriesSlice";
+import { FaPen } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { Image } from "@chakra-ui/react";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -46,23 +49,29 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 const schema = z.object({
-  name: z
+  title: z
     .string({
-      required_error: "Vui lòng nhập tên danh mục",
+      required_error: "Vui lòng nhập tên bài viết",
     })
-    .min(1, { message: "Vui lòng nhập tên danh mục" })
-    .max(35, "Tên danh mục không được quá 35 ký tự"),
+    .min(1, { message: "Vui lòng nhập tên bài viết" })
+    .max(35, "Tên bài viết không được quá 35 ký tự"),
+  content: z
+    .string({
+      required_error: "Vui lòng nhập mô tả ngắn về bài viết",
+    })
+    .min(1, { message: "Vui lòng nhập mô tả ngắn về bài viết" })
+    .max(100, "Mô tả không được quá 100 ký tự"),
   short_description: z
     .string({
-      required_error: "Vui lòng nhập mô tả ngắn về danh mục",
+      required_error: "Vui lòng nhập mô tả ngắn về bài viết",
     })
-    .min(1, { message: "Vui lòng nhập mô tả ngắn về danh mục" })
+    .min(1, { message: "Vui lòng nhập mô tả ngắn về bài viết" })
     .max(100, "Mô tả không được quá 100 ký tự"),
   description: z
     .string({
-      required_error: "Vui lòng nhập mô tả đầy đủ về danh mục",
+      required_error: "Vui lòng nhập mô tả đầy đủ về bài viết",
     })
-    .min(1, { message: "Vui lòng nhập mô tả đầy đủ về danh mục" })
+    .min(1, { message: "Vui lòng nhập mô tả đầy đủ về bài viết" })
     .max(255, "Mô tả không được quá 255 ký tự"),
 });
 
@@ -83,7 +92,7 @@ const checkFileSize = (file) => {
   return false;
 };
 
-const CategoriesTab = () => {
+const BlogsTabs = () => {
   const dispatch = useDispatch();
   const [categories, setCategories] = useState(null);
   const [blogs, setBlogs] = useState(null);
@@ -95,6 +104,8 @@ const CategoriesTab = () => {
   const [isImagesEmpty, setIsImagesEmpty] = React.useState(false);
   const [isImageOverSize, setIsImageOverSize] = React.useState(false);
   const [isFormatAccepted, setIsFormatAccepted] = React.useState(false);
+  const [dataToShow, setDataToShow] = React.useState(null);
+  const [category_id, setCategory_id] = React.useState(null);
   const router = useRouter();
 
   const { isAddingCategory } = useSelector((store) => store.categories);
@@ -116,8 +127,15 @@ const CategoriesTab = () => {
       const blogs = await axios.get("http://joieplace.live/api/blogs/get-all");
       const listCategoriesBlog = blogCategories?.data?.data[0]?.childrens;
       const listBlogs = blogs?.data?.data;
+
+      setCategory_id(listCategoriesBlog[0].id);
       setBlogs(listBlogs);
       setCategories(listCategoriesBlog);
+      setDataToShow(
+        listBlogs.filter(
+          (item) => item.category_id === listCategoriesBlog[0].id
+        )
+      );
     };
     fecthData();
   }, []);
@@ -142,6 +160,10 @@ const CategoriesTab = () => {
     return totalBlogCount;
   };
   // handle delete blog category
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
+    setCategory_id(value);
+  };
   const handleDeleteCategory = async (id) => {
     const response = await dispatch(deleteCategory({ id })).unwrap();
 
@@ -178,7 +200,7 @@ const CategoriesTab = () => {
   const handleFileChange = (newFiles) => {
     setFiles(newFiles);
   };
-  const handleAddCategory = async (data) => {
+  const handleAddBlog = async (data) => {
     // console.log("data -> ", data);
 
     // Check if there are no images or images do not meet the requirements
@@ -199,54 +221,72 @@ const CategoriesTab = () => {
     // append data to form data
     const formData = new FormData();
     formData.append("name", data.name);
-    formData.append("category_id", 10);
+    formData.append("category_id", category_id);
+    formData.append("content", data.content);
     formData.append("description", data.description);
     formData.append("short_description", data.short_description);
     files.forEach((file) => {
       formData.append("images", file);
     });
 
-    // console.log("Form data -> ", formData);
+    console.log("Form data -> ", formData);
 
     // dispatch add category
-    const response = await dispatch(addCategory({ data: formData })).unwrap();
 
-    if (response.success) {
-      toast({
-        title: "Thành công",
-        description: "Danh mục đã được thêm",
-        type: "success",
-        isClosable: true,
-      });
-      reset();
-    } else {
-      if (response.error.statusCode === 401) {
-        toast({
-          title: "Lỗi thêm danh mục",
-          description: "Phiên đăng nhập đã hết hạn",
-          type: "error",
-          isClosable: true,
-        });
-      } else {
-        toast({
-          title: "Lỗi thêm danh mục",
-          description:
-            response.error.message || "Có lỗi xảy ra khi thêm danh mục",
-          type: "error",
-          isClosable: true,
-        });
-      }
-    }
+    // const response = await dispatch(addCategory({ data: formData })).unwrap();
+
+    // if (response.success) {
+    //   toast({
+    //     title: "Thành công",
+    //     description: "Danh mục đã được thêm",
+    //     type: "success",
+    //     isClosable: true,
+    //   });
+    //   reset();
+    // } else {
+    //   if (response.error.statusCode === 401) {
+    //     toast({
+    //       title: "Lỗi thêm danh mục",
+    //       description: "Phiên đăng nhập đã hết hạn",
+    //       type: "error",
+    //       isClosable: true,
+    //     });
+    //   } else {
+    //     toast({
+    //       title: "Lỗi thêm danh mục",
+    //       description:
+    //         response.error.message || "Có lỗi xảy ra khi thêm danh mục",
+    //       type: "error",
+    //       isClosable: true,
+    //     });
+    //   }
+    // }
   };
   const onSubmit = async (data) => {
-    await handleAddCategory(data);
+    await handleAddBlog(data);
     router.refresh();
   };
 
-  if (!categories || !blogs) return <Loading />;
+  if (!categories || !blogs || !dataToShow) return <Loading />;
+  console.log("categories", categories);
   return (
     <>
       <div className="w-full min-h-[100vh] mt-12 flex flex-col gap-[30px]">
+        <div className="w-full flex gap">
+          {categories.map((category) => (
+            <span
+              onClick={() => {
+                setDataToShow(
+                  blogs.filter((item) => item.category_id === category.id)
+                );
+              }}
+              key={category.id}
+              className="text-[#9BA2AE] py-2 px-4 cursor-pointer"
+            >
+              {category.name}
+            </span>
+          ))}
+        </div>
         <div className="w-full flex justify-end">
           <Button
             onClick={onOpen}
@@ -256,68 +296,81 @@ const CategoriesTab = () => {
               <PlusIcon className="w-5 h-5 text-white font-semibold shrink-0" />
             }
           >
-            Thêm danh mục
+            Thêm bài viết
           </Button>
         </div>
-        <div className="w-full min-h-[500px]">
-          <table className="table-auto border-collapse border border-gray-300 w-full text-center text-white">
-            <thead>
-              <tr className="bg-whiteAlpha-100">
-                <th className="border border-[#5B5B5B] px-4 py-2">ID</th>
-                <th className="border border-[#5B5B5B] px-4 py-2">
-                  Tên danh mục
-                </th>
-                <th className="border border-[#5B5B5B] px-4 py-2">
-                  Số bài viết
-                </th>
-                <th className="border border-[#5B5B5B] px-4 py-2 w-[1%]">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((category) => (
-                <tr key={category.id} className="bg-whiteAlpha-50">
-                  <td className="border border-[#5B5B5B] px-4 py-2 uppercase">
-                    {category.id}
-                  </td>
-                  <td className="border border-[#5B5B5B] px-4 py-2">
-                    {category.name}
-                  </td>
-                  <td className="border border-[#5B5B5B] px-4 py-2">
-                    {getNumberBlog(category.id)}
-                  </td>
-                  <td className="border border-[#5B5B5B] px-4 py-2 text-cyan-400 cursor-pointer flex items-center justify-center whitespace-nowrap">
-                    <div className="relative flex justify-center items-center gap-2">
-                      <Dropdown>
-                        <DropdownTrigger>
-                          <Button isIconOnly size="sm" variant="light">
-                            <VerticalDotsIcon className="text-default-300" />
-                          </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu>
-                          <DropdownItem>
-                            <Link
-                              href={`/admin/quan-ly-danh-muc/${category.id}`}
-                            >
-                              Xem chi tiết
-                            </Link>
-                          </DropdownItem>
-                          <DropdownItem
-                            className="text-red-400"
-                            onClick={() => handleDeleteCategory(category.id)}
-                          >
-                            Xóa danh mục
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </Dropdown>
+        {dataToShow.length > 0 ? (
+          <div className="w-full min-h-[500px] flex gap-16">
+            <div className="w-[65%] min-h-[200px] flex flex-col gap-5">
+              {dataToShow.map((item) => (
+                <div key={item.id} className="w-full flex gap-4">
+                  <div className="w-[170px] h-[160px] overflow-hidden">
+                    <Image
+                      src={item.images[0]}
+                      className="w-full h-full object-cover"
+                      alt=""
+                    />
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <span className="uppercase text-xs text-[#9BA2AE]">
+                      Công nghệ
+                    </span>
+                    <span className="text-white text-sm font-bold leading-5">
+                      {item.title}
+                    </span>
+                    <span className="uppercase text-xs text-[#9BA2AE]">
+                      {(() => {
+                        const date = new Date(item.created_at);
+                        const day = date.getUTCDate();
+                        const month = date.getUTCMonth() + 1; // Tháng bắt đầu từ 0
+                        const year = date.getUTCFullYear();
+                        return `${day}/${month}/${year}`; // Hoặc bạn có thể định dạng theo cách khác
+                      })()}
+                    </span>
+                    <div className="w-full flex justify-between text-sm text-[#9BA2AE]">
+                      <span className="flex gap-1 items-center cursor-pointer">
+                        <FaPen /> Chỉnh sửa
+                      </span>
+                      <span className="flex gap-1 items-center cursor-pointer">
+                        <MdDelete /> Xóa
+                      </span>
+                      <span className="opacity-0">lskd</span>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+            {/* đọc nhiều nhất */}
+            <div className="w-[35%] min-h-[200px] flex flex-col gap-8 ">
+              <span className="text-white uppercase">Đọc nhiều nhất</span>
+              <div className="w-full flex gap-4 border-l-1 border-whiteAlpha-50 pl-8">
+                <div className="flex flex-col gap-4">
+                  <span className="uppercase text-xs text-[#9BA2AE]">
+                    Công nghệ
+                  </span>
+                  <span className="text-white text-sm font-bold leading-5">
+                    Designing for AI Hallucination: Can Design Help Tackle
+                    Machine Challenges?
+                  </span>
+                  <span className="uppercase text-xs text-[#9BA2AE]">
+                    05/12/2024
+                  </span>
+                  <div className="w-full flex justify-between text-sm text-[#9BA2AE]">
+                    <span className="flex gap-1 items-center cursor-pointer">
+                      <FaPen /> Chỉnh sửa
+                    </span>
+                    <span className="flex gap-1 items-center cursor-pointer">
+                      <MdDelete /> Xóa
+                    </span>
+                    <span className="opacity-0">lskd</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <span className="text-white">Chưa có dữ liệu</span>
+        )}
       </div>
       <Modal
         size="3xl"
@@ -329,7 +382,7 @@ const CategoriesTab = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Thêm danh mục
+                Thêm bài viết
               </ModalHeader>
               <ModalBody>
                 <form
@@ -388,20 +441,49 @@ const CategoriesTab = () => {
                       </AnimatePresence>
                     </Col>
                     <Col span={12}>
+                      <select
+                        name="category_id"
+                        value={category_id}
+                        onChange={handleSelectChange}
+                        className="w-[100%] border bg-transparent p-3 py-2 rounded-sm text-black border-1-[#000000]"
+                      >
+                        {categories.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.name}
+                          </option>
+                        ))}
+                      </select>
                       <FormInput
                         theme="dark"
                         inputRef={inputRef}
                         type={"text"}
                         register={register}
-                        id={"name"}
-                        name={"name"}
-                        ariaLabel={"Tên danh mục"}
-                        placeholder={"Nhập tên danh mục"}
+                        id={"title"}
+                        name={"title"}
+                        ariaLabel={"Tên bài viết"}
+                        placeholder={"Nhập tên bài viết"}
                         errors={errors}
                         errorMessage={errors?.name?.message}
                         className={"!bg-gray-100 !mt-0 !text-gray-600"}
                         wrapperClassName={"w-full text-gray-600 !mt-0"}
-                        value={watch("name")}
+                        value={watch("title")}
+                        onChange={onInputChange}
+                      />
+                      <FormInput
+                        theme="dark"
+                        type={"textarea"}
+                        register={register}
+                        cols={3}
+                        rows={3}
+                        id={"content"}
+                        name={"content"}
+                        ariaLabel={"Nội dung bài viết"}
+                        placeholder={"Nhập nội dung bài viết"}
+                        errors={errors}
+                        errorMessage={errors?.content?.message}
+                        className={"!bg-gray-100 !mt-0 !text-gray-600"}
+                        wrapperClassName={"w-full text-gray-600 !mt-3"}
+                        value={watch("content")}
                         onChange={onInputChange}
                       />
                       <FormInput
@@ -475,4 +557,4 @@ const CategoriesTab = () => {
   );
 };
 
-export default CategoriesTab;
+export default BlogsTabs;

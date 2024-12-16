@@ -38,7 +38,7 @@ const MenuItems = ({ data, imgMenu, nameMenu, priceTotal }) => {
                     className="object-contain"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-end text-center text-white p-6">
-                    <h1 className="text-2xl font-bold">WHITE PALACE</h1>
+                    <h1 className="text-2xl font-bold">JOIE PALACE</h1>
                     <p className="text-lg font-semibold mt-4">{nameMenu}</p>
                 </div>
             </div>
