@@ -50,6 +50,7 @@ export class MailService {
   // ! Gửi mail xác nhận đăng ký tài khoản
   async confirmRegister(name: string, email: string, token: string) {
     try {
+      console.log('Trong quá trình gửi mail');
       await this.mailerService.sendMail({
         to: email,
         subject: 'Xác nhận đăng ký tài khoản tại Joie Palace',
@@ -61,6 +62,7 @@ export class MailService {
           confirmationLink: `${this.configService.get<string>('BACKEND_URL')}confirm-register?token=${token}?email=${email}`,
         },
       });
+      console.log('Qúa trình gửi mail thành công');
     } catch (error) {
       console.log('Lỗi từ MailService->confirmRegister', error);
       throw new InternalServerErrorException({

@@ -125,7 +125,6 @@ const Page = ({ params }) => {
                   <tr>
                     <th>ID</th>
                     <th>Tên</th>
-                    <th>Hạng thành viên</th>
                     <th>Số điện thoại</th>
                     <th>Tiệc đã hoàn thành</th>
                     <th onClick={() => toggleSortOrder("totalAmount")} style={{ cursor: "pointer" }}>
@@ -135,26 +134,32 @@ const Page = ({ params }) => {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {filteredDataUser.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.id}</td>
-                      <td>{item.username || "N/A"}</td>
-                      <td>{item.memberships || "N/A"}</td>
-                      <td>{item.phone || "N/A"}</td>
-                      <td>{item.totalBookingSuccess}</td>
-                      <td>{formatPrice(item.totalAmount)}</td>
-                      <td>
-                        {item.id && (
-                          <Link
-                            href={`/admin/khach-hang/${item.id}`}
-                            className="text-teal-400 text-xs font-bold"
-                          >
-                            Chi tiết
-                          </Link>
-                        )}
-                      </td>
+                  {filteredDataUser.length > 0 ? (
+                    filteredDataUser.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.id}</td>
+                        <td>{item.username || "--"}</td>
+                        <td>{item.phone ?? "--"}</td>
+                        <td>{item.totalBookingSuccess}</td>
+                        <td>{formatPrice(item.totalAmount)}</td>
+                        <td>
+                          {item.id && (
+                            <Link
+                              href={`/admin/khach-hang/${item.id}`}
+                              className="text-teal-400 text-xs font-bold"
+                            >
+                              Chi tiết
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} className="text-center h-[404px]">Không có dữ liệu.</td>
                     </tr>
-                  ))}
+                  )}
+
                 </tbody>
               </table>
             </Suspense>
@@ -193,7 +198,7 @@ const Page = ({ params }) => {
                       />
                       <div className="w-full flex justify-between items-center">
                         <div>
-                          <p className="text-sm font-semibold">{item.username || "N/A"}</p>
+                          <p className="text-sm font-semibold">{item.username || "--"}</p>
                           <p className="text-sm mb-[10px] font-semibold">{formatPrice(item.totalAmount)}</p>
                         </div>
                       </div>

@@ -34,9 +34,9 @@ export const FormatDateToEndOfDay = (date: string): string => {
 export const FormatDateWithShift = (date: string, shift: string): string => {
   var HISTime = '';
   if (shift === 'Sáng') {
-    HISTime = 'T08:00:00.000Z';
+    HISTime = 'T09:30:00.000Z';
   } else if (shift === 'Tối') {
-    HISTime = 'T18:00:00.000Z';
+    HISTime = 'T19:00:00.000Z';
   } else {
     HISTime = 'T00:00:00.000Z';
   }

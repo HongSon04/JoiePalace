@@ -44,6 +44,7 @@ import LoadingContent from "@/app/_components/LoadingContent";
 import { capitalize } from "@mui/material";
 import { formatPrice } from "@/app/_utils/formaters";
 import "../../_styles/client.css";
+
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
@@ -86,6 +87,7 @@ function BookingsTable({userId }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  
   const {
     requests,
     pagination,
@@ -129,21 +131,26 @@ function BookingsTable({userId }) {
   React.useEffect(() => {
     const params = {
       user_id: userId,
+      page: currentPage ,
+      itemsPerPage: 5
     };
     dispatch(fetchRequests({ params }));
-  }, [userId]);
+    
+  }, [userId, currentPage,itemsPerPage]);
 
   React.useEffect(() => {
     const controller = new AbortController();
     const params = {
-      user_id: userId   
+      user_id: userId,
+      page: currentPage,
+      itemsPerPage: 5
     };
 
     dispatch(fetchRequests({ signal: controller.signal, params }));
     return () => {
       controller.abort();
     };
-  }, [userId]);
+  }, [userId, currentPage,itemsPerPage]);
   // console.log(requests);
   
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
@@ -201,7 +208,7 @@ function BookingsTable({userId }) {
             if (pay_date) {
               return format(new Date(pay_date), "dd/MM/yyyy");
             } else {
-              return "N/A"; 
+              return "--"; 
             }
           case "created_at":
             return format(new Date(cellValue), "dd/MM/yyyy");
@@ -212,34 +219,34 @@ function BookingsTable({userId }) {
               const expiredAt = depositsDetails.expired_at;
               return format(new Date(expiredAt), "dd/MM/yyyy");
             } else {
-              return "N/A";  
+              return "--";  
             }
             
           case "deposits_amount":
             const bookingDetails = item.booking_details?.[0];  
             if (bookingDetails) {
-              const depositsAmount = bookingDetails?.deposits?.amount ?? "N/A";
+              const depositsAmount = bookingDetails?.deposits?.amount ?? "--";
               return formatPrice(depositsAmount);
             } else {
-              return "N/A";
+              return "--";
             }
            
           case "total_amount":
             const totalAmountDetails = item.booking_details?.[0];  
             if (totalAmountDetails) {
-              const totalAmount = totalAmountDetails?.total_amount ?? "N/A";
+              const totalAmount = totalAmountDetails?.total_amount ?? "--";
               return formatPrice(totalAmount);  
             } else {
-              return "N/A";  
+              return "--";  
             }
           
           case "remaining_amount":
             const remainingAmountDetails = item.booking_details?.[0];
             if (remainingAmountDetails) {
-              const remainingAmount = (remainingAmountDetails?.total_amount - remainingAmountDetails?.deposits?.amount) ?? "N/A";
+              const remainingAmount = (remainingAmountDetails?.total_amount - remainingAmountDetails?.deposits?.amount) ?? "--";
               return formatPrice(remainingAmount);  
             } else {
-              return "N/A"; 
+              return "--"; 
             }
           case "table_all":
             const totalTableDetails = item.booking_details?.[0]; 
@@ -253,10 +260,10 @@ function BookingsTable({userId }) {
                   return `${tableCount}`; 
                 }
               } else {
-                return "N/A"; 
+                return "--"; 
               }
             } else {
-              return "N/A"; 
+              return "--"; 
             }
             
           case "branches_name":
@@ -265,9 +272,9 @@ function BookingsTable({userId }) {
             if (bookingBranches) {
               const branches_name = bookingBranches?.name
               
-              return branches_name ?? "N/A";
+              return branches_name ?? "--";
             } else {
-              return "N/A";
+              return "--";
             }
             
           
@@ -275,9 +282,9 @@ function BookingsTable({userId }) {
             const bookingStages = item.stages;
             if (bookingStages) {
               const stages_name = bookingStages?.name;
-              return stages_name ?? "N/A";
+              return stages_name ?? "--";
             } else {
-              return "N/A";
+              return "--";
             }
             
           case "name":
@@ -345,18 +352,7 @@ function BookingsTable({userId }) {
       <div className="flex flex-col gap-4 mt-8">
         <div className="flex justify-between gap-3 items-center">
           <label className="flex items-center text-default-400 text-small">
-            Dòng trên trang:
-            <select
-              className="bg-transparent outline-none text-default-400 text-small"
-              onChange={onItemsPerPageChange}
-              value={itemsPerPage}
-            >
-              {CONFIG.ITEMS_PER_PAGE.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
+         
           </label>
           <div className="flex gap-3 items-center">
             <SearchForm
@@ -385,29 +381,13 @@ function BookingsTable({userId }) {
                 onSelectionChange={setVisibleColumns}
               >
                 {columns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
+                  <DropdownItem key={column.uid} className="capitalize option">
                     {capitalize(column.name)}
                   </DropdownItem>
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <div className="flex-1 justify-end flex">
-              <DateRangePicker
-                value={date}
-                onChange={setDate}
-                className="w-fit"
-                aria-label="Date Range Picker"
-                classNames={{
-                  inputWrapper: "!bg-whiteAlpha-100",
-                  "start-input": "text-white *:text-white",
-                  "end-input": "text-white *:text-white",
-                  innerWrapper:
-                    "text-white [&>data-[slot=start-input]>data-[slot=segment]]:text-white",
-                  segment:
-                    "text-white data-[editable=true]:text-white data-[editable=true]:data-[placeholder=true]:text-white",
-                }}
-              />
-            </div>
+           
           </div>
         </div>
         

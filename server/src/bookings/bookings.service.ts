@@ -1096,13 +1096,6 @@ export class BookingsService {
           (totalAmount + totalFee - depositAmount).toFixed(0),
         );
 
-        // Push New Image To Old Image
-        if (uploadImages.length > 0) {
-          uploadImages.map((image) => {
-            findBookingDetail.images.push(image);
-          });
-        }
-
         // ! Update Booking
         await this.prismaService.booking_details.update({
           where: { booking_id: Number(findBooking.id) },

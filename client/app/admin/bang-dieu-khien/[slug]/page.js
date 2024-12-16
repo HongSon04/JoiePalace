@@ -26,14 +26,8 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import TableBookingsPending from "./TableBookingsPending";
 import TableStageStatus from "./TableStageStatus";
+import { Skeleton } from "@nextui-org/react";
 
-const formatDate = (dateInput) => {
-  const date = new Date(dateInput);
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-};
 
 const Page = ({ params }) => {
   const { slug } = params;
@@ -52,10 +46,18 @@ const Page = ({ params }) => {
   const { makeAuthorizedRequest } = useApiServices();
   const [dataBookingByBranch, setDataBookingByBranch] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
   const [start_Date, setStartDate] = useState(null);
   const [end_Date, setEndDate] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
+  const [totalBookingMonth, setTotalBookingMonth] = useState("month");
+  const [itemPerPage, setItemsPerPage ] = useState(null);
+  const formatDate = (dateInput) => {
+    const date = new Date(dateInput);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
   function getCurrentMonthAndWeekDates() {
     const currentDate = new Date();
     const startDate = new Date(
@@ -101,26 +103,35 @@ const Page = ({ params }) => {
         if (currentBranch.slug === "ho-chi-minh") {
           idBranch = 0;
         }
-        // console.log(idBranch);
-        // console.log(branchId);
-
         const {
+          startDate,
+          endDate,
           startOfWeek,
           endOfWeek,
         } = getCurrentMonthAndWeekDates();
+        // console.log(startDate);
+        // console.log(endDate);
         const totalBookingWeek = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
-            branch_id: 0,
-            startDate: startOfWeek,
-            endDate: endOfWeek,
+            branch_id: idBranch,
             status: "processing",
+            startOrganizationDate: startOfWeek,
+            endOrganizationDate: endOfWeek
           }),
           "GET",
           null
         );
-
-        console.log(totalBookingWeek);
-        // console.log(end_Date);
+        const totalBookingMonth = await makeAuthorizedRequest(
+          API_CONFIG.BOOKINGS.GET_ALL({
+            branch_id: idBranch,
+            status: "success",
+            startOrganizationDate: startDate,
+            endOrganizationDate: endDate
+          }),
+          "GET",
+          null
+        );
+        // console.log(totalBookingMonth);
         const allBooking = await makeAuthorizedRequest(
           API_CONFIG.BOOKINGS.GET_ALL({
             branch_id: idBranch,
@@ -144,9 +155,6 @@ const Page = ({ params }) => {
           null
         );
 
-        // console.log(currentDate);
-        // console.log(dataUser);
-
         const [
           allInfo,
           dataInfo,
@@ -165,6 +173,7 @@ const Page = ({ params }) => {
           fetchAllByBranch(branchId),
         ]);
         // console.log(dataUser);
+        setTotalBookingMonth(totalBookingMonth);
         setIdBranch(idBranch);
         setDataBookingByBranch(dataBookingByBranch);
         setallInfo(allInfo);
@@ -254,16 +263,13 @@ const Page = ({ params }) => {
   };
 
   const dataBooking = allBooking?.data || [];
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN");
-  }
 
   const { month } = getCurrentMonthAndWeekDates();
   const bookingsOffWeek = totalBookingWeek?.pagination?.total || 0;
   const bookingsOffWeekBranch = totalBookingWeekBranch?.pagination?.total || 0;
+  const bookingsOffMonth = totalBookingMonth?.pagination?.total || 0;
   const totalInfoBranch = dataTotalBranch?.count_booking_status[0]?.data;
-  // console.log(bookingsOffWeekBranch);
+  // console.log(bookingsOffMonth);
   useEffect(() => {
     if (allBooking && allBooking.pagination) {
       setCurrentPage(allBooking.pagination.currentPage);
@@ -282,11 +288,84 @@ const Page = ({ params }) => {
         title="Chung"
         showBackButton={false}
         showHomeButton={false}
+        showSearchForm = {false}
       ></AdminHeader>
-      <div className="px-4 w-full flex gap-[16px] justify-between text-white">
         {slug === "ho-chi-minh" ? (
           allInfo ? (
             <>
+              <div className="px-4 w-full flex gap-[16px] justify-between text-white">
+                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+                  <FiPhone className="text-4xl" />
+                  <div className="flex justify-between items-center">
+                    <p className="text-white text-base font-normal">
+                      Yêu cầu cần được xử lý
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-4xl font-bold">
+                      {allInfo?.count_booking_status?.pending}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+                  <IoCalendarOutline className="text-4xl" />
+                  <div className="flex justify-between items-center">
+                    <p className="text-white text-base font-normal">
+                      Tiệc sắp diễn ra trong tuần
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-end gap-1">
+                      <p className="text-4xl font-bold">{bookingsOffWeek}</p>
+                      <p>tiệc</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+                  <RiMoneyDollarCircleLine className="text-4xl" />
+                  <div className="flex justify-between items-center">
+                    <p className="text-white text-base font-normal">
+                      Doanh thu tổng tháng {month}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-4xl font-bold">
+                      {formatPrice(allInfo.total_revune_by_month || 0)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+                  <RiMoneyDollarCircleLine className="text-4xl" />
+                  <div className="flex justify-between items-center">
+                    <p className="text-white text-base font-normal">
+                      Doanh thu tổng năm
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-4xl font-bold">
+                      {formatPrice(allInfo.total_revune_by_year || 0)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="px-4 w-full flex gap-[16px] justify-between text-white">
+              {
+                [0, 1, 2, 3].map(n => {
+                  return (
+                    <Skeleton className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200" key={n}></Skeleton>
+                  )
+                })
+              }
+            </div>
+          )
+        ) : dataTotalBranch ? (
+          <>
+            <div className="px-4 w-full flex gap-[16px] justify-between text-white">
               <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
                 <FiPhone className="text-4xl" />
                 <div className="flex justify-between items-center">
@@ -295,9 +374,7 @@ const Page = ({ params }) => {
                   </p>
                 </div>
                 <div className="flex justify-between items-center">
-                  <p className="text-4xl font-bold">
-                    {allInfo?.count_booking_status?.pending}
-                  </p>
+                  <p className="text-4xl font-bold">{totalInfoBranch.pending}</p>
                 </div>
               </div>
 
@@ -310,7 +387,7 @@ const Page = ({ params }) => {
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="flex items-end gap-1">
-                    <p className="text-4xl font-bold">{bookingsOffWeek}</p>
+                    <p className="text-4xl font-bold">{bookingsOffWeekBranch}</p>
                     <p>tiệc</p>
                   </div>
                 </div>
@@ -325,102 +402,51 @@ const Page = ({ params }) => {
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="text-4xl font-bold">
-                    {formatPrice(allInfo.total_revune_by_month || 0)}
+                    {formatPrice(
+                      Number(dataTotalBranch.total_revune_by_month) || 0
+                    )}
                   </p>
                 </div>
               </div>
 
               <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-                <RiMoneyDollarCircleLine className="text-4xl" />
+                <FaRegCalendarCheck className="text-4xl" />
                 <div className="flex justify-between items-center">
                   <p className="text-white text-base font-normal">
-                    Doanh thu tổng năm
+                    Tiệc đã hoàn thành trong tháng
                   </p>
                 </div>
                 <div className="flex justify-between items-center">
-                  <p className="text-4xl font-bold">
-                    {formatPrice(allInfo.total_revune_by_year || 0)}
-                  </p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p>Đang tải dữ liệu...</p>
-          )
-        ) : dataTotalBranch ? (
-          <>
-            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-              <FiPhone className="text-4xl" />
-              <div className="flex justify-between items-center">
-                <p className="text-white text-base font-normal">
-                  Yêu cầu cần được xử lý
-                </p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="text-4xl font-bold">{totalInfoBranch.pending}</p>
-              </div>
-            </div>
-
-            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-              <IoCalendarOutline className="text-4xl" />
-              <div className="flex justify-between items-center">
-                <p className="text-white text-base font-normal">
-                  Tiệc sắp diễn ra trong tuần
-                </p>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-end gap-1">
-                  <p className="text-4xl font-bold">{bookingsOffWeekBranch}</p>
-                  <p>tiệc</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-              <RiMoneyDollarCircleLine className="text-4xl" />
-              <div className="flex justify-between items-center">
-                <p className="text-white text-base font-normal">
-                  Doanh thu tổng tháng {month}
-                </p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="text-4xl font-bold">
-                  {formatPrice(
-                    Number(dataTotalBranch.total_revune_by_month) || 0
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-              <FaRegCalendarCheck className="text-4xl" />
-              <div className="flex justify-between items-center">
-                <p className="text-white text-base font-normal">
-                  Tiệc đã hoàn thành trong tháng
-                </p>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-end gap-1">
-                  <p className="text-4xl font-bold">
-                    {totalInfoBranch.success}
-                  </p>
-                  <p>tiệc</p>
+                  <div className="flex items-end gap-1">
+                    <p className="text-4xl font-bold">
+                      {bookingsOffMonth}
+                    </p>
+                    <p>tiệc</p>
+                  </div>
                 </div>
               </div>
             </div>
           </>
         ) : (
-          <p>Đang tải dữ liệu...</p>
+          <div className="px-4 w-full flex gap-[16px] justify-between text-white">
+            {
+              [0, 1, 2, 3].map(n => {
+                return (
+                  <Skeleton className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200" key={n}></Skeleton>
+                )
+              })
+            }
+          </div>
         )}
-      </div>
+      
 
       <div className="w-full  flex gap-4   p-4">
-        <div className="p-4   bg-whiteAlpha-100  rounded-xl">
-          <div className="flex justify-between gap-[10px] items-center mb-[10px]">
+        <div className="p-4 bg-whiteAlpha-100  rounded-xl">
+          <div className="flex justify-between gap-[10px] items-center mb-[20px]">
             <p className="text-base font-semibold ">Lịch tổ chức tháng {month}</p>
           </div>
-          <div className="flex justify-center">
-            <CustomCalendar />
+          <div className="flex justify-center ">
+            <CustomCalendar/>
           </div>
         </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
@@ -454,11 +480,11 @@ const Page = ({ params }) => {
                 {Array.isArray(requestData) && requestData.length > 0 ? (
                   requestData.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.users ? item.users.username : "N/A"}</td>
-                      <td>{item.branches ? item.branches.name : "N/A"}</td>
-                      <td>{item.phone || "N/A"}</td>
+                      <td>{item.users ? item.users.username : "--"}</td>
+                      <td>{item.branches ? item.branches.name : "--"}</td>
+                      <td>{item.phone || "--"}</td>
                       <td>
-                        <Link href={`/admin/yeu-cau/${slug}/${item.id}`}>
+                        <Link href={`/admin/yeu-cau/${item.branches?.slug}/${item.id}`}>
                           <p className="text-teal-400 font-bold text-xs">
                             Xem thêm
                           </p>
@@ -499,7 +525,7 @@ const Page = ({ params }) => {
             </div>
 
             {selectedPeriod === "week" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl min-h-[410px]">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tuần</p>
                 </div>
@@ -507,7 +533,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "month" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo tháng</p>
                 </div>
@@ -515,7 +541,7 @@ const Page = ({ params }) => {
               </div>
             )}
             {selectedPeriod === "year" && (
-              <div className="p-2 bg-blackAlpha-100 rounded-xl">
+              <div className="p-2  bg-blackAlpha-100 rounded-xl">
                 <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                   <p className=" text-base">Doanh thu theo năm</p>
                 </div>
@@ -529,7 +555,7 @@ const Page = ({ params }) => {
             <div className="flex justify-between gap-[10px] items-center mb-[10px]">
               <p className="text-base font-semibold ">Doanh thu tổng</p>
             </div>
-            <div className="p-2 bg-blackAlpha-100 rounded-xl">
+            <div className="p-2  bg-blackAlpha-100 rounded-xl min-h-[410px]">
               <div className="flex items-center justify-between gap-[10px] mb-[10px]">
                 <p className=" text-base">Doanh thu theo năm</p>
               </div>

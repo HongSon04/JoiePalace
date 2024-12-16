@@ -12,6 +12,50 @@ import TextFade from "@/app/_components/TextFade";
 import "@/app/_styles/client.css";
 import { fetchBranchBySlug } from "@/app/_services/branchesServices";
 
+const maps = [
+  {
+    slug: "cao-bang", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3681.7671853462266!2d106.2570404750805!3d22.66246737942782!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x36ca65dc62d27b5f%3A0xe1d816e0c5031367!2zTcaw4budbmcgVGhhbmggTHV4dXJ5IENhbyBC4bqxbmcgSG90ZWw!5e0!3m2!1svi!2sus!4v1734342772260!5m2!1svi!2sus",
+    location: "42 Kim Đồng, P. Hợp giang, Cao Bằng, Việt Nam"
+  },
+  {
+    slug: "ha-tay", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29786.862810415932!2d105.7934319743164!3d21.058365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135aa5504cf4f8d%3A0x38355eb7fe4e696d!2sInterContinental%20H%C3%A0%20N%E1%BB%99i%20Westlake!5e0!3m2!1svi!2sus!4v1734343368421!5m2!1svi!2sus" ,
+    
+    location: "05 P. Từ Hoa, Quảng An, Tây Hồ, Hà Nội, Việt Nam"
+  },
+  {
+    slug: "ha-dong", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29797.131405926233!2d105.74501327431636!3d21.00700600000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135acacbb621a31%3A0x6b9d241f84cd960!2sJW%20Marriott%20Hotel%20Hanoi!5e0!3m2!1svi!2sus!4v1734343324150!5m2!1svi!2sus",
+    location: "No 8 P. Đỗ Đức Dục, Road, Nam Từ Liêm, Hà Nội, Việt Nam"  
+  },
+  {
+    slug: "ha-nam", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3736.011609754988!2d105.91395717501761!3d20.546705880984735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ce2ea9cd72f3%3A0xafbb06ea47daec82!2sMeli%C3%A1%20Vinpearl%20Phu%20Ly!5e0!3m2!1svi!2sus!4v1734343235733!5m2!1svi!2sus",
+      location: "60 Biên Hòa, Minh Khai, Phủ Lý, Hà Nam, Việt Nam"
+    },
+  {
+    slug: "ha-tinh", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d121137.53243161227!2d105.811944228535!3d18.413416641405522!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31384e1639406681%3A0x1c72d7db74585241!2sMeli%C3%A1%20Vinpearl%20Ha%20Tinh!5e0!3m2!1svi!2sus!4v1734343184651!5m2!1svi!2sus",
+    location: "Hàm Nghi, Hà Huy Tập, Hà Tĩnh, Việt Nam"  
+  },
+  {
+    slug: "can-tho", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.6891583609668!2d105.78776047479411!3d10.042488690065072!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a063a1771a0823%3A0xa7fe937e43c2970c!2zS2jDoWNoIHPhuqFuIE3GsOG7nW5nIFRoYW5oIEx1eHVyeSBD4bqnbiBUaMah!5e0!3m2!1svi!2sus!4v1734342889468!5m2!1svi!2sus",
+    location: "Khu E1, cồn, Ninh Kiều, Cần Thơ, Việt Nam"
+  },
+
+  {
+    slug: "hai-phong", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29825.805734003105!2d106.62349287431641!3d20.8629505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314a7bc272e761a7%3A0x32b4a96f4ad187c7!2sSheraton%20Hai%20Phong!5e0!3m2!1svi!2sus!4v1734343136970!5m2!1svi!2sus",
+    location: "Khu do thị, Hà Nội - Hải Phòng, Vinhomes Imperia, Hồng Bàng, Hải Phòng, Việt Nam"  
+  },
+  {
+    slug: "da-nang", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30672.975713192074!2d108.19017055018162!3d16.05915956558383!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142177a5081b45b%3A0x1dba027958889476!2zTcaw4budbmcgVGhhbmggTHV4dXJ5IMSQw6AgTuG6tW5nIEhvdGVs!5e0!3m2!1svi!2sus!4v1734343071117!5m2!1svi!2sus",
+    location: "270 Võ Nguyên Giáp, Bắc Mỹ Phú, Ngũ Hành Sơn, Đà Nẵng, Việt Nam"  
+  },
+  {
+    slug: "ho-chi-minh", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.183607488274!2d106.66944317480524!3d10.797245389352735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175294e1f81bde7%3A0x2a8eeb556a2cd1c7!2zS2jDoWNoIHPhuqFuIE3GsOG7nW5nIFRoYW5oIEx1eHVyeSBTw6BpIEfDsm4!5e0!3m2!1svi!2sus!4v1734342940894!5m2!1svi!2sus",
+    location: "261C Đ. Nguyễn Văn Trỗi, Phường 10, Phú Nhuận, Hồ Chí Minh, Việt Nam"
+  },
+  {
+    slug: "ha-noi", html: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29804.622795592673!2d105.78896277431636!3d20.969461600000013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135acf8cb3861d9%3A0xd294605a751a1c4a!2zS2jDoWNoIHPhuqFuIE3GsOG7nW5nIFRoYW5oIEdyYW5kIEjDoCBO4buZaQ!5e0!3m2!1svi!2sus!4v1734343023593!5m2!1svi!2sus", 
+    location: "Đ. Nghiêm Xuân Yêm, Đại Kim, Hà Nội, Việt Nam"  
+  },
+]
 const section6 = [
   {
     id: 1,
@@ -145,6 +189,7 @@ const PageLocation = () => {
       carouselMapRef2.current.previous();
     }
   };
+  
   const handleNext = () => {
     if (carouselMapRef1.current && carouselMapRef2.current) {
       carouselMapRef1.current.next();
@@ -168,6 +213,7 @@ const PageLocation = () => {
   };
 
   const spans = splitIntoSpans(branch.slogan);
+  
   const JsxContent = (
     <>
       {/* banner */}
@@ -190,11 +236,9 @@ const PageLocation = () => {
           {spans.map((span, index) => (
             <span
               key={index}
-              className={`text-[42px] ${
-                index % 2 === 1 ? "sm:text-[84px]" : "sm:text-[64px]"
-              } font-medium leading-[42px] ${
-                index % 2 === 1 ? "sm:leading-[80px]" : "sm:leading-[80px]"
-              } text-center w-full px-8 lg:px-0 lg:w-4/6`}
+              className={`text-[42px] ${index % 2 === 1 ? "sm:text-[84px]" : "sm:text-[64px]"
+                } font-medium leading-[42px] ${index % 2 === 1 ? "sm:leading-[80px]" : "sm:leading-[80px]"
+                } text-center w-full px-8 lg:px-0 lg:w-4/6`}
             >
               {span}
             </span>
@@ -222,13 +266,12 @@ const PageLocation = () => {
           {branch.slogan_images.map((url, index) => {
             <div
               key={index}
-              className={`grid ${
-                index === 0
+              className={`grid ${index === 0
                   ? "col-start-2 col-end-6 row-start-5 xs:row-start-4 row-end-10 md:col-start-1 md:col-end-3 md:row-start-1 md:row-end-7 pt-5"
                   : index === 1
-                  ? "col-start-3 col-end-7 row-start-8 xs:row-start-9 row-end-13 md:col-start-2 md:col-end-4 md:row-start-6 md:row-end-13 pb-5"
-                  : "col-start-8 col-end-12 row-start-5 xs:row-start-4 row-end-13 md:col-start-10 md:col-end-13 md:row-start-1 md:row-end-13"
-              } overflow-hidden`}
+                    ? "col-start-3 col-end-7 row-start-8 xs:row-start-9 row-end-13 md:col-start-2 md:col-end-4 md:row-start-6 md:row-end-13 pb-5"
+                    : "col-start-8 col-end-12 row-start-5 xs:row-start-4 row-end-13 md:col-start-10 md:col-end-13 md:row-start-1 md:row-end-13"
+                } overflow-hidden`}
             >
               <Image
                 src={url}
@@ -518,13 +561,12 @@ const PageLocation = () => {
           {branch.equipment_images.map((url, index) => {
             <div
               key={index}
-              className={`overflow-hidden ${
-                index === 0
+              className={`overflow-hidden ${index === 0
                   ? "row-start-7 lg:row-start-5 row-end-13 col-start-3 col-end-7 pr-5 z-20"
                   : index === 1
-                  ? " pt-6 lg:pt-0 col-start-4 lg:col-start-6 col-end-9 row-start-3 lg:row-start-1 row-end-9 lg:row-end-7 z-10"
-                  : " col-start-7 col-end-11 lg:col-end-13 row-start-4 lg:row-start-2 row-end-10"
-              }`}
+                    ? " pt-6 lg:pt-0 col-start-4 lg:col-start-6 col-end-9 row-start-3 lg:row-start-1 row-end-9 lg:row-end-7 z-10"
+                    : " col-start-7 col-end-11 lg:col-end-13 row-start-4 lg:row-start-2 row-end-10"
+                }`}
             >
               <Image src={url} className="w-full h-full object-cover" alt="" />
             </div>;
@@ -583,11 +625,10 @@ const PageLocation = () => {
                   <span
                     onClick={(e) => setCurrentSpace(spaces[index])}
                     key={space.id}
-                    className={`w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium space-active cursor-pointer ${
-                      currentSpace.id === index + 1
+                    className={`w-full flex text-gold text-[18px] sm:text-[30px] lg:text-4xl font-medium space-active cursor-pointer ${currentSpace.id === index + 1
                         ? "opacity-100"
                         : "!opacity-50"
-                    }`}
+                      }`}
                   >
                     {space.name}
                   </span>
@@ -755,13 +796,13 @@ const PageLocation = () => {
               </span>
               <div className="w-full h-auto flex flex-col gap-6 lg:gap-11">
                 <span className="uppercase text-[18px] sm:text-[20px] lg:text-2xl font-normal">
-                  joice palace phạm văn đồng
+                  joice palace {branch.name}
                 </span>
                 <div className="w-full h-auto flex flex-col gap-6">
                   <div className="w-full flex gap-3 lg:gap-6">
                     <Image src="/room.svg" alt="" />
                     <span className="text-xs sm:text-sm lg:text-base font-normal">
-                      194 Hoàng Văn Thụ, Quận Phú Nhuận, Thành phố Hồ Chí Minh
+                    {maps.find(map => map.slug === branch.slug).location}
                     </span>
                   </div>
                   <div className="w-full flex gap-6">
@@ -781,7 +822,7 @@ const PageLocation = () => {
             </div>
             <div className="w-full lg:w-1/2 h-[50%]  rounded-sm overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.9101447446287!2d106.71386767480566!3d10.825879989325873!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317529b446117cb9%3A0x7549cfeabc04d7d0!2zV2hpdGUgUGFsYWNlIFBo4bqhbSBWxINuIMSQ4buTbmc!5e1!3m2!1svi!2s!4v1726236625632!5m2!1svi!2s"
+                src={maps.find(map => map.slug === branch.slug).html}
                 width="100%"
                 height="100%"
                 loading="lazy"

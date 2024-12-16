@@ -468,6 +468,11 @@ export class BranchesService {
         throw new BadRequestException('Tên địa điểm đã tồn tại');
       }
 
+      // ? Find Branches By Id
+      const findBranchById = await this.prismaService.branches.findFirst({
+        where: { id: Number(id) },
+      });
+
       // Cập nhật branch
       const updatedbranch = await this.prismaService.branches.update({
         where: { id: Number(id) },
@@ -476,14 +481,26 @@ export class BranchesService {
           slug,
           address,
           phone,
-          images: branchImages.images,
+          images: [
+            ...(branchImages.images || []),
+            ...(findBranchById.images || []),
+          ],
           slogan,
           slogan_description,
           diagram_description,
           equipment_description,
-          slogan_images: branchImages.slogan_images,
-          diagram_images: branchImages.diagram_images,
-          equipment_images: branchImages.equipment_images,
+          slogan_images: [
+            ...(branchImages.slogan_images || []),
+            ...(findBranchById.slogan_images || []),
+          ],
+          diagram_images: [
+            ...(branchImages.diagram_images || []),
+            ...(findBranchById.diagram_images || []),
+          ],
+          equipment_images: [
+            ...(branchImages.equipment_images || []),
+            ...(findBranchById.equipment_images || []),
+          ],
         },
         include: {
           stages: true,

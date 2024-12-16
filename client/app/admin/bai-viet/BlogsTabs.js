@@ -40,6 +40,7 @@ import {
 import { FaPen } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { Image } from "@chakra-ui/react";
+import { API_CONFIG } from "@/app/_utils/api.config";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
@@ -121,10 +122,9 @@ const BlogsTabs = () => {
   });
   useEffect(() => {
     const fecthData = async () => {
-      const blogCategories = await axios.get(
-        "http://joieplace.live/api/categories/get/10"
+      const blogCategories = await axios.get(API_CONFIG.PACKAGES.GET_BY_ID(10)
       );
-      const blogs = await axios.get("http://joieplace.live/api/blogs/get-all");
+      const blogs = await axios.get(API_CONFIG.BLOGS.GET_ALL);
       const listCategoriesBlog = blogCategories?.data?.data[0]?.childrens;
       const listBlogs = blogs?.data?.data;
 

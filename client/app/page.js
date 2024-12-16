@@ -19,6 +19,7 @@ import { getAllPackages } from "./_services/packageServices";
 import dynamic from "next/dynamic";
 import { fecthAllBlog } from "./_services/blogServices";
 import { useRouter } from "next/navigation";
+import { fetchBranchesFromApi } from "./_services/branchesServices";
 
 const bannerImages = ["/banner.png", "/banner2.png"];
 const locations = [
@@ -128,6 +129,7 @@ const isBrowser = typeof window !== "undefined";
 function Home() {
   const [timeAutoPlay, setTimeAutoPlay] = useState(false);
   const carouselRef = useRef();
+  const [listBranches, setListBranches] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [dataPackage, setDataPackage] = useState(null);
   const [show6blognew, setShow6blognew] = useState();
@@ -141,6 +143,8 @@ function Home() {
     const callApi = async () => {
       const res = await getAllPackages();
       const blog = await fecthAllBlog();
+      const branches = await fetchBranchesFromApi();
+      setListBranches(branches.slice(7, 10));
       const mapdataBlog = [
         blog.slice(0, 3).map((i, index) => ({
           id: index + 1,
@@ -157,7 +161,6 @@ function Home() {
       ];
 
       setShow6blognew(mapdataBlog);
-
       setDataPackage(res.data.slice(0, 3));
     };
     delay();
@@ -254,8 +257,8 @@ function Home() {
             </span>
           </div>
           <div className="w-[91%] h-screen flex flex-col bg-white gap-[2px] overflow-hidden">
-            {locations.map((location, index) => (
-              <section
+            {listBranches.map((location, index) => (
+                <section
                 key={location.id}
                 className="location-section-item relative w-full h-1/3 bg-pink-100 hover:h-[95%] transition-all duration-500 overflow-hidden"
               >
@@ -302,10 +305,10 @@ function Home() {
                     </div>
                     <div className="w-[50%]">
                       <span className="uppercase text-gold text-6xl font-normal leading-[80px]">
-                        {location.descriptoin}
+                        {locations[index].descriptoin}
                       </span>
                     </div>
-                    <ButtonDiscover className={"w-fit px-3"} />
+                    <ButtonDiscover link={`/client/chi-nhanh/${location.slug}`} className={"w-fit px-3"} />
                   </div>
                 </div>
               </section>

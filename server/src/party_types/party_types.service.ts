@@ -414,7 +414,7 @@ export class PartyTypesService {
         await this.cloudinaryService.deleteMultipleImagesByUrl(
           partyType.images,
         );
-        dataUpdate.images = images as any;
+        dataUpdate.images = [...(images || []), ...(partyType.images || [])];
       }
 
       // Cập nhật loại tiệc

@@ -31,14 +31,14 @@ const WeddingSection = () => {
                 // Fetch all products for each package
                 const enrichedPackages = await Promise.all(
                     packagesByUser.map(async (item) => {
-                        console.log(item.price);
+                        console.log(item);
                         const otherService = JSON.parse(item.other_service);
                         const products = await Promise.all(
                             otherService.map(service => getProductById(service.id))
                         );
 
                         return {
-                            id:item.id,
+                            slug:item.slug,
                             title: item.name,
                             price: `${Math.ceil(item.price / 1000000).toLocaleString()} ${item.price < 1000000000 ? 'Triệu' : 'Tỷ'} VND`,
                             details: `Thường dành cho tiệc khoảng ${item.number_of_guests || 0} khách.`,    
@@ -121,8 +121,8 @@ const WeddingSection = () => {
             </div>
         );
     }
-    const detailCombo = (id) => {
-        router.push(`/client/chi-tiet-goi-dich-vu/${id}`)
+    const detailCombo = (slug) => {
+        router.push(`/client/chi-tiet-goi-dich-vu/${slug}`)
     }
 
     return (
@@ -142,7 +142,7 @@ const WeddingSection = () => {
               </div>
               <p className="text-3xl font-semibold mt-2">{pack.price}</p>
               <button
-                onClick={() => detailCombo(pack.id)}
+                onClick={() => detailCombo(pack.slug)}
                 className="mt-4 bg-white text-sm font-semibold text-black py-2 px-4 rounded-md transition duration-300 hover:bg-gray-200 shadow-lg"
               >
                 {/* {openPackIndex === packIndex ? 'Ẩn Chi Tiết' : 'Xem Chi Tiết →'} */}

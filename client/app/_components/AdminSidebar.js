@@ -225,6 +225,12 @@ function AdminSidebarNav() {
         icon: packageIcon,
         className: "",
       },
+      {
+        title: "Hạng thành viên",
+        path: `/admin/hang-thanh-vien`,
+        icon: StageIcon,
+        className: "",
+      },
     ];
   }, [currentBranch]);
 
