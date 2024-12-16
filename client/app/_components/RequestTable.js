@@ -385,23 +385,17 @@ function RequestTable() {
           switch (cellValue) {
             case "pending":
               return (
-                <Chip variant="flat" color="warning">
+                <Chip className="bg-yellow-500/10 text-yellow-500">
                   Chưa xử lý
                 </Chip>
               );
 
             case "processing":
               return (
-                <Chip variant="flat" color="primary">
-                  Đang xử lý
-                </Chip>
+                <Chip className="bg-blue-500/10 text-blue-400">Đang xử lý</Chip>
               );
             case "cancel":
-              return (
-                <Chip variant="flat" color="danger">
-                  Đã hủy
-                </Chip>
-              );
+              return <Chip className="bg-red-500/30 text-red-500">Đã hủy</Chip>;
           }
         case "actions":
           return (
@@ -604,7 +598,13 @@ function RequestTable() {
       onSelectionChange={setSelectedKeys}
       onSortChange={setSortDescriptor}
       selectionBehavior="replace"
-      onRowAction={(key) => handleUpdateStatus(key)}
+      onRowAction={(key) => {
+        if (key.status === "processing") {
+          handleCancelRequest(key);
+        } else {
+          handleUpdateStatus(key);
+        }
+      }}
     >
       <TableHeader
         columns={headerColumns}
