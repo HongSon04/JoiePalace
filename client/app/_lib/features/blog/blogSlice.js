@@ -61,7 +61,7 @@ const categoriesSlice = createSlice({
       state.categories = Array.isArray(state.categories)
         ? [...state.categories, action.payload]
         : state.categories.push(action.payload);
-    },
+    },  
     addingCategoryFailure(state, action) {
       state.isAddingCategory = false;
       state.error = action.payload;
