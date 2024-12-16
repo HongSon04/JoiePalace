@@ -44,6 +44,7 @@ import LoadingContent from "@/app/_components/LoadingContent";
 import { capitalize } from "@mui/material";
 import { formatPrice } from "@/app/_utils/formaters";
 import "../../_styles/client.css";
+
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "name",
@@ -86,6 +87,7 @@ function BookingsTable({userId }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  
   const {
     requests,
     pagination,
@@ -129,14 +131,16 @@ function BookingsTable({userId }) {
   React.useEffect(() => {
     const params = {
       user_id: userId,
+      page: currentPage ,
+      itemsPerPage: 5
     };
     dispatch(fetchRequests({ params }));
-  }, [userId]);
+  }, [userId, currentPage,itemsPerPage]);
 
   React.useEffect(() => {
     const controller = new AbortController();
     const params = {
-      user_id: userId   
+      user_id: userId
     };
 
     dispatch(fetchRequests({ signal: controller.signal, params }));
@@ -345,7 +349,7 @@ function BookingsTable({userId }) {
       <div className="flex flex-col gap-4 mt-8">
         <div className="flex justify-between gap-3 items-center">
           <label className="flex items-center text-default-400 text-small">
-            Dòng trên trang:
+            {/* Dòng trên trang:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onItemsPerPageChange}
@@ -356,7 +360,7 @@ function BookingsTable({userId }) {
                   {item}
                 </option>
               ))}
-            </select>
+            </select> */}
           </label>
           <div className="flex gap-3 items-center">
             <SearchForm

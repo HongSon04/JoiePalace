@@ -20,9 +20,11 @@ const Page = ({ params }) => {
     const fetchData = async () => {
       try {
         const currentBranch = JSON.parse(localStorage.getItem("currentBranch"));
-        const branchId = currentBranch.id;
         const nameBranch = currentBranch.name;
-
+        let branchId = currentBranch.id;
+        // if (currentBranch.slug === "ho-chi-minh") {
+        //   branchId = 0;
+        // }
         const [dataTotalBranch, allBranch] = await Promise.all([
           fetchAllByBranch(branchId),
           fetchAllBranch()
@@ -119,7 +121,7 @@ const Page = ({ params }) => {
           </div>
           <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
             {/* Truyền selectedBranchId vào BookingsTable */}
-            <BookingsTable branchId={selectedBranchId} />
+            <BookingsTable  branchId={selectedBranchId === 2 ? 0 : selectedBranchId} />
           </div>
         </div>
       </div>
