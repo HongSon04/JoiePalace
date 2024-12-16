@@ -87,7 +87,8 @@ const Page = ({ params }) => {
       data: eachMonthChartData
     }]
   };
-
+  // console.log(selectedBranchId);
+  
   return (
     <main className="font-gilroy grid gap-6 p-4 text-white">
       <AdminHeader title="Thống kê doanh thu" showSearchForm={false} />
@@ -120,8 +121,7 @@ const Page = ({ params }) => {
             <p className="text-base font-semibold">Danh sách tiệc</p>
           </div>
           <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
-            {/* Truyền selectedBranchId vào BookingsTable */}
-            <BookingsTable  branchId={selectedBranchId === 2 ? 0 : selectedBranchId} />
+            <BookingsTable  branchId={selectedBranchId == 2 ? 0 : selectedBranchId} />
           </div>
         </div>
       </div>
