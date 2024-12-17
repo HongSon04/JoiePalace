@@ -16,6 +16,7 @@ import { useParams } from "next/navigation";
 import useApiServices from "@/app/_hooks/useApiServices";
 import { API_CONFIG } from "@/app/_utils/api.config";
 import AdminThemChiNhanhInputAndImg from "@/app/_components/AdminThemChiNhanhInputAndImg";
+import useCustomToast from "@/app/_hooks/useCustomToast";
 
 const defaultValues = {
   name: "",
@@ -54,6 +55,8 @@ function Page() {
     resolver: zodResolver(branchSchema),
     defaultValues,
   });
+
+  const toast = useCustomToast();
 
   const [branchDetail, setBranchDetail] = useState("");
   const [imagesData, setImagesData] = useState({
@@ -113,10 +116,25 @@ function Page() {
       const response = await makeAuthorizedRequest(API_CONFIG.BRANCHES.UPDATE(branchDetail.id), "PATCH", formData);
       if (response.success) {
         console.log("Branch updated successfully:", response.data);
+toast({
+                        title: "Cập nhật thành công",
+                        description: message || "Đã cập nhật thành công chi nhánh",
+                        type: "success",
+                    });
       } else {
         console.error("Error updating branch:", response.message);
+        toast({
+          title: "Cập nhật thất bại",
+          description: message || "Đã cập nhật thất bại chi nhánh",
+          type: "error",
+      });
       }
     } catch (error) {
+      toast({
+        title: "Cập nhật thất bại",
+        description: message || "Đã cập nhật thất bại chi nhánh",
+        type: "error",
+    });
       console.error("Error while submitting form: ", error);
     }
   };
