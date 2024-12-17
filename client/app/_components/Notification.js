@@ -24,18 +24,18 @@ function Notification({ notification }) {
     dailyRemind: "border-green-500",
     feedback: "border-gray-500",
     other: "border-gray-700",
-  }[notification.type];
+  }[notification?.type];
 
   return (
     <div
       className={`notification border-solid border-l-4 ${_type} flex justify-between items-center gap-5 p-3 bg-white mb-3 hover:brightness-95`}
     >
       <div className="flex-1">
-        <h1 className="text-base font-bold">{notification.title}</h1>
+        <h1 className="text-base font-bold">{notification?.title}</h1>
         <p className="text-[10px] my-2 text-gray-400">
-          {formatRelativeTime(notification.dateTime)}
+          {formatRelativeTime(notification?.dateTime)}
         </p>
-        <p className="text-sm">{notification.content}</p>
+        <p className="text-sm">{notification?.content}</p>
       </div>
       <div className="flex flex-col items-end justify-between gap-8 h-full">
         <IconButton className="icon-button" background={"none"} size="xxsm">

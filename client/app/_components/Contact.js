@@ -13,6 +13,7 @@ import useCustomToast from "../_hooks/useCustomToast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPackageById } from "../_services/packageServices";
 import IconButton from "./IconButton";
+import "@/app/_styles/client.css";
 
 const formSchema = z.object({
   name: z.string().min(2, "Vui lòng nhập Họ và tên!"),
@@ -70,7 +71,7 @@ const Contact = () => {
         user_id: user.id || "",
         name: user.name || "",
         email: user.email || "",
-        phone: user.phone || "",
+        phone: user.phone !== null ? "" : user.phone,
       }));
     }
   }, [user]);
@@ -231,6 +232,7 @@ const Contact = () => {
         name="date"
         type="date"
         placeholder="Thời gian*"
+        className="input_date"
       />
       <div className="w-full flex items-center justify-between">
         <span>

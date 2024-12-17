@@ -1,21 +1,23 @@
 "use client";
 
-import Image from "next/image";
-import Notification from "./Notification";
 import notificationIcon from "@/public/admin-sidebar/thong-bao.svg";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Button } from "@nextui-org/react";
-import React from "react";
+import { Button, Spinner } from "@nextui-org/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
+import React from "react";
+import { API_CONFIG, makeAuthorizedRequest } from "../_utils/api.config";
+import { formatDateTime } from "../_utils/formaters";
 
 function NotificationButton() {
-  const [user, setUser] = React.useState({});
+  const [page, setPage] = React.useState(1);
+  const [itemsPerPage, setItemsPerPage] = React.useState(10);
 
   const markIsRead = React.useCallback(async (notification_ids = []) => {
     const result = await makeAuthorizedRequest(
       API_CONFIG.NOTIFICATIONS.IS_READ,
       "PATCH",
-      notification_ids
+      { notification_ids }
     );
 
     if (result.success) {
@@ -38,11 +40,23 @@ function NotificationButton() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["notifications_box", user.id],
+    queryKey: ["notifications_box", page, itemsPerPage],
     queryFn: async () => {
-      const response = await getNotifications();
+      let user = {};
+      try {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        user = storedUser;
+      } catch {
+        user = {};
+      }
 
-      // console.log("response -> ", response);
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.NOTIFICATIONS.GET_BY_ID(user?.id, {
+          page,
+          itemsPerPage,
+        }),
+        "GET"
+      );
 
       if (response.success) {
         return response;
@@ -50,42 +64,31 @@ function NotificationButton() {
         throw new Error(response.error.message);
       }
     },
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
   });
 
-  const notification_ids = React.useMemo(
-    () => (notifications ? notifications?.map((item) => item.id) : []),
-    [notifications]
-  );
+  const notification_ids = React.useMemo(() => {
+    if (!notifications || !Array.isArray(notifications?.data)) return [];
 
-  // console.log("notifications -> ", notifications);
+    return notifications ? notifications?.data?.map((item) => item?.id) : [];
+  }, [notifications]);
 
-  const mutation = useMutation({
-    mutationFn: markIsRead,
+  const {
+    mutate: handleMarkIsRead,
+    isPending: isMarkIsReadPending,
+    isSuccess: isMarkIsReadSuccess,
+  } = useMutation({
+    mutationKey: ["markIsRead"],
+    mutationFn: () => markIsRead(notification_ids),
     onSuccess: () => {
-      queryClient.invalidateQueries([
-        "notifications_box",
-        user.id,
-        notification_ids,
-      ]);
+      queryClient.invalidateQueries(["notifications_box"]);
     },
   });
 
-  const getNotifications = React.useCallback(() => {
-    return makeAuthorizedRequest(
-      API_CONFIG.NOTIFICATIONS.GET_BY_ID(user.id),
-      "GET"
-    );
-  }, [user.id]);
-
-  React.useEffect(() => {
-    if (typeof window !== undefined) {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-
-      if (!storedUser) return;
-
-      setUser(storedUser);
-    }
-  }, []);
+  const handleSeeMore = () => {
+    setItemsPerPage((prev) => (prev += 10));
+  };
 
   return (
     <Popover
@@ -93,7 +96,6 @@ function NotificationButton() {
       offset={10}
       classNames={{
         base: "w-[400px] !h-[500px] !bg-gray-100 overflow-y-auto rounded-xl",
-        // content: "w-[400px] h-[500px] !bg-gray-100",
       }}
     >
       <PopoverTrigger>
@@ -125,15 +127,52 @@ function NotificationButton() {
           </Button>
         </div>
 
-        <div className="flex flex-col mt-3 flex-1 h-full min-h-max">
-          {notifications && notifications?.length > 0 ? (
-            notifications?.map((notification, index) => (
-              <Notification key={index} notification={notification} />
-            ))
-          ) : (
-            <p className="text-center text-base">Không có thông báo</p>
-          )}
+        <div className="flex flex-col gap-3 mt-3 flex-1 h-full min-h-max overflow-y-auto py-4">
+          {!isLoading && notifications && notifications?.data?.length > 0
+            ? notifications?.data?.map((notification, index) => (
+                <div
+                  key={notification?.title + index}
+                  className={`p-4 rounded-lg hover:cursor-pointer relative ${
+                    notification?.is_read
+                      ? "bg-transparent"
+                      : "bg-blackAlpha-100"
+                  }`}
+                  onClick={() => {
+                    if (notification?.is_read) return;
+                    handleMarkIsRead({
+                      notification_ids: [notification.id],
+                    });
+                  }}
+                >
+                  <h4 className="font-semibold text-gray-800 ">
+                    {notification?.title}
+                  </h4>
+                  <p className="text-sm text-gray-400 mt-3">
+                    {notification?.content}
+                  </p>
+                  <p className="text-sm text-gray-400 mt-3">
+                    {formatDateTime(notification?.created_at)}
+                  </p>
+                </div>
+              ))
+            : !isLoading && (
+                <div className="flex-1 flex-center">
+                  <p className="text-center text-base">Không có thông báo</p>
+                </div>
+              )}
         </div>
+        {/* See More Button */}
+        {notifications && notifications.data.length > 0 && (
+          <Button
+            variant="ghost"
+            color="default"
+            radius="full"
+            onClick={handleSeeMore}
+            disabled={isLoading} // Disable while loading
+          >
+            {isLoading ? <Spinner size="sm" /> : "Xem thêm"}
+          </Button>
+        )}
       </PopoverContent>
     </Popover>
   );

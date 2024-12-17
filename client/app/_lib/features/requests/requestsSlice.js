@@ -140,10 +140,10 @@ export const fetchRequests = createAsyncThunk(
       null,
       { signal }
     );
-    
+
     // console.log("response from fetchRequests thunk -> ", response);
     if (response.success) {
-      dispatch(fetchingRequestsSuccess(response));// Return the response for further use
+      dispatch(fetchingRequestsSuccess(response)); // Return the response for further use
       return response;
     } else {
       dispatch(fetchingRequestsFailure(response.error.message));
@@ -182,7 +182,7 @@ export const updateRequestStatus = createAsyncThunk(
 );
 
 export const fetchRequestsByBranch = createAsyncThunk(
-  "requests/fetchRequestsByBranch", 
+  "requests/fetchRequestsByBranch",
   async ({ params, branchId, signal }, { dispatch, rejectWithValue }) => {
     dispatch(fetchingRequests());
 
@@ -215,7 +215,7 @@ export const fetchRequestsByBranch = createAsyncThunk(
   }
 );
 export const fetchRequestsBookingStage = createAsyncThunk(
-  "requests/fetchRequestsByBranch", 
+  "requests/fetchRequestsByBranch",
   async ({ params, branchId, signal }, { dispatch, rejectWithValue }) => {
     dispatch(fetchingRequests());
 

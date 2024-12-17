@@ -32,7 +32,7 @@ export const loginAccountUser = async (dataToSend) => {
 };
 export const loginGoogle = async (dataToSend) => {
   const response = await axios.post(
-    "http://joieplace.live/api/auth/login-social",
+    API_CONFIG.AUTH.LOGIN_GOOLGE,
     dataToSend
   );
   if (response.status !== 200 && response.status !== 201) {

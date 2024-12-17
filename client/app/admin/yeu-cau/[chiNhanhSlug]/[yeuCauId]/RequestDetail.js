@@ -35,46 +35,20 @@ import {
   fetchingPartyTypesSuccess,
 } from "@/app/_lib/features/partyTypes/partyTypesSlice";
 import { usePathname, useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const schema = z.object({
   status: z.string().nonempty("Vui lòng chọn trạng thái"),
 });
 
 function RequestDetail({ id }) {
-  const {
-    selectedRequest,
-    isFetchingSelectedRequest,
-    isFetchingSelectedRequestError,
-  } = useSelector((store) => store.requests);
-  const { partyTypes, isFetchingPartyTypes, isFetchingPartyTypesError } =
-    useSelector((store) => store.partyTypes);
   const dispatch = useDispatch();
   const { makeAuthorizedRequest } = useApiServices();
   const router = useRouter();
   const pathname = usePathname();
   const backPath = pathname.split("/").slice(0, -1).join("/");
-  const [status, setStatus] = React.useState(
-    (selectedRequest && selectedRequest.status) || "pending"
-  );
-  const [hasChange, setHasChange] = React.useState(false);
 
-  React.useEffect(() => {
-    if (!selectedRequest) return;
-
-    if (selectedRequest && status !== selectedRequest.status) {
-      setHasChange(true);
-    }
-  }, [status, setHasChange, selectedRequest]);
-
-  const handleBack = () => {
-    router.push(backPath);
-  };
-
-  const handleStatusChange = (e) => {
-    setStatus(e.target.value);
-  };
-
-  // console.log(pathname);
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -86,100 +60,100 @@ function RequestDetail({ id }) {
   } = useForm({
     resolver: zodResolver(schema),
   });
-
   const toast = useCustomToast();
 
-  const fetchSelectedRequest = React.useCallback(async () => {
-    dispatch(fetchingSelectedRequest());
-
-    const data = await makeAuthorizedRequest(
-      API_CONFIG.BOOKINGS.GET_BY_ID(id),
-      "GET"
-    );
-
-    if (data.success) {
-      dispatch(fetchingSelectedRequestSuccess(data.data.at(0)));
-
-      await fetchPartyType(data.data.at(0).party_type_id);
-    } else {
-      dispatch(fetchingSelectedRequestFailure(data));
-    }
-  }, []);
-
-  const fetchPartyType = React.useCallback(async (id) => {
-    const data = await makeAuthorizedRequest(
-      API_CONFIG.PARTY_TYPES.GET_BY_ID(id),
-      "GET"
-    );
-
-    if (data.success) {
-      dispatch(fetchingPartyTypesSuccess(data.data.at(0)));
-    } else {
-      dispatch(fetchingPartyTypesFailure(data));
-    }
-  }, []);
-
-  const handleUpdateStatus = React.useCallback(async () => {
-    // if (!hasChange) {
-    //   toast({
-    //     title: "Trạng thái không thay đổi",
-    //     description: "Vui lòng chọn trạng thái khác để cập nhật",
-    //     type: "warning",
-    //   });
-    // } else {
-    const confirm = window.confirm(
-      `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id}?`
-    );
-
-    if (!confirm) return;
-
-    if (confirm) {
-      dispatch(updatingRequest());
-
-      const data = await makeAuthorizedRequest(
-        API_CONFIG.BOOKINGS.UPDATE_STATUS(selectedRequest.id),
-        "PATCH",
-        {
-          is_confirm: true,
-          is_deposit: false,
-          status: "processing",
-        }
+  const {
+    data: selectedRequest,
+    isLoading: isFetchingSelectedRequest,
+    isError: isFetchingSelectedRequestError,
+  } = useQuery({
+    queryKey: ["fetchSelectedRequest"],
+    queryFn: async () => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.BOOKINGS.GET_BY_ID(id)
       );
 
-      if (data.success) {
-        toast({
-          title: "Cập nhật trạng thái thành công",
-          description: "Yêu cầu đã được xử lý",
-          type: "success",
-        });
+      return response.data;
+    },
+  });
 
-        dispatch(updatingRequestSuccess());
+  const [status, setStatus] = React.useState(
+    (selectedRequest && selectedRequest?.at(0).status) || "pending"
+  );
 
-        router.push(backPath);
-      } else {
-        toast({
-          title: "Cập nhật trạng thái thất bại",
-          description: "Yêu cầu chưa được cập nhật",
-          type: "error",
-        });
-        dispatch(fetchingRequestsFailure());
+  const {
+    data: partyTypes,
+    isLoading: isFetchingPartyTypes,
+    isError: isFetchingPartyTypesError,
+  } = useQuery({
+    queryKey: ["fetchPartyTypes"],
+    queryFn: async () => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PARTY_TYPES.GET_ALL
+      );
+
+      console.log(
+        "response.data in fetch party type function -> ",
+        response.data
+      );
+      return response?.data;
+    },
+  });
+
+  const {
+    mutate: handleUpdateStatus,
+    isPending: isUpdatingStatus,
+    isError: isUpdatingStatusError,
+  } = useMutation({
+    mutationKey: ["updateRequestStatus"],
+    mutationFn: async () => {
+      const confirm = window.confirm(
+        `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id}?`
+      );
+
+      if (!confirm) return;
+
+      if (confirm) {
+        const data = await makeAuthorizedRequest(
+          API_CONFIG.BOOKINGS.UPDATE_STATUS(selectedRequest?.at(0).id),
+          "PATCH",
+          {
+            is_confirm: true,
+            is_deposit: false,
+            status: "processing",
+          }
+        );
+
+        if (data.success) {
+          toast({
+            title: "Cập nhật trạng thái thành công",
+            description: "Yêu cầu đã được xử lý",
+            type: "success",
+          });
+
+          dispatch(updatingRequestSuccess());
+
+          router.push(backPath);
+        } else {
+          toast({
+            title: "Cập nhật trạng thái thất bại",
+            description: "Yêu cầu chưa được cập nhật",
+            type: "error",
+          });
+        }
       }
-    }
-    // }
-  }, []);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["fetchSelectedRequest"]);
+    },
+  });
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      await fetchSelectedRequest();
-    };
+  const handleBack = () => {
+    router.push(backPath);
+  };
 
-    fetchData();
-
-    return () => {};
-  }, []);
-
-  const onSubmit = async (data) => {
-    await handleUpdateStatus();
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value);
   };
 
   if (isFetchingSelectedRequest) {
@@ -228,7 +202,7 @@ function RequestDetail({ id }) {
                   id={"name"}
                   ariaLabel={"name"}
                   label="Chủ tiệc"
-                  value={selectedRequest.name}
+                  value={selectedRequest?.at(0).name}
                   readOnly
                   startContent={<UserIcon className="w-5 h-5 text-white" />}
                   wrapperClassName="!mt-0"
@@ -245,7 +219,7 @@ function RequestDetail({ id }) {
                   ariaLabel={"Số điện thoại"}
                   label="Số điện thoại"
                   readOnly
-                  value={selectedRequest.phone}
+                  value={selectedRequest?.at(0).phone}
                   startContent={<PhoneIcon className="w-5 h-5 text-white" />}
                   wrapperClassName="!mt-0"
                   OnChange={() => {}}
@@ -260,7 +234,7 @@ function RequestDetail({ id }) {
                   ariaLabel={"Email"}
                   name={"email"}
                   label="Email"
-                  value={selectedRequest.email}
+                  value={selectedRequest?.at(0).email}
                   readOnly
                   startContent={<EnvelopeIcon className="w-5 h-5 text-white" />}
                   wrapperClassName="!mt-0"
@@ -284,7 +258,7 @@ function RequestDetail({ id }) {
                   errors={errors}
                   ariaLabel={"Loại tiệc"}
                   label="Loại tiệc"
-                  value={partyTypes.name}
+                  value={partyTypes?.name}
                   wrapperClassName="!mt-0"
                   OnChange={() => {}}
                 ></FormInput>
@@ -318,7 +292,7 @@ function RequestDetail({ id }) {
                   errors={errors}
                   name={"mainTable"}
                   label="Số lượng bàn chính thức"
-                  value={selectedRequest.number_of_guests / 10}
+                  value={selectedRequest?.at(0).number_of_guests / 10}
                   readOnly
                   wrapperClassName="!mt-0"
                   OnChange={() => {}}
@@ -349,7 +323,7 @@ function RequestDetail({ id }) {
                   ariaLabel={"Số lượng khách dự kiến"}
                   name={"number_of_guests"}
                   label="Số lượng khách dự kiến"
-                  value={selectedRequest.number_of_guests}
+                  value={selectedRequest?.at(0).number_of_guests}
                   readOnly
                   wrapperClassName="!mt-0"
                   OnChange={() => {}}
@@ -367,7 +341,7 @@ function RequestDetail({ id }) {
                   label="Ngày đặt tiệc"
                   ariaLabel="Ngày đặt tiệc"
                   value={format(
-                    new Date(selectedRequest.created_at),
+                    new Date(selectedRequest?.at(0).created_at),
                     "dd/MM/yyyy, hh:mm a"
                   )}
                   readOnly
@@ -387,7 +361,7 @@ function RequestDetail({ id }) {
                   label="Ngày tổ chức"
                   ariaLabel="Ngày tổ chức"
                   value={format(
-                    new Date(selectedRequest.organization_date),
+                    new Date(selectedRequest?.at(0).organization_date),
                     "dd/MM/yyyy, hh:mm a"
                   )}
                   readOnly

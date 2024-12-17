@@ -110,7 +110,7 @@ function DishesSection({ dishCategory, categories }) {
 
   const handleFileChange = (newFiles) => {
     setFiles(newFiles);
-    console.log("Files changed -> ", newFiles);
+    // console.log("Files changed -> ", newFiles);
   };
 
   const handleSearch = async (e) => {
@@ -275,17 +275,15 @@ function DishesSection({ dishCategory, categories }) {
   }, [dishCategory.id, currentPage, itemsPerPage, searchQuery, sortByPrice]);
 
   React.useEffect(() => {
-  
     const params = {
       page: currentPage,
       itemsPerPage,
       search: searchQuery,
       priceSort: sortByPrice,
     };
-  
+
     dispatch(fetchCategoryDishes({ categoryId: dishCategory.id, params }));
   }, [dishCategory.id, currentPage, itemsPerPage, sortByPrice]);
-  
 
   return (
     <>

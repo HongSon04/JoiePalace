@@ -120,7 +120,7 @@ const Page = ({ params }) => {
           <div className="flex justify-between items-center">
             <p className="text-base font-semibold">Danh sách tiệc</p>
           </div>
-          <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mt-6'>
+          <div className='overflow-x-auto max-w-[1531px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 '>
             <BookingsTable  branchId={selectedBranchId == 2 ? 0 : selectedBranchId} />
           </div>
         </div>

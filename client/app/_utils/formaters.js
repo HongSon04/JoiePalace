@@ -11,6 +11,8 @@ export function ISOStringToDateTimeString(isoString) {
 }
 
 export function formatRelativeTime(dateTime) {
+  if (!dateTime) return;
+
   return formatDistanceToNow(new Date(dateTime), { addSuffix: true });
 }
 

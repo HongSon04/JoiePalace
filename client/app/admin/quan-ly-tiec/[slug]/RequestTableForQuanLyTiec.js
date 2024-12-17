@@ -29,7 +29,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
-import { fetchRequests, updateRequestStatus } from "@/app/_lib/features/requests/requestsSlice";
+import {
+  fetchRequests,
+  updateRequestStatus,
+} from "@/app/_lib/features/requests/requestsSlice";
 import { CONFIG } from "@/app/_utils/config";
 import { capitalize } from "@/app/_utils/helpers";
 import { ChevronDownIcon } from "@/app/_components/ChevronDownIcon";
@@ -56,7 +59,11 @@ const columns = [
   { name: "Tổng giá trị", uid: "total_amount", sortable: true },
   { name: "Tiền cọc", uid: "amount_booking", sortable: true },
   { name: "Ngày dự kiến", uid: "organization_date", sortable: true },
-  { name: "Số tiền cần phải thanh toán", uid: "amount_to_be_paid", sortable: true },
+  {
+    name: "Số tiền cần phải thanh toán",
+    uid: "amount_to_be_paid",
+    sortable: true,
+  },
   { name: "Trạng thái", uid: "status", sortable: true },
   { name: "Hành động", uid: "actions" },
 ];
@@ -137,7 +144,7 @@ function RequestTable() {
 
     dispatch(fetchRequests({ params }));
 
-    return () => { };
+    return () => {};
   }, [
     currentPage,
     itemsPerPage,
@@ -202,7 +209,6 @@ function RequestTable() {
       const confirm = window.confirm(
         `Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu #${id} thành "Đang xử lý"?`
       );
-
 
       if (!confirm) return;
 
@@ -401,32 +407,37 @@ function RequestTable() {
           );
         case "total_amount":
           // const totalAmount = item.booking_details?.reduce((total, detail) => total + detail.total_amount, 0)
-          return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
           }).format(item.booking_details.total_amount || 0);
 
         // return item.booking_details.total_amount
         case "amount_booking":
-          const amount_booking = item.booking_details?.map((detail) => detail.deposits?.amount ? `${detail.deposits.amount}` : "Chưa có tiền cọc")
-          return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
+          const amount_booking = item.booking_details?.map((detail) =>
+            detail.deposits?.amount
+              ? `${detail.deposits.amount}`
+              : "Chưa có tiền cọc"
+          );
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
           }).format(amount_booking);
 
-        case 'amount_to_be_paid':
+        case "amount_to_be_paid":
           const bookingDetails = item.booking_details?.[0];
           const totalAmount_paid = bookingDetails?.total_amount || 0;
           const depositAmount = bookingDetails?.deposits?.amount || 0;
           const amountPaid = totalAmount_paid - depositAmount;
 
-          return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
+          return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
           }).format(amountPaid);
 
         case "deposit_amount":
-        case "created_at": return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
+        case "created_at":
+          return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "organization_date":
           return format(new Date(cellValue), "dd/MM/yyyy, hh:mm a");
         case "name":
@@ -452,7 +463,7 @@ function RequestTable() {
           //       {status.label}
           //     </option>
           //   ))}
-          // </select>  
+          // </select>
           switch (cellValue) {
             case "pending":
               return (
@@ -495,15 +506,17 @@ function RequestTable() {
                   </DropdownItem>
                   <DropdownItem
                     onClick={() => handleUpdateStatus(item.id)}
-                    className={`${item.status === "processing" ? "hidden" : ""
-                      }`}
+                    className={`${
+                      item.status === "processing" ? "hidden" : ""
+                    }`}
                   >
                     {`Cập nhật trạng thái "Đang xử lý"`}
                   </DropdownItem>
                   <DropdownItem
                     onClick={() => handleCancelRequest(item.id)}
-                    className={`text-red-400 ${item.status === "cancel" ? "hidden" : ""
-                      }`}
+                    className={`text-red-400 ${
+                      item.status === "cancel" ? "hidden" : ""
+                    }`}
                   >
                     {`Cập nhật trạng thái "Hủy"`}
                   </DropdownItem>
@@ -581,7 +594,9 @@ function RequestTable() {
               value={requestStatus}
             >
               {CONFIG.BOOKING_STATUS.map((item) => {
-                {/* if (item.key === "success") return; */ }
+                {
+                  /* if (item.key === "success") return; */
+                }
 
                 return (
                   <option key={item.key} value={item.key} className="option">
@@ -714,7 +729,7 @@ function RequestTable() {
             }}
           >
             {(columnKey) => (
-              <TableCell className="py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
+              <TableCell className="group-aria-[selected=false]/tr:group-data-[hover=true]/tr:before:!bg-whiteAlpha-100 py-2 px-3 relative align-middle whitespace-normal text-small font-normal [&>*]:z-1 [&>*]:relative outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 before:content-[''] before:absolute before:z-0 before:inset-0 before:opacity-0  before:bg-whiteAlpha-50 group-data-[first=true]:first:before:rounded-tl-lg group-data-[first=true]:rtl:first:before:rounded-tr-lg group-data-[first=true]:rtl:first:before:rounded-tl-[unset] group-data-[first=true]:last:before:rounded-tr-lg group-data-[first=true]:rtl:last:before:rounded-tl-lg group-data-[first=true]:rtl:last:before:rounded-tr-[unset] group-data-[middle=true]:before:rounded-none group-data-[last=true]:first:before:rounded-bl-lg group-data-[last=true]:rtl:first:before:rounded-br-lg group-data-[last=true]:rtl:first:before:rounded-bl-[unset] group-data-[last=true]:last:before:rounded-br-lg group-data-[last=true]:rtl:last:before:rounded-bl-lg group-data-[last=true]:rtl:last:before:rounded-br-[unset] text-start !text-white data-[selected=true]:before:opacity-100 group-dlata-[disabed=true]:text-foreground-300 group-data-[disabled=true]:cursor-not-allowed !before:bg-whiteAlpha-50 data-[selected=true]:text-default-foreground group-aria-[selected=false]:group-data-[hover=true]:before:bg-whiteAlpha-50 group-aria-[selected=false]:group-data-[hover=true]:before:opacity-100">
                 {renderCell(item, columnKey)}
               </TableCell>
             )}

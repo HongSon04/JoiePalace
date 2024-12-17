@@ -220,16 +220,7 @@ export const addDish = createAsyncThunk(
       "POST",
       dishData
     );
-
-    // console.log("response from addDish thunk -> ", response);
-
-    if (response.success) {
-      dispatch(addingDishSuccess(response.data.at(0)));
-      return response.data;
-    } else {
-      dispatch(addingDishFailure(response.error.message));
-      return rejectWithValue(response.error.message);
-    }
+    return response;
   }
 );
 
@@ -237,20 +228,12 @@ export const addDish = createAsyncThunk(
 export const updateDish = createAsyncThunk(
   "dishes/updateDish",
   async ({ dishId, dishData }, { dispatch, rejectWithValue }) => {
-    dispatch(updateDishRequest());
-
     try {
       const response = await makeAuthorizedRequest(
         API_CONFIG.PRODUCTS.UPDATE(dishId),
         "PATCH",
         dishData
       );
-
-      if (response.success) {
-        dispatch(updateDishSuccess(response.data));
-      } else {
-        dispatch(updateDishFailure(response.message));
-      }
 
       return response;
     } catch (error) {
@@ -264,23 +247,15 @@ export const updateDish = createAsyncThunk(
 export const deleteDish = createAsyncThunk(
   "dishes/deleteDish",
   async (dishId, { dispatch, rejectWithValue }) => {
-    dispatch(deleteDishRequest());
     try {
       const response = await makeAuthorizedRequest(
         API_CONFIG.PRODUCTS.DELETE(dishId),
         "DELETE"
       );
-      if (response.success) {
-        dispatch(deleteDishSuccess(dishId));
-      } else {
-        dispatch(deleteDishFailure(response.message));
-        return rejectWithValue(response.message);
-      }
 
       return response;
     } catch (error) {
-      dispatch(deleteDishFailure(error));
-      return rejectWithValue(error.message);
+      return error;
     }
   }
 );

@@ -30,11 +30,13 @@ import statisticIcon from "@/public/admin-sidebar/thong-ke.svg";
 import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
+import decorsIcon from "@/public/admin-sidebar/trang-tri.svg";
+import packageIcon from "@/public/admin-sidebar/goi-combo.svg";
 import logo from "@/public/logo-dark.png";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip } from "antd";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
-import { TbLogs } from "react-icons/tb";
+import { API_CONFIG } from "../_utils/api.config";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -44,7 +46,6 @@ function AdminSidebar() {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
-
         await animate(
           scope.current,
           {
@@ -117,7 +118,7 @@ function AdminSidebarHeader() {
 
 function AdminSidebarNav() {
   const { currentBranch } = useSelector((state) => state.branch);
-  // const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
+  const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
 
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
@@ -156,7 +157,7 @@ function AdminSidebarNav() {
         path: `/admin/yeu-cau/${currentBranch?.slug}`,
         icon: requestIcon,
         className: "",
-        qty: 5,
+        // qty: 5,
       },
       {
         title: "Quản lý tiệc",
@@ -214,6 +215,18 @@ function AdminSidebarNav() {
       {
         title: "Trang Trí",
         path: `/admin/trang-tri`,
+        icon: decorsIcon,
+        className: "",
+      },
+      {
+        title: "Gói Combo",
+        path: `/admin/goi-combo`,
+        icon: packageIcon,
+        className: "",
+      },
+      {
+        title: "Hạng thành viên",
+        path: `/admin/hang-thanh-vien`,
         icon: StageIcon,
         className: "",
       },
@@ -281,8 +294,10 @@ function AdminSidebarItem({ item, className }) {
 
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
+  const itemTitle = item?.title;
+
   return (
-    <Tooltip content={item.title} placement="right-end">
+    <Tooltip placement="topLeft" title={itemTitle} color="white">
       <li
         item={item}
         className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${

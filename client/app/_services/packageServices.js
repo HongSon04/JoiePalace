@@ -2,9 +2,7 @@ import axios from "axios";
 import { API_CONFIG } from "../_utils/api.config";
 
 export const getAllPackages = async () => {
-  const response = await axios.get(
-    "http://joieplace.live/api/packages/get-all"
-  );
+  const response = await axios.get(API_CONFIG.PACKAGES.GET_ALL);
   if (response.status !== 201 && response.status !== 200) {
     throw new Error("Có lỗi xảy ra khi lấy dữ liệu");
   }
