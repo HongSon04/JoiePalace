@@ -234,6 +234,7 @@ export class PaymentMethodsService {
           },
           data: {
             is_deposit: true,
+            status: 'processing',
           },
         });
         this.notificationDepositSuccess(
@@ -370,6 +371,7 @@ export class PaymentMethodsService {
           },
           data: {
             is_deposit: true,
+            status: 'processing',
           },
         });
         this.notificationDepositSuccess(
@@ -474,6 +476,7 @@ export class PaymentMethodsService {
         },
         data: {
           is_deposit: true,
+          status: 'processing',
         },
       });
       this.notificationDepositSuccess(
@@ -617,14 +620,6 @@ export class PaymentMethodsService {
               deposit_id: Number(query.deposit_id),
             },
           });
-        await this.prismaService.bookings.update({
-          where: {
-            id: Number(findBookingDetail.booking_id),
-          },
-          data: {
-            is_deposit: true,
-          },
-        });
 
         const updateBooking = await this.prismaService.bookings.update({
           where: {
@@ -632,6 +627,7 @@ export class PaymentMethodsService {
           },
           data: {
             is_deposit: true,
+            status: 'processing',
           },
         });
         this.notificationDepositSuccess(
