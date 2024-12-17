@@ -116,32 +116,32 @@ function Page() {
       const response = await makeAuthorizedRequest(API_CONFIG.BRANCHES.UPDATE(branchDetail.id), "PATCH", formData);
       if (response.success) {
         console.log("Branch updated successfully:", response.data);
-toast({
-                        title: "Cập nhật thành công",
-                        description: message || "Đã cập nhật thành công chi nhánh",
-                        type: "success",
-                    });
+        toast({
+          title: "Cập nhật thành công",
+          description: response.message || "Đã cập nhật thành công chi nhánh",
+          type: "success",
+        });
       } else {
         console.error("Error updating branch:", response.message);
         toast({
           title: "Cập nhật thất bại",
-          description: message || "Đã cập nhật thất bại chi nhánh",
+          description: response.message || "Đã cập nhật thất bại chi nhánh",
           type: "error",
-      });
+        });
       }
     } catch (error) {
       toast({
         title: "Cập nhật thất bại",
         description: message || "Đã cập nhật thất bại chi nhánh",
         type: "error",
-    });
+      });
       console.error("Error while submitting form: ", error);
     }
   };
   const handleDelete = (section, index) => {
     setImagesData((prevImagesData) => {
       if (!prevImagesData[section]) {
-        return prevImagesData; 
+        return prevImagesData;
       }
       const updatedSectionData = prevImagesData[section].filter((_, i) => i !== index);
       return {
@@ -155,8 +155,8 @@ toast({
       <AdminHeader showSearchForm={false} title="Chi tiết chi nhánh" />
       <Stack alignItems="start" spacing="8" direction="row" className="mt-5">
         <h1 className="text-base leading-6 font-normal text-gray-400">
-            Chi nhánh / {branchDetail.name || "Loading..."}
-      </h1>
+          Chi nhánh / {branchDetail.name || "Loading..."}
+        </h1>
       </Stack>
       <div className="flex flex-col gap-6 w-full mt-6">
         <div className="flex gap-5">
@@ -215,7 +215,7 @@ toast({
             inputId="input-image-upload-diagram"
             onImagesChange={onImagesChange}
             name="diagram_images"
-            initialImages={imagesData.diagram_images|| []}
+            initialImages={imagesData.diagram_images || []}
           />
         </div>
 
@@ -234,11 +234,11 @@ toast({
             inputId="input-image-upload-equipment"
             onImagesChange={onImagesChange}
             name="equipment_images"
-            initialImages={imagesData.equipment_images|| []}
+            initialImages={imagesData.equipment_images || []}
           />
         </div>
-        <AdminThemChiNhanhInputAndImg name='stages' title="Sảnh" height="290px"     inputId="input-image-upload-map" input={false} branchData={imagesData.stages} 
-        onDelete={handleDelete}
+        <AdminThemChiNhanhInputAndImg name='stages' title="Sảnh" height="290px" inputId="input-image-upload-map" input={false} branchData={imagesData.stages}
+          onDelete={handleDelete}
         />
       </div>
 
