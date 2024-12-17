@@ -31,10 +31,11 @@ import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import logo from "@/public/logo-dark.png";
-import { Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
 import { TbLogs } from "react-icons/tb";
+import { API_CONFIG } from "../_utils/api.config";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -44,7 +45,6 @@ function AdminSidebar() {
   useEffect(() => {
     if (isSidebarOpen) {
       const enterAnimation = async () => {
-
         await animate(
           scope.current,
           {
@@ -117,113 +117,153 @@ function AdminSidebarHeader() {
 
 function AdminSidebarNav() {
   const { currentBranch } = useSelector((state) => state.branch);
-  // const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
+  const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
 
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   const mainOptions = React.useMemo(() => {
-    return [
-      {
-        title: "Bảng điều khiển",
-        // path: isGeneralBranch
-        //   ? "/admin/bang-dieu-khien"
-        //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
-        path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
-        icon: dashboardIcon,
-        className: "",
-      },
-      {
-        title: "Chi nhánh",
-        path: `/admin/chi-nhanh/${currentBranch?.slug}`,
-        icon: branchIcon,
-        className: "",
-      },
-      {
-        title: "Thống kê",
-        path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
-        // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
-        icon: statisticIcon,
-        className: "",
-      },
-      {
-        title: "Khách hàng",
-        path: `/admin/khach-hang/`,
-        icon: customerIcon,
-        className: "",
-      },
-      {
-        title: "Yêu cầu",
-        path: `/admin/yeu-cau/${currentBranch?.slug}`,
-        icon: requestIcon,
-        className: "",
-        qty: 5,
-      },
-      {
-        title: "Quản lý tiệc",
-        path: `/admin/quan-ly-tiec/${currentBranch?.slug}`,
-        icon: eventIcon,
-        className: "",
-      },
-      {
-        title: "Danh mục", // path: isGeneralBranch
-        //   ? "/admin/bang-dieu-khien"
-        //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
-        path: `/admin/quan-ly-danh-muc/`,
-        icon: categoryIcon,
-        className: "",
-      },
-      {
-        title: "Thực đơn",
-        path: `/admin/thuc-don/`,
-        icon: menuIcon,
-        className: "",
-      },
-      {
-        title: "Quản lý thực phẩm",
-        path: `/admin/thuc-pham/`,
-        icon: foodIcon,
-        className: "",
-      },
-      {
-        title: "Phản hồi & đánh giá",
-        // path: isGeneralBranch
-        //   ? `/admin/phan-hoi-danh-gia`
-        //   : `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
-        path: `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
-        icon: feedbackIcon,
-        className: "",
-      },
-      {
-        title: "Danh mục bài viết",
-        path: `/admin/danh-muc-bai-viet/`,
-        icon: blogIcon,
-        className: "",
-      },
-      {
-        title: "Bài viết",
-        path: `/admin/bai-viet/`,
-        icon: blogIcon,
-        className: "",
-      },
-      {
-        title: "Sảnh",
-        path: `/admin/sanh/${currentBranch?.slug}`,
-        icon: StageIcon,
-        className: "",
-      },
-      {
-        title: "Trang Trí",
-        path: `/admin/trang-tri`,
-        icon: StageIcon,
-        className: "",
-      },
-      {
-        title: "Hạng thành viên",
-        path: `/admin/hang-thanh-vien`,
-        icon: StageIcon,
-        className: "",
-      },
-    ];
+    if (isGeneralBranch) {
+      return [
+        {
+          title: "Bảng điều khiển",
+          // path: isGeneralBranch
+          //   ? "/admin/bang-dieu-khien"
+          //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+          path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+          icon: dashboardIcon,
+          className: "",
+        },
+        {
+          title: "Chi nhánh",
+          path: `/admin/chi-nhanh/${currentBranch?.slug}`,
+          icon: branchIcon,
+          className: "",
+        },
+        {
+          title: "Thống kê",
+          path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+          // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+          icon: statisticIcon,
+          className: "",
+        },
+        {
+          title: "Khách hàng",
+          path: `/admin/khach-hang/`,
+          icon: customerIcon,
+          className: "",
+        },
+        {
+          title: "Yêu cầu",
+          path: `/admin/yeu-cau/${currentBranch?.slug}`,
+          icon: requestIcon,
+          className: "",
+          qty: 5,
+        },
+        {
+          title: "Quản lý tiệc",
+          path: `/admin/quan-ly-tiec/${currentBranch?.slug}`,
+          icon: eventIcon,
+          className: "",
+        },
+        {
+          title: "Danh mục", // path: isGeneralBranch
+          //   ? "/admin/bang-dieu-khien"
+          //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+          path: `/admin/quan-ly-danh-muc/`,
+          icon: categoryIcon,
+          className: "",
+        },
+        {
+          title: "Thực đơn",
+          path: `/admin/thuc-don/`,
+          icon: menuIcon,
+          className: "",
+        },
+        {
+          title: "Quản lý thực phẩm",
+          path: `/admin/thuc-pham/`,
+          icon: foodIcon,
+          className: "",
+        },
+        {
+          title: "Phản hồi & đánh giá",
+          // path: isGeneralBranch
+          //   ? `/admin/phan-hoi-danh-gia`
+          //   : `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
+          path: `/admin/phan-hoi-danh-gia/${currentBranch.slug}`,
+          icon: feedbackIcon,
+          className: "",
+        },
+        {
+          title: "Danh mục bài viết",
+          path: `/admin/danh-muc-bai-viet/`,
+          icon: blogIcon,
+          className: "",
+        },
+        {
+          title: "Bài viết",
+          path: `/admin/bai-viet/`,
+          icon: blogIcon,
+          className: "",
+        },
+        {
+          title: "Sảnh",
+          path: `/admin/sanh/${currentBranch?.slug}`,
+          icon: StageIcon,
+          className: "",
+        },
+        {
+          title: "Trang Trí",
+          path: `/admin/trang-tri`,
+          icon: StageIcon,
+          className: "",
+        },
+        {
+          title: "Hạng thành viên",
+          path: `/admin/hang-thanh-vien`,
+          icon: StageIcon,
+          className: "",
+        },
+      ];
+    } else {
+      return [
+        {
+          title: "Bảng điều khiển",
+          // path: isGeneralBranch
+          //   ? "/admin/bang-dieu-khien"
+          //   : `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+          path: `/admin/bang-dieu-khien/${currentBranch?.slug}`,
+          icon: dashboardIcon,
+          className: "",
+        },
+        {
+          title: "Thống kê",
+          path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+          // path: `/admin/thong-ke/doanh-thu-tong/${currentBranch?.slug}`,
+          icon: statisticIcon,
+          className: "",
+        },
+        {
+          title: "Yêu cầu",
+          path: `/admin/yeu-cau/${currentBranch?.slug}`,
+          icon: requestIcon,
+          className: "",
+          qty: 5,
+        },
+        {
+          title: "Quản lý tiệc",
+          path: `/admin/quan-ly-tiec/${currentBranch?.slug}`,
+          icon: eventIcon,
+          className: "",
+        },
+        {
+          title: "Sảnh",
+          path: `/admin/sanh/${currentBranch?.slug}`,
+          icon: StageIcon,
+          className: "",
+        },
+      ];
+    }
   }, [currentBranch]);
 
   const subOptions = React.useMemo(() => {
@@ -288,27 +328,30 @@ function AdminSidebarItem({ item, className }) {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
   return (
-    <Tooltip content={item.title} placement="right-end">
+    <Tooltip content={item?.title} placement="right-end">
       <li
         item={item}
         className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
           isActive ? "bg-whiteAlpha-100" : ""
-        } ${item.qty ? "bg-whiteAlpha-50 animate-pulse" : ""} ${className}`}
+        } ${item?.qty ? "bg-whiteAlpha-50 animate-pulse" : ""} ${className}`}
       >
         <Link
-          href={item.path}
+          href={item?.path}
           className={`flex items-center gap-2 p-2 flex-1 text-white !stroke-gray-600 rounded-md flex-center relative`}
         >
-          <Image src={item.icon} alt={item.title} className={`w-6 h-6`} />
+          {/* <Button> */}
+
+          <Image src={item?.icon} alt={item?.title} className={`w-6 h-6`} />
+          {/* </Button> */}
           {isSidebarOpen && (
             <span
               className={`text-white transition flex-1 min-w-max block text-base`}
             >
-              {item.title}
+              {item?.title}
             </span>
           )}
         </Link>
-        {item.qty && (
+        {item?.qty && (
           <span
             className={`shrink-0 w-5 h-5 bg-red-400 text-sm text-white rounded-full flex-center absolute -top-1 -right-1`}
           >
