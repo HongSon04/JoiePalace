@@ -112,6 +112,7 @@ const Page = ({ params }) => {
         throw new Error(response.error.message);
       }
 
+      reset();
       return response;
     },
     onSuccess: (response) => {
@@ -120,7 +121,11 @@ const Page = ({ params }) => {
         description: response?.message || "Sảnh mới đã được tạo",
         type: "success",
       });
-      reset();
+      setValue("name", "");
+      setValue("description", "");
+      setValue("capacity_min", "");
+      setValue("capacity_max", "");
+      setValue("price", "");
     },
     onError: (error) => {
       console.error("Error while submitting form: ", error);
@@ -142,8 +147,6 @@ const Page = ({ params }) => {
   });
 
   const onSubmit = (data) => {
-    console.log("errors -> ", errors);
-    console.log("data", data);
     mutate(data);
   };
 
