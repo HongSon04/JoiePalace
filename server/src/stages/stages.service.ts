@@ -168,15 +168,15 @@ export class StagesService {
         throw new NotFoundException('Không tìm thấy sảnh');
       }
 
-      const findStageByName = await this.prismaService.stages.findFirst({
-        where: { AND: [{ name }, { id: { not: Number(stage_id) } }] },
-      });
+      // const findStageByName = await this.prismaService.stages.findFirst({
+      //   where: { AND: [{ name }, { id: { not: Number(stage_id) } }] },
+      // });
 
-      if (findStageByName) {
-        throw new BadRequestException(
-          'Tên sảnh đã tồn tại, vui lòng chọn tên khác',
-        );
-      }
+      // if (findStageByName) {
+      //   throw new BadRequestException(
+      //     'Tên sảnh đã tồn tại, vui lòng chọn tên khác',
+      //   );
+      // }
 
       const updateData = {
         branch_id: Number(branch_id),

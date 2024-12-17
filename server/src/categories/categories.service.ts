@@ -443,13 +443,13 @@ export class CategoriesService {
         updateCategoryDto;
       const slug = MakeSlugger(name);
       // ? Check Name and Slug
-      const findCategoriesByName =
-        await this.prismaService.categories.findFirst({
-          where: { AND: [{ name }, { id: { not: Number(id) } }] },
-        });
-      if (findCategoriesByName) {
-        throw new BadRequestException({ message: 'Tên danh mục đã tồn tại' });
-      }
+      // const findCategoriesByName =
+      //   await this.prismaService.categories.findFirst({
+      //     where: { AND: [{ name }, { id: { not: Number(id) } }] },
+      //   });
+      // if (findCategoriesByName) {
+      //   throw new BadRequestException({ message: 'Tên danh mục đã tồn tại' });
+      // }
 
       // Upload images if available
       let uploadImages;

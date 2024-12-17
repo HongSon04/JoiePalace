@@ -806,16 +806,16 @@ export class BlogsService {
       }
 
       // Check slug existence
-      const existingSlug = await this.prismaService.blogs.findFirst({
-        where: { slug: slug },
-      });
+      // const existingSlug = await this.prismaService.blogs.findFirst({
+      //   where: { slug: slug },
+      // });
 
-      if (existingSlug && Number(existingSlug.id) !== Number(id)) {
-        throw new HttpException(
-          'Tên bài viết đã tồn tại',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      // if (existingSlug && Number(existingSlug.id) !== Number(id)) {
+      //   throw new HttpException(
+      //     'Tên bài viết đã tồn tại',
+      //     HttpStatus.BAD_REQUEST,
+      //   );
+      // }
 
       // Initialize tagsSet
       let tagsSet = [];

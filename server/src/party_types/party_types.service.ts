@@ -351,13 +351,13 @@ export class PartyTypesService {
       }
 
       // Kiểm tra tên loại tiệc
-      const existingPartyType = await this.prismaService.party_types.findFirst({
-        where: { AND: [{ name }, { id: { not: Number(id) } }] },
-      });
+      // const existingPartyType = await this.prismaService.party_types.findFirst({
+      //   where: { AND: [{ name }, { id: { not: Number(id) } }] },
+      // });
 
-      if (existingPartyType) {
-        throw new BadRequestException('Tên loại tiệc đã tồn tại');
-      }
+      // if (existingPartyType) {
+      //   throw new BadRequestException('Tên loại tiệc đã tồn tại');
+      // }
 
       // ? Kiểm tra sản phẩm
       let productsTagSet = [];

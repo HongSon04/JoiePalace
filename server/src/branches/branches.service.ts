@@ -460,13 +460,20 @@ export class BranchesService {
       const slug = name ? MakeSlugger(name) : undefined;
 
       // Kiểm tra tên địa điểm đã tồn tại và không phải id hiện tại
-      const checkNamebranch = await this.prismaService.branches.findFirst({
-        where: { AND: [{ name }, { id: { not: Number(id) } }] },
-      });
+      // const checkNamebranch = await this.prismaService.branches.findFirst({
+      //   where: {
+      //     name: {
+      //       equals: 'Tên bạn muốn kiểm tra',
+      //     },
+      //     id: {
+      //       not: Number(id),
+      //     },
+      //   },
+      // });
 
-      if (checkNamebranch) {
-        throw new BadRequestException('Tên địa điểm đã tồn tại');
-      }
+      // if (checkNamebranch) {
+      //   throw new BadRequestException('Tên địa điểm đã tồn tại');
+      // }
 
       // ? Find Branches By Id
       const findBranchById = await this.prismaService.branches.findFirst({

@@ -790,20 +790,20 @@ export class ProductsService {
       }
 
       // Check product existence by name and not the same id
-      const findProductByName = await this.prismaService.products.findFirst({
-        where: {
-          name: name,
-          AND: {
-            id: {
-              not: Number(id),
-            },
-          },
-        },
-      });
+      // const findProductByName = await this.prismaService.products.findFirst({
+      //   where: {
+      //     name: name,
+      //     AND: {
+      //       id: {
+      //         not: Number(id),
+      //       },
+      //     },
+      //   },
+      // });
 
-      if (findProductByName) {
-        throw new BadRequestException('Tên Sản phẩm đã tồn tại');
-      }
+      // if (findProductByName) {
+      //   throw new BadRequestException('Tên Sản phẩm đã tồn tại');
+      // }
 
       // Initialize tagsSet
       let tagsSet = [];

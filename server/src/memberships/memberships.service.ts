@@ -263,15 +263,15 @@ export class MembershipsService {
 
       const slug = MakeSlugger(name);
 
-      const findMembershipName = await this.prismaService.memberships.findFirst(
-        {
-          where: { AND: [{ name }, { id: { not: Number(id) } }] },
-        },
-      );
+      // const findMembershipName = await this.prismaService.memberships.findFirst(
+      //   {
+      //     where: { AND: [{ name }, { id: { not: Number(id) } }] },
+      //   },
+      // );
 
-      if (findMembershipName) {
-        throw new BadRequestException('Tên hạng thành viên đã tồn tại');
-      }
+      // if (findMembershipName) {
+      //   throw new BadRequestException('Tên hạng thành viên đã tồn tại');
+      // }
 
       // ? Kiểm tra xem gifts có tồn tại không
       let giftsTagset = [];

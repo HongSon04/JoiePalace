@@ -555,13 +555,13 @@ export class MenusService {
     const { name, description, products, price, is_show } = updateMenuDto;
     try {
       const slug = MakeSlugger(name);
-      const findMenuByname = await this.prismaService.menus.findFirst({
-        where: { AND: [{ name }, { id: { not: Number(id) } }] },
-      });
+      // const findMenuByname = await this.prismaService.menus.findFirst({
+      //   where: { AND: [{ name }, { id: { not: Number(id) } }] },
+      // });
 
-      if (findMenuByname) {
-        throw new BadRequestException('Tên menu đã tồn tại');
-      }
+      // if (findMenuByname) {
+      //   throw new BadRequestException('Tên menu đã tồn tại');
+      // }
 
       const findMenuById = await this.prismaService.menus.findUnique({
         where: { id: Number(id) },

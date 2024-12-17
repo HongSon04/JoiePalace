@@ -304,13 +304,13 @@ export class PackagesService {
       }
 
       // Validate unique name and slug
-      const slug = MakeSlugger(name);
-      const existingPackage = await this.prismaService.packages.findFirst({
-        where: { OR: [{ name }, { slug }], NOT: { id: Number(id) } },
-      });
-      if (existingPackage) {
-        throw new BadRequestException('Tên gói đã tồn tại');
-      }
+      // const slug = MakeSlugger(name);
+      // const existingPackage = await this.prismaService.packages.findFirst({
+      //   where: { OR: [{ name }, { slug }], NOT: { id: Number(id) } },
+      // });
+      // if (existingPackage) {
+      //   throw new BadRequestException('Tên gói đã tồn tại');
+      // }
 
       // Calculate total price from all components
       const totalPrice = await this.calculateTotalPrice({

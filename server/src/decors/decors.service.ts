@@ -473,13 +473,13 @@ export class DecorsService {
         throw new NotFoundException('Không tìm thấy trang trí');
       }
 
-      const findDecorByName = await this.prismaService.decors.findFirst({
-        where: { AND: [{ name }, { id: { not: Number(id) } }] },
-      });
+      // const findDecorByName = await this.prismaService.decors.findFirst({
+      //   where: { AND: [{ name }, { id: { not: Number(id) } }] },
+      // });
 
-      if (findDecorByName) {
-        throw new BadRequestException('Tên trang trí đã tồn tại');
-      }
+      // if (findDecorByName) {
+      //   throw new BadRequestException('Tên trang trí đã tồn tại');
+      // }
 
       // ? Kiểm tra sản phẩm
       let productsTagSet = [];
