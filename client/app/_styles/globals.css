@@ -765,4 +765,10 @@ select {
   border-radius: 50%;
 }
 
+input[type="date" i]::-webkit-calendar-picker-indicator {
+  background-color: white !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+}
+
 /* tr[data-] */
