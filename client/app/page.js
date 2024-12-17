@@ -224,7 +224,7 @@ function Home() {
               LÒNG HIẾU KHÁCH <br /> VÀ TINH THẦN DUY MỸ
             </h1>
             <span className="text-base font-normal leading-6 text-center w-[80%] 2md:w-[50%]">
-              Được xây dựng và phát triển bởi IN Hospitality vào năm 2007, White
+              Được xây dựng và phát triển bởi IN Hospitality vào năm 2024, Joice
               Palace là thương hiệu đầu tiên tại Việt Nam mở ra mô hình trung
               tâm hội nghị và sự kiện. Với sự đầu tư bài bản và chuyên biệt cho
               các hội nghị và sự kiện cao cấp, JOIE PALACE luôn được chọn là

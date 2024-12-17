@@ -28,7 +28,6 @@ import TableBookingsPending from "./TableBookingsPending";
 import TableStageStatus from "./TableStageStatus";
 import { Skeleton } from "@nextui-org/react";
 
-
 const Page = ({ params }) => {
   const { slug } = params;
   const [allInfo, setallInfo] = useState(null);
@@ -50,7 +49,7 @@ const Page = ({ params }) => {
   const [end_Date, setEndDate] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
   const [totalBookingMonth, setTotalBookingMonth] = useState("month");
-  const [itemPerPage, setItemsPerPage ] = useState(null);
+  const [itemPerPage, setItemsPerPage] = useState(null);
   const formatDate = (dateInput) => {
     const date = new Date(dateInput);
     const day = date.getDate().toString().padStart(2, "0");
@@ -103,12 +102,8 @@ const Page = ({ params }) => {
         if (currentBranch.slug === "ho-chi-minh") {
           idBranch = 0;
         }
-        const {
-          startDate,
-          endDate,
-          startOfWeek,
-          endOfWeek,
-        } = getCurrentMonthAndWeekDates();
+        const { startDate, endDate, startOfWeek, endOfWeek } =
+          getCurrentMonthAndWeekDates();
         // console.log(startDate);
         // console.log(endDate);
         const totalBookingWeek = await makeAuthorizedRequest(
@@ -116,7 +111,7 @@ const Page = ({ params }) => {
             branch_id: idBranch,
             status: "processing",
             startOrganizationDate: startOfWeek,
-            endOrganizationDate: endOfWeek
+            endOrganizationDate: endOfWeek,
           }),
           "GET",
           null
@@ -126,7 +121,7 @@ const Page = ({ params }) => {
             branch_id: idBranch,
             status: "success",
             startOrganizationDate: startDate,
-            endOrganizationDate: endDate
+            endOrganizationDate: endDate,
           }),
           "GET",
           null
@@ -193,7 +188,7 @@ const Page = ({ params }) => {
     };
 
     fetchAminData();
-  }, [start_Date, end_Date, currentPage]);
+  }, [start_Date, end_Date, currentPage, dataSlug]);
 
   const createChartData = (data, label) => {
     let chartData = {
@@ -239,7 +234,6 @@ const Page = ({ params }) => {
   const yearlyRevenues = Object.values(
     dataBranchChart.total_revune_by_year || []
   );
- 
 
   const dataBranch = {
     labels: ["Tuần", "Tháng", "Năm"],
@@ -288,82 +282,10 @@ const Page = ({ params }) => {
         title="Chung"
         showBackButton={false}
         showHomeButton={false}
-        showSearchForm = {false}
+        showSearchForm={false}
       ></AdminHeader>
-        {slug === "ho-chi-minh" ? (
-          allInfo ? (
-            <>
-              <div className="px-4 w-full flex gap-[16px] justify-between text-white">
-                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-                  <FiPhone className="text-4xl" />
-                  <div className="flex justify-between items-center">
-                    <p className="text-white text-base font-normal">
-                      Yêu cầu cần được xử lý
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-4xl font-bold">
-                      {allInfo?.count_booking_status?.pending}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-                  <IoCalendarOutline className="text-4xl" />
-                  <div className="flex justify-between items-center">
-                    <p className="text-white text-base font-normal">
-                      Tiệc sắp diễn ra trong tuần
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-end gap-1">
-                      <p className="text-4xl font-bold">{bookingsOffWeek}</p>
-                      <p>tiệc</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-                  <RiMoneyDollarCircleLine className="text-4xl" />
-                  <div className="flex justify-between items-center">
-                    <p className="text-white text-base font-normal">
-                      Doanh thu tổng tháng {month}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-4xl font-bold">
-                      {formatPrice(allInfo.total_revune_by_month || 0)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-                  <RiMoneyDollarCircleLine className="text-4xl" />
-                  <div className="flex justify-between items-center">
-                    <p className="text-white text-base font-normal">
-                      Doanh thu tổng năm
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-4xl font-bold">
-                      {formatPrice(allInfo.total_revune_by_year || 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="px-4 w-full flex gap-[16px] justify-between text-white">
-              {
-                [0, 1, 2, 3].map(n => {
-                  return (
-                    <Skeleton className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200" key={n}></Skeleton>
-                  )
-                })
-              }
-            </div>
-          )
-        ) : dataTotalBranch ? (
+      {slug === "ho-chi-minh" ? (
+        allInfo ? (
           <>
             <div className="px-4 w-full flex gap-[16px] justify-between text-white">
               <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
@@ -374,7 +296,9 @@ const Page = ({ params }) => {
                   </p>
                 </div>
                 <div className="flex justify-between items-center">
-                  <p className="text-4xl font-bold">{totalInfoBranch.pending}</p>
+                  <p className="text-4xl font-bold">
+                    {allInfo?.count_booking_status?.pending}
+                  </p>
                 </div>
               </div>
 
@@ -387,7 +311,7 @@ const Page = ({ params }) => {
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="flex items-end gap-1">
-                    <p className="text-4xl font-bold">{bookingsOffWeekBranch}</p>
+                    <p className="text-4xl font-bold">{bookingsOffWeek}</p>
                     <p>tiệc</p>
                   </div>
                 </div>
@@ -402,51 +326,122 @@ const Page = ({ params }) => {
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="text-4xl font-bold">
-                    {formatPrice(
-                      Number(dataTotalBranch.total_revune_by_month) || 0
-                    )}
+                    {formatPrice(allInfo.total_revune_by_month || 0)}
                   </p>
                 </div>
               </div>
 
               <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
-                <FaRegCalendarCheck className="text-4xl" />
+                <RiMoneyDollarCircleLine className="text-4xl" />
                 <div className="flex justify-between items-center">
                   <p className="text-white text-base font-normal">
-                    Tiệc đã hoàn thành trong tháng
+                    Doanh thu tổng năm
                   </p>
                 </div>
                 <div className="flex justify-between items-center">
-                  <div className="flex items-end gap-1">
-                    <p className="text-4xl font-bold">
-                      {bookingsOffMonth}
-                    </p>
-                    <p>tiệc</p>
-                  </div>
+                  <p className="text-4xl font-bold">
+                    {formatPrice(allInfo.total_revune_by_year || 0)}
+                  </p>
                 </div>
               </div>
             </div>
           </>
         ) : (
           <div className="px-4 w-full flex gap-[16px] justify-between text-white">
-            {
-              [0, 1, 2, 3].map(n => {
-                return (
-                  <Skeleton className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200" key={n}></Skeleton>
-                )
-              })
-            }
+            {[0, 1, 2, 3].map((n) => {
+              return (
+                <Skeleton
+                  className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200"
+                  key={n}
+                ></Skeleton>
+              );
+            })}
           </div>
-        )}
-      
+        )
+      ) : dataTotalBranch ? (
+        <>
+          <div className="px-4 w-full flex gap-[16px] justify-between text-white">
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+              <FiPhone className="text-4xl" />
+              <div className="flex justify-between items-center">
+                <p className="text-white text-base font-normal">
+                  Yêu cầu cần được xử lý
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-4xl font-bold">{totalInfoBranch.pending}</p>
+              </div>
+            </div>
+
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+              <IoCalendarOutline className="text-4xl" />
+              <div className="flex justify-between items-center">
+                <p className="text-white text-base font-normal">
+                  Tiệc sắp diễn ra trong tuần
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-end gap-1">
+                  <p className="text-4xl font-bold">{bookingsOffWeekBranch}</p>
+                  <p>tiệc</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+              <RiMoneyDollarCircleLine className="text-4xl" />
+              <div className="flex justify-between items-center">
+                <p className="text-white text-base font-normal">
+                  Doanh thu tổng tháng {month}
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-4xl font-bold">
+                  {formatPrice(
+                    Number(dataTotalBranch.total_revune_by_month) || 0
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="box-item p-3 rounded-xl bg-whiteAlpha-100 inline-flex flex-col gap-6 w-[251px] flex-1">
+              <FaRegCalendarCheck className="text-4xl" />
+              <div className="flex justify-between items-center">
+                <p className="text-white text-base font-normal">
+                  Tiệc đã hoàn thành trong tháng
+                </p>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-end gap-1">
+                  <p className="text-4xl font-bold">{bookingsOffMonth}</p>
+                  <p>tiệc</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="px-4 w-full flex gap-[16px] justify-between text-white">
+          {[0, 1, 2, 3].map((n) => {
+            return (
+              <Skeleton
+                className="w-[251px] flex-1 h-[172px] rounded-xl bg-whiteAlpha-200"
+                key={n}
+              ></Skeleton>
+            );
+          })}
+        </div>
+      )}
 
       <div className="w-full  flex gap-4   p-4">
         <div className="p-4 bg-whiteAlpha-100  rounded-xl">
           <div className="flex justify-between gap-[10px] items-center mb-[20px]">
-            <p className="text-base font-semibold ">Lịch tổ chức tháng {month}</p>
+            <p className="text-base font-semibold ">
+              Lịch tổ chức tháng {month}
+            </p>
           </div>
           <div className="flex justify-center ">
-            <CustomCalendar/>
+            <CustomCalendar />
           </div>
         </div>
         <div className=" p-4 rounded-xl w-full bg-whiteAlpha-100">
@@ -484,7 +479,9 @@ const Page = ({ params }) => {
                       <td>{item.branches ? item.branches.name : "--"}</td>
                       <td>{item.phone || "--"}</td>
                       <td>
-                        <Link href={`/admin/yeu-cau/${item.branches?.slug}/${item.id}`}>
+                        <Link
+                          href={`/admin/yeu-cau/${item.branches?.slug}/${item.id}`}
+                        >
                           <p className="text-teal-400 font-bold text-xs">
                             Xem thêm
                           </p>

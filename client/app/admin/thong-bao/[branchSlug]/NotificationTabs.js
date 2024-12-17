@@ -50,7 +50,7 @@ const categories = [
   },
 ];
 
-function NotificationTabs({ branchSlug }) {
+function NotificationTabs() {
   const [user, setUser] = React.useState({});
   const [selectedCategory, setSelectedCategory] = React.useState("all");
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
@@ -94,6 +94,7 @@ function NotificationTabs({ branchSlug }) {
         throw new Error(response.error.message);
       }
     },
+    refetchOnWindowFocus: false,
   });
 
   const mutation = useMutation({
@@ -119,10 +120,10 @@ function NotificationTabs({ branchSlug }) {
     );
   }, [user.id, itemsPerPage, page]);
 
-  const filteredFeedbacks = notifications?.data?.filter((item) =>
+  const filteredNotifications = notifications?.data?.filter((item) =>
     selectedCategory === "all" ? item : item.type === selectedCategory
   );
-  const notification_ids = filteredFeedbacks?.map((item) => item.id);
+  const notification_ids = filteredNotifications?.map((item) => item.id);
 
   React.useEffect(() => {
     if (typeof window !== undefined) {
@@ -198,33 +199,38 @@ function NotificationTabs({ branchSlug }) {
             {isLoading && <NotificationsSkeleton />}
             {isError && <Error message="Có lỗi xảy ra" />}
 
-            {!isLoading && filteredFeedbacks?.length > 0 ? (
-              filteredFeedbacks.map((n, i) => (
-                <div
-                  key={i}
-                  className={`p-4 rounded-md flex items-center justify-between text-white ${
-                    n?.is_read ? "bg-transparent" : "bg-whiteAlpha-100"
-                  }`}
-                  onClick={() =>
-                    mutation.mutate({
-                      notification_ids: [n.id],
-                    })
-                  }
-                >
-                  <div>
-                    <p className="text-sm">{n?.title}</p>
-                    <p className="text-base font-semibold">{n?.content}</p>
+            {isLoading && <NotificationsSkeleton />}
+            {isError && <Error message="Có lỗi xảy ra" />}
+
+            {!isLoading &&
+              (filteredNotifications?.length > 0 ? (
+                filteredNotifications.map((n) => (
+                  <div
+                    key={n.title}
+                    className={`p-4 rounded-md flex items-center justify-between text-white ${
+                      n.is_read ? "bg-transparent" : "bg-whiteAlpha-100"
+                    }`}
+                    onClick={() => {
+                      if (n.is_read) return;
+                      mutation.mutate({
+                        notification_ids: [n.id],
+                      });
+                    }}
+                  >
+                    <div>
+                      <p className="text-sm">{n.title}</p>
+                      <p className="text-base font-semibold">{n.content}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm">{formatDateTime(n.created_at)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm">{formatDateTime(n?.created_at)}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-lg text-gray-400">
-                Không có thông báo nào
-              </p>
-            )}
+                ))
+              ) : (
+                <p className="text-center text-lg text-gray-400">
+                  Không có thông báo nào
+                </p>
+              ))}
           </div>
           {notifications && notifications?.paginationInfo && (
             <CustomPagination

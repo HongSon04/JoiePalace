@@ -96,4 +96,5 @@ export const {
   error,
   getCurrentBranch,
 } = branchSlice.actions;
+
 export default branchSlice;

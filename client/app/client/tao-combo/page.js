@@ -542,6 +542,7 @@ function Page() {
             title: "Tạo thất bại",
             description: response?.error?.message || "Vui lòng thử lại sau",
             status: "error",
+            position: "top-right",
           });
         }
       }

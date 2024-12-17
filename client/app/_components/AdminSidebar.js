@@ -31,11 +31,10 @@ import foodIcon from "@/public/admin-sidebar/thuc-pham.svg";
 import eventIcon from "@/public/admin-sidebar/tiec-icon.svg";
 import requestIcon from "@/public/admin-sidebar/yeu-cau.svg";
 import logo from "@/public/logo-dark.png";
-import { Button, Tooltip } from "@nextui-org/react";
+import { Tooltip } from "@nextui-org/react";
 import { useSelector } from "react-redux";
-import AdminUser from "./AdminUser";
-import { TbLogs } from "react-icons/tb";
 import { API_CONFIG } from "../_utils/api.config";
+import AdminUser from "./AdminUser";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -339,10 +338,7 @@ function AdminSidebarItem({ item, className }) {
           href={item?.path}
           className={`flex items-center gap-2 p-2 flex-1 text-white !stroke-gray-600 rounded-md flex-center relative`}
         >
-          {/* <Button> */}
-
           <Image src={item?.icon} alt={item?.title} className={`w-6 h-6`} />
-          {/* </Button> */}
           {isSidebarOpen && (
             <span
               className={`text-white transition flex-1 min-w-max block text-base`}

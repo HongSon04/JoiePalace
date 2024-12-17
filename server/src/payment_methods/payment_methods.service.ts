@@ -234,17 +234,18 @@ export class PaymentMethodsService {
           },
           data: {
             is_deposit: true,
+            status: 'processing',
           },
         });
-        this.notificationDepositSuccess(
+        await this.notificationDepositSuccess(
           findDeposit.transactionID,
           Number(updateBooking.branch_id),
         );
         // ? Redirect to success page
-        this.successPayment(res);
+        return this.successPayment(res);
       } else {
         // ? Redirect to fail page
-        this.failPayment(res);
+        return this.failPayment(res);
       }
     } catch (error) {
       console.log('Lỗi từ payment_method.service.ts -> callbackVNPay', error);
@@ -370,14 +371,17 @@ export class PaymentMethodsService {
           },
           data: {
             is_deposit: true,
+            status: 'processing',
           },
         });
-        this.notificationDepositSuccess(
+        await this.notificationDepositSuccess(
           updateDeposit.transactionID,
           Number(updateBooking.branch_id),
         );
+
+        return this.successPayment(res);
       } else {
-        this.failPayment(res);
+        return this.failPayment(res);
       }
     } catch (error) {
       console.log('Lỗi từ payment_method.service.ts -> callbackVNPay', error);
@@ -474,15 +478,16 @@ export class PaymentMethodsService {
         },
         data: {
           is_deposit: true,
+          status: 'processing',
         },
       });
-      this.notificationDepositSuccess(
+      await this.notificationDepositSuccess(
         updateDeposit.transactionID,
         Number(updateBooking.branch_id),
       );
-      this.successPayment(res);
+      return this.successPayment(res);
     } else {
-      this.failPayment(res);
+      return this.failPayment(res);
     }
   }
 
@@ -513,7 +518,7 @@ export class PaymentMethodsService {
       };
 
       const items = [{}];
-      const transID = Math.floor(Math.random() * 99999999999);
+      const transID = Math.ceil(Math.random() * 99999);
       const order = {
         app_id: config.app_id,
         app_trans_id: `${dayjs(Date.now()).format('YYMMDD')}-${findDeposit.transactionID}-${transID}`,
@@ -617,14 +622,6 @@ export class PaymentMethodsService {
               deposit_id: Number(query.deposit_id),
             },
           });
-        await this.prismaService.bookings.update({
-          where: {
-            id: Number(findBookingDetail.booking_id),
-          },
-          data: {
-            is_deposit: true,
-          },
-        });
 
         const updateBooking = await this.prismaService.bookings.update({
           where: {
@@ -632,13 +629,15 @@ export class PaymentMethodsService {
           },
           data: {
             is_deposit: true,
+            status: 'processing',
           },
         });
-        this.notificationDepositSuccess(
+        await this.notificationDepositSuccess(
           updateDeposit.transactionID,
           Number(updateBooking.branch_id),
         );
-        this.successPayment(res);
+
+        return this.successPayment(res);
       }
     } catch (ex) {
       result.return_code = 0;
@@ -651,14 +650,15 @@ export class PaymentMethodsService {
   // *********************************************************
   // ! Payment Success
   private async successPayment(res) {
-    res.redirect(
+    res.location(
       `${this.configService.get<string>('FRONTEND_URL')}client/xac-nhan-thanh-toan/thanh-toan-thanh-cong`,
     );
+    res.sendStatus(302);
   }
 
   // ! Payment Fail
   private async failPayment(res) {
-    res.redirect(
+    return res.redirect(
       `${this.configService.get<string>('FRONTEND_URL')}client/xac-nhan-thanh-toan/thanh-toan-that-bai`,
     );
   }

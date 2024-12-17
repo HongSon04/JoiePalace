@@ -6,15 +6,9 @@ import FormInput from "@/app/_components/FormInput";
 import SearchForm from "@/app/_components/SearchForm";
 import DishesSectionSkeleton from "@/app/_components/skeletons/DishesSectionSkeleton";
 import Uploader from "@/app/_components/Uploader";
-import useApiServices from "@/app/_hooks/useApiServices";
 import useCustomToast from "@/app/_hooks/useCustomToast";
-import {
-  addDish,
-  deleteDish,
-  fetchCategoryDishes,
-  setSelectedDish,
-  updateDish,
-} from "@/app/_lib/features/dishes/dishesSlice";
+import { setSelectedDish } from "@/app/_lib/features/dishes/dishesSlice";
+import { API_CONFIG, makeAuthorizedRequest } from "@/app/_utils/api.config";
 import { CONFIG } from "@/app/_utils/config";
 import { PlusIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,26 +19,17 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@nextui-org/modal";
-import { Image } from "@nextui-org/react";
-import NextImage from "next/image";
-import { Button, Switch } from "@nextui-org/react";
+import { Button, Image, Spinner, Switch } from "@nextui-org/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Col, Row } from "antd";
+import NextImage from "next/image";
 import React, { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { IoSaveOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 import Loading from "../loading";
-
-// Define a schema for individual file validation
-const fileSchema = z
-  .instanceof(File)
-  .refine((file) => file.size <= 5 * 1024 * 1024, {
-    message: "Kích thước ảnh không được vượt quá 5MB",
-  })
-  .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
-    message: "Chỉ chấp nhận ảnh định dạng JPEG hoặc PNG",
-  });
+import { MdRestore } from "react-icons/md";
 
 const schema = z.object({
   name: z
@@ -82,9 +67,6 @@ const schema = z.object({
       required_error: "Mô tả chi tiết không được để trống",
     })
     .min(1, { message: "Mô tả chi tiết không được để trống" }),
-  images: z.array(fileSchema).refine((files) => files.length > 0, {
-    message: "Vui lòng chọn ít nhất một ảnh",
-  }),
 });
 
 function DishesSection({ dishCategory, categories }) {
@@ -92,25 +74,59 @@ function DishesSection({ dishCategory, categories }) {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [isOpenDetailModal, setIsOpenDetailModal] = React.useState(false);
   const [imgSrc, setImgSrc] = React.useState(CONFIG.DISH_IMAGE_PLACEHOLDER);
-  const {
-    selectedDish,
-    pagination,
-    categoryDishes,
-    isLoading,
-    isError,
-    isAddingDish,
-    isUpdatingDish,
-  } = useSelector((store) => store.dishes);
+  const { selectedDish } = useSelector((store) => store.dishes);
   const toast = useCustomToast();
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
   const [sortByPrice, setSortByPrice] = React.useState("DESC");
   const [searchQuery, setSearchQuery] = React.useState("");
   const [files, setFiles] = React.useState([]);
   const [resetAfterSubmit, setResetAfterSubmit] = React.useState(false);
+  const [dishesStatus, setDishesStatus] = React.useState("visible"); // ["visible", "deleted"]
+
+  const {
+    data: categoryDishes,
+    isLoading: isFetchingCategoryDishes,
+    isError: isFetchingCategoryDishesError,
+  } = useQuery({
+    queryKey: [
+      "categoryDishes",
+      dishCategory.id,
+      currentPage,
+      searchQuery,
+      itemsPerPage,
+      sortByPrice,
+      dishesStatus,
+    ],
+    queryFn: async () => {
+      const abortController = new AbortController();
+      const signal = abortController.signal;
+
+      const params = {
+        page: currentPage,
+        itemsPerPage,
+        search: searchQuery,
+        priceSort: sortByPrice,
+      };
+
+      const api =
+        dishesStatus === "visible"
+          ? API_CONFIG.PRODUCTS.GET_BY_CATEGORY(dishCategory.id, params)
+          : API_CONFIG.PRODUCTS.GET_ALL_DELETED({
+              ...params,
+              category_id: dishCategory.id,
+            });
+
+      const response = await makeAuthorizedRequest(api, "GET", null, {
+        signal,
+      });
+
+      return response;
+    },
+    enabled: !!dishCategory.id,
+  });
 
   const handleFileChange = (newFiles) => {
     setFiles(newFiles);
-    console.log("Files changed -> ", newFiles);
   };
 
   const handleSearch = async (e) => {
@@ -162,6 +178,261 @@ function DishesSection({ dishCategory, categories }) {
     setIsOpenDetailModal(false);
   }, []);
 
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: addDish,
+    isPending: isAddingDish,
+    isError: isAddingDishError,
+  } = useMutation({
+    mutationKey: ["addDish"],
+    mutationFn: async (formData) => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.CREATE,
+        "POST",
+        formData
+      );
+
+      if (response.success) {
+        toast({
+          title: "Thêm thành công",
+          description: "Món ăn đã được thêm vào danh sách",
+          type: "success",
+        });
+      } else {
+        if (response.error.statusCode === 401) {
+          toast({
+            title: "Lỗi thêm món ăn",
+            description: "Phiên đăng nhập đã hết hạn",
+            type: "error",
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Lỗi thêm món ăn",
+            description:
+              response.error.message || "Có lỗi xảy ra khi thêm món ăn",
+            type: "error",
+            isClosable: true,
+          });
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["categoryDishes", dishCategory.id]);
+      if (resetAfterSubmit) {
+        reset();
+        setFiles([]);
+        setIsOpenDetailModal(false);
+      }
+    },
+  });
+
+  const {
+    mutate: updateDish,
+    isPending: isUpdatingDish,
+    isError: isUpdatingDishError,
+  } = useMutation({
+    mutationKey: ["updateDish"],
+    mutationFn: async (id, formData) => {
+      console.log("formData -> ", formData);
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.UPDATE(id),
+        "PATCH",
+        formData
+      );
+
+      if (response.success) {
+        toast({
+          title: "Cập nhật thành công",
+          description: "Món ăn đã được cập nhật",
+          type: "success",
+        });
+      } else {
+        if (response.error.statusCode === 401) {
+          toast({
+            title: "Lỗi cập nhật món ăn",
+            description: "Phiên đăng nhập đã hết hạn",
+            type: "error",
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Lỗi cập nhật món ăn",
+            description:
+              response.error.message || "Có lỗi xảy ra khi cập nhật món ăn",
+            type: "error",
+            isClosable: true,
+          });
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["categoryDishes", dishCategory.id]);
+      if (resetAfterSubmit) {
+        reset();
+        setFiles([]);
+        setIsOpenDetailModal(false);
+      }
+    },
+  });
+
+  const {
+    mutate: deleteDish,
+    isPending: isDeletingDish,
+    isError: isDeletingDishError,
+  } = useMutation({
+    mutationKey: ["deletingDish"],
+    mutationFn: async (id) => {
+      if (typeof window === undefined) return;
+
+      const confirm = window.confirm("Bạn có chắc chắn muốn xóa món ăn này?");
+
+      if (!confirm) return;
+
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.DELETE(id),
+        "DELETE"
+      );
+
+      if (response.success) {
+        toast({
+          title: "Xóa thành công",
+          description: "Món ăn đã được xóa",
+          type: "success",
+        });
+      } else {
+        if (response.error.statusCode === 401) {
+          toast({
+            title: "Lỗi xóa món ăn",
+            description: "Phiên đăng nhập đã hết hạn",
+            type: "error",
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Lỗi xóa món ăn",
+            description:
+              response.error.message || "Có lỗi xảy ra khi xóa món ăn",
+            type: "error",
+            isClosable: true,
+          });
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["categoryDishes", dishCategory.id]);
+      if (resetAfterSubmit) {
+        reset();
+        setFiles([]);
+      }
+      setIsOpenDetailModal(false);
+    },
+  });
+
+  const {
+    mutate: restoreDish,
+    isPending: isRestoringDish,
+    isError: isRestoringDishError,
+  } = useMutation({
+    mutationKey: ["restoringDish"],
+    mutationFn: async (id) => {
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.RESTORE(id),
+        "POST"
+      );
+
+      if (response.success) {
+        toast({
+          title: "Khôi phục thành công",
+          description: "Món ăn đã được khôi phục",
+          type: "success",
+        });
+      } else {
+        if (response.error.statusCode === 401) {
+          toast({
+            title: "Lỗi!",
+            description: "Phiên đăng nhập đã hết hạn",
+            type: "error",
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Lỗi!",
+            description:
+              response.error.message || "Có lỗi xảy ra khi khôi phục món ăn",
+            type: "error",
+            isClosable: true,
+          });
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["categoryDishes", dishCategory.id]);
+      if (resetAfterSubmit) {
+        reset();
+        setFiles([]);
+      }
+      setIsOpenDetailModal(false);
+    },
+  });
+
+  const {
+    mutate: destroyDish,
+    isPending: isDestroyingDish,
+    isError: isDestroyingDishError,
+  } = useMutation({
+    mutationKey: ["destroyingDish"],
+    mutationFn: async (id) => {
+      if (typeof window === undefined) return;
+
+      const confirm = window.confirm(
+        "Bạn có chắc chắn muốn xóa vĩnh viễn món ăn này?"
+      );
+
+      if (!confirm) return;
+
+      const response = await makeAuthorizedRequest(
+        API_CONFIG.PRODUCTS.DESTROY(id),
+        "DELETE"
+      );
+
+      if (response.success) {
+        toast({
+          title: "Xóa vĩnh viễn thành công",
+          description: "Món ăn đã được xóa vĩnh viễn",
+          type: "success",
+        });
+      } else {
+        if (response.error.statusCode === 401) {
+          toast({
+            title: "Lỗi!",
+            description: "Phiên đăng nhập đã hết hạn",
+            type: "error",
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Lỗi!",
+            description:
+              response.error.message ||
+              "Có lỗi xảy ra khi xóa vĩnh viễn món ăn",
+            type: "error",
+            isClosable: true,
+          });
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["categoryDishes", dishCategory.id]);
+      if (resetAfterSubmit) {
+        reset();
+        setFiles([]);
+      }
+      setIsOpenDetailModal(false);
+    },
+  });
+
   const onSubmit = React.useCallback(
     async (data) => {
       const formData = new FormData();
@@ -172,46 +443,16 @@ function DishesSection({ dishCategory, categories }) {
       formData.append("description", data.description);
       files.forEach((file) => {
         formData.append("images", file);
-        console.log("File appended -> ", file);
       });
 
-      console.log("Files that should be appended to form data -> ", files);
-      console.log("form data that's gonna be submit -> ", formData);
-
-      // Log FormData content
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
+      console.log("data -> ", data);
 
       try {
         if (selectedDish) {
-          const result = await dispatch(
-            updateDish({ dishId: selectedDish.id, dishData: formData })
-          ).unwrap();
-
-          console.log("Result from updating dish -> ", result);
-
-          if (result)
-            toast({
-              title: "Cập nhật thành công",
-              description: "Món ăn đã được cập nhật",
-              type: "success",
-            });
+          console.log("formData -> ", formData);
+          updateDish(selectedDish?.id, formData);
         } else {
-          const result = await dispatch(addDish(formData)).unwrap();
-
-          // console.log("Result from adding dish -> ", result);
-
-          if (result)
-            toast({
-              title: "Thêm thành công",
-              description: "Món ăn đã được thêm vào danh sách",
-              type: "success",
-            });
-          if (resetAfterSubmit) {
-            reset();
-            setFiles([]);
-          }
+          addDish(formData);
         }
       } catch (error) {
         toast({
@@ -223,14 +464,6 @@ function DishesSection({ dishCategory, categories }) {
     },
     [selectedDish, files, resetAfterSubmit]
   );
-
-  const handleDeleteDish = React.useCallback((dishId) => {
-    const confirm = window.confirm("Bạn có chắc chắn muốn xóa món ăn này?");
-
-    if (!confirm) return;
-
-    dispatch(deleteDish(dishId));
-  }, []);
 
   React.useEffect(() => {
     const handle = () => {
@@ -254,37 +487,6 @@ function DishesSection({ dishCategory, categories }) {
 
     return () => {};
   }, [selectedDish]);
-
-  React.useEffect(() => {
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-
-    const params = {
-      page: currentPage, // or any other page you want to start with
-      itemsPerPage,
-      search: searchQuery,
-      priceSort: sortByPrice,
-    };
-    dispatch(
-      fetchCategoryDishes({ categoryId: dishCategory.id, params, signal })
-    );
-
-    return () => {
-      abortController.abort();
-    };
-  }, [dishCategory.id, currentPage, itemsPerPage, searchQuery, sortByPrice]);
-
-  // useEffect for other dependencies
-  React.useEffect(() => {
-    const params = {
-      page: currentPage,
-      itemsPerPage,
-      search: searchQuery,
-      priceSort: sortByPrice,
-    };
-
-    dispatch(fetchCategoryDishes({ categoryId: dishCategory.id, params }));
-  }, [dishCategory.id, currentPage, itemsPerPage, sortByPrice]);
 
   return (
     <>
@@ -330,6 +532,20 @@ function DishesSection({ dishCategory, categories }) {
               onChange={handleSearch}
             />
             <select
+              name="dishesStatus"
+              id="dishesStatus"
+              value={dishesStatus}
+              onChange={(e) => setDishesStatus(e.target.value)}
+              className="select dark:bg-gray-800 dark:text-white h-fit !rounded-full"
+            >
+              <option value="visible" className="option" key={"visible"}>
+                Hiển thị
+              </option>
+              <option value="deleted" className="option" key={"deleted"}>
+                Đã xóa
+              </option>
+            </select>
+            <select
               name="sortByPrice"
               id="sortByPrice"
               className="select dark:bg-gray-800 dark:text-white h-fit !rounded-full"
@@ -355,29 +571,27 @@ function DishesSection({ dishCategory, categories }) {
             </Button>
           </div>
         </div>
-        {isLoading && <DishesSectionSkeleton />}
-        {isError && (
+        {isFetchingCategoryDishes && <DishesSectionSkeleton />}
+        {isFetchingCategoryDishesError && (
           <div className="flex flex-col gap-3 justify-center items-center">
             <p className="text-gray-400">Tải món ăn thất bại</p>
             <button
               className="text-gray-400 underline"
               onClick={() =>
-                dispatch(
-                  fetchCategoryDishes({
-                    categoryId: dishCategory.id,
-                    params: { page: currentPage, itemsPerPage },
-                  })
-                )
+                queryClient.invalidateQueries([
+                  "categoryDishes",
+                  dishCategory?.id,
+                ])
               }
             >
               Thử lại
             </button>
           </div>
         )}
-        {!isLoading && !isError && (
+        {!isFetchingCategoryDishes && !isFetchingCategoryDishesError && (
           <Row gutter={[12, 12]} className="mt-3">
             {categoryDishes &&
-              categoryDishes.map((dish, index) => (
+              categoryDishes?.data?.map((dish, index) => (
                 <Col
                   span={8}
                   md={{
@@ -395,7 +609,7 @@ function DishesSection({ dishCategory, categories }) {
                       }}
                       onContextMenu={(e) => {
                         e.preventDefault();
-                        handleDeleteDish(dish.id);
+                        deleteDish(dish.id);
                       }}
                       className={"flex-1 min-w-0"}
                     ></Dish>
@@ -419,13 +633,15 @@ function DishesSection({ dishCategory, categories }) {
             </Col>
           </Row>
         )}
-        {pagination && pagination.lastPage > 1 && (
-          <CustomPagination
-            onChange={handlePageChange}
-            total={pagination.lastPage}
-            page={currentPage}
-          ></CustomPagination>
-        )}
+        {categoryDishes &&
+          categoryDishes?.pagination &&
+          categoryDishes?.pagination?.lastPage > 1 && (
+            <CustomPagination
+              onChange={handlePageChange}
+              total={categoryDishes?.pagination?.lastPage}
+              page={currentPage}
+            ></CustomPagination>
+          )}
         {/* MODAL */}
         {isOpenDetailModal && (
           <Suspense fallback={<Loading />}>
@@ -460,6 +676,7 @@ function DishesSection({ dishCategory, categories }) {
                                   "Chọn ảnh món ăn hoặc kéo thả vào đây"
                                 }
                                 register={register}
+                                required={selectedDish ? false : true}
                                 errors={errors}
                               />
                               {selectedDish && (
@@ -579,7 +796,7 @@ function DishesSection({ dishCategory, categories }) {
                               <Switch
                                 isSelected={resetAfterSubmit}
                                 onValueChange={setResetAfterSubmit}
-                                aria-label="Xóa dữ liệu sau khi thêm"
+                                aria-label="Khôi phục dữ liệu sau khi thêm"
                                 size="small"
                                 classNames={{
                                   label: "text-gray-400 text-md",
@@ -589,67 +806,147 @@ function DishesSection({ dishCategory, categories }) {
                               </Switch>
                             )}
                           </div>
-                          <div className="flex gap-3 items-center">
-                            {selectedDish ? (
+                          {dishesStatus === "visible" ? (
+                            <div className="flex gap-3 items-center">
+                              {selectedDish ? (
+                                <Button
+                                  radius="full"
+                                  onPress={() => {
+                                    deleteDish(selectedDish?.id);
+                                  }}
+                                  isLoading={isDeletingDish}
+                                  startContent={
+                                    isDeletingDish ? null : (
+                                      <TrashIcon className="shrink-0 w-4 h-4" />
+                                    )
+                                  }
+                                  className="bg-red-500/10 hover:bg-red-500/30 text-red-500"
+                                >
+                                  Xóa món ăn
+                                </Button>
+                              ) : (
+                                <Button
+                                  radius="full"
+                                  onPress={() => {
+                                    reset();
+                                    onClose();
+                                  }}
+                                  startContent={
+                                    <XMarkIcon className="w-4 h-4 shrink-0" />
+                                  }
+                                  className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+                                >
+                                  Hủy
+                                </Button>
+                              )}
                               <Button
+                                type="submit"
                                 radius="full"
-                                onPress={() => {
-                                  handleDeleteDish(selectedDish.id);
-                                }}
-                                startContent={
-                                  <TrashIcon className="shrink-0 w-4 h-4" />
+                                className="bg-teal-400 hover:bg-teal-500 text-white"
+                                startContent={(() => {
+                                  if (selectedDish) {
+                                    return isUpdatingDish ? null : (
+                                      <IoSaveOutline className="w-4 h-4 shrink-0" />
+                                    );
+                                  } else {
+                                    return isAddingDish ? null : (
+                                      <PlusIcon className="w-4 h-4 shrink-0" />
+                                    );
+                                  }
+                                })()}
+                                isLoading={
+                                  selectedDish ? isUpdatingDish : isAddingDish
                                 }
-                                className="bg-red-200 hover:bg-red-300 text-red-500"
+                                onPress={handleSubmit(onSubmit)}
                               >
-                                Xóa món ăn
+                                {(() => {
+                                  if (selectedDish) {
+                                    return isUpdatingDish
+                                      ? "Đang cập nhật..."
+                                      : "Cập nhật món ăn";
+                                  } else {
+                                    return isAddingDish
+                                      ? "Đang thêm..."
+                                      : "Thêm món ăn";
+                                  }
+                                })()}
                               </Button>
-                            ) : (
+                            </div>
+                          ) : (
+                            <div className="flex gap-3 items-center">
+                              {selectedDish ? (
+                                <Button
+                                  radius="full"
+                                  onPress={() => {
+                                    destroyDish(selectedDish?.id);
+                                  }}
+                                  isLoading={isDestroyingDish}
+                                  startContent={
+                                    isDestroyingDish ? null : (
+                                      <TrashIcon className="shrink-0 w-4 h-4" />
+                                    )
+                                  }
+                                  className="bg-red-500/10 hover:bg-red-500/20 text-red-500"
+                                >
+                                  {isDestroyingDish
+                                    ? "Đang xóa..."
+                                    : "Xóa vĩnh viễn món ăn"}
+                                </Button>
+                              ) : (
+                                <Button
+                                  radius="full"
+                                  onPress={() => {
+                                    reset();
+                                    onClose();
+                                  }}
+                                  startContent={
+                                    <XMarkIcon className="w-4 h-4 shrink-0" />
+                                  }
+                                  className="bg-gray-200 hover:bg-gray-300 text-gray-800"
+                                >
+                                  Hủy
+                                </Button>
+                              )}
                               <Button
+                                type="submit"
                                 radius="full"
+                                className="bg-teal-400 hover:bg-teal-500 text-white"
+                                startContent={(() => {
+                                  if (selectedDish) {
+                                    return isRestoringDish ? null : (
+                                      <MdRestore className="w-4 h-4 shrink-0" />
+                                    );
+                                  } else {
+                                    return isAddingDish ? null : (
+                                      <PlusIcon className="w-4 h-4 shrink-0" />
+                                    );
+                                  }
+                                })()}
                                 onPress={() => {
-                                  reset();
-                                  onClose();
+                                  if (selectedDish) {
+                                    restoreDish(selectedDish?.id);
+                                  } else {
+                                    handleSubmit(onSubmit);
+                                  }
                                 }}
-                                startContent={
-                                  <XMarkIcon className="w-4 h-4 shrink-0" />
+                                isLoading={
+                                  selectedDish ? isRestoringDish : isAddingDish
                                 }
-                                className="bg-gray-200 hover:bg-gray-300 text-gray-800"
                               >
-                                Hủy
+                                {(() => {
+                                  if (selectedDish) {
+                                    return isRestoringDish
+                                      ? "Đang khôi phục..."
+                                      : "Khôi phục món ăn";
+                                  } else {
+                                    return isAddingDish
+                                      ? "Đang thêm..."
+                                      : "Thêm món ăn";
+                                  }
+                                })()}
                               </Button>
-                            )}
-                            <Button
-                              type="submit"
-                              radius="full"
-                              className="bg-teal-400 hover:bg-teal-500 text-white"
-                              startContent={(() => {
-                                if (selectedDish) {
-                                  return isUpdatingDish ? null : (
-                                    <IoSaveOutline className="w-4 h-4 shrink-0" />
-                                  );
-                                } else {
-                                  return isAddingDish ? null : (
-                                    <PlusIcon className="w-4 h-4 shrink-0" />
-                                  );
-                                }
-                              })()}
-                              isLoading={
-                                selectedDish ? isUpdatingDish : isAddingDish
-                              }
-                            >
-                              {(() => {
-                                if (selectedDish) {
-                                  return isUpdatingDish
-                                    ? "Đang cập nhật..."
-                                    : "Cập nhật món ăn";
-                                } else {
-                                  return isAddingDish
-                                    ? "Đang thêm..."
-                                    : "Thêm món ăn";
-                                }
-                              })()}
-                            </Button>
-                          </div>
+                            </div>
+                          )}
                         </ModalFooter>
                       </form>
                     </>

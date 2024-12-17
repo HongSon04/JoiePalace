@@ -197,7 +197,7 @@ const Page = ({ params }) => {
     };
     const fetchAllMenus = async () => {
         try {
-            const response = await makeAuthorizedRequest(API_CONFIG.MENU.GET_ALL(), 'GET');
+            const response = await makeAuthorizedRequest(API_CONFIG.MENU.GET_ALL({itemsPerPage: '99'}), 'GET');
             const menuOptions = response.data.map(menu => ({
                 value: menu.id,
                 label: menu.name,
@@ -350,8 +350,9 @@ const Page = ({ params }) => {
         }
     };
     const getServiceNameById = (id, services) => {
-        const service = services.find(service => service.id === id);
-        return service ? service.name : 'Không xác định';
+        const allServices = services.flatMap(service => service.options || []);
+        const service = allServices.find(service => service.value === id);
+        return service ? service.label : 'Không xác định';
     };
     
     const fetchPackageByID = async (packageId) => {
@@ -403,7 +404,7 @@ const Page = ({ params }) => {
                     price: service.price || 0,
                     quantity: service.quantity,
                 }));
-
+    
                 setSelectExtraDishes(updatedExtraDishes);
             } else {
                 setSelectExtraDishes([]);
@@ -412,6 +413,8 @@ const Page = ({ params }) => {
             console.error('Lỗi khi lấy gói dịch vụ:', error);
         }
     };
+
+    
     
     const fetchAllServices = async () => {
         try {
@@ -439,7 +442,6 @@ const Page = ({ params }) => {
                 const options = stages[0]?.options || [];
                 // Kiểm tra package_id
                 if (partyData.package_id) {
-                    console.log('Calling fetchPackageByID with packageId:', partyData.package_id);
                     await fetchPackageByID(partyData.package_id);
                 } 
                     if(partyData.stage_id){
@@ -593,10 +595,6 @@ const Page = ({ params }) => {
     }, [otherServices, extraServices])
 
     useEffect(() => {
-        console.log('extraServices:', extraServices);
-        console.log('selectExtraServices:', selectExtraServices);
-        console.log('selectExtraDishes:', selectExtraDishes);
-        console.log('bookingDetails:', bookingDetails);
         if (otherServices[0]?.options.length > 1 && extraServices[0]?.options.length > 1 && bookingDetails) {
             memoizedCheckServices(bookingDetails);
         }
@@ -1129,16 +1127,16 @@ const Page = ({ params }) => {
                 <div className='p-4 mt-5 w-full bg-whiteAlpha-200 rounded-lg flex flex-col gap-[22px]'>
                     <TitleSpanInfo title={'Thêm mới dịch vụ - Chỉ thêm khi tiệc đã hoàn thành'} />
                     <div className='grid grid-cols-3 gap-[30px]'>
-                        {extraServices.map((service, index) => (
-                            <DropDownSelect2
-                                key={index}
-                                label={service.title}
-                                name={`service-${service.id}`}
-                                options={service.options || []}
-                                value={selectExtraServices}
-                                onChange={handleExtraService}
-                            />
-                        ))}
+                    {extraServices.map((service, index) => (
+                        <DropDownSelect2
+                            key={index}
+                            label={service.title}
+                            name={`service-${service.id}`}
+                            options={service.options || []}
+                            value={selectExtraServices}
+                            onChange={handleExtraService}
+                        />
+                    ))}
                         {selectExtraDishes.length > 0 &&
                             selectExtraDishes.map((dish, index) => (
                                 <div key={`${dish.id}-${index}`} className="flex justify-between items-center bg-whiteAlpha-200 p-4 rounded-lg shadow-md transition-transform transform hover:scale-105">

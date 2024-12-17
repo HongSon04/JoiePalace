@@ -109,16 +109,16 @@ function ServiceItem({ service, compairState, onChange, name, type }) {
           <NextImage
             fill
             sizes="100px"
-            src={service.images.at(0) || CONFIG.DISH_IMAGE_PLACEHOLDER}
-            alt={service.name}
+            src={service?.images?.at(0) || CONFIG?.DISH_IMAGE_PLACEHOLDER}
+            alt={service?.name}
             className="object-cover"
           />
         </div>
         <span className="text-white text-start w-full text-sm text-wrap">
-          {service.name}
+          {service?.name}
         </span>
         <span className="text-white text-start w-full text-sm text-wrap">
-          {service.price.toLocaleString()} VNĐ
+          {service?.price?.toLocaleString()} VNĐ
         </span>
       </label>
       <Modal
@@ -154,8 +154,8 @@ function ServiceItem({ service, compairState, onChange, name, type }) {
         <Row gutter={[16, 16]}>
           <Col span={12}>
             <Image
-              src={service.images.at(0)}
-              alt={service.name}
+              src={service?.images?.at(0)}
+              alt={service?.name}
               height={"100%"}
               width={"100%"}
             ></Image>
