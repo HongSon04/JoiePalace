@@ -36,6 +36,7 @@ import logo from "@/public/logo-dark.png";
 import { Tooltip } from "antd";
 import { useSelector } from "react-redux";
 import AdminUser from "./AdminUser";
+import { API_CONFIG } from "../_utils/api.config";
 
 function AdminSidebar() {
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
@@ -117,7 +118,7 @@ function AdminSidebarHeader() {
 
 function AdminSidebarNav() {
   const { currentBranch } = useSelector((state) => state.branch);
-  // const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
+  const isGeneralBranch = currentBranch.slug === API_CONFIG.GENERAL_BRANCH;
 
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
@@ -156,7 +157,7 @@ function AdminSidebarNav() {
         path: `/admin/yeu-cau/${currentBranch?.slug}`,
         icon: requestIcon,
         className: "",
-        qty: 5,
+        // qty: 5,
       },
       {
         title: "Quản lý tiệc",
@@ -293,8 +294,10 @@ function AdminSidebarItem({ item, className }) {
 
   const { isSidebarOpen } = useSelector((state) => state.sidebar);
 
+  const itemTitle = item?.title;
+
   return (
-    <Tooltip placement="topLeft" title={item?.title} color="white">
+    <Tooltip placement="topLeft" title={itemTitle} color="white">
       <li
         item={item}
         className={`flex w-full items-center justify-between rounded-md !text-white mb-2 transition-all relative hover:bg-whiteAlpha-50 ${
