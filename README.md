@@ -1,7 +1,8 @@
 # Nang Tam Fix Bug - Graduation Project
 
 ## About The Project
-This graduation project represents the culmination of our 2-year and 4-month learning journey. Our team "Nang Tam Fix Bug" has put together a comprehensive solution utilizing modern technologies and best practices in software development.
+- This project is about online wedding restaurant where customers can choose party type, branch, time of organization with user friendly process and quick convenience.
+- This graduation project represents the culmination of our 2-year and 4-month learning journey. Our team "Nang Tam Fix Bug" has put together a comprehensive solution utilizing modern technologies and best practices in software development.
 
 ## Built With
 <div align="center">
@@ -78,10 +79,9 @@ npm run start:dev
 ```
 
 ## Features
-[Add your project's key features here]
-
-## Contributing
-[Add contribution guidelines here]
+- More Event Sale
+- Role & permission
+- Etc...
 
 ## Team Members
 - Ho Huy Hoang Giang (Team Leader Frontend)
